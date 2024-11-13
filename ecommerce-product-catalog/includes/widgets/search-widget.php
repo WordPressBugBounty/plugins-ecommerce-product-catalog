@@ -39,15 +39,18 @@ class product_widget_search extends WP_Widget {
 			}
 
 			$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
-
-			echo $args['before_widget'];
+			if ( ! empty( $args['before_widget'] ) ) {
+				echo $args['before_widget'];
+			}
 			if ( $title ) {
 				echo $args['before_title'] . $title . $args['after_title'];
 			}
 			ic_save_global( 'search_widget_instance', $instance );
 			add_filter( 'ic_search_box_class', array( __CLASS__, 'box_class' ) );
 			ic_show_search_widget_form();
-			echo $args['after_widget'];
+			if ( ! empty( $args['after_widget'] ) ) {
+				echo $args['after_widget'];
+			}
 		}
 	}
 

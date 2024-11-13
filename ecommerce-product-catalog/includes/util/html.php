@@ -11,12 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 function ic_html_util() {
-	global $implecode;
-	if ( empty( $implecode['html'] ) ) {
-		$implecode['html'] = new ic_html_util();
+	global $implecode_ic;
+	if ( empty( $implecode_ic['html'] ) ) {
+		$implecode_ic['html'] = new ic_html_util();
 	}
 
-	return $implecode['html'];
+	return $implecode_ic['html'];
 }
 
 if ( ! class_exists( 'ic_html_util' ) ) {
@@ -31,6 +31,10 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 * @var int
 		 */
 		private $counter = 0;
+		/**
+		 * @var int
+		 */
+		private $label_counter = 0;
 
 		/**
 		 * @var string
@@ -44,12 +48,15 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 
 		/**
 		 * @param $label
-		 * @param $class
+		 * @param string $class
 		 *
 		 * @return string
 		 */
-		function button( $label, $class, $onclick = null, $attr = array() ) {
-			$class = 'button ' . design_schemes( 'box', 0 ) . ' ' . $class;
+		function button( $label, $class = 'ic-secondary-button', $onclick = null, $attr = array() ) {
+			$class = 'button ' . $class;
+			if ( function_exists( 'design_schemes' ) ) {
+				$class .= design_schemes( 'box', 0 );
+			}
 			if ( ! empty( $onclick ) ) {
 				$attr['onclick'] = $onclick;
 			}
@@ -287,7 +294,7 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 			$dropdown_options = '';
 			foreach ( $options as $option_value => $option_label ) {
 				$selected = false;
-				if ( $selected_value === $option_value ) {
+				if ( $selected_value == $option_value ) {
 					$selected = true;
 				}
 				$options_attr = array( 'value' => $option_value );
@@ -310,8 +317,8 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return void
 		 */
-		function radio( $name, $value, $label, $selected = false, $id = '', $required = 0, $class = '' ) {
-			$attr = array( 'checked' => $selected );
+		function radio( $name, $value, $label, $selected = false, $id = '', $required = 0, $class = '', $attr = array() ) {
+			$attr['checked'] = $selected;
 			if ( ! empty( $class ) ) {
 				$attr['class'] = $class;
 			}
@@ -383,6 +390,10 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 * @return string
 		 */
 		function label( $label, $id = '', $class = '' ) {
+			if ( $this->fix_id && ! empty( $id ) ) {
+				$this->label_counter ++;
+				$id = sanitize_title( str_replace( '-', '_', $id ) . '_' . $this->label_counter );
+			}
 			$type = 'label';
 			$attr = array();
 			if ( ! empty( $id ) ) {

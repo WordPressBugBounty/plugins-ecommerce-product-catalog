@@ -19,14 +19,19 @@ add_action( 'init', 'ic_create_product_attributes' );
  *
  */
 function ic_create_product_attributes() {
-	$args       = array(
+	$args = array(
 		'label'        => 'Attributes',
 		'hierarchical' => true,
 		'public'       => false,
 		'query_var'    => false,
 		'rewrite'      => false,
 	);
-	$post_types = apply_filters( 'ic_attributes_register_post_types', product_post_type_array() );
+	if ( function_exists( 'product_post_type_array' ) ) {
+		$post_types_def = product_post_type_array();
+	} else {
+		$post_types_def = array();
+	}
+	$post_types = apply_filters( 'ic_attributes_register_post_types', $post_types_def );
 	register_taxonomy( 'al_product-attributes', $post_types, $args );
 }
 

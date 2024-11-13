@@ -317,7 +317,7 @@ function get_product_catalog_page_title() {
 		} else {
 			$title = $the_tax->name;
 		}
-	} else if ( is_ic_product_search() ) {
+	} else if ( is_ic_product_search() && isset( $_GET['s'] ) ) {
 		$search_keyword = apply_filters( 'ic_search_keayword', wp_unslash( strval( $_GET['s'] ) ) );
 		if ( ! empty( $search_keyword ) ) {
 			$title = __( 'Search Results for:', 'ecommerce-product-catalog' ) . ' <span class="ic-search-keyword">' . wp_unslash( esc_html( $search_keyword ) ) . '</span>';

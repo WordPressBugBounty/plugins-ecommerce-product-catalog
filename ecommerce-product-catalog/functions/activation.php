@@ -364,7 +364,7 @@ function ic_update_product_data() {
 		$done = 0;
 	}
 	if ( get_transient( 'ic_doing_update_product_data_loop' ) ) {
-		wp_schedule_single_event( time(), $hook_name );
+		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, $hook_name );
 
 		return;
 	}
@@ -411,6 +411,7 @@ function ic_update_product_data_loop( $done, $start_time = 0, $done_option_name 
 		if ( ! empty( $done_option_name ) ) {
 			update_option( $done_option_name, $done );
 		}
+		set_transient( 'ic_doing_update_product_data_loop', $done, MINUTE_IN_SECONDS * 15 );
 
 		return ic_update_product_data_loop( $done, $start_time, $done_option_name );
 	}

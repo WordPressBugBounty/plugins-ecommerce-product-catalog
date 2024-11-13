@@ -156,7 +156,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 	if ( ! empty( $product ) ) {
 		$product_array = explode( ',', $product );
 		$query_param   = array(
-			'post_type'      => $post_type,
+			'post_type'      => product_post_type_array(),
 			'post__in'       => $product_array,
 			'posts_per_page' => $products_limit,
 		);
