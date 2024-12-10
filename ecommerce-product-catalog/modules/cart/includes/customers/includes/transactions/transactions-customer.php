@@ -112,7 +112,7 @@ class ic_orders_customer {
 
 			update_post_meta( $trans_id, '_customer_id', $customer_id );
 
-			do_action( 'existing_customer_buy', $customer_id, $trans_id, $product_id, $manual_products['manual_product_ids'], $manual_products['custom_manual_products'] );
+			do_action( 'existing_customer_buy', $customer_id, $trans_id, $product_id, $manual_products['manual_product_ids'], $manual_products['custom_manual_products'], $payment_details );
 
 			if ( ! is_wp_error( $customer_id ) ) {
 				return $customer_id;
