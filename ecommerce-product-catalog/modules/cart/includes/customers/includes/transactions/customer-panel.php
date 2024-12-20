@@ -45,6 +45,7 @@ class ic_customer_panel {
 	}
 
 	function customer_panel( $atts, $content = '' ) {
+		ic_enqueue_main_catalog_js_css();
 		$customer_id = ic_get_logged_customer_id();
 		if ( is_ic_digital_customer( $customer_id ) ) {
 			$panel = '<div id="customer_panel">';
@@ -106,9 +107,12 @@ class ic_customer_panel {
 	 *
 	 */
 	function password_reset() {
-		if ( ! empty( $_POST['new_password'] ) && isset( $_POST['repeat_new_password'] ) && is_ic_digital_customer() && $_POST['new_password'] == $_POST['repeat_new_password'] ) {
+		if ( ! empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ic_ajax' ) && ! empty( $_POST['new_password'] ) && isset( $_POST['repeat_new_password'] ) && is_ic_digital_customer() && $_POST['new_password'] == $_POST['repeat_new_password'] ) {
 			$customer_id = ic_get_logged_customer_id();
 			wp_set_password( $_POST['new_password'], $customer_id );
+			implecode_success( sprintf( __( 'The password has been changed! Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' ) );
+		} else {
+			implecode_warning( sprintf( __( 'An error occurred. Please try again. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' ) );
 		}
 		wp_die();
 	}

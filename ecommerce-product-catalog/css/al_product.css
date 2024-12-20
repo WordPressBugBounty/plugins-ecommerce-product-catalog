@@ -834,6 +834,7 @@ article#product_listing, #product_listing {
     left: 0;
     right: 0;
     bottom: 0;
+    width: auto;
     height: auto;
     max-width: 100%;
     max-height: 100%;

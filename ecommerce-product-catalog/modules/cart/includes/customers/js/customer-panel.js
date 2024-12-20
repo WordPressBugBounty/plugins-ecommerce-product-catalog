@@ -20,11 +20,12 @@ jQuery(document).ready(function () {
             var data = {
                 'action': 'customer_panel_password_reset',
                 'new_password': first,
-                'repeat_new_password': second
+                'repeat_new_password': second,
+                'nonce': ic_ajax.nonce
             };
-            jQuery.post(product_object.ajaxurl, data, function () {
+            jQuery.post(product_object.ajaxurl, data, function (result) {
                 password.find('.spinner img').hide();
-                password.find('.password-reset-result').html('<div class="al-box success">The password has been changed! Auto refresh in <span class="time">3</span> seconds.</div>');
+                password.find('.password-reset-result').html(result);
                 var time = 3;
                 setInterval(function () {
                     time--;
@@ -55,7 +56,8 @@ jQuery(document).ready(function () {
             var data = {
                 'action': 'change_order_name',
                 'order_id': order_id,
-                'new_name': new_order_name
+                'new_name': new_order_name,
+                'nonce': ic_ajax.nonce
             };
             order_name_edit.attr('disabled', true);
             jQuery.post(product_object.ajaxurl, data, function (response) {

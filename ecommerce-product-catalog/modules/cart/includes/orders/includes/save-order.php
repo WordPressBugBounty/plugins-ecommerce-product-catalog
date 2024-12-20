@@ -254,7 +254,7 @@ class ic_orders_save {
 	}
 
 	function rename() {
-		if ( ! empty( $_POST['order_id'] ) && ! empty( $_POST['new_name'] ) && is_ic_digital_customer() ) {
+		if ( ! empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ic_ajax' ) && ! empty( $_POST['order_id'] ) && ! empty( $_POST['new_name'] ) && is_ic_digital_customer() ) {
 			$customer_id              = ic_get_logged_customer_id();
 			$customer_transaction_ids = ic_customer_transaction_ids( $customer_id );
 			if ( ! empty( $customer_transaction_ids ) ) {
