@@ -5,7 +5,7 @@ Tags: ecommerce, shopping cart, catalog, quote, request a quote
 Requires at least: 3.7
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 3.3.44
+Stable tag: 3.4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -388,6 +388,14 @@ This can be a store but it is not limited to it. It's main purpose is to present
 == Changelog ==
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
+
+= 3.4.0 - 21/02/2025 =
+
+* New block to display product page
+* New block to display category page
+* Improved comptatibility with block themes
+* Fix plain product page template for some themes
+* Security: properly escape all show_products block parameters
 
 = 3.3.44 - 20/12/2024 =
 

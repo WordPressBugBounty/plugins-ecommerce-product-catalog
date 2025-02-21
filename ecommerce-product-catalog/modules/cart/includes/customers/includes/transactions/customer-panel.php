@@ -94,7 +94,8 @@ class ic_customer_panel {
 	}
 
 	function password_reset_container( $customer_id ) {
-		$form = '<div class="new-password"><label for="new_password_1">New Password</label><input type="password" name="new_password_1" id="new_password_1"></div>';
+		$form = implecode_info( __( 'Please use a strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols for better security.', 'ecommerce-product-catalog' ), 0 );
+		$form .= '<div class="new-password"><label for="new_password_1">New Password</label><input type="password" name="new_password_1" id="new_password_1"></div>';
 		$form .= '<div class="repeat-new-password"><label for="new_password_2">Repeat New Password</label><input type="password" name="new_password_2" id="new_password_2"></div>';
 		$form .= '<div class="password-reset-result"></div>';
 		$form .= '<div class="new-password-button"><button class="button">Change Password</button><div class="spinner"><img title="WordPress Loading Animation Image" alt="WordPress Loading Animation Image" src="' . admin_url( '/images/wpspin_light-2x.gif' ) . '" width="25" height="25"></div></div>';
@@ -102,19 +103,57 @@ class ic_customer_panel {
 		return $form;
 	}
 
-	/**
-	 * Ajax password reset in customer panel
-	 *
-	 */
 	function password_reset() {
-		if ( ! empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ic_ajax' ) && ! empty( $_POST['new_password'] ) && isset( $_POST['repeat_new_password'] ) && is_ic_digital_customer() && $_POST['new_password'] == $_POST['repeat_new_password'] ) {
+		$nonce               = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : '';
+		$new_password        = isset( $_POST['new_password'] ) ? sanitize_text_field( $_POST['new_password'] ) : '';
+		$repeat_new_password = isset( $_POST['repeat_new_password'] ) ? sanitize_text_field( $_POST['repeat_new_password'] ) : '';
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic_ajax' ) && ! empty( $new_password ) && ! empty( $repeat_new_password ) && $new_password === $repeat_new_password && is_ic_digital_customer() ) {
 			$customer_id = ic_get_logged_customer_id();
-			wp_set_password( $_POST['new_password'], $customer_id );
+			if ( empty( $customer_id ) || ! is_numeric( $customer_id ) ) {
+				implecode_warning( sprintf( __( 'User not logged in or invalid customer ID. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' ) );
+				wp_die();
+			}
+			$validate_password = $this->validate_password( $new_password );
+			if ( $validate_password !== true ) {
+				implecode_warning( $validate_password );
+				wp_die();
+			}
+			wp_set_password( $new_password, $customer_id );
 			implecode_success( sprintf( __( 'The password has been changed! Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' ) );
 		} else {
 			implecode_warning( sprintf( __( 'An error occurred. Please try again. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' ) );
 		}
 		wp_die();
+	}
+
+	function validate_password( $new_password ) {
+		// Validate Password Strength
+		$min_length = 8; // Minimum length for the password
+		if ( strlen( $new_password ) < $min_length ) {
+			return sprintf( __( 'Password must be at least %d characters long. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), $min_length, '<span class="time">5</span>' );
+		}
+
+		// Check for at least one number
+		if ( ! preg_match( '/\d/', $new_password ) ) {
+			return sprintf( __( 'Password must include at least one number. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' );
+		}
+
+		// Check for at least one uppercase letter
+		if ( ! preg_match( '/[A-Z]/', $new_password ) ) {
+			return sprintf( __( 'Password must include at least one uppercase letter. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' );
+		}
+
+		// Check for at least one lowercase letter
+		if ( ! preg_match( '/[a-z]/', $new_password ) ) {
+			return sprintf( __( 'Password must include at least one lowercase letter. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' );
+		}
+
+		// Check for at least one special character
+		if ( ! preg_match( '/[\W_]/', $new_password ) ) {
+			return sprintf( __( 'Password must include at least one special character. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), '<span class="time">3</span>' );
+		}
+
+		return true;
 	}
 
 }

@@ -26,7 +26,7 @@ jQuery(document).ready(function () {
             jQuery.post(product_object.ajaxurl, data, function (result) {
                 password.find('.spinner img').hide();
                 password.find('.password-reset-result').html(result);
-                var time = 3;
+                var time = jQuery('span.time').text();
                 setInterval(function () {
                     time--;
                     jQuery('span.time').html(time);

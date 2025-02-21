@@ -724,14 +724,27 @@ class ic_orders {
 		}
 	}
 
-	function all_product_prices() {
-		$pages = get_all_products();
-		$price = '';
-		echo '<input hidden=hidden id="product_price_noid" value="0" />';
+	function all_product_prices( $offset = null ) {
+		if ( $offset > 500 ) {
+			return;
+		}
+		$pages = get_all_catalog_products( null, null, 10, $offset );
+		if ( empty( $pages ) ) {
+			return;
+		}
+		if ( empty( $offset ) ) {
+			$offset = 0;
+			echo '<input hidden=hidden id="product_price_noid" value="0" />';
+		}
 		foreach ( $pages as $page ) {
 			$price = apply_filters( 'digital_product_prices_table_price', get_post_meta( $page->ID, '_price', true ), $page->ID );
-			echo '<input hidden=hidden id="product_price_' . $page->ID . '" value="' . $price . '" />';
+			if ( ! empty( $price ) ) {
+				echo '<input type=hidden id="product_price_' . $page->ID . '" value="' . $price . '" />';
+			}
 		}
+		$offset += count( $pages );
+
+		return $this->all_product_prices( $offset );
 	}
 
 	function linked_name( $product_id, $front = true ) {

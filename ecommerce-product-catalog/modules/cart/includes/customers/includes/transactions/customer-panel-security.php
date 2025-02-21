@@ -64,17 +64,43 @@ class ic_customer_panel_security {
 		}
 	}
 
+	/**
+	 * Filters and modifies the login URL based on the user's roles and other conditions.
+	 *
+	 * @param string $url The original login URL.
+	 * @param object $request The request object, typically representing the data passed during the login attempt.
+	 * @param object $user The user object, containing details about the user attempting to log in.
+	 *
+	 * @return string The modified login URL after applying roles-based or condition-based redirects, or the original URL if no modifications are made.
+	 */
 	static function login_url( $url, $request, $user ) {
+		if ( ! is_object( $user ) ) {
+			return $url;
+		}
 		$panel_url   = ic_customer_panel_panel_url();
 		$customer_id = null;
 		if ( ! empty( $user->ID ) ) {
 			$customer_id = intval( $user->ID );
 		}
-		if ( is_ic_shopping_cart() || is_ic_shopping_order() ) {
+		if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+			// Redirect admins to the dashboard
+			if ( in_array( 'administrator', $user->roles, true ) ) {
+				return apply_filters( 'ic_admin_redirect_url', admin_url() );
+			}
+
+			// Redirect any user who can edit posts or pages to dashboard
+			if ( user_can( $user->ID, 'edit_posts' ) || user_can( $user->ID, 'edit_pages' ) ) {
+				return apply_filters( 'ic_admin_redirect_url', admin_url() );
+			}
+		}
+		if ( function_exists( 'is_ic_shopping_cart' ) && is_ic_shopping_cart() ||
+		     function_exists( 'is_ic_shopping_order' ) && is_ic_shopping_order() ) {
 			$panel_url = ic_current_page_url();
 		}
-		if ( ! empty( $panel_url ) && is_ic_digital_customer( $customer_id ) && ! current_user_can( 'administrator' ) ) {
-			return $panel_url;
+		if ( ! empty( $panel_url ) && is_ic_digital_customer( $customer_id ) && ! in_array( 'administrator', $user->roles, true ) ) {
+			if ( is_string( $panel_url ) ) {
+				return esc_url( $panel_url );
+			}
 		}
 
 		return $url;

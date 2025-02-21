@@ -32,9 +32,13 @@ class ic_shopping_ecommerce_shortcodes {
 		//$shopping_cart_settings = get_shopping_cart_settings();
 		remove_filter( 'the_content', array( __CLASS__, 'implement_shortcodes' ) );
 		if ( is_ic_shopping_cart() && ! has_shortcode( $content, 'shopping_cart' ) ) {
-			$content .= '[shopping_cart]';
+			if ( ! ic_string_contains( $content, 'shopping-cart-container' ) ) {
+				$content .= '[shopping_cart]';
+			}
 		} else if ( is_ic_shopping_order() && ! has_shortcode( $content, 'cart_submit_form' ) ) {
-			$content .= '[cart_submit_form]';
+			if ( ! ic_string_contains( $content, 'shopping-cart-submit-container' ) ) {
+				$content .= '[cart_submit_form]';
+			}
 		} else if ( is_ic_shopping_thank_you() && ! has_shortcode( $content, 'success_page' ) ) {
 			$content .= '[success_page]';
 		}

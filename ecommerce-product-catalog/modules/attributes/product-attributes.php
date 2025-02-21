@@ -409,6 +409,7 @@ function ic_get_attribute_name( $attribute_id ) {
 function ic_get_attribute_values( $label, $format = 'names', $current = false, $product_ids = array() ) {
 	$attribute_id = ic_get_attribute_id( $label );
 	if ( $attribute_id === false ) {
+
 		return false;
 	}
 	$cache_key = 'attribute_values' . $label . $format;
@@ -428,6 +429,7 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 			$args['object_ids'] = array_map( 'intval', $product_ids );
 			$current            = false;
 		}
+
 		if ( $current ) {
 			if ( is_product_filter_active( 'attribute_filter' ) && ic_exclude_tax_query( 'al_product-attributes', $label ) ) {
 				$exclude_tax = array( 'al_product-attributes' );
@@ -452,7 +454,6 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 					$attributes = ic_get_global( $current_cache_meta );
 				}
 		*/
-
 		if ( $attributes === false ) {
 			$values = ic_get_terms( $args );
 			if ( empty( $values ) || is_wp_error( $values ) || ! is_array( $values ) ) {

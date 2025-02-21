@@ -386,7 +386,7 @@ function ic_attributes_standard_labels( $single_names ) {
 	return $single_names;
 }
 
-//add_filter( 'pre_update_option_product_attribute_label', 'ic_product_attribute_label_update', 10, 2 );
+add_filter( 'pre_update_option_product_attribute_label', 'ic_product_attribute_label_update', 10, 2 );
 
 function ic_product_attribute_label_update( $new_value, $old_value ) {
 	if ( empty( $old_value ) ) {
