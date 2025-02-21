@@ -206,7 +206,34 @@ class ic_attribute_default_filters {
 	}
 
 	function filter_array( $array ) {
-		return array_map( 'floatval', array_filter( array_unique( $array ) ) );
+		if ( ! is_array( $array ) ) {
+			return array();
+		}
+
+		return array_filter(
+			array_map(
+				array(
+					$this,
+					'filter'
+				),
+				array_filter( array_unique( $array ) ) ),
+			'is_numeric' );
+	}
+
+	function filter( $value ) {
+		$numeric_value = $value;
+		if ( ! is_numeric( $value ) && is_string( $value ) ) {
+			// Extract the number from the value string
+			preg_match( '/\d+/', $value, $matches );
+			if ( ! empty( $matches[0] ) ) {
+				$numeric_value = $matches[0]; // Return the first matched number as an integer
+			}
+		}
+		if ( is_numeric( $numeric_value ) ) {
+			return floatval( $numeric_value );
+		} else {
+			return 'not_numeric';
+		}
 	}
 
 	function get_meta_values( $key = '', $query = null, $type = 'al_product', $status = 'publish' ) {

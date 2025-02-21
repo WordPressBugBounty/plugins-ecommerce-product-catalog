@@ -792,7 +792,8 @@ class ic_shortcode_catalog {
             <div id="<?php echo $id ?>" <?php post_class() ?>>
 			<?php
 		}
-		echo '<div class="ic-catalog-container alignwide">';
+		//echo '<div class="ic-catalog-container alignwide">';
+		echo '<div class="ic-catalog-container">';
 		if ( $id === 'product_listing' ) {
 			$this->product_listing();
 		} else {

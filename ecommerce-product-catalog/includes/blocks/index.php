@@ -51,7 +51,7 @@ class ic_epc_blocks {
 	}
 
 	function description_placeholder( $text, $post ) {
-		if ( ic_string_contains( $post->post_type, 'al_product' ) ) {
+		if ( isset( $post->post_type ) && ic_string_contains( $post->post_type, 'al_product' ) ) {
 			$catalog_placeholder = sprintf( __( 'Enter %s description.' ), get_catalog_names( 'singular' ) );
 			$text                = $catalog_placeholder . ' ' . $text;
 		}
@@ -195,7 +195,8 @@ class ic_epc_blocks {
 		$ic_rendering_catalog_block = 1;
 		$rendered                   = do_shortcode( '[show_product_catalog]' );
 		if ( ! empty( $rendered ) ) {
-			$rendered = '<div class="ic-catalog-block-container alignwide">' . $rendered . '</div>';
+			//$rendered = '<div class="ic-catalog-block-container alignwide">' . $rendered . '</div>';
+			$rendered = '<div class="ic-catalog-block-container">' . $rendered . '</div>';
 		}
 		if ( empty( $rendered ) && ic_is_rendering_catalog_block() ) {
 			if ( is_ic_product_listing_enabled() ) {
