@@ -52,7 +52,6 @@ function get_shipping_options( $product_id ) {
  * @return type
  */
 function get_shipping_labels( $product_id ) {
-	//$shipping_options	 = get_shipping_options_number();
 	$shipping_values = get_shipping_options( $product_id );
 	$shipping_labels = array();
 	if ( is_array( $shipping_values ) ) {
@@ -62,13 +61,6 @@ function get_shipping_labels( $product_id ) {
 				$shipping_labels[ $i ] = get_shipping_label( $i, $product_id );
 			}
 		}
-		/*
-		  for ( $i = 1; $i <= $shipping_options; $i++ ) {
-		  $sh_label				 = get_shipping_label( $i, $product_id );
-		  $shipping_labels[ $i ]	 = $sh_label;
-		  }
-		 *
-		 */
 	}
 
 	return apply_filters( 'product_shipping_labels', $shipping_labels );

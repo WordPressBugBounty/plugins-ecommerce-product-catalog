@@ -1269,9 +1269,11 @@ function ic_product_listing_products( $archive_template, $multiple_settings ) {
 		if ( ! empty( $catalog_query ) ) {
 			global $wp_query;
 			$wp_query = $catalog_query;
+
 		}
 		$ic_is_home = 1;
 	}
+	global $wp_query;
 	if ( /* (!is_ic_only_main_cats() || is_search() || is_product_filters_active() || is_ic_ajax() ) && */ more_products() ) {
 		do_action( 'before_product_list', $archive_template, $multiple_settings );
 		$product_list = '';

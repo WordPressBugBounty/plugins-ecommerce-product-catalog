@@ -210,14 +210,14 @@ class ic_attribute_default_filters {
 			return array();
 		}
 
-		return array_filter(
+		return array_unique( array_filter(
 			array_map(
 				array(
 					$this,
 					'filter'
 				),
 				array_filter( array_unique( $array ) ) ),
-			'is_numeric' );
+			'is_numeric' ) );
 	}
 
 	function filter( $value ) {
