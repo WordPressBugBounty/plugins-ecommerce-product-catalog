@@ -27,30 +27,33 @@ function ic_product_edit_url( $product_id ) {
 	return $product;
 }
 
-function ic_order_details_fields() {
-	$fields = array(
-		'status',
-		'date',
-		'name',
-		'email',
-		'billing_name',
-		'tax_code',
-		'street',
-		'postcode',
-		'city',
-		'country',
-		'country_code',
-		'shipping_email',
-		'currency',
-		'vatid',
-		'vat_name',
-		'vat_address',
-		'vat_country',
-		'vat_ver_id'
-	);
+if ( ! function_exists( 'ic_order_details_fields' ) ) {
+	function ic_order_details_fields() {
+		$fields = array(
+			'status',
+			'date',
+			'name',
+			'email',
+			'billing_name',
+			'tax_code',
+			'street',
+			'postcode',
+			'city',
+			'country',
+			'country_code',
+			'shipping_email',
+			'currency',
+			'vatid',
+			'vat_name',
+			'vat_address',
+			'vat_country',
+			'vat_ver_id'
+		);
 
-	return $fields;
+		return $fields;
+	}
 }
+
 
 function ic_order_product_fields() {
 	$fields = array( 'product_id', 'product_name', 'product_quantity', 'product_price', 'product_summary' );
@@ -213,16 +216,19 @@ function ic_should_digital_order_be_taxed( $order_id ) {
 	return $return;
 }
 
-/**
- * Returns order payment details
- *
- * @param int $order_id
- *
- * @return array
- */
-function ic_get_order_payment_details( $order_id ) {
-	return ic_sanitize_order_payment_details( ic_decode_payment_details( get_post_meta( $order_id, '_payment_details', true ) ) );
+if ( ! function_exists( 'ic_get_order_payment_details' ) ) {
+	/**
+	 * Returns order payment details
+	 *
+	 * @param int $order_id
+	 *
+	 * @return array
+	 */
+	function ic_get_order_payment_details( $order_id ) {
+		return ic_sanitize_order_payment_details( ic_decode_payment_details( get_post_meta( $order_id, '_payment_details', true ) ) );
+	}
 }
+
 
 function ic_sanitize_order_payment_details( $payment_details ) {
 	$fields                      = ic_order_details_fields();
@@ -251,30 +257,33 @@ function ic_get_order_summary( $order_id ) {
 	return $order_summary;
 }
 
-/**
- * Decodes payment details saved in database
- *
- * @param array $data
- *
- * @return array
- */
-function ic_decode_payment_details( $data ) {
-	$decoded = array();
-	if ( is_array( $data ) ) {
-		$charset = get_option( 'blog_charset' );
-		foreach ( $data as $key => $value ) {
-			if ( is_array( $value ) ) {
-				$decoded[ $key ] = $value;
-				continue;
+if ( ! function_exists( 'ic_decode_payment_details' ) ) {
+	/**
+	 * Decodes payment details saved in database
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	function ic_decode_payment_details( $data ) {
+		$decoded = array();
+		if ( is_array( $data ) ) {
+			$charset = get_option( 'blog_charset' );
+			foreach ( $data as $key => $value ) {
+				if ( is_array( $value ) ) {
+					$decoded[ $key ] = $value;
+					continue;
+				}
+				$decoded[ $key ] = stripslashes( $value );
+				$decoded[ $key ] = html_entity_decode( $decoded[ $key ], ENT_NOQUOTES, $charset );
+				$decoded[ $key ] = html_entity_decode( $decoded[ $key ], ENT_COMPAT, $charset );
 			}
-			$decoded[ $key ] = stripslashes( $value );
-			$decoded[ $key ] = html_entity_decode( $decoded[ $key ], ENT_NOQUOTES, $charset );
-			$decoded[ $key ] = html_entity_decode( $decoded[ $key ], ENT_COMPAT, $charset );
 		}
-	}
 
-	return $decoded;
+		return $decoded;
+	}
 }
+
 
 add_filter( 'is_ic_catalog_admin_page', 'ic_orders_as_catalog_admin_page' );
 

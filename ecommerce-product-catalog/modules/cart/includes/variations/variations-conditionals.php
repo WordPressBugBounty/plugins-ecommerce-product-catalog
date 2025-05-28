@@ -158,3 +158,23 @@ function is_ic_inside_variation_selectors() {
 
 	return false;
 }
+
+function ic_cart_all_variations_selected() {
+	$cart_items          = shopping_cart_products_array();
+	$all_have_variations = true;
+	foreach ( $cart_items as $cart_id => $qty ) {
+		if ( ! ic_has_product_variations( $cart_id ) ) {
+			continue;
+		}
+		$available           = get_product_variations_values( $cart_id, false );
+		$selected_variations = array_filter( get_variation_value_from_cart_id( $cart_id ), function ( $value ) {
+			return ! empty( $value ) || is_numeric( $value );
+		} );
+		if ( count( $available ) > count( $selected_variations ) ) {
+			$all_have_variations = false;
+			break;
+		}
+	}
+
+	return $all_have_variations;
+}

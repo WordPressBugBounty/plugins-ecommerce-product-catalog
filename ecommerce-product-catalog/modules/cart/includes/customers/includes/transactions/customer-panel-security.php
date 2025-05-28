@@ -74,7 +74,7 @@ class ic_customer_panel_security {
 	 * @return string The modified login URL after applying roles-based or condition-based redirects, or the original URL if no modifications are made.
 	 */
 	static function login_url( $url, $request, $user ) {
-		if ( ! is_object( $user ) ) {
+		if ( ! is_object( $user ) || is_wp_error( $user ) ) {
 			return $url;
 		}
 		$panel_url   = ic_customer_panel_panel_url();

@@ -240,7 +240,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 		$pagination = ob_get_clean();
 	}
 	if ( ! empty( $args['empty'] ) && ! $products_listed ) {
-		$inside .= $args['empty'];
+		$inside .= wp_kses_post( $args['empty'] );
 	}
 	$inside = apply_filters( 'product_list_ready', $inside, $archive_template, $args );
 	wp_reset_postdata();
@@ -527,6 +527,7 @@ function product_post_class( $classes ) {
 		if ( is_ic_product_page() ) {
 			$single_options = get_product_page_settings();
 			$classes[]      = $single_options['template'];
+			$classes[]      = 'ic-template-' . $single_options['template'];
 			$product_id     = ic_get_product_id();
 			if ( ! empty( $product_id ) ) {
 				$classes[] = 'product-' . $product_id;

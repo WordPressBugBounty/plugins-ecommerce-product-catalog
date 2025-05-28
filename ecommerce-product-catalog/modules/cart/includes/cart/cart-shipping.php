@@ -39,9 +39,10 @@ class ic_cart_shipping {
 		$cart_shipping = $this->settings();
 		echo '<h3>' . __( 'Checkout Shipping Cost', 'ecommerce-product-catalog' ) . '</h3>';
 		echo '<table>';
-		implecode_settings_radio( __( 'Shipping Cost Mode', 'ecommerce-product-catalog' ), 'general_shipping_settings[cart_shipping][mode]', $cart_shipping['mode'], array( 'highest'    => __( 'Highest cost of all products in cart', 'ecommerce-product-catalog' ),
-		                                                                                                                                                                    'individual' => __( 'Sum of each product shipping cost', 'ecommerce-product-catalog' ),
-		                                                                                                                                                                    'none'       => __( 'Shipping cost calculation disabled', 'ecommerce-product-catalog' )
+		implecode_settings_radio( __( 'Shipping Cost Mode', 'ecommerce-product-catalog' ), 'general_shipping_settings[cart_shipping][mode]', $cart_shipping['mode'], array(
+			'highest'    => __( 'Highest cost of all products in cart', 'ecommerce-product-catalog' ),
+			'individual' => __( 'Sum of each product shipping cost', 'ecommerce-product-catalog' ),
+			'none'       => __( 'Shipping cost calculation disabled', 'ecommerce-product-catalog' )
 		) );
 		echo '</table>';
 	}
@@ -136,8 +137,9 @@ class ic_cart_shipping {
 					if ( ! empty( $name ) ) {
 						$shipping[ $cart_id ]['product_ids']      = $product_id;
 						$shipping[ $cart_id ]['product_names']    = $product_name;
-						$shipping[ $cart_id ]['options'][ $name ] = array( 'name'  => $name,
-						                                                   'price' => $ship['prices'][ $i ]
+						$shipping[ $cart_id ]['options'][ $name ] = array(
+							'name'  => $name,
+							'price' => $ship['prices'][ $i ]
 						);
 					}
 				}
@@ -387,7 +389,7 @@ class ic_cart_shipping {
 	 * @return type
 	 */
 	function selected_cost( $handling, $pre_name ) {
-		if ( isset( $_POST['shipping'] ) || isset( $_POST['shipping_0'] ) ) {
+		if ( true || isset( $_POST['shipping'] ) || isset( $_POST['shipping_0'] ) ) {
 			$shipping_options = $this->selected_options( $pre_name );
 			$shipping_num     = count( $shipping_options );
 			$a                = 0;

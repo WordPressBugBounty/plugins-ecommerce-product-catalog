@@ -580,6 +580,14 @@ function ic_validate_variations_submit() {
 				exit();
 			}
 		}
+		if ( empty( $_POST ) && is_ic_shopping_order() && ! ic_cart_all_variations_selected() ) {
+			$checkout_url = esc_url_raw( ic_shopping_cart_page_url() );
+			if ( empty( $checkout_url ) ) {
+				return;
+			}
+			wp_redirect( add_query_arg( 'no_variations', '1', $checkout_url ) );
+			exit();
+		}
 	}
 }
 

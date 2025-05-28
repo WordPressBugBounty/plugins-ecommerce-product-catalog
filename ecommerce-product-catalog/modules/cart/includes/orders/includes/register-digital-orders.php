@@ -98,7 +98,7 @@ class ic_orders {
 		$payment_details = ic_get_order_payment_details( $post->ID );
 		$order_id        = get_post_meta( $post->ID, '_order_id' );
 		if ( empty( $payment_details['name'] ) && isset( $_GET['payment_details'] ) ) {
-			$payment_details         = isset( $_GET['payment_details'] ) ? ic_sanitize_order_payment_details( url_to_array( $_GET['payment_details'] ) ) : '';
+			$payment_details         = isset( $_GET['payment_details'] ) ? ic_sanitize_order_payment_details( url_to_array( $_GET['payment_details'], false ) ) : '';
 			$payment_details['date'] = current_time( 'timestamp' );
 		}
 		//$req_fields	 = get_eo_required_fields();
@@ -449,7 +449,7 @@ class ic_orders {
 		$fields          = ic_order_details_fields();
 		$payment_details = implecode_array_variables_init( $fields, get_post_meta( $post->ID, '_payment_details', true ) );
 		if ( empty( $order_summary['email'] ) && isset( $_GET['payment_details'] ) ) {
-			$payment_details        = isset( $_GET['payment_details'] ) ? url_to_array( $_GET['payment_details'] ) : '';
+			$payment_details        = isset( $_GET['payment_details'] ) ? url_to_array( $_GET['payment_details'], false ) : '';
 			$order_summary['email'] = $payment_details['shipping_email'];
 		}
 		if ( $order_summary['price'] == 0 ) {
