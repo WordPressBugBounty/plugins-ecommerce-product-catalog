@@ -540,9 +540,9 @@ function product_post_class( $classes ) {
 }
 
 add_action( 'before_product_list', 'product_listing_additional_styles' );
+add_action( 'before_ajax_product_list', 'product_listing_additional_styles' );
 add_action( 'before_category_list', 'product_listing_additional_styles' );
 add_action( 'product_listing_entry_inside', 'product_listing_additional_styles' );
-
 /**
  * Ads product listing inline styles container
  */
@@ -1325,7 +1325,7 @@ function ic_home_listing_query_args() {
 	$args = apply_filters( 'home_product_listing_query', array(
 		'post_status'    => ic_visible_product_status(),
 		'post_type'      => 'al_product',
-		'posts_per_page' => $multiple_settings['archive_products_limit'],
+		'posts_per_page' => isset( $multiple_settings['archive_products_limit'] ) ? $multiple_settings['archive_products_limit'] : 12,
 		'paged'          => $paged
 	) );
 	ic_save_global( 'home_listing_query_args', $args );

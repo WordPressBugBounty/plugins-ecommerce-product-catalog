@@ -180,11 +180,15 @@ class product_cat_widget extends WP_Widget {
 class ic_cat_Walker_CategoryDropdown extends Walker_CategoryDropdown {
 
 	function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
+		$term_link = get_term_link( $category );
+		if ( is_wp_error( $term_link ) ) {
+			return $output;
+		}
 		$pad = str_repeat( '&nbsp;', $depth * 3 );
 		//$taxonomy	 = get_current_screen_tax();
 		$taxonomy = $category->taxonomy;
 		$cat_name = apply_filters( 'list_cats', $category->name, $category );
-		$output   .= "\t<option class=\"level-$depth\" value=\"" . get_term_link( $category ) . "\"";
+		$output   .= "\t<option class=\"level-$depth\" value=\"" . $term_link . "\"";
 		if ( $category->slug == get_query_var( $taxonomy ) ) {
 			$output .= ' selected="selected"';
 		}

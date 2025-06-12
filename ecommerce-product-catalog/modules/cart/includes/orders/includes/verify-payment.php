@@ -20,18 +20,20 @@ if ( ! function_exists( 'validate_payment_data' ) ) {
 	}
 
 }
-
-function ic_validate_payment_data( $character_set, $data ) {
-	if ( ! is_array( $data ) && ! empty( $data ) ) {
-		$charset = get_option( 'blog_charset' );
-		if ( $character_set ) {
-			$data = iconv( $character_set, $charset, $data );
+if ( ! function_exists( 'ic_validate_payment_data' ) ) {
+	function ic_validate_payment_data( $character_set, $data ) {
+		if ( ! is_array( $data ) && ! empty( $data ) ) {
+			$charset = get_option( 'blog_charset' );
+			if ( $character_set ) {
+				$data = iconv( $character_set, $charset, $data );
+			}
+			$data = htmlspecialchars( $data, ENT_COMPAT, $charset );
 		}
-		$data = htmlspecialchars( $data, ENT_COMPAT, $charset );
-	}
 
-	return $data;
+		return $data;
+	}
 }
+
 
 /**
  * Verifies if payment amount is the same or more than expected amount

@@ -1202,7 +1202,7 @@ function ic_license_reverify_schedule() {
 		$schedules = wp_get_schedules();
 		if ( ! empty( $schedules[ $reschedule ]['interval'] ) ) {
 			if ( $reschedule === 'weekly' ) {
-				$time = time() + HOUR_IN_SECODS + DAY_IN_SECONDS;
+				$time = time() + HOUR_IN_SECONDS + DAY_IN_SECONDS;
 			} else {
 				$time = time() + $schedules[ $reschedule ]['interval'];
 			}

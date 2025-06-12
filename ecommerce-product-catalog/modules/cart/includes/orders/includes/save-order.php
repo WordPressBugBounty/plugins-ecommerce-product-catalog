@@ -53,7 +53,7 @@ class ic_orders_save {
 				'product_name'         => $order['product'],
 				'product_quantity'     => $order['quantity'],
 				'product_net_price'    => $order['sum'],
-				'product_subtotal_net' => $order['product_total_net'],
+				'product_subtotal_net' => isset( $order['product_total_net'] ) ? $order['product_total_net'] : '',
 			);
 			if ( isset( $order['product_total'] ) ) {
 				$order_products['product_price']   = $order['product_total'];

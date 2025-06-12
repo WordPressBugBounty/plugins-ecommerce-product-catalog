@@ -3,7 +3,7 @@
  * Plugin Name: eCommerce Product Catalog for WordPress
  * Plugin URI: https://implecode.com/wordpress/product-catalog/#cam=in-plugin-urls&key=plugin-url
  * Description: Easy to use, powerful and beautiful WordPress eCommerce plugin from impleCode. A Great choice if you want to sell easy and quick. Or beautifully present your products on a WordPress website. Full WordPress integration does a great job not only for Merchants but also for Developers and Theme Constructors.
- * Version: 3.4.4
+ * Version: 3.4.5
  * Author: impleCode
  * Author URI: https://implecode.com/#cam=in-plugin-urls&key=author-url
  * Text Domain: ecommerce-product-catalog
@@ -102,7 +102,7 @@ if ( ! class_exists( 'eCommerce_Product_Catalog' ) ) {
 		 */
 		private function setup_constants() {
 			if ( ! defined( 'AL_BASE_PATH' ) ) {
-				define( 'AL_BASE_PATH', dirname( __FILE__ ) );
+				define( 'AL_BASE_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 			}
 			if ( ! defined( 'AL_PLUGIN_BASE_PATH' ) ) {
 				define( 'AL_PLUGIN_BASE_PATH', plugins_url( '/', __FILE__ ) );
@@ -111,7 +111,7 @@ if ( ! class_exists( 'eCommerce_Product_Catalog' ) ) {
 				define( 'AL_PLUGIN_MAIN_FILE', __FILE__ );
 			}
 			if ( ! defined( 'AL_BASE_TEMPLATES_PATH' ) ) {
-				define( 'AL_BASE_TEMPLATES_PATH', dirname( __FILE__ ) );
+				define( 'AL_BASE_TEMPLATES_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 			}
 			if ( ! defined( 'IC_EPC_VERSION' ) ) {
 				if ( function_exists( 'get_file_data' ) ) {

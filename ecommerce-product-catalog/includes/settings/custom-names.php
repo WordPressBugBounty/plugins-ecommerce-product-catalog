@@ -235,6 +235,9 @@ function get_single_names() {
 	if ( ! $single_names ) {
 		$default_single_names = default_single_names();
 		$single_names         = get_option( 'single_names', $default_single_names );
+		if ( ! is_array( $single_names ) ) {
+			$single_names = array();
+		}
 		foreach ( $default_single_names as $key => $value ) {
 			$single_names[ $key ] = isset( $single_names[ $key ] ) ? $single_names[ $key ] : $value;
 		}
