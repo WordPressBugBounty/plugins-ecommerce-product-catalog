@@ -28,7 +28,7 @@ if ( $product_cat->parent == 0 ) {
     <div class="archive-listing category-<?php echo $product_cat->term_id ?> list <?php echo $class ?>">
         <a href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>"><span class="div-link"></span></a>
         <div class="classic-list-image-wrapper">
-            <div class="pseudo"></div><?php echo $product_cat->listing_image_html ?></div>
+            <div class="pseudo"></div><?php echo ic_get_category_listing_image_html( $product_cat->term_id ) ?></div>
         <div class="product-name"><?php echo $product_cat->name ?></div>
         <div class="product-short-descr">
             <p><?php echo c_list_desc( null, $product_cat->description ) ?></p>

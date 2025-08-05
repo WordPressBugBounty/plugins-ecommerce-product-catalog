@@ -216,8 +216,38 @@ if ( ! class_exists( 'ic_activation_wizard' ) ) {
 			return $available_extensions;
 		}
 
-		function get_notice_status( $notice = null ) {
-			$status = get_option( 'ic_hidden_notices', array() );
+		function get_notice_status( $notice = null, $type = null ) {
+			if ( ! empty( $notice ) ) {
+				$type = null;
+			}
+			$status = array();
+			if ( get_current_user_id() ) {
+				if ( empty( $type ) || $type === 'user' ) {
+					$status = get_user_meta( get_current_user_id(), '_ic_hidden_notices', true );
+					if ( empty( $status ) ) {
+						$status = array();
+					}
+				}
+				if ( ! empty( $notice ) && ( empty( $type ) || $type === 'temp' ) ) {
+					$transient_name = 'ic_hidden_notices_' . $notice;
+					if ( get_current_user_id() ) {
+						$transient_name .= '_' . get_current_user_id();
+					}
+					$transient_status = get_transient( $transient_name );
+					if ( ! empty( $transient_status ) ) {
+						$status[ $notice ] = $transient_status;
+					}
+				}
+			}
+			if ( empty( $type ) || $type === 'global' ) {
+				$global_status = get_option( 'ic_hidden_notices', array() );
+				if ( empty( $global_status ) ) {
+					$global_status = array();
+				}
+				if ( ! empty( $global_status ) ) {
+					$status = array_merge( $status, array_filter( $global_status ) );
+				}
+			}
 			if ( empty( $notice ) ) {
 				return $status;
 			} else if ( empty( $status[ $notice ] ) ) {
@@ -229,11 +259,22 @@ if ( ! class_exists( 'ic_activation_wizard' ) ) {
 
 		function ajax_hide_ic_notice() {
 			if ( ! empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ic-ajax-nonce' ) ) {
-				$element = esc_attr( $_POST['element'] );
+				$element = sanitize_text_field( $_POST['element'] );
+				$type    = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : 'global';
 				if ( ! empty( $element ) ) {
-					$status = $this->get_notice_status();
-					if ( empty( $status[ $element ] ) ) {
+					$status = $this->get_notice_status( null, $type );
+					if ( is_array( $status ) && empty( $status[ $element ] ) ) {
 						$status[ $element ] = 1;
+					}
+					if ( $type === 'user' && get_current_user_id() ) {
+						update_user_meta( get_current_user_id(), '_ic_hidden_notices', $status );
+					} else if ( $type === 'temp' ) {
+						$transient_name = 'ic_hidden_notices_' . $element;
+						if ( get_current_user_id() ) {
+							$transient_name .= '_' . get_current_user_id();
+						}
+						set_transient( $transient_name, 1, MONTH_IN_SECONDS );
+					} else {
 						update_option( 'ic_hidden_notices', $status );
 					}
 				}

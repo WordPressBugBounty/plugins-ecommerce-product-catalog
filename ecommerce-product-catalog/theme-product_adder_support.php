@@ -92,13 +92,13 @@ class ic_catalog_notices extends ic_activation_wizard {
 
 	function catalog_admin_priority_notices() {
 		if ( is_ic_admin_page() ) {
-			do_action( 'ic_catalog_admin_priority_notices' );
+			do_action( 'ic_catalog_admin_priority_notices', $this );
 		}
 	}
 
 	function catalog_admin_notices() {
 		if ( is_ic_admin_page() ) {
-			do_action( 'ic_catalog_admin_notices' );
+			do_action( 'ic_catalog_admin_notices', $this );
 		}
 	}
 
@@ -121,7 +121,7 @@ class ic_catalog_notices extends ic_activation_wizard {
 			if ( is_ic_catalog_admin_page() ) {
 				$product_count = ic_products_count();
 				if ( $product_count > 5 ) {
-					if ( false === get_site_transient( 'implecode_hide_plugin_review_info' ) ) {
+					if ( false === get_site_transient( 'implecode_hide_plugin_review_info' ) && $this->get_notice_status( 'ic-catalog-review' ) === 0 ) {
 						$this->review_notice();
 						//set_site_transient( 'implecode_hide_plugin_translation_info', 1, WEEK_IN_SECONDS );
 					} else if ( false === get_site_transient( 'implecode_hide_plugin_translation_info' ) && ! is_english_catalog_active() ) {
@@ -333,11 +333,13 @@ class ic_catalog_notices extends ic_activation_wizard {
 		  <div class="update-nag implecode-review"><strong><?php _e( 'Rate this Plugin!', 'ecommerce-product-catalog' ) ?></strong> <?php echo sprintf( __( 'Please <a target="_blank" href="%s">rate</a> %s and tell me if it works for you or not. It really helps development.', 'ecommerce-product-catalog' ), 'https://wordpress.org/support/view/plugin-reviews/ecommerce-product-catalog#postform', 'eCommerce Product Catalog' ) ?> <span class="dashicons dashicons-no"></span></div> */
 		$text = apply_filters( 'ic_review_notice_text', sprintf( __( '%s is free software. Would you mind taking <strong>5 seconds</strong> to <a target="_blank" href="%s">rate the plugin</a> for us, please? Your comments <strong>help others know what to expect</strong> when they install %s.', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME, 'https://wordpress.org/support/plugin/' . IC_CATALOG_PLUGIN_SLUG . '/reviews/#new-post', IC_CATALOG_PLUGIN_NAME ) )
 		?>
-        <div class="notice notice-warning implecode-review is-dismissible">
+        <div class="notice notice-warning implecode-review ic-notice is-dismissible"
+             data-ic_dismissible="ic-catalog-review"
+             data-ic_dismissible_type="temp">
             <p><?php echo $text . ' ' . __( 'A <strong>huge thank you</strong> from impleCode and WordPress community in advance!', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
                   href="https://wordpress.org/support/view/plugin-reviews/ecommerce-product-catalog#new-post"
-                  class="button-primary"><?php _e( 'Rate Now & Hide Forever', 'ecommerce-product-catalog' ); ?></a>
+                  class="button-primary ic-user-dismiss"><?php _e( 'Rate Now & Hide Forever', 'ecommerce-product-catalog' ); ?></a>
 				<?php /* <a href="" class="button"><?php _e( 'Hide Forever', 'ecommerce-product-catalog' ); ?></a> */ ?>
         </div>
         <div class="update-nag notice notice-warning inline implecode-review-thanks"

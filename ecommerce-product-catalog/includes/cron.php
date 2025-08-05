@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -25,25 +25,7 @@ class IC_EPC_Cron {
 	 *
 	 */
 	public function __construct() {
-		add_filter( 'cron_schedules', array( $this, 'add_schedules' ) );
 		add_action( 'wp', array( $this, 'schedule_events' ) );
-	}
-
-	/**
-	 * Registers new cron schedules
-	 *
-	 *
-	 * @param array $schedules
-	 * @return array
-	 */
-	public function add_schedules( $schedules = array() ) {
-		// Adds once weekly to the existing schedules.
-		$schedules[ 'weekly' ] = array(
-			'interval'	 => 604800,
-			'display'	 => __( 'Once Weekly', 'ecommerce-product-catalog' )
-		);
-
-		return $schedules;
 	}
 
 	/**
@@ -64,7 +46,7 @@ class IC_EPC_Cron {
 	 * @return void
 	 */
 	private function weekly_events() {
-		if ( !wp_next_scheduled( 'ic_epc_weekly_scheduled_events' ) ) {
+		if ( ! wp_next_scheduled( 'ic_epc_weekly_scheduled_events' ) ) {
 			wp_schedule_event( current_time( 'timestamp', true ), 'weekly', 'ic_epc_weekly_scheduled_events' );
 		}
 	}
@@ -76,7 +58,7 @@ class IC_EPC_Cron {
 	 * @return void
 	 */
 	private function daily_events() {
-		if ( !wp_next_scheduled( 'ic_epc_daily_scheduled_events' ) ) {
+		if ( ! wp_next_scheduled( 'ic_epc_daily_scheduled_events' ) ) {
 			wp_schedule_event( current_time( 'timestamp', true ), 'daily', 'ic_epc_daily_scheduled_events' );
 		}
 	}

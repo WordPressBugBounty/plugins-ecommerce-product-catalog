@@ -451,7 +451,6 @@ if ( ! function_exists( 'ic_mail' ) ) {
 		if ( ic_is_message_spam( $sender_name, $sender_email, $message ) ) {
 			return false;
 		}
-
 		$headers[] = 'From: ' . $sender_name . ' <' . $sender_email . '>';
 
 		if ( is_email( $sender_name ) ) {

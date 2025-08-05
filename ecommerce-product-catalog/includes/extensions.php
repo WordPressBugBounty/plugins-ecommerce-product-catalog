@@ -765,9 +765,10 @@ function start_free_implecode_install() {
 			$upgrader->install( $url );
 			echo '</div>';
 		} else {
+			$url = 'https://downloads.wordpress.org/plugin/' . $slug . '.latest-stable.zip';
 			echo '<div id="message error" class="error product-adder-message messages-connect">
 				<div class="squeezer">
-					<h4><strong>' . __( 'This extension is not available at this time. Try again later.', 'ecommerce-product-catalog' ) . '</strong></h4>
+					<h4><strong>' . sprintf( __( 'Automatic installation is currently unavailable because your website cannot connect to WordPress.org. You can <a href="%s">download the extension manually</a> and install it via Plugins > Add New > Upload Plugin.', 'ecommerce-product-catalog' ), $url ) . '</strong></h4>
 				</div>
 			</div>';
 		}
@@ -859,7 +860,7 @@ function implecode_installation_url() {
 /**
  * Returns installation URL from WordPress repository
  *
- * @param type $slug
+ * @param string $slug
  *
  * @return string
  */
@@ -1149,7 +1150,7 @@ function ic_license_renewal_notice() {
 		return;
 	}
 	?>
-    <div class="error notice-updated is-dismissible ic-notice" data-ic_dismissible="notice-ic-catalog-welcome">
+    <div class="error notice-updated is-dismissible ic-notice" data-ic_dismissible="notice-ic-catalog-renewal">
         <div class="squeezer">
 			<?php
 			echo '<p>' . $message . '</p>';
@@ -1259,4 +1260,3 @@ function ic_license_is_subscription() {
 
 	return false;
 }
-

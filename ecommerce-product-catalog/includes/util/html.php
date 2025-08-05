@@ -52,16 +52,20 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function button( $label, $class = 'ic-secondary-button', $onclick = null, $attr = array() ) {
-			$class = 'button ' . $class;
+		function button( $label, $class = 'ic-secondary-button', $onclick = null, $attr = array(), $url = '' ) {
+			$class = 'button ic-button ' . $class;
 			if ( function_exists( 'design_schemes' ) ) {
 				$class .= ' ' . design_schemes( 'box', 0 );
 			}
 			if ( ! empty( $onclick ) ) {
 				$attr['onclick'] = $onclick;
 			}
+			if ( ! empty( $url ) ) {
+				return $this->div( $this->link( $label, $class, $url, $attr ) );
+			} else {
+				return $this->div( $label, $class, null, $attr );
+			}
 
-			return $this->div( $label, $class, null, $attr );
 		}
 
 		/**
@@ -69,7 +73,7 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function buttons( $buttons ) {
+		function buttons( $buttons, $title = '' ) {
 			if ( empty( $buttons ) ) {
 				return '';
 			}
@@ -94,8 +98,14 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 					$button_tags .= $this->link( $button['label'], $class, $button['url'] );
 				} else {
 					$onclick     = isset( $button['onclick'] ) ? $button['onclick'] : '';
-					$button_tags .= $this->button( $button['label'], $button['class'], $onclick );
+					$attr        = isset( $button['attr'] ) ? $button['attr'] : array();
+					$button_tags .= $this->button( $button['label'], $button['class'], $onclick, $attr );
 				}
+			}
+
+			if ( ! empty( $title ) && ! empty( $button_tags ) ) {
+				$title_container = $this->div( $title, 'ic-buttons-title' );
+				$button_tags     = $title_container . $button_tags;
 			}
 
 			return $this->div( $button_tags, 'ic-buttons' );
@@ -108,11 +118,11 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function link( $label, $class, $url ) {
-			$attr = array(
+		function link( $label, $class, $url = '', $attr = array() ) {
+			$attr = array_merge( $attr, array(
 				'href'  => $url,
 				'class' => $class,
-			);
+			) );
 
 			return $this->tag( 'a', $label, $attr );
 		}
@@ -135,12 +145,40 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 
 		}
 
-		function popup( $inside, $buttons, $class = null ) {
+		function center_div( $content, $class = null, $id = null, $attr = array() ) {
+			if ( empty( $class ) ) {
+				$class = 'ic-center';
+			} else {
+				$class .= ' ic-center';
+			}
+
+			return $this->div( $content, $class, $id, $attr );
+		}
+
+		function h( $h_num, $content, $class = null, $id = null, $attr = array() ) {
+			$h_num = intval( $h_num );
+			if ( empty( $h_num ) ) {
+				return '';
+			}
+			if ( ! empty( $class ) ) {
+				$attr['class'] = $class;
+			}
+			if ( ! empty( $id ) ) {
+				$attr['id'] = $id;
+			}
+
+			return $this->tag( 'h' . $h_num, $content, $attr );
+		}
+
+		function popup( $inside, $buttons = array(), $class = null, $closer = true ) {
 			$class_base = 'ic-modal-container';
 			$id         = '';
 			if ( ! empty( $class ) ) {
 				$id    = $class;
 				$class = ' ' . $class;
+			}
+			if ( $closer ) {
+				$class .= ' ic-modal-closer-active';
 			}
 			$inside_container = $this->div( $inside, $class_base . '-inside', $class_base . '-inside' );
 			if ( ! empty( $buttons ) ) {
@@ -148,16 +186,12 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 			} else {
 				$buttons_container = '';
 			}
-			$container = $this->div( $inside_container . $buttons_container, $class_base );
-			if ( function_exists( 'ic_message_hash' ) ) {
-				$hash = ic_message_hash( $id . $container );
-				$attr = array( 'data-hash' => $hash );
-				if ( ic_is_user_hidden_content( $hash ) ) {
-					return '';
-				}
+			if ( $closer ) {
+				$inside_container .= $this->span( '', 'ic-modal-close' );
 			}
+			$container = $this->div( $inside_container . $buttons_container, $class_base );
 
-			return $this->div( $container, $class_base . '-container ic-overlay-container' . $class, $id, $attr );
+			return $this->div( $container, $class_base . '-container ic-overlay-container' . $class, $id );
 		}
 
 		/**
@@ -197,21 +231,25 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 			if ( ! empty( $ajax_data ) ) {
 				$attr['data-ic_ajax_data'] = json_encode( $ajax_data );
 			}
+			if ( is_array( $fields ) ) {
+				foreach ( $fields as $key => $field ) {
+					$field_name = $form_name . '-' . $field['name'];
+					$field_id   = $field_name . '_' . $key;
+					$label      = isset( $field['label'] ) ? $field['label'] : '';
+					$comment    = isset( $field['comment'] ) ? $field['comment'] : '';
+					$required   = isset( $field['required'] ) ? $field['required'] : '';
+					$options    = isset( $field['options'] ) ? $field['options'] : array();
 
-			foreach ( $fields as $key => $field ) {
-				$field_name = $form_name . '-' . $field['name'];
-				$field_id   = $field_name . '_' . $key;
-				$label      = isset( $field['label'] ) ? $field['label'] : '';
-				$comment    = isset( $field['comment'] ) ? $field['comment'] : '';
-				$required   = isset( $field['required'] ) ? $field['required'] : '';
-				$options    = isset( $field['options'] ) ? $field['options'] : array();
-
-				$content .= $this->input( $field['type'], $field_name, $field['value'], $field_id, $required, $label, $comment, $p, $options, $default_attr );
+					$content .= $this->input( $field['type'], $field_name, $field['value'], $field_id, $required, $label, $comment, $p, $options, $default_attr );
+				}
+			} else {
+				$content .= $fields;
 			}
+
 			if ( ! empty( $buttons ) ) {
 				$content .= $this->buttons( $buttons );
 			}
-			$content .= '<input class="ic-hidden-submit" style="display: none;" type="submit">';
+			$content .= '<input class="ic-hidden-submit" name="ic-hidden-submit" style="display: none;" type="submit">';
 
 			return $this->tag( 'form', $this->div( $content, 'ic-form-inside' ), $attr );
 		}
@@ -247,10 +285,21 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 
 			if ( ! empty( $options ) ) {
 				if ( $type === 'dropdown' ) {
+					if ( ! empty( $attr['multiple'] ) && ! empty( $options[0] ) && ! is_numeric( $options[0] ) ) {
+						$placeholder = $options[0];
+						unset( $options[0] );
+					}
 					$dropdown_options = $this->dropdown_options( $options, $value );
 					if ( ! empty( $dropdown_options ) ) {
 						unset( $attr['type'] );
 						unset( $attr['value'] );
+						if ( ! empty( $attr['multiple'] ) ) {
+							$attr['class'] = isset( $attr['class'] ) ? $attr['class'] : '';
+							$attr['class'] .= ' ic-chosen';
+							if ( ! empty( $placeholder ) && empty( $attr['data-placeholder'] ) ) {
+								$attr['data-placeholder'] = $placeholder;
+							}
+						}
 						$return .= $this->tag( 'select', $dropdown_options, $attr );
 					}
 				} else if ( $type === 'radio' || $type === 'checkbox' ) {
@@ -295,8 +344,12 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function dropdown( $name, $value, $id, $options, $required = 0, $label = null, $comment = null, $p = false ) {
-			return $this->input( 'dropdown', $name, $value, $id, $required, $label, $comment, $p, $options, array() );
+		function dropdown( $name, $value, $id, $options, $required = 0, $label = null, $comment = null, $p = false, $multiple = false ) {
+			if ( $multiple && ! ic_string_contains( $name, '[]' ) ) {
+				$name .= '[]';
+			}
+
+			return $this->input( 'dropdown', $name, $value, $id, $required, $label, $comment, $p, $options, array( 'multiple' => $multiple ) );
 		}
 
 		/**
@@ -307,10 +360,16 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 */
 		function dropdown_options( $options, $selected_value = null ) {
 			$dropdown_options = '';
+			$first_option     = array_key_first( $options );
 			foreach ( $options as $option_value => $option_label ) {
 				$selected = false;
 				if ( $selected_value == $option_value ) {
 					$selected = true;
+				} else if ( is_array( $selected_value ) && in_array( $option_value, $selected_value ) ) {
+					$selected = true;
+				}
+				if ( $option_value === 0 && $first_option === 0 ) {
+					$option_value = '';
 				}
 				$options_attr = array( 'value' => $option_value );
 				if ( $selected ) {
@@ -370,9 +429,12 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function radio_checkbox_options( $options, $selected_value, $name, $id = '', $required = 0, $type = 'radio', $class = '' ) {
+		function radio_checkbox_options( $options, $selected_value, $name, $id = '', $required = 0, $type = 'radio', $class = '', $group_label = '' ) {
 			$radio_checkbox_options = '';
-			$name_array_base        = false;
+			if ( ! empty( $group_label ) ) {
+				$radio_checkbox_options .= $this->label( $group_label, $id );
+			}
+			$name_array_base = false;
 			if ( ! ic_string_contains( $name, '[' ) ) {
 				$name_array_base = $name;
 			}
@@ -396,6 +458,36 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 			}
 
 			return $radio_checkbox_options;
+		}
+
+		/**
+		 * @param string $name The name attribute for the textarea element.
+		 * @param string $value The content inside the textarea element.
+		 * @param string $id The id attribute for the textarea element.
+		 * @param int $required Indicates if the textarea element is required (1 for true, 0 for false).
+		 * @param string|null $label The label text for the textarea element.
+		 * @param string $class Additional CSS classes for the textarea element.
+		 *
+		 * @return string Returns the generated HTML string for the textarea element.
+		 */
+		function textarea( $name, $value, $id = '', $required = 0, $label = null, $class = '' ) {
+			$id     = $this->fix_id ? str_replace( '-', '_', $id ) : $id;
+			$return = '';
+			if ( ! empty( $label ) ) {
+				$return .= $this->label( $label, $id );
+			}
+			$return .= $this->tag(
+				'textarea',
+				$value,
+				[
+					'id'       => $id,
+					'name'     => $name,
+					'class'    => $class,
+					'required' => ! empty( $required ) ? 'required' : false
+				]
+			);
+
+			return $return;
 		}
 
 		/**
@@ -501,17 +593,32 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		function table( $trs, $class = null, $ths = array() ) {
 			$rows = '';
 			if ( ! empty( $ths ) ) {
-				$rows .= $this->tr( $ths );
+				$rows .= $this->ths( $ths );
 			}
 			foreach ( $trs as $tr ) {
-				$tr['attr'] = isset( $tr['attr'] ) ? $tr['attr'] : array();
-				$rows       .= $this->tr( $tr['tds'], $tr['class'], $tr['attr'] );
+				$tr['attr']  = isset( $tr['attr'] ) ? $tr['attr'] : array();
+				$tr['class'] = isset( $tr['class'] ) ? $tr['class'] : '';
+				$rows        .= $this->tr( $tr['tds'], $tr['class'], $tr['attr'] );
 			}
 			if ( ! empty( $rows ) ) {
 				return $this->tag( 'table', $rows, array( 'class' => $class ) );
 			} else {
 				return '';
 			}
+		}
+
+		function ths( $ths ) {
+			$tr = '';
+			foreach ( $ths as $td ) {
+				if ( ! empty( $td['header'] ) ) {
+					$td['attr'] = isset( $td['attr'] ) ? $td['attr'] : array();
+					$tr         .= $this->th( $td['header'], $td['class'], $td['attr'] );
+				} else {
+					$tr .= $this->th( $td );
+				}
+			}
+
+			return $tr;
 		}
 
 		/**
@@ -628,6 +735,18 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 			}
 
 			return '</' . $type . '>';
+		}
+
+		function datetime( $name, $value, $min_date = '', $max_date = '' ) {
+			$attr = array( 'type' => 'datetime-local', 'value' => $value, 'name' => $name );
+			if ( ! empty( $min_date ) ) {
+				$attr['min'] = $min_date;
+			}
+			if ( ! empty( $max_date ) ) {
+				$attr['max'] = $max_date;
+			}
+
+			return $this->tag( 'input', '', $attr );
 		}
 	}
 }

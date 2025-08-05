@@ -549,9 +549,11 @@ function product_breadcrumbs() {
 			$taxonomy            = isset( $obj->taxonomy ) ? $obj->taxonomy : 'al_product-cat';
 			$current_category_id = $obj->term_id;
 			$category_parents    = ic_get_product_category_parents( $current_category_id, $taxonomy, true, '|', null, array(), ' itemprop="item" ', '<span itemprop="name">', '</span>' );
-			if ( ! is_wp_error( $category_parents ) ) {
+			if ( $category_parents && ! is_wp_error( $category_parents ) ) {
 				$parents = array_filter( explode( '|', $category_parents ) );
-				array_pop( $parents );
+				if ( is_array( $parents ) ) {
+					array_pop( $parents );
+				}
 			}
 		} else if ( is_search() ) {
 			$current_product = __( 'Product Search', 'ecommerce-product-catalog' );
@@ -611,6 +613,15 @@ function ic_get_category_url( $category_id ) {
 	}
 
 	return apply_filters( 'ic_category_url', $link, $category_id );
+}
+
+function ic_get_category_listing_image_html( $term_id ) {
+	$image_html = ic_get_global( 'ic_category_listing_image_html_' . $term_id );
+	if ( $image_html ) {
+		return $image_html;
+	} else {
+		return '';
+	}
 }
 
 function ic_get_product_category_parents(

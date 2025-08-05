@@ -119,7 +119,8 @@ function ic_set_classic_grid_category_image_html( $product_cat ) {
 		$url   = default_product_thumbnail_url();
 		$image = '<img src="' . $url . '" class="classic-grid-image default-image" alt="' . $product_cat->name . '" >';
 	}
-	$product_cat->listing_image_html = $image;
+	//$product_cat->listing_image_html = $image;
+	ic_save_global( 'ic_category_listing_image_html_' . $product_cat->term_id, $image );
 
 	return $product_cat;
 }

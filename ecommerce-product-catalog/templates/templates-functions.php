@@ -457,6 +457,7 @@ function more_products() {
 function more_product_cats() {
 	global $cat_shortcode_query;
 	if ( isset( $cat_shortcode_query['current'] ) ) {
+
 		return $cat_shortcode_query['current'] + 1 < $cat_shortcode_query['count'];
 	} else {
 		return false;
@@ -482,6 +483,7 @@ function get_row_class( $grid_settings, $what = 'products' ) {
 		if ( $ic_row > $per_row || ! isset( $ic_row ) ) {
 			$ic_row = 1;
 		}
+
 		$count = $ic_row - $per_row;
 		if ( $ic_row == 1 ) {
 			$row_class = 'first';

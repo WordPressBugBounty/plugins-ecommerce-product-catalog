@@ -25,7 +25,7 @@ $classic_grid_settings = get_classic_grid_settings();
         <a href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>">
             <div class="classic-grid-image-wrapper">
                 <div class="pseudo"></div>
-                <div class="image"><?php echo $product_cat->listing_image_html ?></div>
+                <div class="image"><?php echo ic_get_category_listing_image_html( $product_cat->term_id ) ?></div>
             </div>
             <h3 class="product-name"><?php echo $product_cat->name ?></h3>
         </a>

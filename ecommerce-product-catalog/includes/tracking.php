@@ -460,7 +460,7 @@ jQuery(this).parent("p").next("p").find("textarea").show();
 
 	function fatal() {
 		$error = error_get_last();
-		if ( $error !== null && ! empty( $error['file'] ) ) {
+		if ( ! empty( $error ) && ! empty( $error['file'] ) ) {
 			if ( $this->supported_slug( $error['file'] ) ) {
 				$message = '';
 				if ( ! empty( $error['type'] ) ) {
@@ -485,7 +485,7 @@ jQuery(this).parent("p").next("p").find("textarea").show();
 	}
 
 	function supported_slug( $file ) {
-		if ( empty( $file ) ) {
+		if ( empty( $file ) || ! is_string( $file ) ) {
 			return false;
 		}
 		if ( defined( 'AL_BASE_PATH' ) && strpos( $file, AL_BASE_PATH ) !== false ) {

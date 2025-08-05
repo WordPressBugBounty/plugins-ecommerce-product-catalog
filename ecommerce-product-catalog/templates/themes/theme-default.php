@@ -147,7 +147,8 @@ function ic_set_modern_grid_category_image_html( $product_cat ) {
 		$url   = default_product_thumbnail_url();
 		$image = '<img class="modern-grid-image" src="' . $url . '" alt="' . $product_cat->name . '">';
 	}
-	$product_cat->listing_image_html = $image;
+	//$product_cat->listing_image_html = $image;
+	ic_save_global( 'ic_category_listing_image_html_' . $product_cat->term_id, $image );
 
 	return $product_cat;
 }
