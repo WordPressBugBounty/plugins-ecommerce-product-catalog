@@ -63,12 +63,13 @@ function ic_get_customer_id_from_order_id( $order_id ) {
 	return ic_get_customer_id_from_email( $payment_details['shipping_email'] );
 }
 
-function ic_get_logged_customer_id() {
-	$id = get_current_user_id();
+if ( ! function_exists( 'ic_get_logged_customer_id' ) ) {
+	function ic_get_logged_customer_id() {
+		$id = get_current_user_id();
 
-	return $id;
+		return $id;
+	}
 }
-
 function ic_get_digital_customer_email( $customer_id = null ) {
 	if ( empty( $customer_id ) ) {
 		$customer_id = ic_get_logged_customer_id();

@@ -73,6 +73,7 @@ class ic_shortcode_catalog {
 
 		add_filter( 'ic_catalog_listing_nav_menu', array( $this, 'fake_listing_first_post' ), 99 );
 		add_action( 'get_template_part', array( $this, 'overwrite_query' ), 99, 0 );
+		add_action( 'wp_after_load_template', array( $this, 'overwrite_query' ), 99, 0 );
 		//add_action( 'get_template_part', array( $this, 'break_query' ), 100, 0 ); // Shows no content when multiple loops present
 //add_action( 'get_template_part_content', array( $this, 'overwrite_query' ), 101, 0 );
 //add_action( 'get_template_part_loop', array( $this, 'overwrite_query' ), 101, 0 );

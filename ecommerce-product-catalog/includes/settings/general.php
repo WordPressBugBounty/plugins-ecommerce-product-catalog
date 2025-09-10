@@ -600,7 +600,9 @@ function get_multiple_settings() {
 	$theme    = get_option( 'template' );
 	$prev_int = 'simple';
 	if ( ! isset( $archive_multiple_settings['integration_type'] ) || ! is_array( $archive_multiple_settings['integration_type'] ) ) {
-		$support_check = ic_catalog_notices::theme_support_check();
+		if ( class_exists( 'ic_catalog_notices' ) ) {
+			$support_check = ic_catalog_notices::theme_support_check();
+		}
 		if ( ! empty( $support_check[ $theme ] ) ) {
 			$prev_int = isset( $archive_multiple_settings['integration_type'] ) ? $archive_multiple_settings['integration_type'] : 'simple';
 		}

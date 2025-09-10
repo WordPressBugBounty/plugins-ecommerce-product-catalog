@@ -11,6 +11,9 @@
  */
 
 /* Product Archive */
+h1.product-listing-name, h1.entry-title.product-listing-name {
+    display: block;
+}
 
 /* Archive pagination */
 .product-archive-nav {

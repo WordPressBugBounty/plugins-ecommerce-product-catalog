@@ -182,6 +182,13 @@ add_action( 'ic_scheduled_attributes_clear', 'ic_clear_empty_attributes' );
  *
  */
 function ic_clear_empty_attributes() {
+	if ( wp_defer_term_counting() ) {
+		if ( ! wp_get_schedule( 'ic_scheduled_attributes_clear' ) ) {
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'ic_scheduled_attributes_clear' );
+		}
+
+		return;
+	}
 	$max_attr   = product_attributes_number();
 	$attributes = ic_get_terms( array(
 		'taxonomy'   => 'al_product-attributes',
@@ -216,7 +223,7 @@ function ic_clear_empty_attributes() {
 add_action( 'ic_scheduled_attributes_assignment', 'ic_reassign_all_products_attributes' );
 
 /**
- * Scheduled even to reassign all products attributes
+ * Scheduled even to reassign all product attributes
  *
  * @return string
  */
@@ -306,7 +313,7 @@ function ic_reassign_products_attributes( $done, $start_time = 0, $repeat = true
 add_action( 'ic_system_tools', 'ic_system_tools_attributes_upgrade' );
 
 /**
- * Shows database upgrade button in system tools
+ * Shows a database upgrade button in system tools
  *
  */
 function ic_system_tools_attributes_upgrade() {
@@ -542,7 +549,7 @@ function ic_delete_all_attribute_terms() {
 if ( ! function_exists( 'get_all_attribute_labels' ) ) {
 
 	/**
-	 * Returns all attrubutes labels
+	 * Returns all attributes labels
 	 *
 	 * @return type
 	 */
@@ -572,7 +579,7 @@ if ( ! function_exists( 'get_all_attribute_labels' ) ) {
 if ( ! function_exists( 'get_all_attribute_values' ) ) {
 
 	/**
-	 * Returns all attrubutes labels
+	 * Returns all attributes labels
 	 *
 	 * @return type
 	 */

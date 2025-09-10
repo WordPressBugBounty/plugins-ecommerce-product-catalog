@@ -23,9 +23,10 @@ class product_price_filter extends WP_Widget {
 			$label    = __( 'Catalog Price Filter', 'ecommerce-product-catalog' );
 			$sublabel = __( 'Filter items by price.', 'ecommerce-product-catalog' );
 		}
-		$widget_ops = array( 'classname'             => 'product_price_filter',
-		                     'description'           => $sublabel,
-		                     'show_instance_in_rest' => true
+		$widget_ops = array(
+			'classname'             => 'product_price_filter',
+			'description'           => $sublabel,
+			'show_instance_in_rest' => true
 		);
 		parent::__construct( 'product_price_filter', $label, $widget_ops );
 	}
@@ -115,13 +116,13 @@ class product_price_filter extends WP_Widget {
 
 }
 
-add_action( 'implecode_register_widgets', 'register_price_filter_widget' );
+add_action( 'implecode_register_widgets', 'ic_register_price_filter_widget' );
 
 /**
  * Registers price filter widget
  *
  */
-function register_price_filter_widget() {
+function ic_register_price_filter_widget() {
 	if ( is_ic_price_enabled() ) {
 		register_widget( 'product_price_filter' );
 	}

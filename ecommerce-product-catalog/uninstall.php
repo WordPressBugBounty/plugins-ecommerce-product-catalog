@@ -144,4 +144,7 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 	}
 
 	delete_user_meta( get_current_user_id(), 'ic_review_hidden' );
+	global $wpdb;
+	$wpdb->delete( $wpdb->usermeta, array( 'meta_key' => '_ic_hidden_notices' ) );
+
 }

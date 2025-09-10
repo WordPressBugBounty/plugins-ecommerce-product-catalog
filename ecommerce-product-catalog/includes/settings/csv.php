@@ -131,15 +131,15 @@ function simple_import_product_from_csv() {
 	$product   = array();
 	if ( $fp !== false ) {
 		$sep      = apply_filters( 'simple_csv_separator', ';' );
-		$csv_cols = fgetcsv( $fp, 0, $sep, '"' );
+		$csv_cols = fgetcsv( $fp, 0, $sep, '"', '\\' );
 		if ( isset( $csv_cols[0] ) && $csv_cols[0] == '﻿sep=' ) {
-			$csv_cols = fgetcsv( $fp, 0, $sep, '"' );
+			$csv_cols = fgetcsv( $fp, 0, $sep, '"', '\\' );
 		}
 		$import_array = simple_prepare_csv_import_array();
 		if ( count( $csv_cols ) == count( $import_array ) ) {
 			$i     = 0;
 			$error = 0;
-			while ( ( $data = fgetcsv( $fp, 0, $sep, '"' ) ) !== false ) {
+			while ( ( $data = fgetcsv( $fp, 0, $sep, '"', '\\' ) ) !== false ) {
 				$filtered_data = array_filter( $data );
 				if ( empty( $data ) || ! is_array( $data ) || ( is_array( $data ) && empty( $filtered_data ) ) || count( $data ) == 1 ) {
 					continue;
