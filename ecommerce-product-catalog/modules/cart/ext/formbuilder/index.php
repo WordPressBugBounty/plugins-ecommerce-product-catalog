@@ -954,7 +954,7 @@ if ( ! defined( 'IC_FORMBUILDER_URL' ) ) {
 
 	function ic_ajax_dropdown_state() {
 		$selected_country_code = isset( $_POST['country_code'] ) ? sanitize_text_field( $_POST['country_code'] ) : '';
-		if ( ! empty( $selected_country_code ) ) {
+		if ( ! empty( $selected_country_code ) && ! empty( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ic-ajax-nonce' ) ) {
 			$selected_state_code = isset( $_POST['state_code'] ) ? sanitize_text_field( $_POST['state_code'] ) : '';
 			if ( ! empty( $selected_state_code ) && ic_string_contains( $selected_state_code, $selected_country_code ) ) {
 				$selected_country_code = $selected_state_code;

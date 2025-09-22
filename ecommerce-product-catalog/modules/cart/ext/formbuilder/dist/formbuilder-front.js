@@ -5,12 +5,17 @@
  */
 
 jQuery(document).ready(function () {
-    /* globals product_object,implecode,ajaxurl */
+    /* globals product_object,implecode,ajaxurl,ic_catalog */
     var ic_ajaxurl = '';
+    var nonce = '';
     if (typeof product_object !== 'undefined') {
         ic_ajaxurl = product_object.ajaxurl;
+        nonce = product_object.nonce;
     } else if (typeof ajaxurl !== undefined) {
         ic_ajaxurl = ajaxurl;
+    }
+    if (nonce === '' && typeof ic_catalog !== 'undefined') {
+        nonce = ic_catalog.nonce;
     }
     var state_container = jQuery('.ic-form .dropdown_state, .ic-order-checkout-data .dropdown_state');
     var state_select = state_container.find('select');
@@ -33,7 +38,8 @@ jQuery(document).ready(function () {
                 var data = {
                     'action': 'ic_state_dropdown',
                     'country_code': country_code,
-                    'state_code': this_state_select.val()
+                    'state_code': this_state_select.val(),
+                    'nonce': nonce
                 };
                 implecode.disable_container(this_state_container);
                 jQuery.post(ic_ajaxurl, data, function (response) {
