@@ -55,11 +55,16 @@ class ic_epc_context_blocks {
 			__DIR__ . '/short-description/'
 		) );
 		foreach ( $blocks as $block_dir ) {
-			register_block_type( $block_dir,
-				array(
-					'render_callback' => array( $this, 'render' ),
-				)
+			$args = array(
+				'render_callback' => array( $this, 'render' ),
 			);
+			if ( file_exists( $block_dir . 'block.json' ) ) {
+				$args['title'] = ! empty( $block_dir ) ? json_decode( file_get_contents( $block_dir . 'block.json' ), true )['title'] ?? '' : '';
+				if ( ! empty( $args['title'] ) ) {
+					$args['title'] = __( $args['title'], 'ecommerce-product-catalog' );
+				}
+			}
+			register_block_type( $block_dir, $args );
 		}
 	}
 

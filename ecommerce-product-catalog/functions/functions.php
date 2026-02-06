@@ -184,7 +184,12 @@ if ( ! function_exists( 'ic_select_product' ) ) {
                 } else {
                     $selected = selected( $product_id, $selected_value, 0 );
                 }
-                $select_box .= '<option class="id_' . $product_id . '" value="' . $product_id . '" ' . $selected . '>' . get_product_name( $product_id ) . ' (ID:' . $product_id . ')</option>';
+                $name = get_product_name( $product_id ) . ' (ID:' . $product_id;
+                if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
+                    $name .= ', SKU:' . get_product_sku( $product_id );
+                }
+                $name       .= ')';
+                $select_box .= '<option class="id_' . $product_id . '" value="' . $product_id . '" ' . $selected . '>' . $name . '</option>';
             }
             $select_box .= '</select>';
         } else {

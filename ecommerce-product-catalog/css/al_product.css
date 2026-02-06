@@ -151,6 +151,10 @@ button.grey-box:hover {
     width: auto;
 }
 
+.ic-design.button span {
+    color: #fff;
+}
+
 .ic-design.button:hover, article.al_product .ic-design.button:hover, .al_product .ic-design.button:hover, #product_listing .ic-design.button:hover, body a.ic-design.button:hover, .ic-design.button:active, article.al_product .ic-design.button:active, .al_product .ic-design.button:active, #product_listing .ic-design.button:active, body a.ic-design.button:active {
     text-decoration: none;
     background-image: none;

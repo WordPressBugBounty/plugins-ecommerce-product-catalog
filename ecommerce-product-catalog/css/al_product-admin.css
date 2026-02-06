@@ -1487,7 +1487,7 @@ a.ic_cat-activation-choice:focus {
     cursor: default;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1550px) {
     .nav-tab-wrapper .page-title-action {
         display: none;
     }

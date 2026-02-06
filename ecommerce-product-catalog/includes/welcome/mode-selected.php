@@ -1,6 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+    exit; // Exit if accessed directly
 }
 /*
  *
@@ -39,10 +39,10 @@ $additional_content = ob_get_clean();
         }
     </style>
     <div class="about__section is-feature ic-mode-selected-container">
-		<?php if ( empty( $_GET['ic_catalog_activation_choice'] ) ) { ?>
+        <?php if ( empty( $_GET['ic_catalog_activation_choice'] ) ) { ?>
             <h1><?php printf( __( '%s mode is active now!', 'ecommmerce-product-catalog' ), ic_ucfirst( $selected_mode ) ) ?></h1>
-		<?php } ?>
-		<?php echo $additional_content ?>
+        <?php } ?>
+        <?php echo $additional_content ?>
         <div class="column">
             <p style="text-align: center;"><a
                         href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=implecode_welcome' ) ) ?>"><?php _e( 'GO BACK TO MODE SELECTION', 'ecommerce-product-catalog' ) ?></a>
@@ -58,7 +58,7 @@ $additional_content = ob_get_clean();
             <p><?php _e( 'You can select the main catalog page in the general settings screen. It will show categories and products according to the catalog settings.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'Apart from the main catalog page, you can display products and categories anywhere on the website.', 'ecommerce-product-catalog' ) ?></p>
         </header>
-		<?php if ( function_exists( 'register_block_type' ) ) { ?>
+        <?php if ( function_exists( 'register_block_type' ) ) { ?>
             <div class="column">
                 <h3><?php _e( 'Catalog Blocks', 'ecommerce-product-catalog' ) ?></h3>
                 <p><?php _e( 'You can use three different blocks to display catalog parts.', 'ecommerce-product-catalog' ) ?></p>
@@ -66,7 +66,7 @@ $additional_content = ob_get_clean();
                     <a href="https://implecode.com/docs/ecommerce-product-catalog/all-product-catalog-blocks/#cam=welcome&key=blocks"><?php _e( 'Blocks usage', 'ecommerce-product-catalog' ) ?></a>
                 </p>
             </div>
-		<?php } ?>
+        <?php } ?>
         <div class="column">
             <h3><?php _e( 'Catalog Shortcodes', 'ecommerce-product-catalog' ) ?></h3>
             <p><?php _e( 'You can use many different shortcodes to displays catalog parts.', 'ecommerce-product-catalog' ) ?></p>
@@ -80,7 +80,7 @@ $additional_content = ob_get_clean();
 
     <div class="about__section has-subtle-background-color has-2-columns">
         <header class="is-section-header">
-            <h2><?php _e( 'For developers' ); ?></h2>
+            <h2><?php _e( 'For developers', 'ecommerce-product-catalog' ); ?></h2>
             <p><?php printf( __( '%s is designed to make it easy for developers to customize things.', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></p>
         </header>
         <div class="column">
@@ -91,7 +91,7 @@ $additional_content = ob_get_clean();
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'Template Customization' ); ?></h3>
+            <h3><?php _e( 'Template Customization', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( "You can customize the output by placing the template file in your theme 'implecode' folder.", 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'All the templates are located in the plugin templates folder.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
@@ -109,7 +109,7 @@ $additional_content = ob_get_clean();
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'CSS & PHP code snippets' ); ?></h3>
+            <h3><?php _e( 'CSS & PHP code snippets', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'We keep the list of most useful code snippets to adjust things.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
                   href="https://implecode.com/docs/ecommerce-product-catalog/css-adjustments/#cam=welcome&key=css"><?php _e( 'CSS code snippets', 'ecommerce-product-catalog' ) ?></a>
@@ -121,7 +121,7 @@ $additional_content = ob_get_clean();
 
     <div class="about__section has-2-columns has-subtle-background-color is-wider-right">
         <div class="column">
-            <h3><?php _e( 'Catalog Custom Coding' ); ?></h3>
+            <h3><?php _e( 'Catalog Custom Coding', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'If you need a custom feature, do not hesitate to contact the developers.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We know the plugin and WordPress to the ground, can adjust small things and create very complex features or integrations.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We provide custom coding services in a professional and timely manner.', 'ecommerce-product-catalog' ) ?></p>
@@ -140,12 +140,12 @@ $additional_content = ob_get_clean();
 
     <div class="about__section">
         <div class="column">
-            <h3><?php _e( 'Check the documentation for more!' ); ?></h3>
+            <h3><?php _e( 'Check the documentation for more!', 'ecommerce-product-catalog' ); ?></h3>
             <p>
-				<?php
-				printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s' ),
-					IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION, '<a href="https://implecode.com/docs/#cam=welcome&key=docs">', '</a>' );
-				?>
+                <?php
+                printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ),
+                        IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION, '<a href="https://implecode.com/docs/#cam=welcome&key=docs">', '</a>' );
+                ?>
             </p>
         </div>
     </div>

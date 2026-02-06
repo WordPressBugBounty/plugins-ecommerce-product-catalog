@@ -462,7 +462,7 @@ function ic_tabs() {
                 ic_tab_content.addClass('ic_tab_content');
                 var h = ic_tab_content.find('> h3.catalog-header');
                 if (h.length) {
-                    tabs = tabs + '<h3 data-tab_id="' + ic_tab_id + '"><a href="#' + ic_tab_id + '_tab">' + h.html() + '</a></h3>';
+                    tabs = tabs + '<h3 data-tab_id="' + ic_tab_id + '" class="catalog-header"><a href="#' + ic_tab_id + '_tab">' + h.html() + '</a></h3>';
                     h.remove();
                 }
             });

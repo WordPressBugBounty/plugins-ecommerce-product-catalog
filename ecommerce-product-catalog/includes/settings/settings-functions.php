@@ -88,7 +88,17 @@ if ( ! function_exists( 'implecode_settings_dropdown' ) ) {
 			$return .= $option_label . ':</td>';
 			$return .= '<td>';
 		}
-		$return            .= '<select name="' . $option_name . '" ' . $attr . '>';
+		$class = '';
+		if ( ! empty( $attr ) && ic_string_contains( $attr, 'multiple' ) ) {
+			if ( ! ic_string_contains( $option_name, '[]' ) ) {
+				$option_name .= '[]';
+			}
+			$class = 'ic_chosen';
+		}
+		if ( ! empty( $class ) ) {
+			$class = 'class="' . $class . '" ';
+		}
+		$return            .= '<select name="' . $option_name . '" ' . $attr . ' ' . $class . '>';
 		$this_option_value = $option_value;
 		$associative       = false;
 		if ( array_keys( $elements ) !== range( 0, count( $elements ) - 1 ) ) {

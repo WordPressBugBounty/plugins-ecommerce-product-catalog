@@ -25,6 +25,9 @@ function is_ic_inside_shopping_page() {
 }
 
 function is_ic_shopping_cart() {
+	if ( is_ic_ajax( 'shopping_cart_products' ) ) {
+		return true;
+	}
 	$shopping_cart_settings = get_shopping_cart_settings();
 	if ( ! empty( $shopping_cart_settings['shopping_cart_page'] ) && $shopping_cart_settings['shopping_cart_page'] !== 'noid' && is_ic_page( $shopping_cart_settings['shopping_cart_page'] ) ) {
 		return true;

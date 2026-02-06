@@ -42,6 +42,7 @@ function ic_block_price_table_localize( $localize ) {
 // Register the block by passing the path to it's block.json file.
 register_block_type( __DIR__,
 	array(
+		'title'           => __( 'Price Table', 'ecommerce-product-catalog' ),
 		'render_callback' => 'ic_block_price_table_render',
 	)
 );
@@ -84,7 +85,7 @@ function ic_block_price_enqueue() {
 	$script_handle = generate_block_asset_handle( 'ic-price-field/ic-price-table', 'editorScript' );
 	$localize      = array(
 		'strings' => array(
-			'title'              => __( 'Price Table', 'ic-block-slider' ),
+			'title'              => __( 'Price Table', 'ecommerce-product-catalog' ),
 			'options'            => __( 'Options', 'ecommerce-product-catalog' ),
 			'disable_add_cart'   => __( 'Disable add to cart button', 'ecommerce-product-catalog' ),
 			'search_product'     => __( 'Search Product', 'ecommerce-product-catalog' ),
@@ -107,3 +108,4 @@ if ( function_exists( 'wp_set_script_translations' ) ) {
 	wp_set_script_translations( $script_handle, 'ecommerce-product-catalog', IC_EPC_TEXTDOMAIN_PATH );
 }
 */
+

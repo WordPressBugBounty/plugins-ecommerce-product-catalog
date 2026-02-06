@@ -174,6 +174,10 @@ function product_settings() {
             //fixDiv();
         });
         jQuery(document).ready(function () {
+            if (jQuery("body").outerWidth() < 800) {
+                jQuery('.product-settings-table.dragable tbody .dragger').hide();
+                return true;
+            }
             jQuery('.product-settings-table.dragable tbody').sortable({
                 update: function (event, ui) {
                     jQuery('.product-settings-table.dragable tbody tr').each(function () {

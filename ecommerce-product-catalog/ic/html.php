@@ -145,6 +145,10 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 
 		}
 
+		function clear() {
+			return $this->div( '', 'ic-clear' );
+		}
+
 		function center_div( $content, $class = null, $id = null, $attr = array() ) {
 			if ( empty( $class ) ) {
 				$class = 'ic-center';
@@ -308,7 +312,7 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 				}
 			} else {
 				if ( $type === 'checkbox' ) {
-					if ( empty( $attr['checked'] ) && $attr['value'] === '1' ) {
+					if ( ! isset( $attr['checked'] ) && $attr['value'] === '1' ) {
 						$attr['checked'] = 'checked';
 					}
 					if ( empty( $attr['value'] ) ) {
@@ -551,15 +555,30 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 		 *
 		 * @return string
 		 */
-		function span( $content, $class = null ) {
+		function span( $content, $class = null, $title = '', $attr = array() ) {
 			$type = 'span';
 			if ( ! empty( $class ) ) {
-				$attr = array( 'class' => $class );
-			} else {
-				$attr = array();
+				$attr['class'] = $class;
+			}
+			if ( ! empty( $title ) ) {
+				$attr['title'] = $title;
 			}
 
 			return $this->tag( $type, $content, $attr );
+		}
+
+		/**
+		 * @param string $type The type of dashicon to display.
+		 * @param string $title The title attribute for the dashicon. Optional.
+		 * @param string $class Additional CSS classes to add to the dashicon. Optional.
+		 * @param array $attr Additional attributes for the dashicon element. Optional.
+		 *
+		 * @return string HTML markup for the specified dashicon with the given attributes.
+		 */
+		function dashicon( $type, $title = '', $class = '', $attr = array() ): string {
+			$class .= ' dashicons dashicons-' . $type;
+
+			return $this->span( '', 'ic-middle ' . $class, $title, $attr );
 		}
 
 		/**
@@ -722,7 +741,7 @@ if ( ! class_exists( 'ic_html_util' ) ) {
 				if ( is_bool( $value ) && ! $value ) {
 					continue;
 				}
-				if ( ic_string_contains( $value, ' ' ) && $name !== 'value' && $name !== 'onclick' && $name !== 'placeholder' && ! ic_string_contains( $name, 'data-' ) && substr( $value, 0, 1 ) !== '{' ) {
+				if ( ic_string_contains( $value, ' ' ) && $name !== 'value' && $name !== 'title' && $name !== 'style' && $name !== 'onclick' && $name !== 'placeholder' && ! ic_string_contains( $name, 'data-' ) && substr( $value, 0, 1 ) !== '{' ) {
 					$value = implode( ' ', array_map( 'sanitize_title', explode( ' ', $value ) ) );
 				}
 				$tag .= ' ';

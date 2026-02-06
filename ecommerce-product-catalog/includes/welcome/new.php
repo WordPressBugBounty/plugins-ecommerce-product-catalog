@@ -1,6 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+    exit; // Exit if accessed directly
 }
 /*
  *
@@ -13,18 +13,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="about__section is-feature has-subtle-background-color">
         <h2>
-			<?php
-			printf(
-			/* translators: %s: The current EPC version number. */
-				__( 'Welcome to %s.' ),
-				IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION
-			);
-			?>
+            <?php
+            printf(
+            /* translators: %s: The current EPC version number. */
+                    __( 'Welcome to %s.', 'ecommerce-product-catalog' ),
+                    IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION
+            );
+            ?>
         </h2>
         <p>
-			<?php
-			_e( 'In this release cycle, your catalog gets more power in CTA, theme integration, speed and usability.' );
-			?>
+            <?php
+            _e( 'In this release cycle, your catalog gets more power in CTA, theme integration, speed and usability.', 'ecommerce-product-catalog' );
+            ?>
         </p>
     </div>
 
@@ -61,9 +61,9 @@ if ( ! defined( 'ABSPATH' ) ) {
             <p>
                 <strong><?php _e( 'Say hello to the fastest catalog experience.', 'ecommerce-product-catalog' ); ?></strong>
             </p>
-            <p><?php printf( __( '%s is tested on websites with more than 40,000 products with many parameters, full-featured shopping cart and automatic product updates.' ), IC_CATALOG_PLUGIN_NAME ) ?></p>
-            <p><?php _e( 'Thanks to many optimization tasks, your catalog pages and search results will load in less than a second.' ); ?></p>
-            <p><?php _e( 'So your catalog can rank higher in the search engines and give the user the fastest experience possible.' ); ?></p>
+            <p><?php printf( __( '%s is tested on websites with more than 40,000 products with many parameters, full-featured shopping cart and automatic product updates.', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></p>
+            <p><?php _e( 'Thanks to many optimization tasks, your catalog pages and search results will load in less than a second.', 'ecommerce-product-catalog' ); ?></p>
+            <p><?php _e( 'So your catalog can rank higher in the search engines and give the user the fastest experience possible.', 'ecommerce-product-catalog' ); ?></p>
         </div>
     </div>
 
@@ -73,8 +73,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             <p>
                 <strong><?php printf( __( 'In this release, %s is continuously improved in the field of front-end and back-end usability', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></strong>
             </p>
-            <p><?php _e( 'Small tweaks have been added in catalog design for the users.' ); ?></p>
-            <p><?php _e( 'Most changes were added in the admin side to make the configuration easier for new users.' ); ?></p>
+            <p><?php _e( 'Small tweaks have been added in catalog design for the users.', 'ecommerce-product-catalog' ); ?></p>
+            <p><?php _e( 'Most changes were added in the admin side to make the configuration easier for new users.', 'ecommerce-product-catalog' ); ?></p>
             <p><?php printf( __( 'If you face any configuration issues, please report it on the %1$ssupport forum%2$s.', 'ecommerce-product-catalog' ), '<a href="https://wordpress.org/support/plugin/ecommerce-product-catalog/">', '</a>' ) ?></p>
             <p><?php _e( 'Thanks to your feedback, we can make things easier together!', 'ecommerce-product-catalog' ); ?></p>
         </div>
@@ -88,10 +88,10 @@ if ( ! defined( 'ABSPATH' ) ) {
             <p>
                 <strong><?php _e( 'Frequent updates guarantee high security. The plugin is continuously being monitored for any security issues.', 'ecommerce-product-catalog' ); ?></strong>
             </p>
-            <p><?php printf( __( 'You can report any bugs or feedback on the %1$ssupport forum%3$s or on the %2$splugin website%3$s.' ), '<a href="https://wordpress.org/support/plugin/ecommerce-product-catalog/">', '<a href="https://implecode.com/support/?support_type=bug_report&cam=welcome&key=bug">', '</a>' ) ?></p>
-            <p><?php printf( __( 'If you find any security issue, please report it %1$shere%2$s.' ), '<a href="https://implecode.com/support/?support_type=bug_report&cam=welcome&key=security">', '</a>' ) ?></p>
+            <p><?php printf( __( 'You can report any bugs or feedback on the %1$ssupport forum%3$s or on the %2$splugin website%3$s.', 'ecommerce-product-catalog' ), '<a href="https://wordpress.org/support/plugin/ecommerce-product-catalog/">', '<a href="https://implecode.com/support/?support_type=bug_report&cam=welcome&key=bug">', '</a>' ) ?></p>
+            <p><?php printf( __( 'If you find any security issue, please report it %1$shere%2$s.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/support/?support_type=bug_report&cam=welcome&key=security">', '</a>' ) ?></p>
             <p>
-                <strong><?php printf( __( 'Thank you for all the effort that you put in testing and reporting. Without your involvement it would never be possible to make %s so reliable and secure!' ), IC_CATALOG_PLUGIN_NAME ) ?></strong>
+                <strong><?php printf( __( 'Thank you for all the effort that you put in testing and reporting. Without your involvement it would never be possible to make %s so reliable and secure!', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></strong>
             </p>
         </div>
         <div class="column about__image is-vertically-aligned-center">
@@ -110,10 +110,10 @@ if ( ! defined( 'ABSPATH' ) ) {
             </figure>
         </div>
         <div class="column">
-            <h2><?php printf( __( '%s reviews on WordPress.org' ), IC_CATALOG_PLUGIN_NAME ) ?></h2>
-            <p><?php _e( 'Your reviews on WordPress.org help us to spread the word about this awesome catalog plugin.' ); ?></p>
-            <p><?php _e( 'This is very important for the developers. We stay motivated and passionate in the sphere of continuos catalog development.' ); ?></p>
-            <p><?php _e( 'Constructive feedback helps to take the right direction in the development.' ); ?></p>
+            <h2><?php printf( __( '%s reviews on WordPress.org', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></h2>
+            <p><?php _e( 'Your reviews on WordPress.org help us to spread the word about this awesome catalog plugin.', 'ecommerce-product-catalog' ); ?></p>
+            <p><?php _e( 'This is very important for the developers. We stay motivated and passionate in the sphere of continuous catalog development.', 'ecommerce-product-catalog' ); ?></p>
+            <p><?php _e( 'Constructive feedback helps to take the right direction in the development.', 'ecommerce-product-catalog' ); ?></p>
             <p><a href="https://wordpress.org/support/plugin/ecommerce-product-catalog/reviews/#new-post"
                   class="button-primary"
                   target="_blank"><?php _e( 'Add your review', 'ecommerce-product-catalog' ) ?></a></p>
@@ -145,7 +145,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'Template Customization' ); ?></h3>
+            <h3><?php _e( 'Template Customization', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( "You can customize the output by placing the template file in your theme 'implecode' folder.", 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'All the templates are located in the plugin templates folder.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
@@ -163,7 +163,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'CSS & PHP code snippets' ); ?></h3>
+            <h3><?php _e( 'CSS & PHP code snippets', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'We keep the list of most useful code snippets to adjust things.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
                   href="https://implecode.com/docs/ecommerce-product-catalog/css-adjustments/#cam=welcome&key=css"><?php _e( 'CSS code snippets', 'ecommerce-product-catalog' ) ?></a>
@@ -175,7 +175,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="about__section has-2-columns has-subtle-background-color is-wider-right">
         <div class="column">
-            <h3><?php _e( 'Catalog Custom Coding' ); ?></h3>
+            <h3><?php _e( 'Catalog Custom Coding', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'If you need a custom feature, do not hesitate to contact the developers.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We know the plugin and WordPress to the ground, can adjust small things and create very complex features or integrations.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We provide custom coding services in a professional and timely manner.', 'ecommerce-product-catalog' ) ?></p>
@@ -194,12 +194,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="about__section">
         <div class="column">
-            <h3><?php _e( 'Check the documentation for more!' ); ?></h3>
+            <h3><?php _e( 'Check the documentation for more!', 'ecommerce-product-catalog' ); ?></h3>
             <p>
-				<?php
-				printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s' ),
-					IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION, '<a href="https://implecode.com/docs/#cam=welcome&key=docs">', '</a>' );
-				?>
+                <?php
+                printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ),
+                        IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION, '<a href="https://implecode.com/docs/#cam=welcome&key=docs">', '</a>' );
+                ?>
             </p>
         </div>
     </div>

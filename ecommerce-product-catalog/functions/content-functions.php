@@ -131,9 +131,9 @@ function ic_localize_main_catalog_js() {
 		'design_schemes'      => design_schemes( 'box', 0 ),
 		'loading'             => get_site_url() . '/wp-includes/js/thickbox/loadingAnimation.gif',
 	) );
-	if ( is_user_logged_in() ) {
-		$localize['nonce'] = wp_create_nonce( 'ic-ajax-nonce' );
-	}
+	//if ( is_user_logged_in() ) {
+	$localize['nonce'] = wp_create_nonce( 'ic-ajax-nonce' );
+	//}
 	wp_localize_script( 'al_product_scripts', 'product_object', $localize );
 }
 

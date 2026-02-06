@@ -32,7 +32,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 
         <div class="about__section has-2-columns">
             <div class="column">
-                <h2><?php _e( 'Web Store' ); ?></h2>
+                <h2><?php _e( 'Web Store', 'ecommerce-product-catalog' ); ?></h2>
                 <p><?php _e( 'Enable this option if you are planning to sell products directly from the website.', 'ecommerce-product-catalog' ) ?></p>
                 <p><?php _e( 'The shopping cart feature will be enabled in this mode.', 'ecommerce-product-catalog' ) ?></p>
                 <p class="ic-select-mode-button-container">
@@ -43,7 +43,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
                 </p>
             </div>
             <div class="column">
-                <h2><?php _e( 'Inquiry Catalog' ); ?></h2>
+                <h2><?php _e( 'Inquiry Catalog', 'ecommerce-product-catalog' ); ?></h2>
                 <p><?php _e( 'Enable this option if you want the customers to ask for price.', 'ecommerce-product-catalog' ) ?></p>
                 <p><?php _e( 'The quote cart feature will be enabled in this mode.', 'ecommerce-product-catalog' ) ?></p>
                 <p class="ic-select-mode-button-container">
@@ -59,7 +59,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 
         <div class="about__section has-2-columns has-subtle-background-color">
             <div class="column">
-                <h2><?php _e( 'Affiliate Catalog' ); ?></h2>
+                <h2><?php _e( 'Affiliate Catalog', 'ecommerce-product-catalog' ); ?></h2>
                 <p><?php _e( 'Enable this option if you want the customers to click the affiliate button.', 'ecommerce-product-catalog' ) ?></p>
                 <p><?php _e( 'The affiliate button feature will be enabled in this mode.', 'ecommerce-product-catalog' ) ?></p>
                 <p class="ic-select-mode-button-container">
@@ -70,7 +70,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
                 </p>
             </div>
             <div class="column">
-                <h2><?php _e( 'Simple Catalog' ); ?></h2>
+                <h2><?php _e( 'Simple Catalog', 'ecommerce-product-catalog' ); ?></h2>
                 <p><?php _e( 'Enable this option if you want to display products without any call to action.', 'ecommerce-product-catalog' ) ?></p>
                 <p class="ic-select-mode-button-container">
                     <a class="button-primary"
@@ -88,19 +88,19 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 ?>
     <div class="about__section has-subtle-background-color has-2-columns">
         <header class="is-section-header">
-            <h2><?php _e( 'For every day users' ); ?></h2>
+            <h2><?php _e( 'For every day users', 'ecommerce-product-catalog' ); ?></h2>
             <p><?php printf( __( '%s is carefully crafted for seamless usability by everyday users.', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) ?></p>
         </header>
         <div class="column">
             <h3><?php _e( 'Catalog Blocks', 'ecommerce-product-catalog' ) ?></h3>
             <p><?php _e( 'You can use three different blocks to display catalog parts.', 'ecommerce-product-catalog' ) ?></p>
-            <p><?php echo sprintf( __( 'Start with %s block to display your main listing page or %s to display only selected products.', 'ecommerce-product-catalog' ), 'Show Catalog', 'Show Products' ) ?></p>
+            <p><?php echo sprintf( __( 'Start with %s block to display your main listing page or %s to display only selected products.', 'ecommerce-product-catalog' ), __( 'Show Catalog', 'ecommerce-product-catalog' ), __( 'Show Products', 'ecommerce-product-catalog' ) ) ?></p>
             <p>
                 <a href="https://implecode.com/docs/ecommerce-product-catalog/all-product-catalog-blocks/#cam=welcome&key=blocks"><?php _e( 'Blocks usage', 'ecommerce-product-catalog' ) ?></a>
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'Customize Headings and Text' ); ?></h3>
+            <h3><?php _e( 'Customize Headings and Text', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'You have complete control over tailoring any text visible on the front-end through an intuitive settings screen.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'You can make the catalog multilingual thanks to full Polylang compatibility.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
@@ -124,7 +124,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'Template Customization' ); ?></h3>
+            <h3><?php _e( 'Template Customization', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( "You can customize the output by placing the template file in your theme 'implecode' folder.", 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'All the templates are located in the plugin templates folder.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
@@ -142,7 +142,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
             </p>
         </div>
         <div class="column">
-            <h3><?php _e( 'CSS & PHP code snippets' ); ?></h3>
+            <h3><?php _e( 'CSS & PHP code snippets', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'We keep the list of most useful code snippets to adjust things.', 'ecommerce-product-catalog' ) ?></p>
             <p><a target="_blank"
                   href="https://implecode.com/docs/ecommerce-product-catalog/css-adjustments/#cam=welcome&key=css"><?php _e( 'CSS code snippets', 'ecommerce-product-catalog' ) ?></a>
@@ -154,7 +154,7 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 
     <div class="about__section has-2-columns has-subtle-background-color is-wider-right">
         <div class="column">
-            <h3><?php _e( 'Catalog Custom Coding' ); ?></h3>
+            <h3><?php _e( 'Catalog Custom Coding', 'ecommerce-product-catalog' ); ?></h3>
             <p><?php _e( 'If you need a custom feature, do not hesitate to contact the developers.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We know the plugin and WordPress to the ground, can adjust small things and create very complex features or integrations.', 'ecommerce-product-catalog' ) ?></p>
             <p><?php _e( 'We provide custom coding services in a professional and timely manner.', 'ecommerce-product-catalog' ) ?></p>
@@ -173,10 +173,10 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 
     <div class="about__section">
         <div class="column">
-            <h3><?php _e( 'Check the documentation for more!' ); ?></h3>
+            <h3><?php _e( 'Check the documentation for more!', 'ecommerce-product-catalog' ); ?></h3>
             <p>
                 <?php
-                printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s' ),
+                printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ),
                         IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION, '<a href="https://implecode.com/docs/#cam=welcome&key=docs">', '</a>' );
                 ?>
             </p>

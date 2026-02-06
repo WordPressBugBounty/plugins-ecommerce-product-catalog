@@ -9,6 +9,13 @@ if (typeof implecode === 'undefined') {
 
 jQuery(document).ready(function () {
     /* global ic_catalog */
+
+    // Detect mobile/touch devices early
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0);
+
+
     var fixHelper = function (e, ui) {
         ui.children().each(function () {
             jQuery(this).width(jQuery(this).width());
@@ -23,29 +30,32 @@ jQuery(document).ready(function () {
 
 
     jQuery(".ic_chosen").chosen({width: '200px', search_contains: true, allow_single_deselect: true});
-
-    jQuery('.sort-settings tbody').sortable({
-        items: "tr:not(.ic-not-sortable)",
-        update: function () {
-            jQuery('.sort-settings tbody tr').each(function () {
-                var r = jQuery(this).index();
-                var label_input = jQuery(this).find('td .attribute-label');
-                var value_input = jQuery(this).find('td .attribute-value');
-                var unit_input = jQuery(this).find('td .attribute-unit');
-                var label_base_name = label_input.data('base_name');
-                var value_base_name = value_input.data('base_name');
-                var unit_base_name = unit_input.data('base_name');
-                label_input.attr('name', label_base_name + r);
-                value_input.attr('name', value_base_name + r);
-                unit_input.attr('name', unit_base_name + r);
-                r = r + 1;
-                jQuery(this).find('td .shipping-label').attr('name', '_shipping-label' + r);
-                jQuery(this).find('td .shipping-value').attr('name', '_shipping' + r);
-            });
-        },
-        helper: fixHelper,
-        placeholder: 'sort-settings-placeholder'
-    });
+    if (!isMobile) {
+        jQuery('.sort-settings tbody').sortable({
+            items: "tr:not(.ic-not-sortable)",
+            update: function () {
+                jQuery('.sort-settings tbody tr').each(function () {
+                    var r = jQuery(this).index();
+                    var label_input = jQuery(this).find('td .attribute-label');
+                    var value_input = jQuery(this).find('td .attribute-value');
+                    var unit_input = jQuery(this).find('td .attribute-unit');
+                    var label_base_name = label_input.data('base_name');
+                    var value_base_name = value_input.data('base_name');
+                    var unit_base_name = unit_input.data('base_name');
+                    label_input.attr('name', label_base_name + r);
+                    value_input.attr('name', value_base_name + r);
+                    unit_input.attr('name', unit_base_name + r);
+                    r = r + 1;
+                    jQuery(this).find('td .shipping-label').attr('name', '_shipping-label' + r);
+                    jQuery(this).find('td .shipping-value').attr('name', '_shipping' + r);
+                });
+            },
+            helper: fixHelper,
+            placeholder: 'sort-settings-placeholder'
+        });
+    } else {
+        jQuery('.sort-settings tbody .dragger').hide();
+    }
 //jQuery('.attributes .ui-sortable').height(jQuery('.attributes .ui-sortable').height());
 //jQuery('.shipping .ui-sortable').height(jQuery('.shipping .ui-sortable').height());
     var fields_hide_simple = new Array('input[name="archive_multiple_settings\[category_archive_url\]"]', 'input[name="archive_multiple_settings\[seo_title\]"]', 'input[name="archive_multiple_settings\[seo_title_sep\]"]', 'input[name="archive_multiple_settings\[breadcrumbs_title\]"]', 'input[name="archive_multiple_settings\[enable_product_breadcrumbs\]"]', 'input[name="archive_multiple_settings\[product_listing_cats\]"]', 'input[name="archive_multiple_settings\[category_top_cats\]"]', 'input[name="archive_multiple_settings\[cat_template\]"]');

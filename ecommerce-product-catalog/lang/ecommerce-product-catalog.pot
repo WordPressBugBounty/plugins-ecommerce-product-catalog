@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: eCommerce Product Catalog for WordPress\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ecommerce-product-"
 "catalog\n"
-"POT-Creation-Date: 2023-08-09 10:09+0000\n"
+"POT-Creation-Date: 2026-01-20 12:42+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,48 +17,52 @@ msgstr ""
 "Language: \n"
 "X-Generator: Loco https://localise.biz/"
 
-#: includes/register-product.php:737
+#: includes/register-product.php:763
 #, php-format
 msgid " published. <a href=\"%1$s\">View %2$s</a>"
 msgstr ""
 
-#: theme-product_adder_support.php:236
+#: theme-product_adder_support.php:237
+#, php-format
 msgid "%1$s and %2$s separately for different product catalogs"
 msgstr ""
 
-#: theme-product_adder_support.php:238
+#: theme-product_adder_support.php:239
+#, php-format
 msgid "%1$s as an alternative to %2$s"
 msgstr ""
 
-#: includes/register-product.php:741
+#: includes/register-product.php:767
 #, php-format
 msgid "%1$s draft updated. <a target=\"_blank\" href=\"%2$s\">Preview %1$s</a>"
 msgstr ""
 
-#: includes/register-product.php:736
+#: includes/register-product.php:762
 #, php-format
 msgid "%1$s restored to revision from %2$s"
 msgstr ""
 
-#: includes/register-product.php:739
+#: includes/register-product.php:765
 #, php-format
 msgid "%1$s submitted. <a target=\"_blank\" href=\"%2$s\">Preview %1$s</a>"
 msgstr ""
 
 #: functions/duplicate.php:130
+#, php-format
 msgid "%1$s successfully duplicated! You can edit your new %2$s %3$s."
 msgstr ""
 
-#: includes/register-product.php:732
+#: includes/register-product.php:758
 #, php-format
 msgid "%1$s updated. <a href=\"%2$s\">View %1$s</a>"
 msgstr ""
 
-#: theme-product_adder_support.php:240
+#: theme-product_adder_support.php:241
+#, php-format
 msgid "%1$s with %2$s design"
 msgstr ""
 
-#: includes/settings/general.php:340
+#: includes/settings/general.php:348
 #, php-format
 msgid ""
 "%1$sCreate a main catalog listing page%2$s with %3$s to have more styling "
@@ -66,105 +70,133 @@ msgid ""
 msgstr ""
 
 #: templates/theme-integration.php:97
+#, php-format
 msgid ""
 "%1$sDecrease width%2$s to change the product page horizontal size, "
 "%1$sincrease padding%2$s to generate space around the content and %1$sset "
 "background & text colors%2$s to match your theme style"
 msgstr ""
 
-#: includes/register-product.php:740
+#: includes/register-product.php:766
 #, php-format
 msgid ""
 "%3$s scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" "
 "href=\"%2$s\">Preview %3$s</a>"
 msgstr ""
 
-#: includes/settings/search.php:108
+#: includes/settings/search.php:110
 #, php-format
 msgid "%s adjustment options found in settings for '%s'"
 msgstr ""
 
 #: modules/attributes/attributes-meta.php:24
+#, php-format
 msgid "%s Attributes"
+msgstr ""
+
+#: includes/blocks/index.php:72
+#, php-format
+msgid "%s block"
 msgstr ""
 
 #: includes/product-categories.php:31 includes/product-categories.php:41
 #: includes/widgets/category-widget.php:20
+#, php-format
 msgid "%s Categories"
 msgstr ""
 
 #: includes/product-categories.php:32
+#, php-format
 msgid "%s Category"
 msgstr ""
 
-#: includes/blocks/widgets.php:112 includes/widgets/filter-widgets.php:126
+#: includes/blocks/widgets.php:117 includes/widgets/filter-widgets.php:129
+#, php-format
 msgid "%s Category Filter"
 msgstr ""
 
-#: includes/system.php:195
+#: includes/system.php:200
+#, php-format
 msgid "%s Database Version"
 msgstr ""
 
 #: includes/settings/custom-names.php:28
+#, php-format
 msgid "%s Description"
 msgstr ""
 
-#: includes/register-product.php:298
+#: includes/register-product.php:302
+#, php-format
 msgid "%s description"
 msgstr ""
 
-#: includes/register-product.php:299
+#: includes/register-product.php:303
+#, php-format
 msgid "%s Details"
 msgstr ""
 
 #: functions/support.php:155
+#, php-format
 msgid "%s documentation"
 msgstr ""
 
-#: includes/settings/search.php:220
+#: includes/settings/search.php:230
 #, php-format
 msgid "%s documentation pages found for '%s'"
 msgstr ""
 
-#: includes/settings/csv.php:154
+#: includes/settings/csv.php:169
+#, php-format
 msgid "%s failures occurred. Please check if the file is UTF-8 encoded"
 msgstr ""
 
 #: includes/settings/custom-names.php:23
+#, php-format
 msgid "%s Features"
 msgstr ""
 
 #: includes/widgets/filter-widgets.php:20
+#, php-format
 msgid "%s Filters Bar"
 msgstr ""
 
-#: includes/register-product.php:145 includes/register-product.php:689
+#: includes/register-product.php:150 includes/register-product.php:715
+#, php-format
 msgid "%s Image"
 msgstr ""
 
-#: includes/activation-config.php:273
+#: includes/activation-config.php:281
+#, php-format
 msgid "%s is active now!"
 msgstr ""
 
+#: includes/welcome/start.php:92
+#, php-format
+msgid "%s is carefully crafted for seamless usability by everyday users."
+msgstr ""
+
 #: templates/theme-integration.php:70
+#, php-format
 msgid "%s is currently running in Advanced Mode."
 msgstr ""
 
 #: templates/theme-integration.php:64
+#, php-format
 msgid "%s is currently running in Shortcode Mode."
 msgstr ""
 
 #: templates/theme-integration.php:67
+#, php-format
 msgid "%s is currently running in Simple Mode."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:84 includes/welcome/new.php:138
-#: includes/welcome/start.php:92
+#: includes/welcome/start.php:117
 #, php-format
 msgid "%s is designed to make it easy for developers to customize things."
 msgstr ""
 
-#: theme-product_adder_support.php:331
+#: theme-product_adder_support.php:334
 #, php-format
 msgid ""
 "%s is free software. Would you mind taking <strong>5 seconds</strong> to <a "
@@ -173,75 +205,103 @@ msgid ""
 "%s."
 msgstr ""
 
-#: includes/customizer.php:214 includes/customizer.php:235
+#: includes/welcome/new.php:64
+#, php-format
+msgid ""
+"%s is tested on websites with more than 40,000 products with many parameters,"
+" full-featured shopping cart and automatic product updates."
+msgstr ""
+
+#: includes/customizer.php:255 includes/customizer.php:277
+#, php-format
 msgid "%s Label"
 msgstr ""
 
 #: includes/settings/custom-names.php:19
+#, php-format
 msgid "%s Price"
 msgstr ""
 
 #: modules/price/widgets/price-filter-widget.php:20
+#, php-format
 msgid "%s Price Filter"
 msgstr ""
 
-#: includes/settings/csv.php:152
+#: includes/settings/csv.php:167
+#, php-format
 msgid "%s products successfully added to the catalog"
 msgstr ""
 
 #: theme-product_adder_support.php:195
+#, php-format
 msgid ""
 "%s requires initial configuration in order to work properly &#8211; please "
 "click the Initial Configuration button to proceed."
 msgstr ""
 
-#: includes/blocks/widgets.php:110 includes/widgets/search-widget.php:20
-#: includes/widgets/search-widget.php:97
+#: includes/welcome/new.php:113
+#, php-format
+msgid "%s reviews on WordPress.org"
+msgstr ""
+
+#: includes/blocks/widgets.php:115 includes/widgets/search-widget.php:20
+#: includes/widgets/search-widget.php:101
+#, php-format
 msgid "%s Search"
 msgstr ""
 
-#: includes/product-settings.php:324
+#: includes/product-settings.php:332
+#, php-format
 msgid "%s Settings in Docs"
 msgstr ""
 
 #: includes/settings/custom-names.php:22 modules/shipping/shipping-meta.php:25
+#, php-format
 msgid "%s Shipping"
 msgstr ""
 
-#: includes/register-product.php:297
+#: includes/register-product.php:301
+#, php-format
 msgid "%s Short Description"
 msgstr ""
 
-#: includes/blocks/widgets.php:113 includes/widgets/filter-widgets.php:401
+#: includes/blocks/widgets.php:118 includes/widgets/filter-widgets.php:408
+#, php-format
 msgid "%s Size Filter"
 msgstr ""
 
-#: includes/blocks/widgets.php:111 includes/widgets/filter-widgets.php:328
+#: includes/blocks/widgets.php:116 includes/widgets/filter-widgets.php:335
+#, php-format
 msgid "%s Sort"
 msgstr ""
 
-#: includes/settings/csv.php:463
+#: includes/settings/csv.php:550
+#, php-format
 msgid "%s successfully imported!"
 msgstr ""
 
-#: includes/system.php:415
+#: includes/system.php:420
+#, php-format
 msgid "%s Support"
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:322
+#: modules/cart/includes/orders/functions/functions.php:334
 #, php-format
 msgid "%s Team"
 msgstr ""
 
-#: includes/register-product.php:735
+#: includes/register-product.php:761
+#, php-format
 msgid "%s updated."
 msgstr ""
 
-#: includes/system.php:183
+#: includes/system.php:188
+#, php-format
 msgid "%s Version"
 msgstr ""
 
 #: includes/blocks/widgets.php:73
+#: modules/price/blocks/price-filter/index.php:28
 #, php-format
 msgid ""
 "%s will only show up on the front-end if something is available in the "
@@ -255,7 +315,8 @@ msgid ""
 "assigned."
 msgstr ""
 
-#: functions/functions.php:1233
+#: functions/functions.php:1270
+#, php-format
 msgid "%sAdd widgets to the filters bar now%s or %sdismiss this notice%s."
 msgstr ""
 
@@ -267,6 +328,7 @@ msgid ""
 msgstr ""
 
 #: includes/settings/custom-names.php:25
+#, php-format
 msgid "<< return to %s"
 msgstr ""
 
@@ -275,6 +337,7 @@ msgid "<< return to listing"
 msgstr ""
 
 #: functions/support.php:156
+#, php-format
 msgid ""
 "<b>%4$s</b> documentation is being developed <a href=\"%1$s\">here</a>. For "
 "questions about %4$s please use <a href=\"%2$s\">support forum</a> or <a "
@@ -282,21 +345,23 @@ msgid ""
 msgstr ""
 
 #: functions/support.php:40
+#, php-format
 msgid ""
 "<b>%s is free to use</b>. That's great! It's a pleasure to serve it to you. "
 "Let's keep it free forever!"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:217
+#: modules/cart/includes/shopping-settings.php:220
 msgid "<b>BILLING ADDRESS</b>"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:245
+#: modules/cart/includes/shopping-settings.php:248
 msgid ""
 "<b>DELIVERY ADDRESS</b> (FILL ONLY IF DIFFERENT FROM THE BILLING ADDRESS)"
 msgstr ""
 
 #: functions/support.php:67
+#, php-format
 msgid ""
 "<b>Extensions apart of premium support</b> provide additional useful "
 "features. They improve %s in a field of <a href=\"%1$s\">SEO</a>, <a "
@@ -304,7 +369,7 @@ msgid ""
 "href=\"%4$s\">Conversion</a>."
 msgstr ""
 
-#: theme-product_adder_support.php:347
+#: theme-product_adder_support.php:352
 #, php-format
 msgid ""
 "<strong>Psst, it's less than 1 minute</strong> to add some translations to "
@@ -318,13 +383,14 @@ msgid ""
 "proceed to sample product page where automatic layout adjustment can be made."
 msgstr ""
 
-#: theme-product_adder_support.php:334
+#: theme-product_adder_support.php:339
 msgid ""
 "A <strong>huge thank you</strong> from impleCode and WordPress community in "
 "advance!"
 msgstr ""
 
 #: includes/widgets/category-widget.php:21
+#, php-format
 msgid "A list or dropdown of %s categories"
 msgstr ""
 
@@ -333,6 +399,7 @@ msgid "A list or dropdown of catalog categories"
 msgstr ""
 
 #: includes/widgets/search-widget.php:21
+#, php-format
 msgid "A search form for your %s."
 msgstr ""
 
@@ -344,17 +411,17 @@ msgstr ""
 msgid "Active Extension"
 msgstr ""
 
-#: includes/product-filters.php:581
+#: includes/product-filters.php:586 includes/blocks/index.php:179
 msgid "Active Filters"
 msgstr ""
 
-#: includes/blocks/index.php:249
+#: includes/blocks/index.php:327
 msgid ""
 "Active filters will only show up on the front-end if any filters are active "
 "in the current context."
 msgstr ""
 
-#: includes/system.php:323
+#: includes/system.php:328
 msgid "Active Plugins"
 msgstr ""
 
@@ -362,16 +429,17 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: includes/settings/general.php:337
+#: includes/settings/general.php:345
 #, php-format
 msgid "Add %1$s to the %2$smain catalog page%3$s to have more styling options."
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:170
+#: modules/cart/includes/orders/functions/functions.php:173
 msgid "Add Custom Product"
 msgstr ""
 
-#: includes/activation-config.php:308
+#: includes/activation-config.php:316
+#, php-format
 msgid "Add First %s"
 msgstr ""
 
@@ -379,12 +447,13 @@ msgstr ""
 msgid "Add more Products"
 msgstr ""
 
-#: includes/register-product.php:151
+#: includes/register-product.php:156
 msgid "Add New"
 msgstr ""
 
-#: includes/register-product.php:135 includes/register-product.php:136
-#: includes/register-product.php:138
+#: includes/register-product.php:140 includes/register-product.php:141
+#: includes/register-product.php:143
+#, php-format
 msgid "Add New %s"
 msgstr ""
 
@@ -394,6 +463,7 @@ msgid "Add new %s"
 msgstr ""
 
 #: includes/product-categories.php:39
+#, php-format
 msgid "Add New %s Category"
 msgstr ""
 
@@ -401,7 +471,7 @@ msgstr ""
 msgid "Add New Category"
 msgstr ""
 
-#: includes/register-product.php:152 includes/register-product.php:154
+#: includes/register-product.php:157 includes/register-product.php:159
 msgid "Add New Item"
 msgstr ""
 
@@ -409,7 +479,7 @@ msgstr ""
 msgid "Add New Order"
 msgstr ""
 
-#: includes/activation-config.php:173 includes/activation-config.php:174
+#: includes/activation-config.php:181 includes/activation-config.php:182
 msgid "Add new product"
 msgstr ""
 
@@ -421,7 +491,7 @@ msgstr ""
 msgid "Add Order"
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:168
+#: modules/cart/includes/orders/functions/functions.php:171
 msgid "Add Product"
 msgstr ""
 
@@ -433,8 +503,8 @@ msgstr ""
 msgid "Add Shortcode Now"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:46
-#: modules/cart/includes/orders/includes/save-order.php:213
+#: modules/cart/includes/shopping-settings.php:49
+#: modules/cart/includes/orders/includes/save-order.php:215
 msgid "Add to Cart"
 msgstr ""
 
@@ -442,7 +512,8 @@ msgstr ""
 msgid "Add to Inquiry"
 msgstr ""
 
-#: includes/activation-config.php:330
+#: includes/activation-config.php:338
+#, php-format
 msgid "Add your first %s here."
 msgstr ""
 
@@ -450,8 +521,8 @@ msgstr ""
 msgid "Add your review"
 msgstr ""
 
-#: theme-product_adder_support.php:317 includes/extensions.php:903
-#: includes/welcome/welcome-screen.php:153
+#: theme-product_adder_support.php:320 includes/extensions.php:915
+#: includes/welcome/welcome-screen.php:188
 msgid "Add-ons & Integrations"
 msgstr ""
 
@@ -470,30 +541,30 @@ msgstr ""
 msgid "Additional Settings"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
-#: modules/cart/includes/shopping-settings.php:217
-#: modules/cart/includes/shopping-settings.php:246
+#: modules/quote-cart/index.php:283
+#: modules/cart/includes/shopping-settings.php:220
+#: modules/cart/includes/shopping-settings.php:249
 msgid "Address"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:169
+#: modules/cart/includes/shopping-settings.php:172
 msgid "Admin Email Subject"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:170
+#: modules/cart/includes/shopping-settings.php:173
 msgid "Admin Email template"
 msgstr ""
 
-#: functions/catalog-admin.php:58 functions/catalog-admin.php:74
+#: functions/catalog-admin.php:57 functions/catalog-admin.php:74
 msgid "Admin Options"
 msgstr ""
 
-#: includes/activation-config.php:574 includes/activation-config.php:575
-#: includes/settings/general.php:363 includes/settings/general.php:364
+#: includes/activation-config.php:584 includes/activation-config.php:585
+#: includes/settings/general.php:371 includes/settings/general.php:372
 msgid "Admin panel customisation setting. Change it to what you sell."
 msgstr ""
 
-#: includes/settings/general.php:197 includes/settings/general.php:231
+#: includes/settings/general.php:205 includes/settings/general.php:239
 msgid "Advanced Mode"
 msgstr ""
 
@@ -506,23 +577,23 @@ msgstr ""
 msgid "Advanced Mode Required"
 msgstr ""
 
-#: includes/settings/general.php:213 includes/settings/general.php:308
+#: includes/settings/general.php:221 includes/settings/general.php:316
 msgid "Advanced Mode Visual Wizard"
 msgstr ""
 
-#: functions/activation.php:160
+#: functions/activation.php:164
 msgid "Advanced Theme Integration Mode"
 msgstr ""
 
-#: includes/activation-config.php:107 modules/button/index.php:126
+#: includes/activation-config.php:115 modules/button/index.php:126
 msgid "Affiliate Button"
 msgstr ""
 
-#: includes/settings/general.php:353
+#: includes/settings/general.php:361 includes/welcome/start.php:62
 msgid "Affiliate Catalog"
 msgstr ""
 
-#: modules/price/config/currencies.php:193
+#: modules/price/config/currencies.php:195
 msgid "Afghan afghani"
 msgstr ""
 
@@ -538,7 +609,7 @@ msgstr ""
 msgid "After Price Text"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/digital-order-columns.php:94
+#: modules/cart/includes/orders/includes/digital-order-columns.php:98
 msgid "ago"
 msgstr ""
 
@@ -546,7 +617,7 @@ msgstr ""
 msgid "Albania"
 msgstr ""
 
-#: modules/price/config/currencies.php:194
+#: modules/price/config/currencies.php:196
 msgid "Albanian lek"
 msgstr ""
 
@@ -554,40 +625,42 @@ msgstr ""
 msgid "Algeria"
 msgstr ""
 
-#: modules/price/config/currencies.php:233
+#: modules/price/config/currencies.php:235
 msgid "Algerian dinar"
 msgstr ""
 
-#: functions/functions.php:967 includes/product-columns.php:117
-#: includes/blocks/index.php:119 includes/blocks/index.php:269
-#: includes/blocks/index.php:303 includes/settings/custom-names.php:60
+#: functions/functions.php:1004 includes/product-columns.php:117
+#: includes/blocks/index.php:123 includes/blocks/index.php:347
+#: includes/blocks/index.php:381 includes/settings/custom-names.php:60
 #: includes/settings/custom-names.php:71
 msgid "All"
 msgstr ""
 
 #: includes/settings/custom-names.php:59
+#, php-format
 msgid "All %s"
 msgstr ""
 
 #: includes/product-categories.php:34
+#, php-format
 msgid "All %s Categories"
 msgstr ""
 
-#: includes/product-settings.php:385
+#: includes/product-settings.php:393
 msgid "All bug reports and support tickets are tracked on a daily basis."
 msgstr ""
 
-#: includes/system.php:69
+#: includes/system.php:71
 msgid "All Catalog Categories successfully deleted!"
 msgstr ""
 
-#: includes/system.php:71
+#: includes/system.php:73
 msgid ""
 "All catalog categories will be permanently deleted. Would you like to "
 "proceed?"
 msgstr ""
 
-#: includes/system.php:43
+#: includes/system.php:44
 msgid "All Catalog Products successfully deleted!"
 msgstr ""
 
@@ -600,7 +673,7 @@ msgstr ""
 msgid "All Categories"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:156
+#: includes/class-ic-sitewide-bar.php:201
 msgid "All devices"
 msgstr ""
 
@@ -609,7 +682,7 @@ msgstr ""
 msgid "All extensions are designed to work with each other smoothly."
 msgstr ""
 
-#: includes/system.php:45
+#: includes/system.php:46
 msgid "All items will be permanently deleted. Would you like to proceed?"
 msgstr ""
 
@@ -625,26 +698,27 @@ msgid "All Products"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:96 includes/welcome/new.php:150
-#: includes/welcome/start.php:104
+#: includes/welcome/start.php:129
 msgid "All the templates are located in the plugin templates folder."
 msgstr ""
 
-#: templates/shortcode-catalog.php:708
+#: templates/shortcode-catalog.php:722
 msgid ""
 "All your individual product pages will include this page slug as a parent."
 msgstr ""
 
-#: includes/tracking.php:301
+#: includes/tracking.php:318
 msgid "Allow"
 msgstr ""
 
-#: includes/tracking.php:300
+#: includes/tracking.php:317
+#, php-format
 msgid ""
 "Allow %s to track plugin usage? Opt-in to tracking to help in plugin "
 "development. No sensitive data is tracked."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:161
+#: modules/cart/includes/shopping-settings.php:164
 msgid ""
 "Alternately, try using the Email to send confirmations that matches your "
 "website domain."
@@ -670,7 +744,12 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
-#: includes/settings/search.php:209
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:124
+#, php-format
+msgid "An error occurred. Please try again. Auto refresh in %s seconds."
+msgstr ""
+
+#: includes/settings/search.php:219
 msgid "An error ocurred while searching. Please try again. "
 msgstr ""
 
@@ -687,7 +766,7 @@ msgstr ""
 msgid "Angola"
 msgstr ""
 
-#: modules/price/config/currencies.php:197
+#: modules/price/config/currencies.php:199
 msgid "Angolan kwanza"
 msgstr ""
 
@@ -721,6 +800,7 @@ msgid ""
 msgstr ""
 
 #: includes/widgets/filter-widgets.php:21
+#, php-format
 msgid ""
 "Appears above the product list. Recommended widgets: %1$s Search, %1$s Price "
 "Filter, %1$s Sort and %1$s Category Filter."
@@ -732,15 +812,15 @@ msgid ""
 "Price Filter, Catalog Sort and Catalog Category Filter."
 msgstr ""
 
-#: includes/settings/custom-design.php:308
+#: includes/settings/custom-design.php:309
 msgid "archive pagination"
 msgstr ""
 
-#: includes/settings/general.php:487
+#: includes/settings/general.php:495
 msgid "Archive SEO Title"
 msgstr ""
 
-#: includes/settings/tooltips.php:180
+#: includes/settings/tooltips.php:182
 msgid "Are you sure? This will disable all tutorial boxes on all screens."
 msgstr ""
 
@@ -748,7 +828,7 @@ msgstr ""
 msgid "Argentina"
 msgstr ""
 
-#: modules/price/config/currencies.php:198
+#: modules/price/config/currencies.php:200
 msgid "Argentine peso"
 msgstr ""
 
@@ -756,7 +836,7 @@ msgstr ""
 msgid "Armenia"
 msgstr ""
 
-#: modules/price/config/currencies.php:195
+#: modules/price/config/currencies.php:197
 msgid "Armenian dram"
 msgstr ""
 
@@ -764,7 +844,7 @@ msgstr ""
 msgid "Aruba"
 msgstr ""
 
-#: modules/price/config/currencies.php:200
+#: modules/price/config/currencies.php:202
 msgid "Aruban florin"
 msgstr ""
 
@@ -778,11 +858,11 @@ msgid ""
 "Support</a> service."
 msgstr ""
 
-#: includes/blocks/index.php:339
+#: includes/blocks/index.php:417
 msgid "ASC"
 msgstr ""
 
-#: includes/activation-config.php:184
+#: includes/activation-config.php:192
 msgid "Assign or add the product categories and subcategories here."
 msgstr ""
 
@@ -809,7 +889,7 @@ msgstr ""
 msgid "Attribute value"
 msgstr ""
 
-#: includes/activation-config.php:186 modules/attributes/attributes-meta.php:26
+#: includes/activation-config.php:194 modules/attributes/attributes-meta.php:26
 #: modules/attributes/attributes-settings.php:25
 msgid "Attributes"
 msgstr ""
@@ -818,11 +898,11 @@ msgstr ""
 msgid "attributes"
 msgstr ""
 
-#: includes/activation-config.php:341
+#: includes/activation-config.php:349
 msgid "Attributes box"
 msgstr ""
 
-#: includes/activation-config.php:118
+#: includes/activation-config.php:126
 msgid "Attributes Configuration"
 msgstr ""
 
@@ -843,7 +923,7 @@ msgstr ""
 msgid "Australia"
 msgstr ""
 
-#: modules/price/config/currencies.php:199
+#: modules/price/config/currencies.php:201
 msgid "Australian dollar"
 msgstr ""
 
@@ -851,8 +931,16 @@ msgstr ""
 msgid "Austria"
 msgstr ""
 
-#: includes/system.php:388
+#: includes/system.php:390
 msgid "Author URL"
+msgstr ""
+
+#: includes/extensions.php:771
+#, php-format
+msgid ""
+"Automatic installation is currently unavailable because your website cannot "
+"connect to WordPress.org. You can <a href=\"%s\">download the extension "
+"manually</a> and install it via Plugins > Add New > Upload Plugin."
 msgstr ""
 
 #: functions/support.php:100
@@ -867,11 +955,11 @@ msgstr ""
 msgid "Azerbaijan"
 msgstr ""
 
-#: modules/price/config/currencies.php:201
+#: modules/price/config/currencies.php:203
 msgid "Azerbaijani manat"
 msgstr ""
 
-#: includes/customizer.php:165 templates/theme-integration.php:99
+#: includes/customizer.php:198 templates/theme-integration.php:99
 msgid "Background"
 msgstr ""
 
@@ -879,7 +967,7 @@ msgstr ""
 msgid "Bahamas"
 msgstr ""
 
-#: modules/price/config/currencies.php:212
+#: modules/price/config/currencies.php:214
 msgid "Bahamian dollar"
 msgstr ""
 
@@ -887,7 +975,7 @@ msgstr ""
 msgid "Bahrain"
 msgstr ""
 
-#: modules/price/config/currencies.php:206
+#: modules/price/config/currencies.php:208
 msgid "Bahraini dinar"
 msgstr ""
 
@@ -895,11 +983,11 @@ msgstr ""
 msgid "Bangladesh"
 msgstr ""
 
-#: modules/price/config/currencies.php:204
+#: modules/price/config/currencies.php:206
 msgid "Bangladeshi taka"
 msgstr ""
 
-#: modules/price/config/currencies.php:203
+#: modules/price/config/currencies.php:205
 msgid "Barbadian dollar"
 msgstr ""
 
@@ -915,11 +1003,11 @@ msgstr ""
 msgid "Belarus"
 msgstr ""
 
-#: modules/price/config/currencies.php:217
+#: modules/price/config/currencies.php:219
 msgid "Belarusian ruble"
 msgstr ""
 
-#: modules/price/config/currencies.php:216
+#: modules/price/config/currencies.php:218
 msgid "Belarusian ruble (old)"
 msgstr ""
 
@@ -931,7 +1019,7 @@ msgstr ""
 msgid "Belize"
 msgstr ""
 
-#: modules/price/config/currencies.php:218
+#: modules/price/config/currencies.php:220
 msgid "Belize dollar"
 msgstr ""
 
@@ -943,7 +1031,7 @@ msgstr ""
 msgid "Bermuda"
 msgstr ""
 
-#: modules/price/config/currencies.php:208
+#: modules/price/config/currencies.php:210
 msgid "Bermudian dollar"
 msgstr ""
 
@@ -951,28 +1039,28 @@ msgstr ""
 msgid "Bhutan"
 msgstr ""
 
-#: modules/price/config/currencies.php:214
+#: modules/price/config/currencies.php:216
 msgid "Bhutanese ngultrum"
 msgstr ""
 
-#: functions/activation.php:138 includes/customizer.php:134
+#: functions/activation.php:142 includes/customizer.php:164
 #: modules/price/price-settings.php:26
 msgid "Big"
 msgstr ""
 
-#: modules/price/config/currencies.php:213
+#: modules/price/config/currencies.php:215
 msgid "Bitcoin"
 msgstr ""
 
-#: includes/blocks/block-edit.php:74
+#: includes/blocks/block-edit.php:84
 msgid "Blocks"
 msgstr ""
 
-#: includes/welcome/mode-selected.php:66
+#: includes/welcome/mode-selected.php:66 includes/welcome/start.php:99
 msgid "Blocks usage"
 msgstr ""
 
-#: includes/customizer.php:120 includes/settings/custom-design.php:299
+#: includes/customizer.php:147 includes/settings/custom-design.php:300
 #: modules/price/price-settings.php:44
 msgid "Blue"
 msgstr ""
@@ -981,7 +1069,7 @@ msgstr ""
 msgid "Bolivia"
 msgstr ""
 
-#: modules/price/config/currencies.php:210
+#: modules/price/config/currencies.php:212
 msgid "Bolivian boliviano"
 msgstr ""
 
@@ -989,7 +1077,7 @@ msgstr ""
 msgid "Bosnia and Herzegovina"
 msgstr ""
 
-#: modules/price/config/currencies.php:202
+#: modules/price/config/currencies.php:204
 msgid "Bosnia and Herzegovina convertible mark"
 msgstr ""
 
@@ -997,7 +1085,7 @@ msgstr ""
 msgid "Botswana"
 msgstr ""
 
-#: modules/price/config/currencies.php:215
+#: modules/price/config/currencies.php:217
 msgid "Botswana pula"
 msgstr ""
 
@@ -1005,7 +1093,7 @@ msgstr ""
 msgid "Bouvet Island"
 msgstr ""
 
-#: includes/settings/custom-design.php:289
+#: includes/settings/custom-design.php:290
 msgid "Boxes Color"
 msgstr ""
 
@@ -1013,7 +1101,7 @@ msgstr ""
 msgid "Brazil"
 msgstr ""
 
-#: modules/price/config/currencies.php:211
+#: modules/price/config/currencies.php:213
 msgid "Brazilian real"
 msgstr ""
 
@@ -1021,11 +1109,11 @@ msgstr ""
 msgid "Breadcrumbs Home Label"
 msgstr ""
 
-#: includes/settings/general.php:494
+#: includes/settings/general.php:502
 msgid "Breadcrumbs Settings"
 msgstr ""
 
-#: includes/settings/general.php:560
+#: includes/settings/general.php:568
 msgid ""
 "Breadcrumbs will be displayed before the page title. It may require some "
 "additional styling."
@@ -1039,7 +1127,7 @@ msgstr ""
 msgid "Brunei Darrussalam"
 msgstr ""
 
-#: modules/price/config/currencies.php:209
+#: modules/price/config/currencies.php:211
 msgid "Brunei dollar"
 msgstr ""
 
@@ -1047,7 +1135,7 @@ msgstr ""
 msgid "Bulgaria"
 msgstr ""
 
-#: modules/price/config/currencies.php:205
+#: modules/price/config/currencies.php:207
 msgid "Bulgarian lev"
 msgstr ""
 
@@ -1055,7 +1143,7 @@ msgstr ""
 msgid "Burkina Faso"
 msgstr ""
 
-#: modules/price/config/currencies.php:285
+#: modules/price/config/currencies.php:287
 msgid "Burmese kyat"
 msgstr ""
 
@@ -1063,7 +1151,7 @@ msgstr ""
 msgid "Burundi"
 msgstr ""
 
-#: modules/price/config/currencies.php:207
+#: modules/price/config/currencies.php:209
 msgid "Burundian franc"
 msgstr ""
 
@@ -1079,20 +1167,22 @@ msgstr ""
 msgid "Button Label"
 msgstr ""
 
-#: includes/activation-config.php:201 modules/button/index.php:82
+#: includes/activation-config.php:209 modules/button/index.php:82
 msgid "Button URL"
 msgstr ""
 
-#: includes/blocks/index.php:116
+#: includes/blocks/index.php:120
+#, php-format
 msgid "By %s"
 msgstr ""
 
-#: includes/system.php:354
+#: includes/system.php:359
+#, php-format
 msgctxt "by author"
 msgid "by %s"
 msgstr ""
 
-#: includes/blocks/index.php:115
+#: includes/blocks/index.php:119
 msgid "By Category"
 msgstr ""
 
@@ -1100,11 +1190,11 @@ msgstr ""
 msgid "By default it shows the main catalog page content."
 msgstr ""
 
-#: includes/activation-config.php:331
+#: includes/activation-config.php:339
 msgid "By default you should see a two-column layout here:"
 msgstr ""
 
-#: includes/settings/general.php:433
+#: includes/settings/general.php:441
 #, php-format
 msgid ""
 "By default, the category parent slug cannot be the same as for products. If "
@@ -1116,7 +1206,7 @@ msgstr ""
 msgid "Cambodia"
 msgstr ""
 
-#: modules/price/config/currencies.php:268
+#: modules/price/config/currencies.php:270
 msgid "Cambodian riel"
 msgstr ""
 
@@ -1128,15 +1218,15 @@ msgstr ""
 msgid "Canada"
 msgstr ""
 
-#: modules/price/config/currencies.php:219
+#: modules/price/config/currencies.php:221
 msgid "Canadian dollar"
 msgstr ""
 
-#: includes/system.php:80 includes/tracking.php:382
+#: includes/system.php:84 includes/tracking.php:400
 msgid "Cancel"
 msgstr ""
 
-#: includes/settings/general.php:447
+#: includes/settings/general.php:455
 msgid "Cannot be the same as product listing page slug"
 msgstr ""
 
@@ -1144,77 +1234,94 @@ msgstr ""
 msgid "Cape Verde"
 msgstr ""
 
-#: modules/price/config/currencies.php:228
+#: modules/price/config/currencies.php:230
 msgid "Cape Verdean escudo"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:106
+#: modules/price/config/currencies.php:351
+msgid "Caribbean guilder"
+msgstr ""
+
+#: modules/cart/includes/shopping-settings.php:109
 msgid "Cart"
 msgstr ""
 
-#: includes/activation-config.php:104 includes/activation-config.php:154
-#: includes/activation-config.php:155
+#: includes/activation-config.php:112 includes/activation-config.php:162
+#: includes/activation-config.php:163
 msgid "Cart Configuration"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:90
+#: modules/cart/includes/shopping-settings.php:93
 msgid "Cart Settings"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:191
+#: modules/cart/includes/shopping-settings.php:194
 msgid "Cart Widget"
 msgstr ""
 
-#: includes/blocks/index.php:260
+#: includes/blocks/index.php:338
 msgid "Catalog"
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:491
+#: includes/widgets/filter-widgets.php:498
 msgid "Catalog Active Filters"
 msgstr ""
 
-#: includes/activation-config.php:125
+#: includes/activation-config.php:133
 msgid "Catalog Addons"
 msgstr ""
 
-#: includes/welcome/mode-selected.php:63
+#: includes/welcome/mode-selected.php:63 includes/welcome/start.php:95
 msgid "Catalog Blocks"
 msgstr ""
 
-#: includes/activation-config.php:114 includes/widgets/category-widget.php:23
+#: includes/activation-config.php:122 includes/widgets/category-widget.php:23
 msgid "Catalog Categories"
 msgstr ""
 
-#: includes/blocks/widgets.php:118 includes/widgets/filter-widgets.php:129
+#: includes/blocks/widgets.php:123 includes/widgets/filter-widgets.php:132
 msgid "Catalog Category Filter"
+msgstr ""
+
+#: includes/blocks/category-links/block.asset.php:3
+msgid "Catalog Category Links"
+msgstr ""
+
+#: templates/block-catalog.php:39
+msgid "Catalog Category Page"
 msgstr ""
 
 #: includes/settings/image-sizes.php:44
 msgid "Catalog Category Page Image"
 msgstr ""
 
-#: includes/activation-config.php:101 includes/activation-config.php:119
+#: includes/activation-config.php:109 includes/activation-config.php:127
 #: templates/theme-integration.php:50
 msgid "Catalog Configuration"
 msgstr ""
 
-#: includes/blocks/index.php:190
+#: includes/blocks/index.php:214
 msgid "Catalog Container"
 msgstr ""
 
-#: includes/settings/general.php:295
+#: includes/settings/general.php:303
 msgid "Catalog Container Background"
 msgstr ""
 
-#: includes/settings/general.php:296
+#: includes/settings/general.php:304
 msgid "Catalog Container Padding"
 msgstr ""
 
-#: includes/settings/general.php:294
+#: includes/settings/general.php:302
 msgid "Catalog Container Width"
 msgstr ""
 
-#: includes/activation-config.php:117 includes/activation-config.php:135
+#: includes/welcome/mode-selected.php:124 includes/welcome/new.php:178
+#: includes/welcome/start.php:157
+msgid "Catalog Custom Coding"
+msgstr ""
+
+#: includes/activation-config.php:125 includes/activation-config.php:143
 #: includes/settings/custom-design.php:19
 msgid "Catalog Design"
 msgstr ""
@@ -1223,20 +1330,20 @@ msgstr ""
 msgid "Catalog Filters Bar"
 msgstr ""
 
-#: includes/settings/general.php:361
+#: includes/settings/general.php:369
 msgid "Catalog Label"
 msgstr ""
 
-#: includes/activation-config.php:116 includes/activation-config.php:144
+#: includes/activation-config.php:124 includes/activation-config.php:152
 msgid "Catalog Labels"
 msgstr ""
 
-#: includes/settings/general.php:166
+#: includes/settings/general.php:173
 msgid "Catalog Layout Integration with the theme"
 msgstr ""
 
-#: includes/activation-config.php:120 includes/activation-config.php:121
-#: includes/activation-config.php:122 includes/activation-config.php:123
+#: includes/activation-config.php:128 includes/activation-config.php:129
+#: includes/activation-config.php:130 includes/activation-config.php:131
 msgid "Catalog Listing Configuration"
 msgstr ""
 
@@ -1248,24 +1355,31 @@ msgstr ""
 msgid "Catalog Markup Element"
 msgstr ""
 
-#: includes/settings/general.php:348 includes/settings/general.php:350
+#: includes/settings/general.php:356 includes/settings/general.php:358
 msgid "Catalog Mode"
 msgstr ""
 
-#: includes/activation-config.php:575 includes/settings/general.php:364
+#: includes/activation-config.php:585 includes/settings/general.php:372
 msgid "Catalog Plural Name"
 msgstr ""
 
 #: modules/price/widgets/price-filter-widget.php:23
-#: modules/price/blocks/price-filter/index.php:33
+#: modules/price/blocks/price-filter/block.asset.php:3
+#: modules/price/blocks/price-filter/index.php:28
+#: modules/price/blocks/price-filter/index.php:37
+#: modules/price/blocks/price-filter/index.php:45
 msgid "Catalog Price Filter"
 msgstr ""
 
-#: includes/activation-config.php:115
+#: includes/activation-config.php:123
 msgid "Catalog Products"
 msgstr ""
 
-#: includes/activation-config.php:101
+#: includes/blocks/search/block.asset.php:3
+msgid "Catalog Search"
+msgstr ""
+
+#: includes/activation-config.php:109
 msgid ""
 "Catalog settings are located here. Click on the settings link to finish the "
 "catalog configuration."
@@ -1283,22 +1397,22 @@ msgstr ""
 msgid "Catalog Single Page Image"
 msgstr ""
 
-#: includes/activation-config.php:574 includes/settings/general.php:363
+#: includes/activation-config.php:584 includes/settings/general.php:371
 msgid "Catalog Singular Name"
 msgstr ""
 
-#: includes/blocks/widgets.php:119 includes/widgets/filter-widgets.php:404
+#: includes/blocks/widgets.php:124 includes/widgets/filter-widgets.php:411
 msgid "Catalog Size Filter"
 msgstr ""
 
-#: includes/blocks/widgets.php:117 includes/widgets/filter-widgets.php:331
+#: includes/blocks/widgets.php:122 includes/widgets/filter-widgets.php:338
 msgid "Catalog Sort"
 msgstr ""
 
-#: includes/activation-config.php:184 includes/product-categories.php:45
+#: includes/activation-config.php:192 includes/product-categories.php:45
 #: includes/product-categories.php:55 includes/product-columns.php:247
-#: includes/settings/csv.php:247 includes/settings/csv.php:295
-#: includes/settings/general.php:466
+#: includes/settings/csv.php:263 includes/settings/csv.php:311
+#: includes/settings/general.php:474
 msgid "Categories"
 msgstr ""
 
@@ -1307,11 +1421,11 @@ msgstr ""
 msgid "categories"
 msgstr ""
 
-#: includes/activation-config.php:344
+#: includes/activation-config.php:352
 msgid "Categories box"
 msgstr ""
 
-#: includes/settings/general.php:459
+#: includes/settings/general.php:467
 msgid "Categories Display"
 msgstr ""
 
@@ -1319,15 +1433,15 @@ msgstr ""
 msgid "Categories Header Label"
 msgstr ""
 
-#: includes/settings/general.php:435
+#: includes/settings/general.php:443
 msgid "Categories Parent URL"
 msgstr ""
 
-#: includes/settings/general.php:418
+#: includes/settings/general.php:426
 msgid "Categories Settings"
 msgstr ""
 
-#: includes/product-categories.php:46 includes/widgets/filter-widgets.php:266
+#: includes/product-categories.php:46 includes/widgets/filter-widgets.php:273
 msgid "Category"
 msgstr ""
 
@@ -1335,17 +1449,17 @@ msgstr ""
 msgid "category"
 msgstr ""
 
-#: includes/product-category-columns.php:78
-#: includes/product-category-columns.php:92
-#: includes/product-category-columns.php:95
+#: includes/product-category-columns.php:79
+#: includes/product-category-columns.php:93
+#: includes/product-category-columns.php:96
 msgid "Category Image"
 msgstr ""
 
-#: includes/blocks/widgets.php:129
+#: includes/blocks/widgets.php:134
 msgid "Category Links"
 msgstr ""
 
-#: includes/settings/general.php:454
+#: includes/settings/general.php:462
 msgid "Category Page shows"
 msgstr ""
 
@@ -1365,7 +1479,7 @@ msgstr ""
 msgid "Category widget enhancement"
 msgstr ""
 
-#: includes/settings/general.php:449
+#: includes/settings/general.php:457
 msgid "category-name"
 msgstr ""
 
@@ -1373,11 +1487,11 @@ msgstr ""
 msgid "Cayman Islands"
 msgstr ""
 
-#: modules/price/config/currencies.php:273
+#: modules/price/config/currencies.php:275
 msgid "Cayman Islands dollar"
 msgstr ""
 
-#: modules/price/config/currencies.php:347
+#: modules/price/config/currencies.php:349
 msgid "Central African CFA franc"
 msgstr ""
 
@@ -1385,7 +1499,7 @@ msgstr ""
 msgid "Central African Republic"
 msgstr ""
 
-#: modules/price/config/currencies.php:350
+#: modules/price/config/currencies.php:353
 msgid "CFP franc"
 msgstr ""
 
@@ -1393,52 +1507,58 @@ msgstr ""
 msgid "Chad"
 msgstr ""
 
-#: includes/settings/custom-design.php:274
+#: includes/settings/custom-design.php:275
 msgid ""
 "Changing design schemes has almost always impact on various elements. For "
 "example, changing price color has an impact on the single product page and "
 "archive page price color."
 msgstr ""
 
-#: ecommerce-product-catalog.php:79 ecommerce-product-catalog.php:91
+#: ecommerce-product-catalog.php:81 ecommerce-product-catalog.php:93
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:108 includes/welcome/new.php:162
-#: includes/welcome/start.php:116
+#: includes/welcome/start.php:141
 msgid "Check all the shortcodes"
 msgstr ""
 
-#: includes/extensions.php:945
+#: includes/extensions.php:959
 msgid "Check out extensions bundles"
 msgstr ""
 
 #: includes/controls.php:26
+#, php-format
 msgid ""
 "Check the %1$scatalog settings%2$s for more advanced configuration options."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:90 includes/welcome/new.php:144
-#: includes/welcome/start.php:98
+#: includes/welcome/start.php:123
 msgid "Check the advanced theme integration method"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:98 includes/welcome/new.php:152
-#: includes/welcome/start.php:106
+#: includes/welcome/start.php:131
 msgid "Check the details about template modification"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:182
+#: includes/welcome/mode-selected.php:143 includes/welcome/new.php:197
+#: includes/welcome/start.php:176
+msgid "Check the documentation for more!"
+msgstr ""
+
+#: modules/cart/includes/shopping-settings.php:185
 msgid "Check this checbox if you are not selling to USA."
 msgstr ""
 
-#: includes/activation-config.php:201
+#: includes/activation-config.php:209
 msgid ""
 "Check this checkbox if you want to define a separate button URL for each "
 "product."
 msgstr ""
 
-#: includes/settings/general.php:556
+#: includes/settings/general.php:564
 msgid ""
 "Check this if you want to display main catalog page content on every catalog "
 "page. For example, if you are using page builder on the main catalog page to "
@@ -1453,7 +1573,7 @@ msgstr ""
 msgid "checkbox instead of links for category filter"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:122
+#: modules/cart/includes/shopping-settings.php:125
 msgid "Checkout"
 msgstr ""
 
@@ -1461,7 +1581,7 @@ msgstr ""
 msgid "Checkout Shipping Cost"
 msgstr ""
 
-#: includes/system.php:392
+#: includes/system.php:394
 msgid "Child Theme"
 msgstr ""
 
@@ -1469,7 +1589,7 @@ msgstr ""
 msgid "Chile"
 msgstr ""
 
-#: modules/price/config/currencies.php:222
+#: modules/price/config/currencies.php:224
 msgid "Chilean peso"
 msgstr ""
 
@@ -1477,31 +1597,32 @@ msgstr ""
 msgid "China"
 msgstr ""
 
-#: modules/price/config/currencies.php:223
+#: modules/price/config/currencies.php:225
 msgid "Chinese yuan"
 msgstr ""
 
-#: includes/blocks/index.php:113
+#: includes/blocks/index.php:117
+#, php-format
 msgid "Choose %s to Display"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:100
+#: modules/cart/includes/shopping-settings.php:103
 msgid "Choose Cart Page"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:116
+#: modules/cart/includes/shopping-settings.php:119
 msgid "Choose Cart Submit Page"
 msgstr ""
 
-#: includes/blocks/index.php:114
+#: includes/blocks/index.php:118
 msgid "Choose Categories to Display"
 msgstr ""
 
-#: includes/blocks/block-edit.php:76
+#: includes/blocks/block-edit.php:86
 msgid "Choose how would you like to edit the products."
 msgstr ""
 
-#: includes/settings/general.php:390
+#: includes/settings/general.php:398
 msgid "Choose Main Listing Page"
 msgstr ""
 
@@ -1511,18 +1632,18 @@ msgstr ""
 
 #: modules/cart/includes/orders/index.php:53
 #: modules/cart/includes/orders/index.php:57
-#: modules/cart/includes/orders/includes/register-digital-orders.php:323
-#: modules/cart/includes/orders/includes/register-digital-orders.php:325
+#: modules/cart/includes/orders/includes/register-digital-orders.php:324
+#: modules/cart/includes/orders/includes/register-digital-orders.php:326
 msgid "Choose product from catalog"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:132
+#: modules/cart/includes/shopping-settings.php:135
 msgid "Choose Thank You Page"
 msgstr ""
 
-#: modules/cart/functions/functions.php:131
+#: modules/cart/functions/functions.php:133
 #: modules/cart/ext/formbuilder/index.php:934
-#: modules/cart/ext/formbuilder/index.php:1011
+#: modules/cart/ext/formbuilder/index.php:1014
 msgid "Choose your country..."
 msgstr ""
 
@@ -1531,7 +1652,7 @@ msgstr ""
 msgid "Choose your preferred %s configuration."
 msgstr ""
 
-#: includes/settings/general.php:355
+#: includes/settings/general.php:363
 msgid "Choose your usage scenario."
 msgstr ""
 
@@ -1539,17 +1660,17 @@ msgstr ""
 msgid "Christmas Island"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
-#: modules/cart/includes/shopping-settings.php:217
-#: modules/cart/includes/shopping-settings.php:246
+#: modules/quote-cart/index.php:283
+#: modules/cart/includes/shopping-settings.php:220
+#: modules/cart/includes/shopping-settings.php:249
 msgid "City"
 msgstr ""
 
-#: includes/blocks/block-edit.php:73
+#: includes/blocks/block-edit.php:83
 msgid "Classic Editor"
 msgstr ""
 
-#: templates/templates-functions.php:412
+#: templates/templates-functions.php:425
 #: includes/settings/custom-design.php:161
 msgid "Classic Grid"
 msgstr ""
@@ -1558,7 +1679,7 @@ msgstr ""
 msgid "Classic Grid Image"
 msgstr ""
 
-#: templates/templates-functions.php:411
+#: templates/templates-functions.php:424
 #: includes/settings/custom-design.php:143
 msgid "Classic List"
 msgstr ""
@@ -1567,11 +1688,12 @@ msgstr ""
 msgid "Classic List Image"
 msgstr ""
 
-#: functions/activation.php:174
+#: functions/activation.php:178
+#, php-format
 msgid "Click %shere%s to proceed."
 msgstr ""
 
-#: functions/activation.php:168
+#: functions/activation.php:172
 #, php-format
 msgid ""
 "Click <a href=\"%s\">here</a> to test the Automatic Advanced Mode. If the "
@@ -1585,15 +1707,15 @@ msgstr ""
 msgid "Click for more"
 msgstr ""
 
-#: includes/activation-config.php:173 includes/activation-config.php:174
+#: includes/activation-config.php:181 includes/activation-config.php:182
 msgid "Click here to add new product."
 msgstr ""
 
-#: includes/activation-config.php:107
+#: includes/activation-config.php:115
 msgid "Click here to configure your button settings, so it works as expected."
 msgstr ""
 
-#: includes/activation-config.php:104
+#: includes/activation-config.php:112
 msgid ""
 "Click here to configure your cart settings, so it works correctly. Select "
 "the cart, checkout and thank you page. Set the email address for order "
@@ -1609,23 +1731,23 @@ msgstr ""
 msgid "Click start to proceed with layout adjustment."
 msgstr ""
 
-#: includes/product-settings.php:328
+#: includes/product-settings.php:336
 msgid "Click the button to visit impleCode documentation"
 msgstr ""
 
-#: includes/product-settings.php:339
+#: includes/product-settings.php:347
 msgid "Click the button to visit impleCode website"
 msgstr ""
 
-#: includes/product-settings.php:388
+#: includes/product-settings.php:396
 msgid "Click the button to visit the support forum."
 msgstr ""
 
-#: includes/settings/general.php:177
+#: includes/settings/general.php:185
 msgid "Click the Edit button near the Main Catalog Page option."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:45
+#: modules/cart/includes/shopping-settings.php:48
 msgid "Click to add this item to cart."
 msgstr ""
 
@@ -1637,25 +1759,25 @@ msgstr ""
 msgid "Colombia"
 msgstr ""
 
-#: modules/price/config/currencies.php:224
+#: modules/price/config/currencies.php:226
 msgid "Colombian peso"
 msgstr ""
 
-#: functions/activation.php:134
+#: functions/activation.php:138
 msgid "Color"
 msgstr ""
 
-#: includes/settings/csv.php:110
+#: includes/settings/csv.php:122
 msgid "Comma"
 msgstr ""
 
-#: modules/quote-cart/index.php:301
-#: modules/cart/includes/shopping-settings.php:244
-#: modules/cart/includes/shopping-settings.php:272
+#: modules/quote-cart/index.php:304
+#: modules/cart/includes/shopping-settings.php:247
+#: modules/cart/includes/shopping-settings.php:275
 msgid "Comment"
 msgstr ""
 
-#: modules/price/config/currencies.php:269
+#: modules/price/config/currencies.php:271
 msgid "Comorian franc"
 msgstr ""
 
@@ -1663,13 +1785,14 @@ msgstr ""
 msgid "Comoros"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
-#: modules/cart/includes/shopping-settings.php:217
-#: modules/cart/includes/shopping-settings.php:246
+#: modules/quote-cart/index.php:283
+#: modules/cart/includes/shopping-settings.php:220
+#: modules/cart/includes/shopping-settings.php:249
 msgid "Company"
 msgstr ""
 
 #: modules/attributes/comparison.php:185
+#, php-format
 msgid "Compare %s"
 msgstr ""
 
@@ -1686,11 +1809,11 @@ msgid "Comparison Page"
 msgstr ""
 
 #: modules/cart/includes/orders/functions/functions.php:17
-#: modules/cart/includes/orders/includes/digital-order-columns.php:63
+#: modules/cart/includes/orders/includes/digital-order-columns.php:67
 msgid "Complete"
 msgstr ""
 
-#: includes/settings/general.php:104
+#: includes/settings/general.php:110
 msgid "Configuration Wizard"
 msgstr ""
 
@@ -1702,46 +1825,53 @@ msgstr ""
 msgid "Congo, Republic of"
 msgstr ""
 
-#: modules/price/config/currencies.php:220
+#: modules/price/config/currencies.php:222
 msgid "Congolese franc"
 msgstr ""
 
 #: templates/theme-integration.php:177
+#, php-format
 msgid ""
 "Congratulations! %s is working on Advanced Mode now. You can go to admin and "
 "add the products to the catalog."
 msgstr ""
 
-#: includes/settings/tooltips.php:361
+#: includes/settings/tooltips.php:372
 msgid ""
 "Congratulations! You finished the tutorial on this screen. Check all the "
 "options here and go to another screen to continue."
 msgstr ""
 
-#: includes/activation-config.php:305
+#: includes/activation-config.php:313
+#, php-format
 msgid "Congratulations! Your're ready to add %s."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:512
+#: includes/welcome/new.php:116
+msgid ""
+"Constructive feedback helps to take the right direction in the development."
+msgstr ""
+
+#: modules/cart/includes/orders/includes/register-digital-orders.php:514
 msgid "Contact Email"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:515
+#: modules/cart/includes/orders/includes/register-digital-orders.php:517
 msgid ""
 "Contact email will be set as system user name. This email will be used to "
 "send all account credentials to a customer."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:130 includes/welcome/new.php:184
-#: includes/welcome/start.php:138
+#: includes/welcome/start.php:163
 msgid "Contact the developers"
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:98 modules/quote-cart/index.php:108
+#: includes/class-ic-activation-wizard.php:100 modules/quote-cart/index.php:108
 msgid "Continue"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:51
+#: modules/cart/includes/shopping-settings.php:54
 msgid "Continue shopping"
 msgstr ""
 
@@ -1749,7 +1879,7 @@ msgstr ""
 msgid "Cook Islands"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:179
+#: modules/cart/includes/shopping-settings.php:182
 msgid "Cookie Save"
 msgstr ""
 
@@ -1757,7 +1887,7 @@ msgstr ""
 msgid "Costa Rica"
 msgstr ""
 
-#: modules/price/config/currencies.php:225
+#: modules/price/config/currencies.php:227
 msgid "Costa Rican col&oacute;n"
 msgstr ""
 
@@ -1765,26 +1895,26 @@ msgstr ""
 msgid "Cote d'Ivoire"
 msgstr ""
 
-#: includes/blocks/index.php:325
+#: includes/blocks/index.php:403
 msgid "Count"
 msgstr ""
 
-#: modules/quote-cart/index.php:281
-#: modules/cart/includes/shopping-settings.php:218
-#: modules/cart/includes/shopping-settings.php:247
+#: modules/quote-cart/index.php:284
+#: modules/cart/includes/shopping-settings.php:221
+#: modules/cart/includes/shopping-settings.php:250
 msgid "Country"
 msgstr ""
 
-#: theme-product_adder_support.php:269
+#: theme-product_adder_support.php:270
 msgid "Create Main Catalog Listing"
 msgstr ""
 
-#: includes/settings/general.php:847
-#: includes/settings/settings-functions.php:535
+#: includes/settings/general.php:856
+#: includes/settings/settings-functions.php:610
 msgid "Create New"
 msgstr ""
 
-#: includes/activation-config.php:562
+#: includes/activation-config.php:572
 msgid "Create Separate Catalog"
 msgstr ""
 
@@ -1792,12 +1922,17 @@ msgstr ""
 msgid "Croatia/Hrvatska"
 msgstr ""
 
-#: modules/price/config/currencies.php:251
+#: modules/price/config/currencies.php:253
 msgid "Croatian kuna"
 msgstr ""
 
+#: includes/welcome/mode-selected.php:112 includes/welcome/new.php:166
+#: includes/welcome/start.php:145
+msgid "CSS & PHP code snippets"
+msgstr ""
+
 #: includes/welcome/mode-selected.php:115 includes/welcome/new.php:169
-#: includes/welcome/start.php:123
+#: includes/welcome/start.php:148
 msgid "CSS code snippets"
 msgstr ""
 
@@ -1815,11 +1950,11 @@ msgstr ""
 msgid "Cuba"
 msgstr ""
 
-#: modules/price/config/currencies.php:226
+#: modules/price/config/currencies.php:228
 msgid "Cuban convertible peso"
 msgstr ""
 
-#: modules/price/config/currencies.php:227
+#: modules/price/config/currencies.php:229
 msgid "Cuban peso"
 msgstr ""
 
@@ -1831,18 +1966,19 @@ msgstr ""
 msgid "Currency position"
 msgstr ""
 
-#: templates/shortcode-catalog.php:702
+#: templates/shortcode-catalog.php:716
+#, php-format
 msgid ""
 "Currently %sanother page%s is set to show main product listing. Would you "
 "like to show product listing here instead?"
 msgstr ""
 
-#: functions/activation.php:171
+#: functions/activation.php:175
 #, php-format
 msgid "Currently, %s is being used on the main product listing."
 msgstr ""
 
-#: templates/shortcode-catalog.php:704
+#: templates/shortcode-catalog.php:718
 msgid ""
 "Currently, no page is set to show the main product listing. Would you like "
 "to show product listing here?"
@@ -1852,17 +1988,17 @@ msgstr ""
 msgid "Custom Currency Symbol"
 msgstr ""
 
-#: includes/register-product.php:734
-#: modules/cart/includes/orders/includes/register-digital-orders.php:765
+#: includes/register-product.php:760
+#: modules/cart/includes/orders/includes/register-digital-orders.php:780
 msgid "Custom field deleted."
 msgstr ""
 
-#: includes/register-product.php:733
-#: modules/cart/includes/orders/includes/register-digital-orders.php:764
+#: includes/register-product.php:759
+#: modules/cart/includes/orders/includes/register-digital-orders.php:779
 msgid "Custom field updated."
 msgstr ""
 
-#: includes/settings/settings-functions.php:563
+#: includes/settings/settings-functions.php:638
 msgid "Custom URL"
 msgstr ""
 
@@ -1891,20 +2027,21 @@ msgstr ""
 msgid "Customer Name"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:24
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:25
 msgid "Customer Panel"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:46
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:49
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:47
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:50
 msgid "Customer Panel Page"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:42
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:43
 msgid "Customer Panel Settings"
 msgstr ""
 
-#: includes/activation-config.php:361
+#: includes/activation-config.php:369
+#, php-format
 msgid "Customize %s Page Layout"
 msgstr ""
 
@@ -1912,11 +2049,15 @@ msgstr ""
 msgid "Customize Filters Bar"
 msgstr ""
 
+#: includes/welcome/start.php:103
+msgid "Customize Headings and Text"
+msgstr ""
+
 #: functions/catalog-admin.php:95
 msgid "Customize Listing Design"
 msgstr ""
 
-#: includes/activation-config.php:376
+#: includes/activation-config.php:384
 msgid "Customize Listing Layout"
 msgstr ""
 
@@ -1932,7 +2073,7 @@ msgstr ""
 msgid "Cyprus Island"
 msgstr ""
 
-#: modules/price/config/currencies.php:229
+#: modules/price/config/currencies.php:231
 msgid "Czech koruna"
 msgstr ""
 
@@ -1940,7 +2081,7 @@ msgstr ""
 msgid "Czech Republic"
 msgstr ""
 
-#: modules/price/config/currencies.php:231
+#: modules/price/config/currencies.php:233
 msgid "Danish krone"
 msgstr ""
 
@@ -1949,12 +2090,12 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:316
+#: modules/cart/includes/orders/functions/functions.php:328
 #, php-format
 msgid "Dear %s,"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:58
+#: modules/cart/includes/shopping-settings.php:61
 msgid "Dear Customer,"
 msgstr ""
 
@@ -1962,8 +2103,8 @@ msgstr ""
 msgid "Decimal Separator"
 msgstr ""
 
-#: includes/settings/general.php:157 includes/settings/general.php:159
-#: includes/settings/general.php:395 includes/settings/general.php:397
+#: includes/settings/general.php:163 includes/settings/general.php:165
+#: includes/settings/general.php:403 includes/settings/general.php:405
 msgid "Default"
 msgstr ""
 
@@ -1971,7 +2112,7 @@ msgstr ""
 msgid "Default button URL"
 msgstr ""
 
-#: includes/system.php:79
+#: includes/system.php:82
 msgid "Default filters bar will become empty."
 msgstr ""
 
@@ -1979,7 +2120,7 @@ msgstr ""
 msgid "Default Image"
 msgstr ""
 
-#: includes/settings/general.php:411
+#: includes/settings/general.php:419
 msgid "Default order"
 msgstr ""
 
@@ -1987,7 +2128,7 @@ msgstr ""
 msgid "Default Product Image"
 msgstr ""
 
-#: templates/theme-integration.php:108 includes/settings/general.php:298
+#: templates/theme-integration.php:108 includes/settings/general.php:306
 msgid "Default Sidebar"
 msgstr ""
 
@@ -1995,27 +2136,27 @@ msgstr ""
 msgid "Default Template"
 msgstr ""
 
-#: includes/system.php:118
+#: includes/system.php:122
 msgid "Delete all Catalog Categories"
 msgstr ""
 
-#: includes/system.php:112
+#: includes/system.php:116
 msgid "Delete all Catalog Items"
 msgstr ""
 
-#: includes/system.php:116
+#: includes/system.php:120
 msgid "Delete all categories"
 msgstr ""
 
-#: includes/system.php:110
+#: includes/system.php:114
 msgid "Delete all items"
 msgstr ""
 
-#: includes/system.php:132
+#: includes/system.php:136
 msgid "Delete all items and categories on uninstall"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
+#: modules/quote-cart/index.php:283
 msgid "DELIVERY ADDRESS"
 msgstr ""
 
@@ -2023,15 +2164,15 @@ msgstr ""
 msgid "Denmark"
 msgstr ""
 
-#: includes/blocks/index.php:340
+#: includes/blocks/index.php:418
 msgid "DESC"
 msgstr ""
 
-#: includes/settings/search.php:24
+#: includes/settings/search.php:26
 msgid "Describe your issue"
 msgstr ""
 
-#: includes/activation-config.php:188 includes/settings/custom-names.php:42
+#: includes/activation-config.php:196 includes/settings/custom-names.php:42
 msgid "Description"
 msgstr ""
 
@@ -2040,17 +2181,17 @@ msgid "Description Label"
 msgstr ""
 
 #: includes/settings/custom-design.php:51
-#: includes/settings/custom-design.php:272
+#: includes/settings/custom-design.php:273
 msgid "Design Schemes"
 msgstr ""
 
 #: includes/settings/custom-design.php:82
 #: includes/settings/custom-design.php:227
-#: includes/settings/custom-design.php:270
+#: includes/settings/custom-design.php:271
 msgid "Design Settings"
 msgstr ""
 
-#: includes/register-product.php:303
+#: includes/register-product.php:307
 #: modules/cart/includes/orders/includes/register-digital-orders.php:81
 msgid "Details"
 msgstr ""
@@ -2060,52 +2201,53 @@ msgstr ""
 msgid "Did you Know?"
 msgstr ""
 
-#: includes/product-settings.php:336
+#: includes/product-settings.php:344
 msgid "Did you know?"
 msgstr ""
 
-#: includes/settings/search.php:103
+#: includes/settings/search.php:105
 #, php-format
 msgid "Didn't find any adjustment options for '%s'."
 msgstr ""
 
-#: includes/settings/search.php:273
+#: includes/settings/search.php:283
 #, php-format
 msgid "Didn't find any docs or tutorials for '%s'."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:772
+#: modules/cart/includes/orders/includes/register-digital-orders.php:787
 msgid "Digital order draft updated."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:768
+#: modules/cart/includes/orders/includes/register-digital-orders.php:783
 msgid "Digital order published."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:767
+#: modules/cart/includes/orders/includes/register-digital-orders.php:782
 #, php-format
 msgid "Digital order restored to revision from %s"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:771
+#: modules/cart/includes/orders/includes/register-digital-orders.php:786
 #, php-format
 msgid "Digital order scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:770
+#: modules/cart/includes/orders/includes/register-digital-orders.php:785
 msgid "Digital order submitted."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:763
-#: modules/cart/includes/orders/includes/register-digital-orders.php:766
+#: modules/cart/includes/orders/includes/register-digital-orders.php:778
+#: modules/cart/includes/orders/includes/register-digital-orders.php:781
 msgid "Digital order updated."
 msgstr ""
 
-#: includes/blocks/index.php:125 modules/price/blocks/price-table/index.php:89
+#: includes/blocks/index.php:129 modules/price/blocks/price-table/index.php:90
 msgid "Disable add to cart button"
 msgstr ""
 
-#: includes/settings/general.php:383
+#: includes/settings/general.php:391
+#, php-format
 msgid "Disable and use %s shortcode to display the products."
 msgstr ""
 
@@ -2131,7 +2273,7 @@ msgstr ""
 msgid "Disable Image"
 msgstr ""
 
-#: includes/settings/general.php:463
+#: includes/settings/general.php:471
 msgid "Disable Image on Category Page"
 msgstr ""
 
@@ -2143,7 +2285,7 @@ msgstr ""
 msgid "Disable Name"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:188
+#: modules/cart/includes/shopping-settings.php:191
 msgid "Disable Order Registration"
 msgstr ""
 
@@ -2151,7 +2293,7 @@ msgstr ""
 msgid "Disable Price"
 msgstr ""
 
-#: includes/customizer.php:49 includes/settings/general.php:304
+#: includes/customizer.php:56 includes/settings/general.php:312
 msgid "Disable Product Name"
 msgstr ""
 
@@ -2167,11 +2309,11 @@ msgstr ""
 msgid "Disable SKU"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:182
+#: modules/cart/includes/shopping-settings.php:185
 msgid "Disable State Field"
 msgstr ""
 
-#: includes/blocks/index.php:133
+#: includes/blocks/index.php:137
 msgid "Disable to select product."
 msgstr ""
 
@@ -2187,8 +2329,8 @@ msgstr ""
 msgid "Disable Weight"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:158 includes/customizer.php:195
-#: templates/theme-integration.php:109 includes/settings/general.php:299
+#: includes/class-ic-sitewide-bar.php:203 includes/customizer.php:229
+#: templates/theme-integration.php:109 includes/settings/general.php:307
 msgid "Disabled"
 msgstr ""
 
@@ -2200,15 +2342,20 @@ msgstr ""
 msgid "Disabled default image"
 msgstr ""
 
-#: theme-product_adder_support.php:254
+#: theme-product_adder_support.php:255
+#, php-format
 msgid "Disabled due to a lack of main catalog listing.%s"
 msgstr ""
 
-#: theme-product_adder_support.php:256
+#: theme-product_adder_support.php:257
 #, php-format
 msgid ""
 "Disabled in simple mode. Add %1$s to your %2$smain catalog listing page%3$s "
 "to enable it."
+msgstr ""
+
+#: includes/settings/settings-functions.php:443
+msgid "Dismiss this notice."
 msgstr ""
 
 #: functions/support.php:83
@@ -2217,7 +2364,7 @@ msgid ""
 "compare"
 msgstr ""
 
-#: includes/blocks/widgets.php:130 includes/widgets/category-widget.php:155
+#: includes/blocks/widgets.php:135 includes/widgets/category-widget.php:146
 msgid "Display as dropdown"
 msgstr ""
 
@@ -2237,7 +2384,7 @@ msgstr ""
 msgid "Display Shopping Cart."
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:492
+#: includes/widgets/filter-widgets.php:499
 msgid "Displays active filters with an option to remove."
 msgstr ""
 
@@ -2245,7 +2392,7 @@ msgstr ""
 msgid "Djibouti"
 msgstr ""
 
-#: modules/price/config/currencies.php:230
+#: modules/price/config/currencies.php:232
 msgid "Djiboutian franc"
 msgstr ""
 
@@ -2255,19 +2402,19 @@ msgid ""
 "unwanted elements from the theme are displayed on catalog pages."
 msgstr ""
 
-#: includes/tracking.php:302
+#: includes/tracking.php:319
 msgid "Do not allow"
 msgstr ""
 
-#: includes/product-settings.php:384
+#: includes/product-settings.php:392
 msgid "Do you have a problem?"
 msgstr ""
 
-#: includes/extensions.php:945
+#: includes/extensions.php:959
 msgid "Do you need multiple extensions?"
 msgstr ""
 
-#: includes/activation-config.php:407
+#: includes/activation-config.php:415
 msgid "Documentation"
 msgstr ""
 
@@ -2275,7 +2422,7 @@ msgstr ""
 msgid "Documentation & Help"
 msgstr ""
 
-#: theme-product_adder_support.php:237
+#: theme-product_adder_support.php:238
 msgid "doesn't need any specific configuration"
 msgstr ""
 
@@ -2283,7 +2430,7 @@ msgstr ""
 msgid "Dominica"
 msgstr ""
 
-#: modules/price/config/currencies.php:232
+#: modules/price/config/currencies.php:234
 msgid "Dominican peso"
 msgstr ""
 
@@ -2295,16 +2442,11 @@ msgstr ""
 msgid "Don't worry if it looks messy."
 msgstr ""
 
-#: modules/cart/includes/customers/ext/transactions/digital-products.php:25
-#: modules/cart/includes/customers/ext/transactions/digital-products.php:31
-msgid "Download"
-msgstr ""
-
 #: includes/settings/csv.php:53
 msgid "Download CSV"
 msgstr ""
 
-#: includes/settings/csv.php:112
+#: includes/settings/csv.php:124
 msgid "Download CSV Template"
 msgstr ""
 
@@ -2312,7 +2454,7 @@ msgstr ""
 msgid "Duplicate"
 msgstr ""
 
-#: modules/price/config/currencies.php:348
+#: modules/price/config/currencies.php:350
 msgid "East Caribbean dollar"
 msgstr ""
 
@@ -2337,23 +2479,26 @@ msgstr ""
 msgid "Ecuador"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/digital-order-columns.php:56
+#: modules/cart/includes/orders/includes/digital-order-columns.php:60
 msgid "Edit"
 msgstr ""
 
-#: includes/register-product.php:137
+#: includes/register-product.php:142
+#, php-format
 msgid "Edit %s"
 msgstr ""
 
 #: includes/product-categories.php:37
+#, php-format
 msgid "Edit %s Category"
 msgstr ""
 
 #: functions/catalog-admin.php:39
+#, php-format
 msgid "Edit %s Listing"
 msgstr ""
 
-#: includes/blocks/index.php:131
+#: includes/blocks/index.php:135
 msgid "Edit block settings."
 msgstr ""
 
@@ -2361,15 +2506,15 @@ msgstr ""
 msgid "Edit Category"
 msgstr ""
 
-#: includes/register-product.php:153
+#: includes/register-product.php:158
 msgid "Edit Item"
 msgstr ""
 
-#: includes/activation-config.php:378
+#: includes/activation-config.php:386
 msgid "Edit Main Listing"
 msgstr ""
 
-#: includes/blocks/block-edit.php:70
+#: includes/blocks/block-edit.php:80
 msgid "Edit Mode"
 msgstr ""
 
@@ -2389,7 +2534,7 @@ msgstr ""
 msgid "Edit Quote"
 msgstr ""
 
-#: modules/price/blocks/price-table/index.php:93
+#: modules/price/blocks/price-table/index.php:94
 msgid "Edit selected product."
 msgstr ""
 
@@ -2397,7 +2542,7 @@ msgstr ""
 msgid "Egypt"
 msgstr ""
 
-#: modules/price/config/currencies.php:234
+#: modules/price/config/currencies.php:236
 msgid "Egyptian pound"
 msgstr ""
 
@@ -2405,25 +2550,25 @@ msgstr ""
 msgid "El Salvador"
 msgstr ""
 
-#: modules/quote-cart/index.php:301
-#: modules/cart/includes/shopping-settings.php:244
-#: modules/cart/includes/shopping-settings.php:272
+#: modules/quote-cart/index.php:304
+#: modules/cart/includes/shopping-settings.php:247
+#: modules/cart/includes/shopping-settings.php:275
 msgid "Email"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:147
+#: modules/cart/includes/shopping-settings.php:150
 msgid "Email settings"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:166
+#: modules/cart/includes/shopping-settings.php:169
 msgid "Email to receive orders"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:167
+#: modules/cart/includes/shopping-settings.php:170
 msgid "Email to send confirmations"
 msgstr ""
 
-#: includes/system.php:127
+#: includes/system.php:131
 msgid "Empty Default Filters Bar"
 msgstr ""
 
@@ -2431,26 +2576,26 @@ msgstr ""
 msgid "Enable Affiliate Catalog Mode"
 msgstr ""
 
-#: includes/blocks/widgets.php:133 includes/widgets/filter-widgets.php:299
-#: includes/widgets/filter-widgets.php:374
-#: includes/widgets/filter-widgets.php:460 modules/price/blocks/index.php:32
-#: modules/price/widgets/price-filter-widget.php:95
+#: includes/blocks/widgets.php:138 includes/widgets/filter-widgets.php:306
+#: includes/widgets/filter-widgets.php:381
+#: includes/widgets/filter-widgets.php:467 modules/price/blocks/index.php:32
+#: modules/price/widgets/price-filter-widget.php:96
 msgid "Enable also for shortcodes"
 msgstr ""
 
-#: includes/settings/general.php:508
+#: includes/settings/general.php:516
 msgid "Enable Catalog Breadcrumbs"
 msgstr ""
 
-#: includes/customizer.php:63 includes/settings/custom-design.php:236
+#: includes/customizer.php:74 includes/settings/custom-design.php:236
 msgid "Enable image"
 msgstr ""
 
-#: includes/customizer.php:90 includes/settings/custom-design.php:238
+#: includes/customizer.php:109 includes/settings/custom-design.php:238
 msgid "Enable image magnifier"
 msgstr ""
 
-#: includes/customizer.php:103 includes/settings/custom-design.php:239
+#: includes/customizer.php:126 includes/settings/custom-design.php:239
 msgid "Enable image only when inserted"
 msgstr ""
 
@@ -2458,15 +2603,15 @@ msgstr ""
 msgid "Enable Inquiry Catalog Mode"
 msgstr ""
 
-#: includes/customizer.php:77 includes/settings/custom-design.php:237
+#: includes/customizer.php:92 includes/settings/custom-design.php:237
 msgid "Enable lightbox gallery"
 msgstr ""
 
-#: includes/settings/general.php:383
+#: includes/settings/general.php:391
 msgid "Enable Main Listing Page"
 msgstr ""
 
-#: includes/settings/general.php:488
+#: includes/settings/general.php:496
 msgid "Enable SEO title separator"
 msgstr ""
 
@@ -2474,7 +2619,7 @@ msgstr ""
 msgid "Enable Simple Catalog Mode"
 msgstr ""
 
-#: includes/settings/general.php:489
+#: includes/settings/general.php:497
 msgid "Enable Structured Data"
 msgstr ""
 
@@ -2499,12 +2644,12 @@ msgid ""
 "action."
 msgstr ""
 
-#: includes/blocks/index.php:134
+#: includes/blocks/index.php:138
 msgid ""
 "Enable to get the product from context (inside a loop or on a product page)."
 msgstr ""
 
-#: includes/settings/general.php:489
+#: includes/settings/general.php:497
 msgid ""
 "Enable to show structured data on each single product page. Test it with "
 "Google’s Structured Data Testing Tool. You can modify the output with the "
@@ -2519,7 +2664,13 @@ msgstr ""
 msgid "Enhanced category filter"
 msgstr ""
 
+#: includes/blocks/index.php:55
+#, php-format
+msgid "Enter %s description."
+msgstr ""
+
 #: functions/base.php:29
+#, php-format
 msgid "Enter %s name here"
 msgstr ""
 
@@ -2535,8 +2686,12 @@ msgstr ""
 msgid "Eritrea"
 msgstr ""
 
-#: modules/price/config/currencies.php:235
+#: modules/price/config/currencies.php:237
 msgid "Eritrean nakfa"
+msgstr ""
+
+#: includes/extensions.php:1299
+msgid "Error loading form. Please try again later."
 msgstr ""
 
 #: modules/cart/ext/formbuilder/index.php:652
@@ -2547,7 +2702,7 @@ msgstr ""
 msgid "Ethiopia"
 msgstr ""
 
-#: modules/price/config/currencies.php:236
+#: modules/price/config/currencies.php:238
 msgid "Ethiopian birr"
 msgstr ""
 
@@ -2555,30 +2710,31 @@ msgstr ""
 msgid "EU VAT"
 msgstr ""
 
-#: modules/price/config/currencies.php:237
+#: modules/price/config/currencies.php:239
 msgid "Euro"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:88 includes/welcome/new.php:142
-#: includes/welcome/start.php:96
+#: includes/welcome/start.php:121
 msgid ""
 "Even if the catalog works fine with any theme, you can take full control of "
 "the output."
 msgstr ""
 
-#: includes/settings/custom-design.php:282
+#: includes/settings/custom-design.php:283
 msgid "Example Effect"
 msgstr ""
 
 #: modules/price/price-meta.php:31
+#, php-format
 msgid "Example price format: %s or %s"
 msgstr ""
 
-#: includes/activation-config.php:574
+#: includes/activation-config.php:584
 msgid "Examples: Service, Part, Flower, Photo"
 msgstr ""
 
-#: includes/activation-config.php:575
+#: includes/activation-config.php:585
 msgid "Examples: Services, Parts, Flowers, Photos"
 msgstr ""
 
@@ -2590,7 +2746,7 @@ msgstr ""
 msgid "Export Products"
 msgstr ""
 
-#: includes/extensions.php:1085
+#: includes/extensions.php:1099
 msgid "Extension <strong>activated</strong>."
 msgstr ""
 
@@ -2599,14 +2755,15 @@ msgid "Extensions"
 msgstr ""
 
 #: includes/extensions.php:40
+#, php-format
 msgid "Extensions for %s"
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:139
+#: includes/class-ic-activation-wizard.php:141
 msgid "Extensions Install Page"
 msgstr ""
 
-#: includes/blocks/index.php:123
+#: includes/blocks/index.php:127
 msgid "Extra Large"
 msgstr ""
 
@@ -2614,7 +2771,7 @@ msgstr ""
 msgid "Falkland Islands"
 msgstr ""
 
-#: modules/price/config/currencies.php:239
+#: modules/price/config/currencies.php:241
 msgid "Falkland Islands pound"
 msgstr ""
 
@@ -2622,11 +2779,11 @@ msgstr ""
 msgid "Faroe Islands"
 msgstr ""
 
-#: includes/class-ic-featured-products.php:74
+#: includes/class-ic-featured-products.php:78
 msgid "Featured"
 msgstr ""
 
-#: includes/class-ic-featured-products.php:53
+#: includes/class-ic-featured-products.php:56
 msgid "Featured Products"
 msgstr ""
 
@@ -2638,11 +2795,12 @@ msgstr ""
 msgid "Features Label"
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:320
+#: modules/cart/includes/orders/functions/functions.php:332
 msgid "Feel free to contact us in case of any questions or issues."
 msgstr ""
 
-#: includes/product-settings.php:386
+#: includes/product-settings.php:394
+#, php-format
 msgid ""
 "Feel free to submit a ticket if you think that you found a bug or you have a "
 "problem while using %s."
@@ -2652,27 +2810,30 @@ msgstr ""
 msgid "Fiji"
 msgstr ""
 
-#: modules/price/config/currencies.php:238
+#: modules/price/config/currencies.php:240
 msgid "Fijian dollar"
 msgstr ""
 
-#: functions/content-functions.php:126
+#: functions/content-functions.php:130
 msgid "Filter"
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:127
+#: includes/widgets/filter-widgets.php:130
+#, php-format
 msgid "Filter %s by categories."
 msgstr ""
 
 #: modules/price/widgets/price-filter-widget.php:21
+#, php-format
 msgid "Filter %s by price."
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:402
+#: includes/widgets/filter-widgets.php:409
+#, php-format
 msgid "Filter %s by size."
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:130
+#: includes/widgets/filter-widgets.php:133
 msgid "Filter items by categories."
 msgstr ""
 
@@ -2680,7 +2841,7 @@ msgstr ""
 msgid "Filter items by price."
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:405
+#: includes/widgets/filter-widgets.php:412
 msgid "Filter items by size."
 msgstr ""
 
@@ -2688,7 +2849,7 @@ msgstr ""
 msgid "filter products by tags"
 msgstr ""
 
-#: includes/system.php:77
+#: includes/system.php:80
 msgid "Filters bar is now empty by default!"
 msgstr ""
 
@@ -2703,19 +2864,27 @@ msgid ""
 "developers will give you valuable advice."
 msgstr ""
 
-#: includes/settings/general.php:558
+#: includes/welcome/mode-selected.php:83
+msgid "For developers"
+msgstr ""
+
+#: includes/welcome/start.php:91
+msgid "For every day users"
+msgstr ""
+
+#: includes/settings/general.php:566
 msgid "Force category name display"
 msgstr ""
 
-#: includes/settings/general.php:557
+#: includes/settings/general.php:565
 msgid "Force product name display"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:175
+#: modules/cart/includes/shopping-settings.php:178
 msgid "Form Settings"
 msgstr ""
 
-#: includes/customizer.php:37 includes/settings/custom-design.php:247
+#: includes/customizer.php:38 includes/settings/custom-design.php:247
 msgid "Formatted"
 msgstr ""
 
@@ -2728,11 +2897,11 @@ msgstr ""
 msgid "Free"
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:119
+#: includes/class-ic-activation-wizard.php:121
 msgid "free"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:160
+#: modules/cart/includes/shopping-settings.php:163
 #, php-format
 msgid ""
 "Free %1$sSMTP plugin%2$s is recommended to make sure that your notifications "
@@ -2788,9 +2957,9 @@ msgstr ""
 msgid "Front-end Text"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
-#: modules/cart/includes/shopping-settings.php:217
-#: modules/cart/includes/shopping-settings.php:246
+#: modules/quote-cart/index.php:283
+#: modules/cart/includes/shopping-settings.php:220
+#: modules/cart/includes/shopping-settings.php:249
 msgid "Full Name"
 msgstr ""
 
@@ -2798,7 +2967,7 @@ msgstr ""
 msgid "Fully compatible plugins from our partners"
 msgstr ""
 
-#: includes/settings/general.php:197 includes/settings/general.php:231
+#: includes/settings/general.php:205 includes/settings/general.php:239
 msgid "fully customizable layout with the visual configuration wizard."
 msgstr ""
 
@@ -2814,12 +2983,12 @@ msgstr ""
 msgid "Gambia"
 msgstr ""
 
-#: modules/price/config/currencies.php:245
+#: modules/price/config/currencies.php:247
 msgid "Gambian dalasi"
 msgstr ""
 
-#: includes/settings/general.php:19 includes/settings/general.php:91
-#: includes/settings/general.php:102
+#: includes/settings/general.php:19 includes/settings/general.php:97
+#: includes/settings/general.php:108
 msgid "General Settings"
 msgstr ""
 
@@ -2831,7 +3000,7 @@ msgstr ""
 msgid "Georgia"
 msgstr ""
 
-#: modules/price/config/currencies.php:241
+#: modules/price/config/currencies.php:243
 msgid "Georgian lari"
 msgstr ""
 
@@ -2839,11 +3008,11 @@ msgstr ""
 msgid "Germany"
 msgstr ""
 
-#: includes/settings/general.php:183
+#: includes/settings/general.php:191
 msgid "Get back here (refresh this page) and switch the layout mode again."
 msgstr ""
 
-#: includes/blocks/index.php:132
+#: includes/blocks/index.php:136
 msgid "Get product from context."
 msgstr ""
 
@@ -2852,11 +3021,11 @@ msgid "Get the Manual Theme Integration done."
 msgstr ""
 
 #: includes/activation-config.php:45 includes/extensions.php:216
-#: includes/welcome/welcome-screen.php:147
+#: includes/welcome/welcome-screen.php:182
 msgid "Getting Started"
 msgstr ""
 
-#: theme-product_adder_support.php:211 includes/activation-config.php:406
+#: theme-product_adder_support.php:211 includes/activation-config.php:414
 msgid "Getting Started Guide"
 msgstr ""
 
@@ -2868,7 +3037,7 @@ msgstr ""
 msgid "Ghana"
 msgstr ""
 
-#: modules/price/config/currencies.php:243
+#: modules/price/config/currencies.php:245
 msgid "Ghana cedi"
 msgstr ""
 
@@ -2876,7 +3045,7 @@ msgstr ""
 msgid "Gibraltar"
 msgstr ""
 
-#: modules/price/config/currencies.php:244
+#: modules/price/config/currencies.php:246
 msgid "Gibraltar pound"
 msgstr ""
 
@@ -2896,7 +3065,8 @@ msgstr ""
 msgid "GO BACK TO MODE SELECTION"
 msgstr ""
 
-#: theme-product_adder_support.php:239
+#: theme-product_adder_support.php:240
+#, php-format
 msgid ""
 "go to %1$s %3$simport screen%4$s to transfer all %2$s products to %1$s and "
 "remove %2$s after that"
@@ -2911,17 +3081,17 @@ msgstr ""
 msgid "Go to Admin"
 msgstr ""
 
-#: includes/customizer.php:257
+#: includes/customizer.php:300
 msgid ""
 "Go to catalog page that you want to style so you can see the effect "
 "immediately."
 msgstr ""
 
-#: includes/welcome/welcome-screen.php:173
+#: includes/welcome/welcome-screen.php:208
 msgid "Go to settings"
 msgstr ""
 
-#: includes/activation-config.php:401
+#: includes/activation-config.php:409
 msgid "Great! It looks like you are good to go with your catalog adventure."
 msgstr ""
 
@@ -2929,7 +3099,7 @@ msgstr ""
 msgid "Greece"
 msgstr ""
 
-#: includes/customizer.php:120 includes/settings/custom-design.php:297
+#: includes/customizer.php:146 includes/settings/custom-design.php:298
 #: modules/price/price-settings.php:42
 msgid "Green"
 msgstr ""
@@ -2942,7 +3112,7 @@ msgstr ""
 msgid "Grenada"
 msgstr ""
 
-#: includes/customizer.php:120 includes/settings/custom-design.php:301
+#: includes/customizer.php:148 includes/settings/custom-design.php:302
 #: modules/price/price-settings.php:46
 msgid "Grey"
 msgstr ""
@@ -2959,7 +3129,7 @@ msgstr ""
 msgid "Guatemala"
 msgstr ""
 
-#: modules/price/config/currencies.php:247
+#: modules/price/config/currencies.php:249
 msgid "Guatemalan quetzal"
 msgstr ""
 
@@ -2967,7 +3137,7 @@ msgstr ""
 msgid "Guernsey"
 msgstr ""
 
-#: modules/price/config/currencies.php:242
+#: modules/price/config/currencies.php:244
 msgid "Guernsey pound"
 msgstr ""
 
@@ -2979,7 +3149,7 @@ msgstr ""
 msgid "Guinea-Bissau"
 msgstr ""
 
-#: modules/price/config/currencies.php:246
+#: modules/price/config/currencies.php:248
 msgid "Guinean franc"
 msgstr ""
 
@@ -2987,7 +3157,7 @@ msgstr ""
 msgid "Guyana"
 msgstr ""
 
-#: modules/price/config/currencies.php:248
+#: modules/price/config/currencies.php:250
 msgid "Guyanese dollar"
 msgstr ""
 
@@ -2995,8 +3165,12 @@ msgstr ""
 msgid "Haiti"
 msgstr ""
 
-#: modules/price/config/currencies.php:252
+#: modules/price/config/currencies.php:254
 msgid "Haitian gourde"
+msgstr ""
+
+#: includes/welcome/start.php:107
+msgid "Headings & text customization"
 msgstr ""
 
 #: modules/cart/ext/formbuilder/index.php:679
@@ -3012,16 +3186,16 @@ msgctxt "Height"
 msgid "H"
 msgstr ""
 
-#: includes/activation-config.php:126 includes/extensions.php:908
-#: includes/welcome/welcome-screen.php:155
+#: includes/activation-config.php:134 includes/extensions.php:921
+#: includes/welcome/welcome-screen.php:190
 msgid "Help"
 msgstr ""
 
-#: includes/activation-config.php:176
+#: includes/activation-config.php:184
 msgid "Help Docs"
 msgstr ""
 
-#: includes/activation-config.php:177
+#: includes/activation-config.php:185
 msgid "Help from devs"
 msgstr ""
 
@@ -3029,102 +3203,103 @@ msgstr ""
 msgid "here"
 msgstr ""
 
-#: includes/activation-config.php:175
+#: includes/activation-config.php:183
 msgid ""
 "Here all the products will show up. Use the Add new product button on the "
 "top to add a product."
 msgstr ""
 
-#: includes/activation-config.php:187
+#: includes/activation-config.php:195
 msgid "Here you can add images, videos, or any other media to the description."
 msgstr ""
 
-#: includes/activation-config.php:115
+#: includes/activation-config.php:123
 msgid ""
 "Here you can add, edit, and remove products. You can have an unlimited "
 "number of products."
 msgstr ""
 
-#: includes/activation-config.php:126
+#: includes/activation-config.php:134
 msgid "Here you can can get some help."
 msgstr ""
 
-#: includes/activation-config.php:116
+#: includes/activation-config.php:124
 msgid "Here you can change catalog text output."
 msgstr ""
 
-#: includes/activation-config.php:144
+#: includes/activation-config.php:152
 msgid "Here you can change the labels that appear on the product listing."
 msgstr ""
 
-#: includes/activation-config.php:118
+#: includes/activation-config.php:126
 msgid "Here you can configure the attributes. Set the default values."
 msgstr ""
 
-#: includes/activation-config.php:117
+#: includes/activation-config.php:125
 msgid ""
 "Here you can configure the catalog design. Select the listing template and "
 "product page template. Change gallery options."
 msgstr ""
 
-#: includes/activation-config.php:135
+#: includes/activation-config.php:143
 msgid ""
 "Here you can configure the individual product page design and gallery "
 "settings."
 msgstr ""
 
-#: includes/activation-config.php:153
+#: includes/activation-config.php:161
 msgid "Here you can configure the variations."
 msgstr ""
 
-#: includes/activation-config.php:125
+#: includes/activation-config.php:133
 msgid "Here you can find many useful add-ons and integrations."
 msgstr ""
 
-#: includes/activation-config.php:186
+#: includes/activation-config.php:194
 msgid ""
 "Here you can insert product attributes like color, size, or any other "
 "feature that the product has. With some add-ons, you will be able to sort, "
 "filter, and search products by these values."
 msgstr ""
 
-#: includes/activation-config.php:156
+#: includes/activation-config.php:164
 msgid ""
 "Here you can insert product variations so the user can choose additional "
 "product features when buying or asking for a quote."
 msgstr ""
 
-#: includes/activation-config.php:185
+#: includes/activation-config.php:193
 msgid "Here you can insert the product image."
 msgstr ""
 
-#: includes/activation-config.php:114
+#: includes/activation-config.php:122
 msgid ""
 "Here you can manage categories and subcategories. You can add an unlimited "
 "number of categories and multiple levels of subcategories."
 msgstr ""
 
 #: theme-product_adder_support.php:234
+#, php-format
 msgid ""
 "Hey! It looks like you have %1$s installed. You can use %2$s with or without "
 "%1$s."
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:145
-#: includes/class-ic-sitewide-bar.php:230
+#: includes/class-ic-sitewide-bar.php:190
+#: includes/class-ic-sitewide-bar.php:290
 msgid "Hide Catalog Icon"
 msgstr ""
 
-#: includes/settings/tooltips.php:175
+#: includes/settings/tooltips.php:177
 msgid "Hide Forever"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:146
-#: includes/class-ic-sitewide-bar.php:243
+#: includes/class-ic-sitewide-bar.php:191
+#: includes/class-ic-sitewide-bar.php:307
 msgid "Hide Search Icon"
 msgstr ""
 
-#: modules/cart/includes/cart/cart-shipping.php:42
+#: modules/cart/includes/cart/cart-shipping.php:43
 msgid "Highest cost of all products in cart"
 msgstr ""
 
@@ -3136,11 +3311,11 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: includes/system.php:174
+#: includes/system.php:179
 msgid "Home URL"
 msgstr ""
 
-#: modules/price/config/currencies.php:250
+#: modules/price/config/currencies.php:252
 msgid "Honduran lempira"
 msgstr ""
 
@@ -3152,11 +3327,11 @@ msgstr ""
 msgid "Hong Kong"
 msgstr ""
 
-#: modules/price/config/currencies.php:249
+#: modules/price/config/currencies.php:251
 msgid "Hong Kong dollar"
 msgstr ""
 
-#: includes/settings/general.php:175
+#: includes/settings/general.php:183
 msgid "How to do it?"
 msgstr ""
 
@@ -3168,11 +3343,11 @@ msgstr ""
 msgid "How to Install the extension?"
 msgstr ""
 
-#: functions/activation.php:167
+#: functions/activation.php:171
 msgid "How to switch to Advanced Mode?"
 msgstr ""
 
-#: includes/activation-config.php:579
+#: includes/activation-config.php:589
 msgid "How would you like to name the products section in admin?"
 msgstr ""
 
@@ -3186,7 +3361,7 @@ msgid ""
 "urls&key=plugin-url"
 msgstr ""
 
-#: modules/price/config/currencies.php:253
+#: modules/price/config/currencies.php:255
 msgid "Hungarian forint"
 msgstr ""
 
@@ -3194,25 +3369,25 @@ msgstr ""
 msgid "Hungary"
 msgstr ""
 
-#: modules/quote-cart/index.php:306
+#: modules/quote-cart/index.php:309
 #, php-format
 msgid ""
 "I agree to let %1$s process my personal data to process my inquiry and for "
 "other purposes described in %1$s %2$sPrivacy Notice%3$s."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:277
+#: modules/cart/includes/shopping-settings.php:280
 #, php-format
 msgid ""
 "I agree to let %1$s process my personal data to process my order and for "
 "other purposes described in %1$s %2$sPrivacy Notice%3$s."
 msgstr ""
 
-#: includes/tracking.php:394
+#: includes/tracking.php:412
 msgid "I couldn't understand how to make it work"
 msgstr ""
 
-#: includes/tracking.php:398
+#: includes/tracking.php:416
 msgid "I found a better plugin"
 msgstr ""
 
@@ -3220,7 +3395,8 @@ msgstr ""
 msgid "I know, don't bug me"
 msgstr ""
 
-#: includes/activation-config.php:566
+#: includes/activation-config.php:576
+#, php-format
 msgid "I would like to use %s to:"
 msgstr ""
 
@@ -3228,16 +3404,16 @@ msgstr ""
 msgid "Iceland"
 msgstr ""
 
-#: modules/price/config/currencies.php:261
+#: modules/price/config/currencies.php:263
 msgid "Icelandic kr&oacute;na"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:144
-#: includes/class-ic-sitewide-bar.php:216
+#: includes/class-ic-sitewide-bar.php:189
+#: includes/class-ic-sitewide-bar.php:272
 msgid "Icons Display"
 msgstr ""
 
-#: includes/product-category-columns.php:119 includes/product-columns.php:21
+#: includes/product-category-columns.php:120 includes/product-columns.php:21
 #: modules/cart/includes/orders/includes/digital-order-columns.php:25
 msgid "ID"
 msgstr ""
@@ -3248,7 +3424,7 @@ msgid ""
 "If something goes wrong you will have to add %s to the product listing again."
 msgstr ""
 
-#: functions/activation.php:172
+#: functions/activation.php:176
 msgid ""
 "If the catalog pages are not displayed correctly within your theme layout "
 "you can test a different integration method."
@@ -3267,7 +3443,7 @@ msgid ""
 "pages templates, make sure to see the %stemplates docs%s."
 msgstr ""
 
-#: includes/activation-config.php:403
+#: includes/activation-config.php:411
 #, php-format
 msgid ""
 "If you are looking for a customizable product theme, the free %sCatalog Me! "
@@ -3275,12 +3451,13 @@ msgid ""
 msgstr ""
 
 #: theme-product_adder_support.php:198
+#, php-format
 msgid ""
 "If you are looking for a great customizable product theme we recommend free "
 "%sCatalog Me! theme%s."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:188
+#: modules/cart/includes/shopping-settings.php:191
 msgid ""
 "If you check this the orders will not be saved into database. Only the "
 "notification email will be sent."
@@ -3292,7 +3469,7 @@ msgid ""
 "setting and let you use any currency."
 msgstr ""
 
-#: includes/settings/general.php:463
+#: includes/settings/general.php:471
 msgid "If you disable the image, it will be only used for categories listing."
 msgstr ""
 
@@ -3323,18 +3500,23 @@ msgid ""
 "fields when adding a new item, so you don't have to fill them every time."
 msgstr ""
 
-#: includes/tracking.php:373
+#: includes/welcome/new.php:92
+#, php-format
+msgid "If you find any security issue, please report it %1$shere%2$s."
+msgstr ""
+
+#: includes/tracking.php:391
 msgid "If you have a moment, please let us know why you are deactivating"
 msgstr ""
 
-#: includes/settings/general.php:259
+#: includes/settings/general.php:267
 #, php-format
 msgid ""
 "If you have access to the server files, you can also use our %sTheme "
 "Integration Guide%s to achieve it quickly."
 msgstr ""
 
-#: includes/settings/general.php:321
+#: includes/settings/general.php:329
 #, php-format
 msgid ""
 "If you have access to the server files, you can also use our %sTheme "
@@ -3348,20 +3530,20 @@ msgid ""
 "%1$scontact the developers%2$s!"
 msgstr ""
 
-#: includes/settings/general.php:208
+#: includes/settings/general.php:216
 #, php-format
 msgid ""
 "If you have any problems with catalog layout, you can remove the %s and use "
 "the theme integration wizard to fix it."
 msgstr ""
 
-#: includes/settings/general.php:212
+#: includes/settings/general.php:220
 msgid ""
 "If you have any problems with catalog layout, you can use the theme "
 "integration wizard to fix it."
 msgstr ""
 
-#: includes/settings/general.php:260 includes/settings/general.php:322
+#: includes/settings/general.php:268 includes/settings/general.php:330
 #, php-format
 msgid ""
 "If you have any problems with the integration, please insert %s on any page "
@@ -3375,13 +3557,13 @@ msgid ""
 "page content and save."
 msgstr ""
 
-#: includes/activation-config.php:402
+#: includes/activation-config.php:410
 #, php-format
 msgid ""
 "If you have any questions or issues, feel free to post a %ssupport ticket%s."
 msgstr ""
 
-#: includes/settings/tooltips.php:361
+#: includes/settings/tooltips.php:372
 #, php-format
 msgid ""
 "If you have any questions or issues, you can reach the developers on the "
@@ -3389,7 +3571,7 @@ msgid ""
 msgstr ""
 
 #: includes/welcome/mode-selected.php:125 includes/welcome/new.php:179
-#: includes/welcome/start.php:133
+#: includes/welcome/start.php:158
 msgid ""
 "If you need a custom feature, do not hesitate to contact the developers."
 msgstr ""
@@ -3402,7 +3584,7 @@ msgid ""
 "you set a different email address than the one for PayPal."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:180
+#: modules/cart/includes/shopping-settings.php:183
 msgid ""
 "If you select user account you will be able to select a page to become user "
 "account with the order history."
@@ -3415,27 +3597,28 @@ msgid ""
 "report them on the %1$ssupport forum%2$s."
 msgstr ""
 
-#: includes/system.php:394
+#: includes/system.php:396
+#, php-format
 msgid ""
 "If you're modifying %s or a parent theme you didn't build personally we "
 "recommend using a child theme. See: <a href=\"%s\" target=\"_blank\">How to "
 "create a child theme</a>"
 msgstr ""
 
-#: includes/product-category-columns.php:118 includes/product-columns.php:23
-#: includes/register-product.php:161 includes/register-product.php:691
+#: includes/product-category-columns.php:119 includes/product-columns.php:23
+#: includes/register-product.php:166 includes/register-product.php:717
 msgid "Image"
 msgstr ""
 
-#: includes/activation-config.php:342
+#: includes/activation-config.php:350
 msgid "Image box"
 msgstr ""
 
-#: includes/settings/csv.php:242 includes/settings/csv.php:290
+#: includes/settings/csv.php:258 includes/settings/csv.php:306
 msgid "Image URL"
 msgstr ""
 
-#: includes/settings/custom-design.php:283
+#: includes/settings/custom-design.php:284
 msgid "Impact"
 msgstr ""
 
@@ -3447,11 +3630,11 @@ msgstr ""
 msgid "impleCode Support"
 msgstr ""
 
-#: includes/system.php:99
+#: includes/system.php:103
 msgid "impleCode Tools"
 msgstr ""
 
-#: includes/settings/csv.php:442
+#: includes/settings/csv.php:529
 msgid "Import"
 msgstr ""
 
@@ -3459,20 +3642,21 @@ msgstr ""
 msgid "import"
 msgstr ""
 
-#: includes/activation-config.php:309
+#: includes/activation-config.php:317
+#, php-format
 msgid "Import %s"
 msgstr ""
 
-#: ecommerce-product-catalog.php:205 includes/settings/csv.php:20
+#: ecommerce-product-catalog.php:208 includes/settings/csv.php:20
 #: includes/settings/csv.php:29
 msgid "Import / Export"
 msgstr ""
 
-#: includes/settings/csv.php:437
+#: includes/settings/csv.php:524
 msgid "Import from other content"
 msgstr ""
 
-#: includes/settings/csv.php:105
+#: includes/settings/csv.php:117
 msgid "Import Now"
 msgstr ""
 
@@ -3480,11 +3664,12 @@ msgstr ""
 msgid "Import Products"
 msgstr ""
 
-#: includes/activation-config.php:102
+#: includes/activation-config.php:110
 msgid "Important Settings"
 msgstr ""
 
-#: includes/settings/general.php:257
+#: includes/settings/general.php:265
+#, php-format
 msgid ""
 "In Advanced Mode %s must figure out your theme markup to display products "
 "properly."
@@ -3510,15 +3695,20 @@ msgid ""
 msgstr ""
 
 #: includes/welcome/new.php:52
-#, php-format
 msgid ""
 "In the current release, the theme integration goal is almost 100% complete."
 msgstr ""
 
-#: includes/settings/general.php:320
+#: includes/settings/general.php:328
 msgid ""
 "In theme mode the catalog will use your theme layout for all the catalog "
 "pages."
+msgstr ""
+
+#: includes/welcome/new.php:26
+msgid ""
+"In this release cycle, your catalog gets more power in CTA, theme "
+"integration, speed and usability."
 msgstr ""
 
 #: includes/welcome/new.php:74
@@ -3539,7 +3729,7 @@ msgstr ""
 msgid "India"
 msgstr ""
 
-#: modules/price/config/currencies.php:257
+#: modules/price/config/currencies.php:259
 msgid "Indian rupee"
 msgstr ""
 
@@ -3547,31 +3737,32 @@ msgstr ""
 msgid "Indonesia"
 msgstr ""
 
-#: modules/price/config/currencies.php:254
+#: modules/price/config/currencies.php:256
 msgid "Indonesian rupiah"
 msgstr ""
 
-#: includes/settings/general.php:352
+#: includes/settings/general.php:360 includes/welcome/start.php:46
 msgid "Inquiry Catalog"
 msgstr ""
 
-#: includes/activation-config.php:188
+#: includes/activation-config.php:196
 msgid ""
 "Insert the product description here. It will show up in a separate section "
 "or tab in the middle of the product page."
 msgstr ""
 
-#: includes/activation-config.php:190
+#: includes/activation-config.php:198
 msgid "Insert the product name here."
 msgstr ""
 
-#: includes/activation-config.php:189
+#: includes/activation-config.php:197
 msgid ""
 "Insert the product short description here. It will show up on the top of the "
 "product page."
 msgstr ""
 
-#: theme-product_adder_support.php:241
+#: theme-product_adder_support.php:242
+#, php-format
 msgid "install free %1$s plugin from %2$scatalog extensions menu%3$s"
 msgstr ""
 
@@ -3587,11 +3778,11 @@ msgstr ""
 msgid "Iran"
 msgstr ""
 
-#: modules/price/config/currencies.php:259
+#: modules/price/config/currencies.php:261
 msgid "Iranian rial"
 msgstr ""
 
-#: modules/price/config/currencies.php:260
+#: modules/price/config/currencies.php:262
 msgid "Iranian toman"
 msgstr ""
 
@@ -3599,16 +3790,12 @@ msgstr ""
 msgid "Iraq"
 msgstr ""
 
-#: modules/price/config/currencies.php:258
+#: modules/price/config/currencies.php:260
 msgid "Iraqi dinar"
 msgstr ""
 
 #: modules/cart/ext/formbuilder/index.php:689
 msgid "Ireland"
-msgstr ""
-
-#: includes/system.php:383
-msgid "is available"
 msgstr ""
 
 #: templates/theme-integration.php:144
@@ -3623,11 +3810,11 @@ msgstr ""
 msgid "Israel"
 msgstr ""
 
-#: modules/price/config/currencies.php:255
+#: modules/price/config/currencies.php:257
 msgid "Israeli new shekel"
 msgstr ""
 
-#: includes/activation-config.php:566
+#: includes/activation-config.php:576
 #, php-format
 msgid ""
 "It looks like you also have %s active. Make a choice below for correct setup."
@@ -3639,7 +3826,7 @@ msgid ""
 "Mode with your current theme."
 msgstr ""
 
-#: includes/settings/general.php:426
+#: includes/settings/general.php:434
 msgid ""
 "It seems that this categories parent URL is already set to be a parent for "
 "different elements. Please change the Categories Parent URL to make sure "
@@ -3647,7 +3834,7 @@ msgid ""
 "other plugin being set to show categories with the same parent."
 msgstr ""
 
-#: includes/settings/general.php:373
+#: includes/settings/general.php:381
 msgid ""
 "It seems that this page is already set to be a listing for different "
 "elements. Please change the product listing page to make sure that product "
@@ -3663,7 +3850,7 @@ msgstr ""
 msgid "It's Fine"
 msgstr ""
 
-#: includes/tracking.php:410
+#: includes/tracking.php:428
 msgid "It's not what I was looking for"
 msgstr ""
 
@@ -3671,15 +3858,15 @@ msgstr ""
 msgid "Italy"
 msgstr ""
 
-#: includes/settings/settings-functions.php:510
+#: includes/settings/settings-functions.php:585
 msgid "item"
 msgstr ""
 
-#: includes/settings/settings-functions.php:508
+#: includes/settings/settings-functions.php:583
 msgid "items"
 msgstr ""
 
-#: includes/blocks/index.php:112
+#: includes/blocks/index.php:116
 msgid "Items Per Row"
 msgstr ""
 
@@ -3687,7 +3874,7 @@ msgstr ""
 msgid "Jamaica"
 msgstr ""
 
-#: modules/price/config/currencies.php:263
+#: modules/price/config/currencies.php:265
 msgid "Jamaican dollar"
 msgstr ""
 
@@ -3695,7 +3882,7 @@ msgstr ""
 msgid "Japan"
 msgstr ""
 
-#: modules/price/config/currencies.php:265
+#: modules/price/config/currencies.php:267
 msgid "Japanese yen"
 msgstr ""
 
@@ -3703,7 +3890,7 @@ msgstr ""
 msgid "Jersey"
 msgstr ""
 
-#: modules/price/config/currencies.php:262
+#: modules/price/config/currencies.php:264
 msgid "Jersey pound"
 msgstr ""
 
@@ -3711,11 +3898,11 @@ msgstr ""
 msgid "Jordan"
 msgstr ""
 
-#: modules/price/config/currencies.php:264
+#: modules/price/config/currencies.php:266
 msgid "Jordanian dinar"
 msgstr ""
 
-#: functions/activation.php:325 modules/attributes/product-attributes.php:231
+#: functions/activation.php:350 modules/attributes/product-attributes.php:243
 msgid "Just Finished! Wait 10 minutes before restarting."
 msgstr ""
 
@@ -3723,7 +3910,7 @@ msgstr ""
 msgid "Kazakhstan"
 msgstr ""
 
-#: modules/price/config/currencies.php:274
+#: modules/price/config/currencies.php:276
 msgid "Kazakhstani tenge"
 msgstr ""
 
@@ -3735,17 +3922,17 @@ msgstr ""
 msgid "Kenya"
 msgstr ""
 
-#: modules/price/config/currencies.php:266
+#: modules/price/config/currencies.php:268
 msgid "Kenyan shilling"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:58
-#: modules/cart/includes/shopping-settings.php:59
-#: modules/cart/includes/orders/functions/functions.php:321
+#: modules/cart/includes/shopping-settings.php:61
+#: modules/cart/includes/shopping-settings.php:62
+#: modules/cart/includes/orders/functions/functions.php:333
 msgid "Kind regards,"
 msgstr ""
 
-#: includes/tracking.php:407
+#: includes/tracking.php:425
 msgid "Kindly share what didn't work so we can fix it for future users..."
 msgstr ""
 
@@ -3757,7 +3944,7 @@ msgstr ""
 msgid "Kuwait"
 msgstr ""
 
-#: modules/price/config/currencies.php:272
+#: modules/price/config/currencies.php:274
 msgid "Kuwaiti dinar"
 msgstr ""
 
@@ -3765,15 +3952,15 @@ msgstr ""
 msgid "Kyrgyzstan"
 msgstr ""
 
-#: modules/price/config/currencies.php:267
+#: modules/price/config/currencies.php:269
 msgid "Kyrgyzstani som"
 msgstr ""
 
-#: includes/system.php:236
+#: includes/system.php:241
 msgid "Language"
 msgstr ""
 
-#: modules/price/config/currencies.php:275
+#: modules/price/config/currencies.php:277
 msgid "Lao kip"
 msgstr ""
 
@@ -3781,7 +3968,7 @@ msgstr ""
 msgid "Lao People's Democratic Republic"
 msgstr ""
 
-#: includes/blocks/index.php:122
+#: includes/blocks/index.php:126
 msgid "Large"
 msgstr ""
 
@@ -3789,15 +3976,15 @@ msgstr ""
 msgid "Latvia"
 msgstr ""
 
-#: includes/settings/general.php:199 includes/settings/general.php:233
+#: includes/settings/general.php:207 includes/settings/general.php:241
 msgid "Layout mode"
 msgstr ""
 
-#: functions/activation.php:142
+#: functions/activation.php:146
 msgid "lbs"
 msgstr ""
 
-#: modules/price/config/currencies.php:276
+#: modules/price/config/currencies.php:278
 msgid "Lebanese pound"
 msgstr ""
 
@@ -3805,8 +3992,8 @@ msgstr ""
 msgid "Lebanon"
 msgstr ""
 
-#: includes/customizer.php:195 templates/theme-integration.php:110
-#: includes/settings/general.php:300
+#: includes/customizer.php:230 templates/theme-integration.php:110
+#: includes/settings/general.php:308
 msgid "Left"
 msgstr ""
 
@@ -3823,7 +4010,7 @@ msgstr ""
 msgid "Lesotho"
 msgstr ""
 
-#: modules/price/config/currencies.php:279
+#: modules/price/config/currencies.php:281
 msgid "Lesotho loti"
 msgstr ""
 
@@ -3833,7 +4020,8 @@ msgid ""
 "grid or list."
 msgstr ""
 
-#: includes/activation-config.php:359
+#: includes/activation-config.php:367
+#, php-format
 msgid "Let's customize your %s page layout."
 msgstr ""
 
@@ -3841,7 +4029,7 @@ msgstr ""
 msgid "Liberia"
 msgstr ""
 
-#: modules/price/config/currencies.php:278
+#: modules/price/config/currencies.php:280
 msgid "Liberian dollar"
 msgstr ""
 
@@ -3849,7 +4037,7 @@ msgstr ""
 msgid "Libyan Arab Jamahiriya"
 msgstr ""
 
-#: modules/price/config/currencies.php:280
+#: modules/price/config/currencies.php:282
 msgid "Libyan dinar"
 msgstr ""
 
@@ -3875,11 +4063,11 @@ msgstr ""
 msgid "Listing Pages Labels"
 msgstr ""
 
-#: includes/settings/general.php:403
+#: includes/settings/general.php:411
 msgid "Listing shows at most"
 msgstr ""
 
-#: includes/blocks/index.php:111
+#: includes/blocks/index.php:115
 msgid "Listing Template"
 msgstr ""
 
@@ -3887,12 +4075,12 @@ msgstr ""
 msgid "Lithuania"
 msgstr ""
 
-#: includes/blocks/index.php:118
+#: includes/blocks/index.php:122
 msgid "Loading"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel.php:51
-#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:135
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:52
+#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:137
 msgid "Login"
 msgstr ""
 
@@ -3900,20 +4088,20 @@ msgstr ""
 msgid "Login Form"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:138
+#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:140
 msgid "Login Now"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel.php:53
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:54
 msgid "Logout"
 msgstr ""
 
-#: includes/register-product.php:302 includes/settings/csv.php:249
-#: includes/settings/csv.php:297
+#: includes/register-product.php:306 includes/settings/csv.php:265
+#: includes/settings/csv.php:313
 msgid "Long Description"
 msgstr ""
 
-#: includes/activation-config.php:340
+#: includes/activation-config.php:348
 msgid "Long Description field"
 msgstr ""
 
@@ -3921,7 +4109,7 @@ msgstr ""
 msgid "Luxembourgh"
 msgstr ""
 
-#: modules/price/config/currencies.php:287
+#: modules/price/config/currencies.php:289
 msgid "Macanese pataca"
 msgstr ""
 
@@ -3933,7 +4121,7 @@ msgstr ""
 msgid "Macedonia"
 msgstr ""
 
-#: modules/price/config/currencies.php:284
+#: modules/price/config/currencies.php:286
 msgid "Macedonian denar"
 msgstr ""
 
@@ -3941,33 +4129,33 @@ msgstr ""
 msgid "Madagascar"
 msgstr ""
 
-#: includes/activation-config.php:412
+#: includes/activation-config.php:420
 msgid "Main Catalog Listing"
 msgstr ""
 
-#: includes/settings/general.php:153
+#: templates/block-catalog.php:23 includes/settings/general.php:159
 msgid "Main Catalog Page"
 msgstr ""
 
 #: includes/settings/custom-names.php:61 includes/settings/custom-names.php:72
-#: includes/settings/general.php:406 includes/settings/general.php:408
+#: includes/settings/general.php:414 includes/settings/general.php:416
 msgid "Main Categories"
 msgstr ""
 
-#: includes/settings/general.php:407
+#: includes/settings/general.php:415
 #, php-format
 msgid "Main Categories & Uncategorized %s"
 msgstr ""
 
-#: includes/settings/general.php:509
+#: includes/settings/general.php:517
 msgid "Main listing breadcrumbs title"
 msgstr ""
 
-#: includes/settings/general.php:368
+#: includes/settings/general.php:376
 msgid "Main listing page"
 msgstr ""
 
-#: includes/settings/general.php:404
+#: includes/settings/general.php:412
 msgid "Main listing shows"
 msgstr ""
 
@@ -3975,11 +4163,11 @@ msgstr ""
 msgid "Main Listing Title Label"
 msgstr ""
 
-#: includes/activation-config.php:276
+#: includes/activation-config.php:284
 msgid "Make a choice below to continue with 1-minute catalog setup."
 msgstr ""
 
-#: includes/system.php:125
+#: includes/system.php:129
 msgid "Make default filters bar empty."
 msgstr ""
 
@@ -3988,11 +4176,11 @@ msgid ""
 "Make some adjustments if necessary (you can change it at any time later)."
 msgstr ""
 
-#: includes/activation-config.php:404
+#: includes/activation-config.php:412
 msgid "Make sure to visit the documentation for more tweaks and tricks."
 msgstr ""
 
-#: modules/price/config/currencies.php:283
+#: modules/price/config/currencies.php:285
 msgid "Malagasy ariary"
 msgstr ""
 
@@ -4000,7 +4188,7 @@ msgstr ""
 msgid "Malawi"
 msgstr ""
 
-#: modules/price/config/currencies.php:291
+#: modules/price/config/currencies.php:293
 msgid "Malawian kwacha"
 msgstr ""
 
@@ -4008,7 +4196,7 @@ msgstr ""
 msgid "Malaysia"
 msgstr ""
 
-#: modules/price/config/currencies.php:293
+#: modules/price/config/currencies.php:295
 msgid "Malaysian ringgit"
 msgstr ""
 
@@ -4016,7 +4204,7 @@ msgstr ""
 msgid "Maldives"
 msgstr ""
 
-#: modules/price/config/currencies.php:290
+#: modules/price/config/currencies.php:292
 msgid "Maldivian rufiyaa"
 msgstr ""
 
@@ -4028,7 +4216,7 @@ msgstr ""
 msgid "Malta"
 msgstr ""
 
-#: modules/price/config/currencies.php:256
+#: modules/price/config/currencies.php:258
 msgid "Manx pound"
 msgstr ""
 
@@ -4044,11 +4232,11 @@ msgstr ""
 msgid "Mauritania"
 msgstr ""
 
-#: modules/price/config/currencies.php:288
+#: modules/price/config/currencies.php:290
 msgid "Mauritanian ouguiya"
 msgstr ""
 
-#: modules/price/config/currencies.php:289
+#: modules/price/config/currencies.php:291
 msgid "Mauritian rupee"
 msgstr ""
 
@@ -4056,7 +4244,7 @@ msgstr ""
 msgid "Mauritius"
 msgstr ""
 
-#: includes/system.php:291
+#: includes/system.php:296
 msgid "Max Upload Size"
 msgstr ""
 
@@ -4064,15 +4252,15 @@ msgstr ""
 msgid "Mayotte"
 msgstr ""
 
-#: includes/activation-config.php:187
+#: includes/activation-config.php:195
 msgid "Media"
 msgstr ""
 
-#: includes/blocks/index.php:121
+#: includes/blocks/index.php:125
 msgid "Medium"
 msgstr ""
 
-#: modules/price/config/currencies.php:292
+#: modules/price/config/currencies.php:294
 msgid "Mexican peso"
 msgstr ""
 
@@ -4084,7 +4272,11 @@ msgstr ""
 msgid "Micronesia"
 msgstr ""
 
-#: templates/templates-functions.php:410
+#: ext-comp/woocommerce.php:75
+msgid "Missing Module!"
+msgstr ""
+
+#: templates/templates-functions.php:423
 #: includes/settings/custom-design.php:113
 msgid "Modern Grid"
 msgstr ""
@@ -4093,7 +4285,8 @@ msgstr ""
 msgid "Modern Grid Image"
 msgstr ""
 
-#: includes/activation-config.php:564
+#: includes/activation-config.php:574
+#, php-format
 msgid "Modify %s Design"
 msgstr ""
 
@@ -4101,7 +4294,7 @@ msgstr ""
 msgid "Moldova, Republic of"
 msgstr ""
 
-#: modules/price/config/currencies.php:282
+#: modules/price/config/currencies.php:284
 msgid "Moldovan leu"
 msgstr ""
 
@@ -4113,7 +4306,7 @@ msgstr ""
 msgid "Mongolia"
 msgstr ""
 
-#: modules/price/config/currencies.php:286
+#: modules/price/config/currencies.php:288
 msgid "Mongolian t&ouml;gr&ouml;g"
 msgstr ""
 
@@ -4126,6 +4319,7 @@ msgid "Montserrat"
 msgstr ""
 
 #: includes/settings/extension-info.php:53
+#, php-format
 msgid "More free & premium features %shere%s."
 msgstr ""
 
@@ -4133,7 +4327,7 @@ msgstr ""
 msgid "More styling"
 msgstr ""
 
-#: modules/price/config/currencies.php:281
+#: modules/price/config/currencies.php:283
 msgid "Moroccan dirham"
 msgstr ""
 
@@ -4141,11 +4335,17 @@ msgstr ""
 msgid "Morocco"
 msgstr ""
 
-#: includes/settings/general.php:560
+#: includes/welcome/new.php:77
+msgid ""
+"Most changes were added in the admin side to make the configuration easier "
+"for new users."
+msgstr ""
+
+#: includes/settings/general.php:568
 msgid "Move breadcrumbs to the top"
 msgstr ""
 
-#: modules/price/config/currencies.php:294
+#: modules/price/config/currencies.php:296
 msgid "Mozambican metical"
 msgstr ""
 
@@ -4169,21 +4369,21 @@ msgstr ""
 msgid "Myanmar"
 msgstr ""
 
-#: includes/system.php:281
+#: includes/system.php:286
 msgid "MySQL Version"
 msgstr ""
 
-#: includes/system.php:313
+#: includes/system.php:318
 msgid "N/A"
 msgstr ""
 
-#: includes/system.php:374 includes/blocks/index.php:326
-#: includes/settings/csv.php:243 includes/settings/csv.php:291
+#: includes/system.php:380 includes/blocks/index.php:404
+#: includes/settings/csv.php:259 includes/settings/csv.php:307
 #: modules/cart/includes/variations/variations-meta.php:40
 msgid "Name"
 msgstr ""
 
-#: includes/activation-config.php:338
+#: includes/activation-config.php:346
 msgid "Name field"
 msgstr ""
 
@@ -4191,7 +4391,7 @@ msgstr ""
 msgid "Namibia"
 msgstr ""
 
-#: modules/price/config/currencies.php:295
+#: modules/price/config/currencies.php:297
 msgid "Namibian dollar"
 msgstr ""
 
@@ -4199,7 +4399,7 @@ msgstr ""
 msgid "Nauru"
 msgstr ""
 
-#: includes/product-settings.php:362
+#: includes/product-settings.php:370
 msgid "Need Help?"
 msgstr ""
 
@@ -4207,7 +4407,7 @@ msgstr ""
 msgid "Nepal"
 msgstr ""
 
-#: modules/price/config/currencies.php:299
+#: modules/price/config/currencies.php:301
 msgid "Nepalese rupee"
 msgstr ""
 
@@ -4215,7 +4415,7 @@ msgstr ""
 msgid "Netherlands"
 msgstr ""
 
-#: modules/price/config/currencies.php:196
+#: modules/price/config/currencies.php:198
 msgid "Netherlands Antillean guilder"
 msgstr ""
 
@@ -4224,6 +4424,7 @@ msgid "Netherlands Antilles"
 msgstr ""
 
 #: includes/product-categories.php:40
+#, php-format
 msgid "New %s Category"
 msgstr ""
 
@@ -4239,21 +4440,21 @@ msgstr ""
 msgid "New Order"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:59
+#: modules/cart/includes/shopping-settings.php:62
 msgid "New order from a customer."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:70
+#: modules/cart/includes/shopping-settings.php:73
 #, php-format
 msgid "New Order on %s"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:71
+#: modules/cart/includes/shopping-settings.php:74
 #, php-format
 msgid "New Packing List on %s"
 msgstr ""
 
-#: modules/cart/functions/shortcodes.php:66
+#: modules/cart/functions/shortcodes.php:70
 msgid "New quantity values saved."
 msgstr ""
 
@@ -4261,7 +4462,7 @@ msgstr ""
 msgid "New Quote"
 msgstr ""
 
-#: modules/price/config/currencies.php:336
+#: modules/price/config/currencies.php:338
 msgid "New Taiwan dollar"
 msgstr ""
 
@@ -4269,11 +4470,11 @@ msgstr ""
 msgid "New Zealand"
 msgstr ""
 
-#: modules/price/config/currencies.php:300
+#: modules/price/config/currencies.php:302
 msgid "New Zealand dollar"
 msgstr ""
 
-#: templates/theme-integration.php:160 includes/settings/tooltips.php:176
+#: templates/theme-integration.php:160 includes/settings/tooltips.php:178
 msgid "Next"
 msgstr ""
 
@@ -4289,7 +4490,7 @@ msgstr ""
 msgid "Nicaragua"
 msgstr ""
 
-#: modules/price/config/currencies.php:297
+#: modules/price/config/currencies.php:299
 msgid "Nicaraguan c&oacute;rdoba"
 msgstr ""
 
@@ -4301,7 +4502,7 @@ msgstr ""
 msgid "Nigeria"
 msgstr ""
 
-#: modules/price/config/currencies.php:296
+#: modules/price/config/currencies.php:298
 msgid "Nigerian naira"
 msgstr ""
 
@@ -4309,19 +4510,22 @@ msgstr ""
 msgid "Niue"
 msgstr ""
 
-#: includes/system.php:30 includes/system.php:46 includes/system.php:72
+#: includes/system.php:31 includes/system.php:48 includes/system.php:75
 msgid "No"
 msgstr ""
 
-#: functions/functions.php:1540
+#: functions/functions.php:1583
+#, php-format
 msgid "No %s available."
 msgstr ""
 
-#: includes/register-product.php:141
+#: includes/register-product.php:146
+#, php-format
 msgid "No %s found"
 msgstr ""
 
-#: includes/register-product.php:142
+#: includes/register-product.php:147
+#, php-format
 msgid "No %s found in trash"
 msgstr ""
 
@@ -4350,7 +4554,7 @@ msgstr ""
 msgid "No quotes found in the trash"
 msgstr ""
 
-#: includes/blocks/index.php:327
+#: includes/blocks/index.php:405
 msgid "None"
 msgstr ""
 
@@ -4362,7 +4566,7 @@ msgstr ""
 msgid "North Korea"
 msgstr ""
 
-#: modules/price/config/currencies.php:270
+#: modules/price/config/currencies.php:272
 msgid "North Korean won"
 msgstr ""
 
@@ -4374,27 +4578,27 @@ msgstr ""
 msgid "Norway"
 msgstr ""
 
-#: modules/price/config/currencies.php:298
+#: modules/price/config/currencies.php:300
 msgid "Norwegian krone"
 msgstr ""
 
-#: includes/system.php:420
+#: includes/system.php:425
 msgid "Not Declared"
 msgstr ""
 
-#: includes/settings/general.php:467
+#: includes/settings/general.php:475
 msgid "Nothing"
 msgstr ""
 
-#: includes/register-product.php:157
+#: includes/register-product.php:162
 msgid "Nothing found"
 msgstr ""
 
-#: includes/register-product.php:158
+#: includes/register-product.php:163
 msgid "Nothing found in trash"
 msgstr ""
 
-#: includes/extensions.php:921
+#: includes/extensions.php:935
 msgid "Now you can get multiple extensions at once with the lowest price ever."
 msgstr ""
 
@@ -4409,7 +4613,7 @@ msgstr ""
 msgid "Number of attributes"
 msgstr ""
 
-#: includes/settings/csv.php:176
+#: includes/settings/csv.php:191
 msgid "Number of product fields and number of fields in CSV file do not match!"
 msgstr ""
 
@@ -4426,7 +4630,7 @@ msgstr ""
 msgid "Off"
 msgstr ""
 
-#: includes/system.php:80
+#: functions/content-functions.php:162 includes/system.php:84
 msgid "OK"
 msgstr ""
 
@@ -4434,7 +4638,7 @@ msgstr ""
 msgid "Oman"
 msgstr ""
 
-#: modules/price/config/currencies.php:301
+#: modules/price/config/currencies.php:303
 msgid "Omani rial"
 msgstr ""
 
@@ -4446,30 +4650,26 @@ msgstr ""
 msgid "on main listing, individual product, catalog search and category pages"
 msgstr ""
 
-#: includes/settings/general.php:558
+#: includes/settings/general.php:566
 msgid ""
 "On some themes, the category name is missing on the category page, so you "
 "can use this to restore it. Uncheck this if you see duplicated category name "
 "on the category page."
 msgstr ""
 
-#: includes/settings/general.php:557
+#: includes/settings/general.php:565
 msgid ""
 "On some themes, the product name is missing on the product page, so you can "
 "use this to restore it. Uncheck this if you see duplicated product name on "
 "the product page."
 msgstr ""
 
-#: includes/activation-config.php:333
+#: includes/activation-config.php:341
 msgid "on the left side"
 msgstr ""
 
-#: includes/activation-config.php:334
+#: includes/activation-config.php:342
 msgid "on the right side"
-msgstr ""
-
-#: includes/cron.php:43
-msgid "Once Weekly"
 msgstr ""
 
 #: functions/support.php:52
@@ -4491,15 +4691,15 @@ msgstr ""
 msgid "Only variations with non-empty values will show up on the product page."
 msgstr ""
 
-#: includes/activation-config.php:332
+#: includes/activation-config.php:340
 msgid "optional"
 msgstr ""
 
-#: includes/blocks/index.php:124 modules/price/blocks/price-table/index.php:88
+#: includes/blocks/index.php:128 modules/price/blocks/price-table/index.php:89
 msgid "Options"
 msgstr ""
 
-#: includes/customizer.php:120 includes/settings/custom-design.php:295
+#: includes/customizer.php:145 includes/settings/custom-design.php:296
 #: modules/price/price-settings.php:40
 msgid "Orange"
 msgstr ""
@@ -4513,11 +4713,11 @@ msgstr ""
 msgid "order"
 msgstr ""
 
-#: includes/blocks/index.php:109
+#: includes/blocks/index.php:113
 msgid "Order by"
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:323
+#: modules/cart/includes/orders/functions/functions.php:335
 msgid "Order Completed"
 msgstr ""
 
@@ -4525,16 +4725,16 @@ msgstr ""
 msgid "Order Data"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:59
+#: modules/cart/includes/shopping-settings.php:62
 msgid "Order details"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:69
+#: modules/cart/includes/shopping-settings.php:72
 #, php-format
 msgid "Order from %s"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/save-order.php:213
+#: modules/cart/includes/orders/includes/save-order.php:215
 msgid "Order ID"
 msgstr ""
 
@@ -4542,15 +4742,15 @@ msgstr ""
 msgid "Order Status"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:462
+#: modules/cart/includes/orders/includes/register-digital-orders.php:463
 msgid "Order summary will show up after digital order is ready."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:480
+#: modules/cart/includes/orders/includes/register-digital-orders.php:481
 msgid "Order Tax"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:499
+#: modules/cart/includes/orders/includes/register-digital-orders.php:501
 msgid "Order Total"
 msgstr ""
 
@@ -4558,18 +4758,22 @@ msgstr ""
 msgid "Order Total:"
 msgstr ""
 
-#: includes/blocks/index.php:110
+#: includes/blocks/index.php:114
 msgid "Order Type"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:185
+#: modules/cart/includes/shopping-settings.php:188
 #: modules/cart/includes/orders/includes/register-digital-orders.php:39
-#: modules/cart/includes/orders/includes/save-order.php:174
+#: modules/cart/includes/orders/includes/save-order.php:176
 #: modules/cart/includes/customers/includes/transactions/transactions-client-list.php:25
 msgid "Orders"
 msgstr ""
 
-#: includes/tracking.php:418
+#: modules/cart/includes/orders/functions/activation.php:74
+msgid "Orders Manager"
+msgstr ""
+
+#: includes/tracking.php:436
 msgid "Other"
 msgstr ""
 
@@ -4577,11 +4781,11 @@ msgstr ""
 msgid "Padding"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:769
+#: modules/cart/includes/orders/includes/register-digital-orders.php:784
 msgid "Page saved."
 msgstr ""
 
-#: modules/cart/includes/payment.php:133
+#: modules/cart/includes/payment.php:143
 msgid "Paid"
 msgstr ""
 
@@ -4589,7 +4793,7 @@ msgstr ""
 msgid "Pakistan"
 msgstr ""
 
-#: modules/price/config/currencies.php:306
+#: modules/price/config/currencies.php:308
 msgid "Pakistani rupee"
 msgstr ""
 
@@ -4605,7 +4809,7 @@ msgstr ""
 msgid "Panama"
 msgstr ""
 
-#: modules/price/config/currencies.php:302
+#: modules/price/config/currencies.php:304
 msgid "Panamanian balboa"
 msgstr ""
 
@@ -4613,7 +4817,7 @@ msgstr ""
 msgid "Papua New Guinea"
 msgstr ""
 
-#: modules/price/config/currencies.php:304
+#: modules/price/config/currencies.php:306
 msgid "Papua New Guinean kina"
 msgstr ""
 
@@ -4621,15 +4825,17 @@ msgstr ""
 msgid "Paraguay"
 msgstr ""
 
-#: modules/price/config/currencies.php:309
+#: modules/price/config/currencies.php:311
 msgid "Paraguayan guaran&iacute;"
 msgstr ""
 
 #: includes/product-categories.php:35
+#, php-format
 msgid "Parent %s Category"
 msgstr ""
 
 #: includes/product-categories.php:36
+#, php-format
 msgid "Parent %s Category:"
 msgstr ""
 
@@ -4641,21 +4847,53 @@ msgstr ""
 msgid "Parent Category:"
 msgstr ""
 
-#: includes/system.php:410
+#: includes/system.php:412
 msgid "Parent Theme Author URL"
 msgstr ""
 
-#: includes/system.php:402
+#: includes/system.php:404
 msgid "Parent Theme Name"
 msgstr ""
 
-#: includes/system.php:406
+#: includes/system.php:408
 msgid "Parent Theme Version"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel.php:73
-#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:136
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:76
+#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:138
 msgid "Password"
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:133
+#, php-format
+msgid ""
+"Password must be at least %d characters long. Auto refresh in %s seconds."
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:148
+#, php-format
+msgid ""
+"Password must include at least one lowercase letter. Auto refresh in %s "
+"seconds."
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:138
+#, php-format
+msgid "Password must include at least one number. Auto refresh in %s seconds."
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:153
+#, php-format
+msgid ""
+"Password must include at least one special character. Auto refresh in %s "
+"seconds."
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:143
+#, php-format
+msgid ""
+"Password must include at least one uppercase letter. Auto refresh in %s "
+"seconds."
 msgstr ""
 
 #: includes/extensions.php:120 includes/extensions.php:159
@@ -4673,7 +4911,7 @@ msgstr ""
 msgid "Payment and currency"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/save-order.php:108
+#: modules/cart/includes/orders/includes/save-order.php:110
 msgid "Payment Gateway"
 msgstr ""
 
@@ -4708,7 +4946,8 @@ msgstr ""
 msgid "Per row products (Modern Grid)"
 msgstr ""
 
-#: includes/settings/csv.php:192
+#: includes/settings/csv.php:206
+#, php-format
 msgid ""
 "Permission error. Please check WordPress uploads %sfolder permissions%s."
 msgstr ""
@@ -4717,11 +4956,11 @@ msgstr ""
 msgid "Peru"
 msgstr ""
 
-#: modules/price/config/currencies.php:303
+#: modules/price/config/currencies.php:305
 msgid "Peruvian nuevo sol"
 msgstr ""
 
-#: modules/price/config/currencies.php:305
+#: modules/price/config/currencies.php:307
 msgid "Philippine peso"
 msgstr ""
 
@@ -4729,30 +4968,30 @@ msgstr ""
 msgid "Phillipines"
 msgstr ""
 
-#: modules/quote-cart/index.php:301
-#: modules/cart/includes/shopping-settings.php:244
-#: modules/cart/includes/shopping-settings.php:272
+#: modules/quote-cart/index.php:304
+#: modules/cart/includes/shopping-settings.php:247
+#: modules/cart/includes/shopping-settings.php:275
 msgid "Phone"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:117 includes/welcome/new.php:171
-#: includes/welcome/start.php:125
+#: includes/welcome/start.php:150
 msgid "PHP code snippets"
 msgstr ""
 
-#: includes/system.php:276
+#: includes/system.php:281
 msgid "PHP Max Input Vars"
 msgstr ""
 
-#: includes/system.php:261
+#: includes/system.php:266
 msgid "PHP Post Max Size"
 msgstr ""
 
-#: includes/system.php:272
+#: includes/system.php:277
 msgid "PHP Time Limit"
 msgstr ""
 
-#: includes/system.php:254
+#: includes/system.php:259
 msgid "PHP Version"
 msgstr ""
 
@@ -4760,20 +4999,20 @@ msgstr ""
 msgid "Pitcairn Island"
 msgstr ""
 
-#: includes/settings/general.php:148
+#: includes/settings/general.php:154
 #, php-format
 msgid "Place %s on this page."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:50
+#: modules/cart/includes/shopping-settings.php:53
 msgid "Place an order"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:325
+#: modules/cart/includes/shopping-settings.php:331
 msgid "Place Order"
 msgstr ""
 
-#: includes/customizer.php:37 includes/settings/custom-design.php:248
+#: includes/customizer.php:39 includes/settings/custom-design.php:248
 msgid "Plain"
 msgstr ""
 
@@ -4783,25 +5022,26 @@ msgid ""
 "Please %1$sselect the shopping cart pages%2$s for the cart to work correctly."
 msgstr ""
 
-#: includes/product-settings.php:355
+#: includes/product-settings.php:363
+#, php-format
 msgid ""
 "Please <a href=\"%s\">rate</a> this plugin and tell us if it works for you "
 "or not. It really helps development."
 msgstr ""
 
-#: includes/customizer.php:273
+#: includes/customizer.php:316
 msgid "Please adjust these settings on a product listing to see any effect."
 msgstr ""
 
-#: includes/customizer.php:267
+#: includes/customizer.php:310
 msgid "Please adjust these settings on a product page to see any effect."
 msgstr ""
 
-#: includes/tracking.php:380
+#: includes/tracking.php:398
 msgid "Please choose a reason..."
 msgstr ""
 
-#: modules/cart/functions/shortcodes.php:69
+#: modules/cart/functions/shortcodes.php:73
 msgid "Please choose product variations."
 msgstr ""
 
@@ -4809,7 +5049,13 @@ msgstr ""
 msgid "Please consider upgrading to support the project."
 msgstr ""
 
-#: includes/settings/csv.php:179
+#: ext-comp/woocommerce.php:78
+#, php-format
+msgid ""
+"Please install free %1$s extension from %2$scatalog extensions menu%3$s."
+msgstr ""
+
+#: includes/settings/csv.php:194
 msgid ""
 "Please make sure that only the expected columns exist in the import file and "
 "the correct CSV separator is set."
@@ -4820,26 +5066,34 @@ msgid "Please make your choice below or switch the theme."
 msgstr ""
 
 #: modules/price/price-meta.php:32
+#, php-format
 msgid ""
 "Please provide a correct price format according to your currency settings. "
 "Example price format: %s or %s"
 msgstr ""
 
-#: functions/activation.php:122
+#: functions/activation.php:126
 msgid ""
 "Please read this page carefully to fully understand all product page "
 "elements."
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:133
+#: modules/cart/includes/customers/includes/transactions/transactions-customer.php:135
 msgid "Please see your account info below"
 msgstr ""
 
-#: includes/settings/csv.php:93
+#: includes/settings/csv.php:105
 msgid "Please upload only CSV files."
 msgstr ""
 
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:97
+msgid ""
+"Please use a strong password with at least 8 characters, including uppercase "
+"and lowercase letters, numbers, and symbols for better security."
+msgstr ""
+
 #: includes/settings/image-sizes.php:23
+#, php-format
 msgid "Please use the %s plugin to apply the size changes to existing images."
 msgstr ""
 
@@ -4857,11 +5111,11 @@ msgstr ""
 msgid "Poland"
 msgstr ""
 
-#: modules/price/config/currencies.php:307
+#: modules/price/config/currencies.php:309
 msgid "Polish z&#x142;oty"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:165
+#: includes/class-ic-sitewide-bar.php:210
 msgid "Popup"
 msgstr ""
 
@@ -4873,13 +5127,13 @@ msgstr ""
 msgid "Portugal"
 msgstr ""
 
-#: modules/quote-cart/index.php:280
-#: modules/cart/includes/shopping-settings.php:217
-#: modules/cart/includes/shopping-settings.php:246
+#: modules/quote-cart/index.php:283
+#: modules/cart/includes/shopping-settings.php:220
+#: modules/cart/includes/shopping-settings.php:249
 msgid "Postal Code"
 msgstr ""
 
-#: modules/price/config/currencies.php:240
+#: modules/price/config/currencies.php:242
 msgid "Pound sterling"
 msgstr ""
 
@@ -4899,29 +5153,29 @@ msgstr ""
 msgid "Previous Page Label"
 msgstr ""
 
-#: includes/settings/csv.php:245 includes/settings/csv.php:293
+#: includes/settings/csv.php:261 includes/settings/csv.php:309
 #: modules/price/price-meta.php:31 modules/price/price-meta.php:68
 #: modules/price/price-meta.php:122 modules/price/price-settings.php:82
 #: modules/cart/includes/cart-form.php:236
-#: modules/price/widgets/price-filter-widget.php:55
-#: modules/price/widgets/price-filter-widget.php:60
+#: modules/price/widgets/price-filter-widget.php:56
+#: modules/price/widgets/price-filter-widget.php:61
 msgid "Price"
 msgstr ""
 
-#: includes/activation-config.php:345
+#: includes/activation-config.php:353
 msgid "Price & SKU box"
 msgstr ""
 
-#: includes/customizer.php:116 modules/price/price-settings.php:34
+#: includes/customizer.php:139 modules/price/price-settings.php:34
 #: modules/price/price-settings.php:54
 msgid "Price Color"
 msgstr ""
 
-#: includes/activation-config.php:555
+#: includes/activation-config.php:565
 msgid "Price disabled completely"
 msgstr ""
 
-#: includes/activation-config.php:553
+#: includes/activation-config.php:563
 msgid "Price enabled for all or some products"
 msgstr ""
 
@@ -4937,8 +5191,8 @@ msgstr ""
 msgid "Price mod"
 msgstr ""
 
-#: modules/price/blocks/price-table/index.php:71
-#: modules/price/blocks/price-table/index.php:76
+#: modules/price/blocks/price-table/index.php:72
+#: modules/price/blocks/price-table/index.php:77
 msgid "Price not available."
 msgstr ""
 
@@ -4946,21 +5200,26 @@ msgstr ""
 msgid "Price Required"
 msgstr ""
 
-#: includes/customizer.php:130 modules/price/price-settings.php:22
+#: includes/customizer.php:159 modules/price/price-settings.php:22
 #: modules/price/price-settings.php:53
 msgid "Price Size"
+msgstr ""
+
+#: modules/price/blocks/price-table/index.php:45
+#: modules/price/blocks/price-table/index.php:88
+msgid "Price Table"
 msgstr ""
 
 #: includes/settings/custom-names.php:33
 msgid "Price:"
 msgstr ""
 
-#: modules/quote-cart/index.php:307
-#: modules/cart/includes/shopping-settings.php:278
+#: modules/quote-cart/index.php:310
+#: modules/cart/includes/shopping-settings.php:281
 msgid "Privacy Notice"
 msgstr ""
 
-#: includes/tracking.php:341
+#: includes/tracking.php:358
 msgid "Processing..."
 msgstr ""
 
@@ -4973,7 +5232,7 @@ msgstr ""
 msgid "product archive"
 msgstr ""
 
-#: includes/settings/custom-design.php:307
+#: includes/settings/custom-design.php:308
 msgid "product archive title"
 msgstr ""
 
@@ -4981,7 +5240,7 @@ msgstr ""
 msgid "Product Button Options"
 msgstr ""
 
-#: includes/customizer.php:256
+#: includes/customizer.php:299
 msgid "Product Catalog"
 msgstr ""
 
@@ -4993,6 +5252,14 @@ msgstr ""
 msgid "Product Categories"
 msgstr ""
 
+#: includes/blocks/index.php:191
+msgid "Product Category"
+msgstr ""
+
+#: includes/blocks/product-category/block.asset.php:3
+msgid "Product Category Page"
+msgstr ""
+
 #: functions/support.php:115
 msgid "Product Count widget"
 msgstr ""
@@ -5001,11 +5268,11 @@ msgstr ""
 msgid "product count widget that shows the number of displayed products"
 msgstr ""
 
-#: includes/blocks/block-edit.php:72
+#: includes/blocks/block-edit.php:82
 msgid "Product Edit Mode"
 msgstr ""
 
-#: functions/functions.php:1227
+#: functions/functions.php:1264
 msgid "Product Filters Bar has no widgets"
 msgstr ""
 
@@ -5013,45 +5280,51 @@ msgstr ""
 msgid "Product Gallery"
 msgstr ""
 
-#: includes/activation-config.php:185
+#: includes/activation-config.php:193
 msgid "Product Image"
 msgstr ""
 
 #: includes/settings/custom-names.php:173
+#, php-format
 msgid ""
 "Product listing pages are disabled due to a lack of theme integration.%s"
 msgstr ""
 
 #: includes/settings/custom-names.php:171
+#, php-format
 msgid ""
 "Product listing pages are disabled with simple theme integration. See <a "
 "href=\"%s\">Theme Integration Guide</a> to enable product listing pages."
 msgstr ""
 
-#: includes/customizer.php:270
+#: includes/customizer.php:313
 msgid "Product Listing Style"
 msgstr ""
 
-#: includes/customizer.php:144
+#: includes/customizer.php:176
 msgid "Product Listing Template"
 msgstr ""
 
 #: includes/product-columns.php:25
-#: modules/cart/includes/orders/includes/register-digital-orders.php:271
+#: modules/cart/includes/orders/includes/register-digital-orders.php:272
 msgid "Product Name"
 msgstr ""
 
-#: includes/activation-config.php:190 modules/quote-cart/index.php:237
+#: includes/activation-config.php:198 modules/quote-cart/index.php:240
 #: modules/cart/includes/cart-form.php:230
 #: modules/cart/includes/cart/ic-cart.php:64
 msgid "Product name"
 msgstr ""
 
-#: functions/activation.php:158
+#: includes/blocks/index.php:185 includes/blocks/product-page/block.asset.php:3
+msgid "Product Page"
+msgstr ""
+
+#: functions/activation.php:162
 msgid "Product Page Layout"
 msgstr ""
 
-#: includes/customizer.php:264
+#: includes/customizer.php:307
 msgid "Product Page Style"
 msgstr ""
 
@@ -5063,13 +5336,12 @@ msgstr ""
 msgid "Product Promo widget"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:274
+#: modules/cart/includes/orders/includes/register-digital-orders.php:275
 msgid "Product Quantity"
 msgstr ""
 
-#: functions/content-functions.php:98 functions/functions.php:541
-#: includes/blocks/widgets.php:116 includes/widgets/search-widget.php:23
-#: includes/widgets/search-widget.php:99
+#: functions/functions.php:564 includes/blocks/widgets.php:121
+#: includes/widgets/search-widget.php:23 includes/widgets/search-widget.php:103
 msgid "Product Search"
 msgstr ""
 
@@ -5081,7 +5353,7 @@ msgstr ""
 msgid "Product tags filter"
 msgstr ""
 
-#: includes/activation-config.php:156
+#: includes/activation-config.php:164
 #: modules/cart/includes/variations/product-variations-settings.php:18
 #: modules/cart/includes/variations/variations-meta.php:29
 msgid "Product Variations"
@@ -5095,18 +5367,18 @@ msgstr ""
 msgid "Product Variations Settings"
 msgstr ""
 
-#: config/const.php:22 includes/activation-config.php:175
+#: config/const.php:22 includes/activation-config.php:183
 #: includes/settings/custom-names.php:74
 #: modules/cart/includes/orders/includes/register-digital-orders.php:85
 #: modules/cart/includes/customers/includes/transactions/transactions-client-list.php:23
 msgid "Products"
 msgstr ""
 
-#: includes/activation-config.php:183
+#: includes/activation-config.php:191
 msgid "Publish"
 msgstr ""
 
-#: includes/activation-config.php:343
+#: includes/activation-config.php:351
 msgid "Publish box"
 msgstr ""
 
@@ -5126,11 +5398,11 @@ msgstr ""
 msgid "Qatar"
 msgstr ""
 
-#: modules/price/config/currencies.php:310
+#: modules/price/config/currencies.php:312
 msgid "Qatari riyal"
 msgstr ""
 
-#: modules/quote-cart/index.php:242 modules/cart/includes/cart-form.php:235
+#: modules/quote-cart/index.php:245 modules/cart/includes/cart-form.php:235
 #: modules/cart/includes/cart/ic-cart.php:69
 msgid "Quantity"
 msgstr ""
@@ -5153,11 +5425,11 @@ msgstr ""
 msgid "Quotes"
 msgstr ""
 
-#: theme-product_adder_support.php:337
+#: theme-product_adder_support.php:342
 msgid "Rate Now & Hide Forever"
 msgstr ""
 
-#: includes/product-settings.php:354
+#: includes/product-settings.php:362
 msgid "Rate this Plugin!"
 msgstr ""
 
@@ -5170,59 +5442,66 @@ msgstr ""
 msgid "Ready to Install"
 msgstr ""
 
-#: includes/system.php:144
+#: includes/system.php:148
 msgid "Reassign data"
 msgstr ""
 
-#: includes/system.php:138
+#: includes/system.php:142
 msgid "Reassign product data"
 msgstr ""
 
-#: includes/settings/general.php:196 includes/settings/general.php:230
+#: includes/settings/general.php:204 includes/settings/general.php:238
 msgid "recommended"
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:143
+#: includes/class-ic-activation-wizard.php:145
+#, php-format
 msgid ""
 "Recommended extensions on the list below are highlighted with %s and red "
 "border."
 msgstr ""
 
-#: includes/customizer.php:120 includes/settings/custom-design.php:293
+#: includes/customizer.php:144 includes/settings/custom-design.php:294
 #: modules/price/price-settings.php:38
 msgid "Red"
 msgstr ""
 
-#: includes/blocks/widgets.php:114
+#: includes/blocks/widgets.php:119
 #: includes/widgets/related-products-widget.php:20
+#, php-format
 msgid "Related %s"
 msgstr ""
 
-#: includes/blocks/widgets.php:120
+#: includes/blocks/widgets.php:125
 #: includes/widgets/related-products-widget.php:23
 msgid "Related Catalog Items"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:177
+#: includes/blocks/related/block.asset.php:3
+msgid "Related Products"
+msgstr ""
+
+#: modules/cart/includes/shopping-settings.php:180
 msgid "Remember fields by"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:146
+#: modules/cart/includes/shopping-settings.php:149
 #, php-format
 msgid ""
 "Remember to use the %1$sShopping Cart widget%2$s to show the cart in the "
 "sidebar."
 msgstr ""
 
-#: includes/register-product.php:144
+#: includes/register-product.php:149
+#, php-format
 msgid "Remove main %s image"
 msgstr ""
 
-#: includes/register-product.php:160
+#: includes/register-product.php:165
 msgid "Remove main image"
 msgstr ""
 
-#: includes/settings/general.php:179
+#: includes/settings/general.php:187
 #, php-format
 msgid "Remove the %s on the page edit screen."
 msgstr ""
@@ -5231,7 +5510,7 @@ msgstr ""
 msgid "Remove the Shortcode and Start the Wizard"
 msgstr ""
 
-#: includes/product-settings.php:387
+#: includes/product-settings.php:395
 msgid "Report a Problem"
 msgstr ""
 
@@ -5239,11 +5518,11 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: includes/system.php:106 includes/settings/general.php:106
+#: includes/system.php:110 includes/settings/general.php:112
 msgid "Reset Catalog Settings"
 msgstr ""
 
-#: functions/functions.php:1206
+#: functions/functions.php:1243
 msgid "Reset Filters"
 msgstr ""
 
@@ -5251,7 +5530,7 @@ msgstr ""
 msgid "Reset image"
 msgstr ""
 
-#: includes/system.php:104
+#: includes/system.php:108
 msgid "Reset product settings"
 msgstr ""
 
@@ -5272,7 +5551,7 @@ msgstr ""
 msgid "Return to Products Label"
 msgstr ""
 
-#: modules/cart/functions/shortcodes.php:123
+#: modules/cart/functions/shortcodes.php:127
 #, php-format
 msgid "Returning customer? %s"
 msgstr ""
@@ -5281,8 +5560,8 @@ msgstr ""
 msgid "Reunion Island"
 msgstr ""
 
-#: includes/customizer.php:195 templates/theme-integration.php:111
-#: includes/settings/general.php:301
+#: includes/customizer.php:231 templates/theme-integration.php:111
+#: includes/settings/general.php:309
 msgid "Right"
 msgstr ""
 
@@ -5290,7 +5569,7 @@ msgstr ""
 msgid "Romania"
 msgstr ""
 
-#: modules/price/config/currencies.php:311
+#: modules/price/config/currencies.php:313
 msgid "Romanian leu"
 msgstr ""
 
@@ -5298,7 +5577,7 @@ msgstr ""
 msgid "Russian Federation"
 msgstr ""
 
-#: modules/price/config/currencies.php:313
+#: modules/price/config/currencies.php:315
 msgid "Russian ruble"
 msgstr ""
 
@@ -5306,11 +5585,11 @@ msgstr ""
 msgid "Rwanda"
 msgstr ""
 
-#: modules/price/config/currencies.php:314
+#: modules/price/config/currencies.php:316
 msgid "Rwandan franc"
 msgstr ""
 
-#: modules/price/config/currencies.php:326
+#: modules/price/config/currencies.php:328
 msgid "S&atilde;o Tom&eacute; and Pr&iacute;ncipe dobra"
 msgstr ""
 
@@ -5318,7 +5597,7 @@ msgstr ""
 msgid "Saint Helena"
 msgstr ""
 
-#: modules/price/config/currencies.php:321
+#: modules/price/config/currencies.php:323
 msgid "Saint Helena pound"
 msgstr ""
 
@@ -5338,11 +5617,11 @@ msgstr ""
 msgid "Saint Vincent and the Grenadines"
 msgstr ""
 
-#: modules/price/config/currencies.php:346
+#: modules/price/config/currencies.php:348
 msgid "Samoan t&#x101;l&#x101;"
 msgstr ""
 
-#: functions/activation.php:124
+#: functions/activation.php:128
 msgid "Sample Product Page"
 msgstr ""
 
@@ -5358,29 +5637,29 @@ msgstr ""
 msgid "Saudi Arabia"
 msgstr ""
 
-#: modules/price/config/currencies.php:315
+#: modules/price/config/currencies.php:317
 msgid "Saudi riyal"
 msgstr ""
 
 #: includes/settings/custom-design.php:90
 #: includes/settings/custom-design.php:215
-#: includes/settings/custom-design.php:315
+#: includes/settings/custom-design.php:316
 #: includes/settings/custom-names.php:148
-#: includes/settings/custom-names.php:205 includes/settings/general.php:516
+#: includes/settings/custom-names.php:205 includes/settings/general.php:524
 #: modules/attributes/attributes-settings.php:150 modules/button/index.php:115
 #: modules/shipping/shipping-settings.php:127
-#: modules/cart/includes/shopping-settings.php:200
+#: modules/cart/includes/shopping-settings.php:203
 #: modules/cart/includes/variations/product-variations-settings.php:183
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:57
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:59
 msgid "Save changes"
 msgstr ""
 
-#: includes/settings/general.php:181
+#: includes/settings/general.php:189
 #, php-format
 msgid "Save the page without the %s"
 msgstr ""
 
-#: includes/activation-config.php:183
+#: includes/activation-config.php:191
 msgid "Save the product so you can see how it shows up on the website."
 msgstr ""
 
@@ -5388,27 +5667,29 @@ msgstr ""
 msgid "Say hello to the fastest catalog experience."
 msgstr ""
 
-#: includes/settings/tooltips.php:360
+#: includes/settings/tooltips.php:371
 msgid "Screen Tutorial Complete"
 msgstr ""
 
-#: functions/content-functions.php:95 includes/settings/search.php:62
+#: functions/content-functions.php:95 includes/settings/search.php:64
 msgid "Search"
 msgstr ""
 
-#: includes/register-product.php:140
+#: includes/register-product.php:145
+#, php-format
 msgid "Search %s"
 msgstr ""
 
 #: includes/product-categories.php:33
+#, php-format
 msgid "Search %s Categories"
 msgstr ""
 
-#: includes/blocks/index.php:129
+#: includes/blocks/index.php:133
 msgid "Search by category name and select it in the section below"
 msgstr ""
 
-#: includes/blocks/index.php:128 modules/price/blocks/price-table/index.php:92
+#: includes/blocks/index.php:132 modules/price/blocks/price-table/index.php:93
 msgid "Search by item name and select it in the section below"
 msgstr ""
 
@@ -5416,24 +5697,20 @@ msgstr ""
 msgid "Search Categories"
 msgstr ""
 
-#: includes/blocks/index.php:130
+#: includes/blocks/index.php:134
 msgid "Search Category"
 msgstr ""
 
-#: includes/settings/search.php:26
-msgid "Search for help"
-msgstr ""
-
-#: includes/activation-config.php:176
+#: includes/activation-config.php:184
 msgid "Search for help here."
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:147
-#: includes/class-ic-sitewide-bar.php:256
+#: includes/class-ic-sitewide-bar.php:192
+#: includes/class-ic-sitewide-bar.php:320
 msgid "Search Icon"
 msgstr ""
 
-#: includes/register-product.php:156
+#: includes/register-product.php:161
 msgid "Search Items"
 msgstr ""
 
@@ -5441,7 +5718,7 @@ msgstr ""
 msgid "Search Orders"
 msgstr ""
 
-#: includes/blocks/index.php:126 modules/price/blocks/price-table/index.php:90
+#: includes/blocks/index.php:130 modules/price/blocks/price-table/index.php:91
 msgid "Search Product"
 msgstr ""
 
@@ -5449,11 +5726,15 @@ msgstr ""
 msgid "Search Quotes"
 msgstr ""
 
-#: functions/functions.php:323 templates/templates-functions.php:700
+#: functions/functions.php:328 templates/templates-functions.php:714
 msgid "Search Results for:"
 msgstr ""
 
-#: includes/settings/search.php:180
+#: includes/settings/search.php:28
+msgid "Search settings & docs"
+msgstr ""
+
+#: includes/settings/search.php:182
 msgid "Searching also in docs..."
 msgstr ""
 
@@ -5461,11 +5742,13 @@ msgstr ""
 msgid "Security, errors, feedback"
 msgstr ""
 
-#: includes/product-settings.php:326
+#: includes/product-settings.php:334
+#, php-format
 msgid "See %s configuration tips in the impleCode documentation"
 msgstr ""
 
 #: modules/attributes/attributes-meta.php:44
+#, php-format
 msgid "See <a target=\"_blank\" href=\"%s\">docs</a>."
 msgstr ""
 
@@ -5473,31 +5756,31 @@ msgstr ""
 msgid "See also different:"
 msgstr ""
 
-#: includes/product-settings.php:327
+#: includes/product-settings.php:335
 msgid "See in Docs"
 msgstr ""
 
-#: theme-product_adder_support.php:311
+#: theme-product_adder_support.php:313
 msgid "See Main Catalog Listing"
 msgstr ""
 
-#: includes/product-settings.php:338
+#: includes/product-settings.php:346
 msgid "See Now"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/save-order.php:275
+#: modules/cart/includes/orders/includes/save-order.php:277
 msgid "See Order"
 msgstr ""
 
-#: theme-product_adder_support.php:234
+#: theme-product_adder_support.php:235
 msgid "See the usage scenarios below:"
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:114
+#: includes/class-ic-activation-wizard.php:116
 msgid "See them below:"
 msgstr ""
 
-#: theme-product_adder_support.php:295
+#: theme-product_adder_support.php:297
 msgid "See Your Product Listing"
 msgstr ""
 
@@ -5505,15 +5788,18 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: includes/blocks/index.php:106
+#: includes/blocks/index.php:110
+#, php-format
 msgid "Select %s"
 msgstr ""
 
 #: includes/widgets/category-widget.php:58
+#, php-format
 msgid "Select %s Category"
 msgstr ""
 
 #: modules/attributes/comparison.php:125
+#, php-format
 msgid "Select %s to compare"
 msgstr ""
 
@@ -5523,7 +5809,7 @@ msgid ""
 "list, please use the Custom Currency Symbol option below."
 msgstr ""
 
-#: includes/settings/general.php:146
+#: includes/settings/general.php:152
 msgid "Select a page to display your products."
 msgstr ""
 
@@ -5539,15 +5825,15 @@ msgid ""
 "page template."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:105
+#: modules/cart/includes/shopping-settings.php:108
 msgid "Select Cart Page"
 msgstr ""
 
-#: includes/activation-config.php:122
+#: includes/activation-config.php:130
 msgid "Select catalog template here."
 msgstr ""
 
-#: includes/blocks/index.php:107
+#: includes/blocks/index.php:111
 msgid "Select Categories"
 msgstr ""
 
@@ -5555,7 +5841,7 @@ msgstr ""
 msgid "Select Category"
 msgstr ""
 
-#: modules/cart/includes/tax.php:42
+#: modules/cart/includes/tax.php:45
 msgid "Select Checkout Fields"
 msgstr ""
 
@@ -5563,7 +5849,8 @@ msgstr ""
 msgid "select different template for categories"
 msgstr ""
 
-#: includes/activation-config.php:384
+#: includes/activation-config.php:392
+#, php-format
 msgid "Select Main %s Listing Page"
 msgstr ""
 
@@ -5571,15 +5858,15 @@ msgstr ""
 msgid "Select Options"
 msgstr ""
 
-#: includes/activation-config.php:123
+#: includes/activation-config.php:131
 msgid "Select or view your main catalog page here"
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:50
+#: modules/cart/includes/customers/includes/transactions/customer-panel-settings.php:51
 msgid "Select page..."
 msgstr ""
 
-#: includes/blocks/index.php:127 modules/price/blocks/price-table/index.php:91
+#: includes/blocks/index.php:131 modules/price/blocks/price-table/index.php:92
 msgid "Select Product"
 msgstr ""
 
@@ -5587,15 +5874,15 @@ msgstr ""
 msgid "select styling and appearance for sidebar on small screens"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:121
+#: modules/cart/includes/shopping-settings.php:124
 msgid "Select Submit Page"
 msgstr ""
 
-#: includes/customizer.php:33 includes/settings/custom-design.php:246
+#: includes/customizer.php:33 includes/settings/custom-design.php:250
 msgid "Select template"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:137
+#: modules/cart/includes/shopping-settings.php:140
 msgid "Select Thank You Page"
 msgstr ""
 
@@ -5603,11 +5890,11 @@ msgstr ""
 msgid "Select the sidebar side to enable it on your product pages."
 msgstr ""
 
-#: includes/activation-config.php:155
+#: includes/activation-config.php:163
 msgid "Select your cart pages. Each dropdown should point to a different page."
 msgstr ""
 
-#: includes/activation-config.php:463
+#: includes/activation-config.php:473
 msgid ""
 "Select your currency. You can also set a custom currency in catalog settings "
 "later."
@@ -5618,11 +5905,11 @@ msgstr ""
 msgid "selected"
 msgstr ""
 
-#: includes/settings/csv.php:108
+#: includes/settings/csv.php:120
 msgid "Semicolon"
 msgstr ""
 
-#: includes/tracking.php:216
+#: includes/tracking.php:233
 msgid "Send anonymous statistics"
 msgstr ""
 
@@ -5630,7 +5917,7 @@ msgstr ""
 msgid "Senegal"
 msgstr ""
 
-#: includes/settings/general.php:473
+#: includes/settings/general.php:481
 msgid "SEO Settings"
 msgstr ""
 
@@ -5642,23 +5929,24 @@ msgstr ""
 msgid "Serbia"
 msgstr ""
 
-#: modules/price/config/currencies.php:312
+#: modules/price/config/currencies.php:314
 msgid "Serbian dinar"
 msgstr ""
 
-#: includes/system.php:245
+#: includes/system.php:250
 msgid "Server Environment"
 msgstr ""
 
-#: includes/system.php:250
+#: includes/system.php:255
 msgid "Server Info"
 msgstr ""
 
-#: includes/system.php:300
+#: includes/system.php:305
 msgid "Server Locale"
 msgstr ""
 
-#: includes/blocks/index.php:108
+#: includes/blocks/index.php:112
+#, php-format
 msgid "Set %s Limit"
 msgstr ""
 
@@ -5666,11 +5954,12 @@ msgstr ""
 msgid "set clickable price filter ranges in the price filter widget"
 msgstr ""
 
-#: includes/register-product.php:143
+#: includes/register-product.php:148
+#, php-format
 msgid "Set main %s image"
 msgstr ""
 
-#: includes/register-product.php:159
+#: includes/register-product.php:164
 msgid "Set main image"
 msgstr ""
 
@@ -5678,23 +5967,23 @@ msgstr ""
 msgid "set product sidebar and product description width"
 msgstr ""
 
-#: includes/activation-config.php:119
+#: includes/activation-config.php:127
 msgid "Set the currency custom symbol."
 msgstr ""
 
-#: includes/activation-config.php:154
+#: includes/activation-config.php:162
 msgid ""
 "Set the notification email address. The email to receive and send "
 "notifications can be the same."
 msgstr ""
 
-#: includes/settings/custom-design.php:280
+#: includes/settings/custom-design.php:281
 msgid "Setting"
 msgstr ""
 
-#: theme-product_adder_support.php:318 includes/product-settings.php:16
+#: theme-product_adder_support.php:321 includes/product-settings.php:16
 #: includes/product-settings.php:16 includes/product-settings.php:54
-#: includes/blocks/widgets.php:127 includes/welcome/welcome-screen.php:151
+#: includes/blocks/widgets.php:132 includes/welcome/welcome-screen.php:186
 #: modules/price/blocks/index.php:34
 msgid "Settings"
 msgstr ""
@@ -5703,29 +5992,29 @@ msgstr ""
 msgid "Seychelles"
 msgstr ""
 
-#: modules/price/config/currencies.php:317
+#: modules/price/config/currencies.php:319
 msgid "Seychellois rupee"
 msgstr ""
 
-#: modules/cart/includes/cart/cart-shipping.php:318
+#: modules/cart/includes/cart/cart-shipping.php:320
 msgid "SHIPPING"
 msgstr ""
 
 #: includes/settings/custom-names.php:36
-#: modules/shipping/shipping-functions.php:99
+#: modules/shipping/shipping-functions.php:91
 #: modules/shipping/shipping-meta.php:27
 #: modules/shipping/shipping-settings.php:25
 #: modules/cart/includes/cart-form.php:277
-#: modules/cart/includes/cart/cart-shipping.php:466
-#: modules/cart/includes/orders/includes/save-order.php:97
+#: modules/cart/includes/cart/cart-shipping.php:468
+#: modules/cart/includes/orders/includes/save-order.php:99
 msgid "Shipping"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:489
+#: modules/cart/includes/orders/includes/register-digital-orders.php:491
 msgid "Shipping & Handling"
 msgstr ""
 
-#: modules/cart/includes/cart/cart-shipping.php:44
+#: modules/cart/includes/cart/cart-shipping.php:45
 msgid "Shipping cost calculation disabled"
 msgstr ""
 
@@ -5741,7 +6030,7 @@ msgstr ""
 msgid "Shipping default name"
 msgstr ""
 
-#: includes/activation-config.php:546
+#: includes/activation-config.php:556
 msgid "Shipping disabled completely"
 msgstr ""
 
@@ -5753,7 +6042,7 @@ msgstr ""
 msgid "Shipping Email"
 msgstr ""
 
-#: includes/activation-config.php:544
+#: includes/activation-config.php:554
 msgid "Shipping enabled for all or some products"
 msgstr ""
 
@@ -5784,37 +6073,38 @@ msgstr ""
 msgid "Shopping Cart"
 msgstr ""
 
-#: includes/activation-config.php:189 includes/register-product.php:301
-#: includes/settings/csv.php:248 includes/settings/csv.php:296
+#: includes/activation-config.php:197 includes/register-product.php:305
+#: includes/settings/csv.php:264 includes/settings/csv.php:312
 msgid "Short Description"
 msgstr ""
 
-#: includes/activation-config.php:339
+#: includes/activation-config.php:347
 msgid "Short description field"
 msgstr ""
 
-#: includes/product-category-columns.php:122 includes/product-columns.php:29
+#: includes/product-category-columns.php:123 includes/product-columns.php:29
 msgid "Shortcode"
 msgstr ""
 
-#: includes/settings/general.php:523
+#: includes/settings/general.php:531
 msgid "shortcode"
 msgstr ""
 
-#: includes/blocks/index.php:105
+#: includes/blocks/index.php:109
 msgid "Show"
 msgstr ""
 
-#: includes/blocks/index.php:103
+#: includes/blocks/index.php:107
+#, php-format
 msgid "Show %s"
 msgstr ""
 
-#: includes/settings/search.php:155
+#: includes/settings/search.php:157
 #, php-format
 msgid "Show %s more related adjustment options"
 msgstr ""
 
-#: includes/settings/search.php:254
+#: includes/settings/search.php:264
 #, php-format
 msgid "Show %s more related docs"
 msgstr ""
@@ -5824,6 +6114,7 @@ msgid "Show All"
 msgstr ""
 
 #: includes/widgets/category-widget.php:56
+#, php-format
 msgid "Show All %s"
 msgstr ""
 
@@ -5832,15 +6123,13 @@ msgstr ""
 msgid "Show Attributes"
 msgstr ""
 
-#: ext-comp/elementor/show_catalog_widget.php:48 includes/blocks/index.php:102
+#: ext-comp/elementor/show_catalog_widget.php:48 includes/blocks/index.php:72
+#: includes/blocks/index.php:106 includes/blocks/index.php:161
+#: includes/welcome/start.php:97
 msgid "Show Catalog"
 msgstr ""
 
-#: includes/blocks/index.php:68
-msgid "Show Catalog block"
-msgstr ""
-
-#: includes/blocks/index.php:104
+#: includes/blocks/index.php:108 includes/blocks/index.php:173
 msgid "Show Categories"
 msgstr ""
 
@@ -5856,11 +6145,11 @@ msgstr ""
 msgid "Show full price if possible to calculate"
 msgstr ""
 
-#: includes/blocks/widgets.php:132 includes/widgets/category-widget.php:167
+#: includes/blocks/widgets.php:137 includes/widgets/category-widget.php:158
 msgid "Show hierarchy"
 msgstr ""
 
-#: includes/settings/general.php:556
+#: includes/settings/general.php:564
 msgid "Show main catalog page content everywhere"
 msgstr ""
 
@@ -5868,21 +6157,27 @@ msgstr ""
 msgid "Show price effect only"
 msgstr ""
 
-#: includes/blocks/widgets.php:131 includes/widgets/category-widget.php:161
+#: includes/blocks/widgets.php:136 includes/widgets/category-widget.php:152
 msgid "Show product counts"
 msgstr ""
 
-#: includes/settings/general.php:464
+#: includes/blocks/index.php:167 includes/welcome/start.php:97
+#: includes/blocks/show-products/block.asset.php:3
+msgid "Show Products"
+msgstr ""
+
+#: includes/settings/general.php:472
 msgid "Show Related"
 msgstr ""
 
-#: includes/settings/general.php:508
+#: includes/settings/general.php:516
 msgid ""
 "Shows a path to the currently displayed product catalog page with URLs to "
 "parent pages and correct schema markup for SEO."
 msgstr ""
 
 #: includes/widgets/related-products-widget.php:21
+#, php-format
 msgid "Shows related %s."
 msgstr ""
 
@@ -5890,7 +6185,7 @@ msgstr ""
 msgid "Shows related catalog items."
 msgstr ""
 
-#: includes/customizer.php:191
+#: includes/customizer.php:224
 msgid "Sidebar"
 msgstr ""
 
@@ -5898,11 +6193,11 @@ msgstr ""
 msgid "Sierra Leone"
 msgstr ""
 
-#: modules/price/config/currencies.php:322
+#: modules/price/config/currencies.php:324
 msgid "Sierra Leonean leone"
 msgstr ""
 
-#: includes/settings/general.php:354
+#: includes/settings/general.php:362 includes/welcome/start.php:73
 msgid "Simple Catalog"
 msgstr ""
 
@@ -5914,7 +6209,7 @@ msgstr ""
 msgid "Simple Export"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:164
+#: includes/class-ic-sitewide-bar.php:209
 msgid "Simple Field"
 msgstr ""
 
@@ -5922,17 +6217,17 @@ msgstr ""
 msgid "Simple Import"
 msgstr ""
 
-#: includes/settings/general.php:196 includes/settings/general.php:230
+#: includes/settings/general.php:204 includes/settings/general.php:238
 msgid "Simple Mode"
 msgstr ""
 
-#: includes/settings/general.php:203 includes/settings/general.php:237
+#: includes/settings/general.php:211 includes/settings/general.php:245
 msgid ""
 "Simple mode is recommended. Choose Advanced Mode if you want more control "
 "over the layout or theme mode if your theme should control the layout. "
 msgstr ""
 
-#: functions/activation.php:165
+#: functions/activation.php:169
 msgid "Simple Theme Integration Mode"
 msgstr ""
 
@@ -5940,8 +6235,12 @@ msgstr ""
 msgid "Singapore"
 msgstr ""
 
-#: modules/price/config/currencies.php:320
+#: modules/price/config/currencies.php:322
 msgid "Singapore dollar"
+msgstr ""
+
+#: templates/block-catalog.php:31
+msgid "Single Catalog Page"
 msgstr ""
 
 #: includes/settings/custom-names.php:111
@@ -5964,16 +6263,16 @@ msgstr ""
 msgid "single product"
 msgstr ""
 
-#: includes/system.php:178
+#: includes/system.php:183
 msgid "Site URL"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:141
-#: includes/class-ic-sitewide-bar.php:202
+#: includes/class-ic-sitewide-bar.php:186
+#: includes/class-ic-sitewide-bar.php:258
 msgid "Sitewide Icons"
 msgstr ""
 
-#: functions/activation.php:135 includes/widgets/filter-widgets.php:432
+#: functions/activation.php:139 includes/widgets/filter-widgets.php:439
 #: modules/attributes/attributes-meta.php:323
 #: modules/attributes/attributes-meta.php:361
 #: modules/attributes/attributes-meta.php:376
@@ -5984,7 +6283,7 @@ msgstr ""
 msgid "Size Unit"
 msgstr ""
 
-#: includes/tracking.php:383
+#: includes/tracking.php:401
 msgid "Skip"
 msgstr ""
 
@@ -6004,13 +6303,23 @@ msgstr ""
 msgid "Slovenia"
 msgstr ""
 
-#: includes/customizer.php:134 includes/blocks/index.php:120
+#: includes/customizer.php:165 includes/blocks/index.php:124
 #: modules/price/price-settings.php:28
 msgid "Small"
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:157
+#: includes/class-ic-sitewide-bar.php:202
 msgid "Small screens only"
+msgstr ""
+
+#: includes/welcome/new.php:76
+msgid "Small tweaks have been added in catalog design for the users."
+msgstr ""
+
+#: includes/welcome/new.php:66
+msgid ""
+"So your catalog can rank higher in the search engines and give the user the "
+"fastest experience possible."
 msgstr ""
 
 #: modules/cart/includes/product-status.php:47
@@ -6024,11 +6333,11 @@ msgstr ""
 msgid "Solomon Islands"
 msgstr ""
 
-#: modules/price/config/currencies.php:316
+#: modules/price/config/currencies.php:318
 msgid "Solomon Islands dollar"
 msgstr ""
 
-#: modules/price/config/currencies.php:323
+#: modules/price/config/currencies.php:325
 msgid "Somali shilling"
 msgstr ""
 
@@ -6041,47 +6350,49 @@ msgstr ""
 msgid "Some extensions give even more features when combined with another one."
 msgstr ""
 
-#: templates/templates-functions.php:1262
+#: templates/templates-functions.php:1297
 msgid ""
 "Sorry, but nothing matched your search terms. Please try again with some "
 "different keywords."
 msgstr ""
 
-#: templates/templates-functions.php:1268
+#: templates/templates-functions.php:1303
+#, php-format
 msgid ""
 "Sorry, but nothing matched your search terms. Please try again with some "
 "different options or %sreset filters%s."
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:329
+#: includes/widgets/filter-widgets.php:336
+#, php-format
 msgid "Sort %s dropdown."
 msgstr ""
 
-#: includes/blocks/index.php:117
+#: includes/blocks/index.php:121
 msgid "Sort & Limit"
 msgstr ""
 
-#: functions/functions.php:1109
+#: functions/functions.php:1146
 msgid "Sort by"
 msgstr ""
 
-#: includes/settings/general.php:694
+#: includes/settings/general.php:704
 msgid "Sort by Name"
 msgstr ""
 
-#: includes/settings/general.php:693
+#: includes/settings/general.php:703
 msgid "Sort by Newest"
 msgstr ""
 
-#: functions/functions.php:1112
+#: functions/functions.php:1149
 msgid "Sort by Relevance"
 msgstr ""
 
-#: includes/widgets/filter-widgets.php:332
+#: includes/widgets/filter-widgets.php:339
 msgid "Sort catalog items dropdown."
 msgstr ""
 
-#: includes/settings/general.php:524
+#: includes/settings/general.php:532
 msgid "sorting"
 msgstr ""
 
@@ -6089,7 +6400,7 @@ msgstr ""
 msgid "South Africa"
 msgstr ""
 
-#: modules/price/config/currencies.php:352
+#: modules/price/config/currencies.php:355
 msgid "South African rand"
 msgstr ""
 
@@ -6101,11 +6412,11 @@ msgstr ""
 msgid "South Korea"
 msgstr ""
 
-#: modules/price/config/currencies.php:271
+#: modules/price/config/currencies.php:273
 msgid "South Korean won"
 msgstr ""
 
-#: modules/price/config/currencies.php:325
+#: modules/price/config/currencies.php:327
 msgid "South Sudanese pound"
 msgstr ""
 
@@ -6121,7 +6432,7 @@ msgstr ""
 msgid "Speed"
 msgstr ""
 
-#: includes/system.php:147
+#: includes/system.php:151
 msgid "Speed up"
 msgstr ""
 
@@ -6129,7 +6440,7 @@ msgstr ""
 msgid "Sri Lanka"
 msgstr ""
 
-#: modules/price/config/currencies.php:277
+#: modules/price/config/currencies.php:279
 msgid "Sri Lankan rupee"
 msgstr ""
 
@@ -6145,13 +6456,20 @@ msgstr ""
 msgid "Start Advanced Mode Test"
 msgstr ""
 
-#: functions/activation.php:211
+#: functions/activation.php:215
 msgid "Start Automatic Theme Integration"
 msgstr ""
 
-#: modules/quote-cart/index.php:291
-#: modules/cart/includes/shopping-settings.php:234
-#: modules/cart/includes/shopping-settings.php:262
+#: includes/welcome/start.php:97
+#, php-format
+msgid ""
+"Start with %s block to display your main listing page or %s to display only "
+"selected products."
+msgstr ""
+
+#: modules/quote-cart/index.php:294
+#: modules/cart/includes/shopping-settings.php:237
+#: modules/cart/includes/shopping-settings.php:265
 msgid "State"
 msgstr ""
 
@@ -6159,12 +6477,12 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:192
+#: modules/cart/includes/shopping-settings.php:195
 msgid "Stick cart on top on scroll"
 msgstr ""
 
 #: includes/settings/custom-names.php:62 includes/settings/custom-names.php:73
-#: includes/settings/general.php:456 includes/settings/general.php:457
+#: includes/settings/general.php:464 includes/settings/general.php:465
 msgid "Subcategories"
 msgstr ""
 
@@ -6172,7 +6490,7 @@ msgstr ""
 msgid "Subcategories Header Label"
 msgstr ""
 
-#: includes/tracking.php:381
+#: includes/tracking.php:399
 msgid "Submit & Deactivate"
 msgstr ""
 
@@ -6188,11 +6506,11 @@ msgstr ""
 msgid "Sudan"
 msgstr ""
 
-#: modules/price/config/currencies.php:318
+#: modules/price/config/currencies.php:320
 msgid "Sudanese pound"
 msgstr ""
 
-#: modules/cart/includes/cart/cart-shipping.php:43
+#: modules/cart/includes/cart/cart-shipping.php:44
 msgid "Sum of each product shipping cost"
 msgstr ""
 
@@ -6208,7 +6526,7 @@ msgstr ""
 msgid "Suriname"
 msgstr ""
 
-#: modules/price/config/currencies.php:324
+#: modules/price/config/currencies.php:326
 msgid "Surinamese dollar"
 msgstr ""
 
@@ -6216,7 +6534,7 @@ msgstr ""
 msgid "Svalbard and Jan Mayen Islands"
 msgstr ""
 
-#: modules/price/config/currencies.php:328
+#: modules/price/config/currencies.php:330
 msgid "Swazi lilangeni"
 msgstr ""
 
@@ -6228,11 +6546,11 @@ msgstr ""
 msgid "Sweden"
 msgstr ""
 
-#: modules/price/config/currencies.php:319
+#: modules/price/config/currencies.php:321
 msgid "Swedish krona"
 msgstr ""
 
-#: modules/price/config/currencies.php:221
+#: modules/price/config/currencies.php:223
 msgid "Swiss franc"
 msgstr ""
 
@@ -6248,7 +6566,7 @@ msgstr ""
 msgid "Syrian Arab Republic"
 msgstr ""
 
-#: modules/price/config/currencies.php:327
+#: modules/price/config/currencies.php:329
 msgid "Syrian pound"
 msgstr ""
 
@@ -6264,7 +6582,7 @@ msgstr ""
 msgid "Tajikistan"
 msgstr ""
 
-#: modules/price/config/currencies.php:330
+#: modules/price/config/currencies.php:332
 msgid "Tajikistani somoni"
 msgstr ""
 
@@ -6272,23 +6590,23 @@ msgstr ""
 msgid "Tanzania"
 msgstr ""
 
-#: modules/price/config/currencies.php:337
+#: modules/price/config/currencies.php:339
 msgid "Tanzanian shilling"
 msgstr ""
 
-#: modules/cart/includes/tax.php:75
+#: modules/cart/includes/tax.php:79
 msgid "Tax is already included in price"
 msgstr ""
 
-#: modules/cart/includes/tax.php:81
+#: modules/cart/includes/tax.php:85
 msgid "Tax label"
 msgstr ""
 
-#: modules/cart/includes/tax.php:77
+#: modules/cart/includes/tax.php:81
 msgid "Tax rate"
 msgstr ""
 
-#: modules/cart/includes/tax.php:79
+#: modules/cart/includes/tax.php:83
 msgid "Tax round"
 msgstr ""
 
@@ -6296,25 +6614,30 @@ msgstr ""
 msgid "Tax:"
 msgstr ""
 
-#: templates/shortcode-catalog.php:221 includes/settings/general.php:460
+#: templates/shortcode-catalog.php:221 includes/settings/general.php:468
 msgid "Template"
 msgstr ""
 
-#: includes/activation-config.php:375
+#: includes/welcome/mode-selected.php:94 includes/welcome/new.php:148
+#: includes/welcome/start.php:127
+msgid "Template Customization"
+msgstr ""
+
+#: includes/activation-config.php:383
 msgid "Template files will be used to display catalog pages."
 msgstr ""
 
-#: includes/settings/general.php:462
+#: includes/settings/general.php:470
 msgid ""
 "Template option will display categories with the same listing theme as "
 "products. Link option will show categories as simple URLs without image."
 msgstr ""
 
-#: includes/customizer.php:178 templates/theme-integration.php:100
+#: includes/customizer.php:211 templates/theme-integration.php:100
 msgid "Text Color"
 msgstr ""
 
-#: modules/price/config/currencies.php:329
+#: modules/price/config/currencies.php:331
 msgid "Thai baht"
 msgstr ""
 
@@ -6322,14 +6645,23 @@ msgstr ""
 msgid "Thailand"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:138
+#: modules/cart/includes/shopping-settings.php:141
 msgid "Thank You"
 msgstr ""
 
-#: theme-product_adder_support.php:341
+#: theme-product_adder_support.php:346
+#, php-format
 msgid ""
 "Thank you for <a target=\"_blank\" href=\"%s\">your rating</a>! We "
 "appreciate your time and input."
+msgstr ""
+
+#: includes/welcome/new.php:94
+#, php-format
+msgid ""
+"Thank you for all the effort that you put in testing and reporting. Without "
+"your involvement it would never be possible to make %s so reliable and "
+"secure!"
 msgstr ""
 
 #: includes/welcome/new.php:54
@@ -6337,29 +6669,36 @@ msgid "Thank you for all your feedback regarding theme integration issues!"
 msgstr ""
 
 #: theme-product_adder_support.php:194
+#, php-format
 msgid ""
 "Thank you for choosing %1$s! If you have any questions or issues feel free "
 "to %2$spost a support ticket%3$s."
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:317
+#: modules/cart/includes/orders/functions/functions.php:329
 #, php-format
 msgid "Thank you for you order placed on %s."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:58
+#: modules/cart/includes/shopping-settings.php:61
 msgid "Thank you for your order."
 msgstr ""
 
-#: modules/cart/functions/shortcodes.php:133
+#: modules/cart/functions/shortcodes.php:137
 msgid "Thank you. We have received your order. We will contact you shortly."
+msgstr ""
+
+#: includes/welcome/new.php:65
+msgid ""
+"Thanks to many optimization tasks, your catalog pages and search results "
+"will load in less than a second."
 msgstr ""
 
 #: includes/welcome/new.php:79
 msgid "Thanks to your feedback, we can make things easier together!"
 msgstr ""
 
-#: functions/activation.php:164
+#: functions/activation.php:168
 msgid ""
 "The Advanced Mode works out of the box on all default WordPress themes and "
 "all themes with the integration done correctly."
@@ -6376,13 +6715,12 @@ msgid ""
 msgstr ""
 
 #: includes/welcome/new.php:51
-#, php-format
 msgid ""
 "The aim of the 3.x releases is to make it compatible with 99% of the themes "
 "and page builders."
 msgstr ""
 
-#: includes/settings/csv.php:112
+#: includes/settings/csv.php:124
 msgid ""
 "The CSV fields should be in the following order: Image URL, Name, Price, "
 "Categories, Short Description, Long Description."
@@ -6392,19 +6730,20 @@ msgstr ""
 msgid "The default image will be used on the listing only when unchecked."
 msgstr ""
 
-#: includes/settings/csv.php:99
+#: includes/settings/csv.php:111
 msgid ""
 "The file could not be uploaded because of your server limit. Please contact "
 "the server administrator or decrease the file size."
 msgstr ""
 
-#: includes/settings/csv.php:112
+#: includes/settings/csv.php:124
+#, php-format
 msgid ""
 "The first row should contain the field names. %s should be used as the CSV "
 "separator."
 msgstr ""
 
-#: includes/class-ic-sitewide-bar.php:205
+#: includes/class-ic-sitewide-bar.php:250
 msgid "The icons will appear in the main menu."
 msgstr ""
 
@@ -6432,11 +6771,11 @@ msgid ""
 "adjust it."
 msgstr ""
 
-#: theme-product_adder_support.php:296
+#: theme-product_adder_support.php:298
 msgid "The listing has been added successfully!"
 msgstr ""
 
-#: includes/settings/general.php:458
+#: includes/settings/general.php:466
 msgid ""
 "The main listing can show only products, top-level categories and products "
 "or only the categories. With the subcategories option selected the products "
@@ -6445,26 +6784,31 @@ msgid ""
 "products only to it (not to all categories in the tree)."
 msgstr ""
 
-#: includes/activation-config.php:102
+#: includes/activation-config.php:110
 msgid "The most important general catalog settings are located here."
 msgstr ""
 
-#: includes/settings/general.php:388
+#: includes/settings/general.php:396
 msgid ""
 "The page where the main product listing shows. Also this page slug will be "
 "included in product url."
 msgstr ""
 
-#: includes/tracking.php:414
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:122
+#, php-format
+msgid "The password has been changed! Auto refresh in %s seconds."
+msgstr ""
+
+#: includes/tracking.php:432
 msgid "The plugin didn't work as expected"
 msgstr ""
 
-#: includes/tracking.php:402
+#: includes/tracking.php:420
 msgid ""
 "The plugin is excellent, but I need a specific feature that you don't support"
 msgstr ""
 
-#: includes/tracking.php:406
+#: includes/tracking.php:424
 msgid "The plugin is not working"
 msgstr ""
 
@@ -6479,13 +6823,13 @@ msgstr ""
 msgid "The quote cart feature will be enabled in this mode."
 msgstr ""
 
-#: includes/settings/general.php:468
+#: includes/settings/general.php:476
 msgid ""
 "The related products or categories will be shown on the bottom of product "
 "pages."
 msgstr ""
 
-#: includes/settings/general.php:147
+#: includes/settings/general.php:153
 msgid "The selected page will become a parent for each product."
 msgstr ""
 
@@ -6493,7 +6837,7 @@ msgstr ""
 msgid "The shopping cart feature will be enabled in this mode."
 msgstr ""
 
-#: functions/activation.php:166
+#: functions/activation.php:170
 #, php-format
 msgid ""
 "The simple mode allows using %s most features. You can build the product "
@@ -6503,12 +6847,13 @@ msgid ""
 msgstr ""
 
 #: includes/extensions.php:728
+#, php-format
 msgid ""
 "The supplied license key is not valid for this extension! Upgrade it <a "
 "href=\"%s\">here</a>."
 msgstr ""
 
-#: functions/activation.php:169
+#: functions/activation.php:173
 msgid ""
 "The theme integration guide will show you a step by step process. If you "
 "finish it successfully, the integration will be done. It is recommended to "
@@ -6522,18 +6867,18 @@ msgid ""
 "and page builders."
 msgstr ""
 
-#: includes/settings/general.php:509
+#: includes/settings/general.php:517
 msgid "The title for main product listing in breadcrumbs."
 msgstr ""
 
-#: includes/settings/general.php:487
+#: includes/settings/general.php:495
 msgid ""
 "The title tag for selected product listing page. If you are using separate "
 "SEO plugin you should set it there. E.g. in Yoast SEO look for it in Custom "
 "Post Types archive titles section."
 msgstr ""
 
-#: includes/system.php:366
+#: includes/system.php:371
 msgid "Theme"
 msgstr ""
 
@@ -6542,11 +6887,11 @@ msgid "Theme Integration"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:87 includes/welcome/new.php:47
-#: includes/welcome/new.php:141 includes/welcome/start.php:95
+#: includes/welcome/new.php:141 includes/welcome/start.php:120
 msgid "Theme integration"
 msgstr ""
 
-#: includes/settings/general.php:198 includes/settings/general.php:232
+#: includes/settings/general.php:206 includes/settings/general.php:240
 msgid "Theme Mode"
 msgstr ""
 
@@ -6556,19 +6901,29 @@ msgid ""
 "administrator with the following error:"
 msgstr ""
 
-#: includes/settings/csv.php:90
+#: includes/settings/csv.php:102
 msgid "There was a problem with your upload."
 msgstr ""
 
-#: includes/settings/csv.php:101
+#: includes/settings/csv.php:113
 msgid "There was an error while uploading the file to your server."
 msgstr ""
 
 #: includes/controls.php:31
+#, php-format
 msgid ""
 "There's also a range of %1$sCatalog add-ons%2$s available to put additional "
 "power in your hands. Check out the %1$sextensions page%2$s in your dashboard "
 "for more information."
+msgstr ""
+
+#: includes/welcome/mode-selected.php:146 includes/welcome/new.php:200
+#: includes/welcome/start.php:179
+#, php-format
+msgid ""
+"There’s a lot more for developers to love in %1$s. To discover more and "
+"learn how to make the catalog shine on your sites, themes, plugins and more, "
+"check the %2$sdocumentation.%3$s"
 msgstr ""
 
 #: modules/cart/includes/product-status.php:122
@@ -6583,27 +6938,23 @@ msgid ""
 "the high-quality <b>development will be continuous</b>."
 msgstr ""
 
-#: modules/cart/ext/formbuilder/pluggable.php:65
-#: modules/cart/includes/customers/functions/pluggable.php:58
-#: modules/cart/includes/orders/functions/pluggable.php:58
-#, php-format
-msgid "This email is a service from %s."
-msgstr ""
-
-#: includes/extensions.php:768
-msgid "This extension is not available at this time. Try again later."
-msgstr ""
-
-#: includes/activation-config.php:349
+#: includes/activation-config.php:357
 msgid "This help box will disappear once you add your first product."
 msgstr ""
 
-#: includes/settings/general.php:411
+#: includes/settings/general.php:419
 msgid "This is also the default setting for sorting drop-down."
 msgstr ""
 
 #: includes/extensions.php:722
+#, php-format
 msgid "This is not a valid license key! Get it <a href=\"%s\">here</a>."
+msgstr ""
+
+#: includes/welcome/new.php:115
+msgid ""
+"This is very important for the developers. We stay motivated and passionate "
+"in the sphere of continuous catalog development."
 msgstr ""
 
 #: theme-product_adder_support.php:68
@@ -6613,7 +6964,7 @@ msgid ""
 "%scatalog settings%s."
 msgstr ""
 
-#: functions/activation.php:157
+#: functions/activation.php:161
 msgid ""
 "This section is a product long description. It should appear under the "
 "attributes table or in the description tab. Before that, you should see the "
@@ -6621,7 +6972,7 @@ msgid ""
 "can be disabled."
 msgstr ""
 
-#: includes/activation-config.php:580
+#: includes/activation-config.php:590
 msgid ""
 "This will personalize the admin experience. Leave the default values if you "
 "are not sure."
@@ -6631,25 +6982,25 @@ msgstr ""
 msgid "Thousands Separator"
 msgstr ""
 
-#: includes/blocks/widgets.php:128 modules/price/blocks/index.php:33
+#: includes/blocks/widgets.php:133 modules/price/blocks/index.php:33
 msgid "Title"
 msgstr ""
 
-#: includes/util/widget.php:133 includes/widgets/category-widget.php:146
-#: includes/widgets/filter-widgets.php:292
-#: includes/widgets/filter-widgets.php:367
-#: includes/widgets/filter-widgets.php:453
-#: includes/widgets/filter-widgets.php:522
+#: includes/util/widget.php:138 includes/widgets/category-widget.php:137
+#: includes/widgets/filter-widgets.php:299
+#: includes/widgets/filter-widgets.php:374
+#: includes/widgets/filter-widgets.php:460
+#: includes/widgets/filter-widgets.php:529
 #: includes/widgets/related-products-widget.php:61
-#: includes/widgets/search-widget.php:59
+#: includes/widgets/search-widget.php:63
 #: modules/cart/includes/cart-widget.php:86
-#: modules/price/widgets/price-filter-widget.php:88
+#: modules/price/widgets/price-filter-widget.php:89
 #: modules/cart/includes/customers/includes/login-form-widget.php:50
 #: modules/cart/includes/customers/includes/login-url-widget.php:50
 msgid "Title:"
 msgstr ""
 
-#: functions/activation.php:176
+#: functions/activation.php:180
 #, php-format
 msgid ""
 "To proceed with such test, remove %s from your main product listing page and "
@@ -6673,7 +7024,7 @@ msgstr ""
 msgid "Tonga"
 msgstr ""
 
-#: modules/price/config/currencies.php:333
+#: modules/price/config/currencies.php:335
 msgid "Tongan pa&#x2bb;anga"
 msgstr ""
 
@@ -6694,7 +7045,7 @@ msgstr ""
 msgid "Total NET"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:468
+#: modules/cart/includes/orders/includes/register-digital-orders.php:469
 msgid "Total Net"
 msgstr ""
 
@@ -6710,7 +7061,7 @@ msgstr ""
 msgid "Transaction ID"
 msgstr ""
 
-#: modules/price/config/currencies.php:308
+#: modules/price/config/currencies.php:310
 msgid "Transnistrian ruble"
 msgstr ""
 
@@ -6718,7 +7069,7 @@ msgstr ""
 msgid "Trinidad and Tobago"
 msgstr ""
 
-#: modules/price/config/currencies.php:335
+#: modules/price/config/currencies.php:337
 msgid "Trinidad and Tobago dollar"
 msgstr ""
 
@@ -6726,7 +7077,7 @@ msgstr ""
 msgid "Tunisia"
 msgstr ""
 
-#: modules/price/config/currencies.php:332
+#: modules/price/config/currencies.php:334
 msgid "Tunisian dinar"
 msgstr ""
 
@@ -6734,7 +7085,7 @@ msgstr ""
 msgid "Turkey"
 msgstr ""
 
-#: modules/price/config/currencies.php:334
+#: modules/price/config/currencies.php:336
 msgid "Turkish lira"
 msgstr ""
 
@@ -6742,7 +7093,7 @@ msgstr ""
 msgid "Turkmenistan"
 msgstr ""
 
-#: modules/price/config/currencies.php:331
+#: modules/price/config/currencies.php:333
 msgid "Turkmenistan manat"
 msgstr ""
 
@@ -6758,7 +7109,7 @@ msgstr ""
 msgid "Uganda"
 msgstr ""
 
-#: modules/price/config/currencies.php:339
+#: modules/price/config/currencies.php:341
 msgid "Ugandan shilling"
 msgstr ""
 
@@ -6766,7 +7117,7 @@ msgstr ""
 msgid "Ukraine"
 msgstr ""
 
-#: modules/price/config/currencies.php:338
+#: modules/price/config/currencies.php:340
 msgid "Ukrainian hryvnia"
 msgstr ""
 
@@ -6786,7 +7137,7 @@ msgstr ""
 msgid "United Arab Emirates"
 msgstr ""
 
-#: modules/price/config/currencies.php:192
+#: modules/price/config/currencies.php:194
 msgid "United Arab Emirates dirham"
 msgstr ""
 
@@ -6798,7 +7149,7 @@ msgstr ""
 msgid "United States"
 msgstr ""
 
-#: modules/price/config/currencies.php:340
+#: modules/price/config/currencies.php:342
 msgid "United States dollar"
 msgstr ""
 
@@ -6815,6 +7166,7 @@ msgid "Update"
 msgstr ""
 
 #: includes/product-categories.php:38
+#, php-format
 msgid "Update %s Category"
 msgstr ""
 
@@ -6822,11 +7174,11 @@ msgstr ""
 msgid "Update Category"
 msgstr ""
 
-#: includes/extensions.php:921
+#: includes/extensions.php:935
 msgid "Upgrade Now!"
 msgstr ""
 
-#: includes/settings/general.php:461
+#: includes/settings/general.php:469
 msgid "URLs"
 msgstr ""
 
@@ -6834,7 +7186,7 @@ msgstr ""
 msgid "Uruguay"
 msgstr ""
 
-#: modules/price/config/currencies.php:341
+#: modules/price/config/currencies.php:343
 msgid "Uruguayan peso"
 msgstr ""
 
@@ -6863,17 +7215,18 @@ msgstr ""
 msgid "Use Simple Mode"
 msgstr ""
 
-#: templates/shortcode-catalog.php:711
+#: templates/shortcode-catalog.php:725
+#, php-format
 msgid ""
 "Use the %s or %s shortcode if you just want to display products or "
 "categories."
 msgstr ""
 
-#: includes/settings/general.php:258
+#: includes/settings/general.php:266
 msgid "Use the button below to begin the easy auto adjustment."
 msgstr ""
 
-#: includes/extensions.php:1143 includes/extensions.php:1147
+#: includes/extensions.php:1147
 msgid "Use the button below to fix it."
 msgstr ""
 
@@ -6893,13 +7246,13 @@ msgstr ""
 msgid "Use the dropdown below to define the template for all catalog pages."
 msgstr ""
 
-#: includes/activation-config.php:177
+#: includes/activation-config.php:185
 msgid ""
 "Use the forum to get help on the integration, configuration, or any problem "
 "that you face."
 msgstr ""
 
-#: includes/settings/general.php:243
+#: includes/settings/general.php:251
 msgid "Use the options below to adjust the output."
 msgstr ""
 
@@ -6909,7 +7262,7 @@ msgid ""
 "pages."
 msgstr ""
 
-#: includes/activation-config.php:121
+#: includes/activation-config.php:129
 msgid ""
 "Use the Show main catalog page content everywhere option if you are using a "
 "page builder to build your catalog design."
@@ -6919,21 +7272,26 @@ msgstr ""
 msgid "Use this only with short attributes labels and values, e.g. Color: Red"
 msgstr ""
 
-#: includes/activation-config.php:120
+#: includes/activation-config.php:128
 msgid ""
 "Use this option to select what should be shown on your main catalog page."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:178
+#: modules/cart/includes/shopping-settings.php:181
 msgid "User Account"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:171
+#: modules/cart/includes/shopping-settings.php:174
 msgid "User Email Subject"
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:172
+#: modules/cart/includes/shopping-settings.php:175
 msgid "User Email template"
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:113
+#, php-format
+msgid "User not logged in or invalid customer ID. Auto refresh in %s seconds."
 msgstr ""
 
 #: modules/cart/includes/customers/index.php:56
@@ -6945,11 +7303,11 @@ msgstr ""
 msgid "Uzbekistan"
 msgstr ""
 
-#: modules/price/config/currencies.php:342
+#: modules/price/config/currencies.php:344
 msgid "Uzbekistani som"
 msgstr ""
 
-#: includes/settings/custom-design.php:281
+#: includes/settings/custom-design.php:282
 msgid "Value"
 msgstr ""
 
@@ -6961,7 +7319,7 @@ msgstr ""
 msgid "Vanuatu"
 msgstr ""
 
-#: modules/price/config/currencies.php:345
+#: modules/price/config/currencies.php:347
 msgid "Vanuatu vatu"
 msgstr ""
 
@@ -6997,11 +7355,11 @@ msgstr ""
 msgid "Variation Value"
 msgstr ""
 
-#: includes/activation-config.php:153
+#: includes/activation-config.php:161
 msgid "Variations Configuration"
 msgstr ""
 
-#: modules/cart/includes/tax.php:107
+#: modules/cart/includes/tax.php:112
 msgid "VAT"
 msgstr ""
 
@@ -7017,15 +7375,15 @@ msgstr ""
 msgid "Venezuela"
 msgstr ""
 
-#: modules/price/config/currencies.php:343
+#: modules/price/config/currencies.php:345
 msgid "Venezuelan bol&iacute;var"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/register-digital-orders.php:226
+#: modules/cart/includes/orders/includes/register-digital-orders.php:227
 msgid "Ver. ID"
 msgstr ""
 
-#: includes/system.php:378
+#: includes/system.php:384
 msgid "Version"
 msgstr ""
 
@@ -7037,15 +7395,16 @@ msgstr ""
 msgid "Vietnam"
 msgstr ""
 
-#: modules/price/config/currencies.php:344
+#: modules/price/config/currencies.php:346
 msgid "Vietnamese &#x111;&#x1ed3;ng"
 msgstr ""
 
-#: includes/register-product.php:139
+#: includes/register-product.php:144
+#, php-format
 msgid "View %s"
 msgstr ""
 
-#: includes/register-product.php:155
+#: includes/register-product.php:160
 msgid "View Item"
 msgstr ""
 
@@ -7065,11 +7424,11 @@ msgstr ""
 msgid "Virgin Islands (USA)"
 msgstr ""
 
-#: includes/activation-config.php:380
+#: includes/activation-config.php:388
 msgid "Visit Main Listing"
 msgstr ""
 
-#: includes/system.php:349
+#: includes/system.php:354
 msgid "Visit plugin homepage"
 msgstr ""
 
@@ -7078,35 +7437,35 @@ msgid "Wallis and Futuna Islands"
 msgstr ""
 
 #: includes/welcome/mode-selected.php:113 includes/welcome/new.php:167
-#: includes/welcome/start.php:121
+#: includes/welcome/start.php:146
 msgid "We keep the list of most useful code snippets to adjust things."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:126 includes/welcome/new.php:180
-#: includes/welcome/start.php:134
+#: includes/welcome/start.php:159
 msgid ""
 "We know the plugin and WordPress to the ground, can adjust small things and "
 "create very complex features or integrations."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:127 includes/welcome/new.php:181
-#: includes/welcome/start.php:135
+#: includes/welcome/start.php:160
 msgid "We provide custom coding services in a professional and timely manner."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:58
+#: modules/cart/includes/shopping-settings.php:61
 msgid "We will get in touch with you soon."
 msgstr ""
 
-#: modules/cart/includes/orders/functions/functions.php:318
+#: modules/cart/includes/orders/functions/functions.php:330
 msgid "We've received your payment."
 msgstr ""
 
-#: includes/settings/general.php:351
+#: includes/settings/general.php:359 includes/welcome/start.php:35
 msgid "Web Store"
 msgstr ""
 
-#: functions/activation.php:136 modules/attributes/attributes-meta.php:360
+#: functions/activation.php:140 modules/attributes/attributes-meta.php:360
 #: modules/attributes/attributes-meta.php:373
 msgid "Weight"
 msgstr ""
@@ -7115,13 +7474,19 @@ msgstr ""
 msgid "Weight Unit"
 msgstr ""
 
-#: functions/activation.php:120
+#: functions/activation.php:124
 msgid ""
 "Welcome on a product test page. This is a short description. It should show "
 "up on the left side of the product image and below the product name."
 msgstr ""
 
-#: modules/price/config/currencies.php:349
+#. %s: The current EPC version number.
+#: includes/welcome/new.php:19
+#, php-format
+msgid "Welcome to %s."
+msgstr ""
+
+#: modules/price/config/currencies.php:352
 msgid "West African CFA franc"
 msgstr ""
 
@@ -7133,31 +7498,31 @@ msgstr ""
 msgid "Western Samoa"
 msgstr ""
 
-#: includes/tracking.php:395
+#: includes/tracking.php:413
 msgid "What could we do better?"
 msgstr ""
 
-#: includes/tracking.php:415
+#: includes/tracking.php:433
 msgid "What did you expect?"
 msgstr ""
 
-#: includes/tracking.php:403
+#: includes/tracking.php:421
 msgid "What feature?"
 msgstr ""
 
-#: includes/tracking.php:419
+#: includes/tracking.php:437
 msgid "What is the reason?"
 msgstr ""
 
-#: includes/tracking.php:411
+#: includes/tracking.php:429
 msgid "What you've been looking for?"
 msgstr ""
 
-#: includes/welcome/welcome-screen.php:149
+#: includes/welcome/welcome-screen.php:184
 msgid "What&#8217;s New"
 msgstr ""
 
-#: includes/tracking.php:399
+#: includes/tracking.php:417
 msgid "What's the plugin's name?"
 msgstr ""
 
@@ -7187,7 +7552,7 @@ msgstr ""
 msgid "which is considered as SEO booster if used properly"
 msgstr ""
 
-#: functions/activation.php:137
+#: functions/activation.php:141
 msgid "White"
 msgstr ""
 
@@ -7201,7 +7566,7 @@ msgctxt "Width"
 msgid "W"
 msgstr ""
 
-#: includes/settings/general.php:196 includes/settings/general.php:230
+#: includes/settings/general.php:204 includes/settings/general.php:238
 msgid "will use your theme page template with catalog custom styling applied."
 msgstr ""
 
@@ -7215,7 +7580,7 @@ msgid ""
 "with the premium support service!"
 msgstr ""
 
-#: functions/activation.php:163
+#: functions/activation.php:167
 #, php-format
 msgid ""
 "With Advanced Mode, you will be able to use %s in %s. The product listing "
@@ -7224,7 +7589,7 @@ msgid ""
 "see <a target=\"_blank\" href=\"%s\">Theme Integration Guide</a>"
 msgstr ""
 
-#: includes/system.php:169
+#: includes/system.php:174
 msgid "WordPress Environment"
 msgstr ""
 
@@ -7234,19 +7599,19 @@ msgid ""
 "wizard?"
 msgstr ""
 
-#: includes/system.php:226
+#: includes/system.php:231
 msgid "WP Debug Mode"
 msgstr ""
 
-#: includes/system.php:215
+#: includes/system.php:220
 msgid "WP Memory Limit"
 msgstr ""
 
-#: includes/system.php:205
+#: includes/system.php:210
 msgid "WP Multisite"
 msgstr ""
 
-#: includes/system.php:201
+#: includes/system.php:206
 msgid "WP Version"
 msgstr ""
 
@@ -7254,26 +7619,28 @@ msgstr ""
 msgid "Yemen"
 msgstr ""
 
-#: modules/price/config/currencies.php:351
+#: modules/price/config/currencies.php:354
 msgid "Yemeni rial"
 msgstr ""
 
-#: includes/system.php:30 includes/system.php:46 includes/system.php:72
-#: templates/shortcode-catalog.php:709
+#: includes/system.php:31 includes/system.php:48 includes/system.php:75
+#: templates/shortcode-catalog.php:723
 msgid "Yes"
 msgstr ""
 
 #: theme-product_adder_support.php:145
+#, php-format
 msgid ""
 "You are currently using %s in Simple Mode. It is perfectly fine to use it "
 "this way, however some features are limited."
 msgstr ""
 
-#: functions/activation.php:162
+#: functions/activation.php:166
+#, php-format
 msgid "You are currently using %s mode."
 msgstr ""
 
-#: includes/settings/general.php:208
+#: includes/settings/general.php:216
 #, php-format
 msgid ""
 "You are currently using %s on your product listing to integrate the catalog "
@@ -7288,6 +7655,18 @@ msgstr ""
 msgid "You are using simple mode now."
 msgstr ""
 
+#: ext-comp/woocommerce.php:84
+#, php-format
+msgid "You can also %1$simport WooCommerce products into separate catalog%2$s."
+msgstr ""
+
+#: includes/class-ic-sitewide-bar.php:254
+#, php-format
+msgid ""
+"You can also %sadd the Catalog Icons block to the menu%s if your theme "
+"supports site editing with blocks."
+msgstr ""
+
 #: functions/support.php:152
 #, php-format
 msgid ""
@@ -7296,10 +7675,11 @@ msgid ""
 msgstr ""
 
 #: theme-product_adder_support.php:147
+#, php-format
 msgid "You can also use awesome %sCatalog Me! theme%s."
 msgstr ""
 
-#: includes/settings/general.php:403
+#: includes/settings/general.php:411
 msgid "You can also use shortcode with products_limit attribute to set this."
 msgstr ""
 
@@ -7307,7 +7687,7 @@ msgstr ""
 msgid "you can change it in product settings"
 msgstr ""
 
-#: functions/activation.php:121
+#: functions/activation.php:125
 msgid "You can change the product page template in catalog settings."
 msgstr ""
 
@@ -7331,17 +7711,17 @@ msgid ""
 msgstr ""
 
 #: includes/welcome/mode-selected.php:95 includes/welcome/new.php:149
-#: includes/welcome/start.php:103
+#: includes/welcome/start.php:128
 msgid ""
 "You can customize the output by placing the template file in your theme "
 "'implecode' folder."
 msgstr ""
 
-#: includes/activation-config.php:341
+#: includes/activation-config.php:349
 msgid "you can define their number in catalog settings."
 msgstr ""
 
-#: includes/settings/custom-design.php:275
+#: includes/settings/custom-design.php:276
 msgid "You can figure it out by checking the 'impact' column."
 msgstr ""
 
@@ -7360,7 +7740,12 @@ msgstr ""
 msgid "You can make additional adjustments in the settings later."
 msgstr ""
 
-#: modules/cart/includes/customers/includes/transactions/customer-panel.php:85
+#: includes/welcome/start.php:105
+msgid ""
+"You can make the catalog multilingual thanks to full Polylang compatibility."
+msgstr ""
+
+#: modules/cart/includes/customers/includes/transactions/customer-panel.php:90
 #, php-format
 msgid ""
 "You can manage your license when you log in on %s. Use your email as "
@@ -7368,14 +7753,21 @@ msgid ""
 "login."
 msgstr ""
 
-#: functions/activation.php:159
+#: functions/activation.php:163
 msgid ""
 "You can modify the product page and product listing layout by clicking on "
 "the admin options links located under the image."
 msgstr ""
 
-#: includes/activation-config.php:348
+#: includes/activation-config.php:356
 msgid "You can move all the boxes around to better suit your needs."
+msgstr ""
+
+#: includes/welcome/new.php:91
+#, php-format
+msgid ""
+"You can report any bugs or feedback on the %1$ssupport forum%3$s or on the "
+"%2$splugin website%3$s."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:58
@@ -7389,6 +7781,7 @@ msgid "You can switch between modes at any time in Product Settings."
 msgstr ""
 
 #: includes/extensions.php:287
+#, php-format
 msgid ""
 "You can take advantage of premium support and <a href=\"%s\">send support "
 "tickets</a> to impleCode developers once you have your license key."
@@ -7399,17 +7792,17 @@ msgid "You can use many different shortcodes to displays catalog parts."
 msgstr ""
 
 #: includes/welcome/mode-selected.php:106 includes/welcome/new.php:160
-#: includes/welcome/start.php:114
+#: includes/welcome/start.php:139
 msgid ""
 "You can use many shortcodes to display the entire catalog or even each "
 "smallest part."
 msgstr ""
 
-#: includes/welcome/mode-selected.php:64
+#: includes/welcome/mode-selected.php:64 includes/welcome/start.php:96
 msgid "You can use three different blocks to display catalog parts."
 msgstr ""
 
-#: modules/cart/includes/orders/includes/save-order.php:167
+#: modules/cart/includes/orders/includes/save-order.php:169
 msgid "You don't have any completed orders yet."
 msgstr ""
 
@@ -7417,11 +7810,21 @@ msgstr ""
 msgid "You don't have permission to install and activate extensions."
 msgstr ""
 
+#: includes/settings/csv.php:372
+msgid "You don't have permission to read the exported file."
+msgstr ""
+
 #: templates/theme-integration.php:165
 msgid "You Have 3 choices"
 msgstr ""
 
-#: includes/blocks/index.php:191
+#: includes/welcome/start.php:104
+msgid ""
+"You have complete control over tailoring any text visible on the front-end "
+"through an intuitive settings screen."
+msgstr ""
+
+#: includes/blocks/index.php:215
 #, php-format
 msgid ""
 "You have disabled the main listing page in %scatalog settings%s so this "
@@ -7429,12 +7832,12 @@ msgid ""
 "catalog categories and individual product pages."
 msgstr ""
 
-#: includes/class-ic-activation-wizard.php:113
+#: includes/class-ic-activation-wizard.php:115
 msgid ""
 "You have some recommended extensions based on your initial setup answers!"
 msgstr ""
 
-#: includes/settings/general.php:172
+#: includes/settings/general.php:180
 #, php-format
 msgid ""
 "You have to remove the %s from the main catalog page to switch the "
@@ -7442,38 +7845,46 @@ msgid ""
 msgstr ""
 
 #: includes/extensions.php:735
+#, php-format
 msgid ""
 "You need to provide the license key to activate the extension. Get yours <a "
 "href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/activation-config.php:318
+#: includes/activation-config.php:326
 msgid ""
 "You will be able to change your choice later in catalog settings or by "
 "reactivating the plugin."
 msgstr ""
 
-#: modules/price/price-settings.php:91 modules/price/price-settings.php:183
+#: ext-comp/woocommerce.php:81
+msgid ""
+"You will be able to customize the WooCommerce catalog design, disable cart, "
+"enable inquiry and many more."
+msgstr ""
+
+#: modules/price/price-settings.php:91 modules/price/price-settings.php:186
 msgid "Your currency"
 msgstr ""
 
-#: includes/extensions.php:1142 includes/extensions.php:1146
+#: includes/extensions.php:1146
 msgid ""
 "Your license is expired. The latest security and feature updates cannot be "
 "applied without an active license."
 msgstr ""
 
-#: includes/extensions.php:1131
+#: includes/extensions.php:1141
 msgid ""
 "Your license will expire soon. Use the button below to prevent it, so the "
 "updates work without any interruptions."
 msgstr ""
 
-#: includes/activation-config.php:374
+#: includes/activation-config.php:382
+#, php-format
 msgid "Your main %s listing page is defined."
 msgstr ""
 
-#: includes/activation-config.php:382
+#: includes/activation-config.php:390
 #, php-format
 msgid ""
 "Your main %s listing page is not selected. You can use shortcodes to display "
@@ -7487,15 +7898,21 @@ msgid ""
 "status (it is not visible for visitors)."
 msgstr ""
 
-#: modules/cart/includes/shopping-settings.php:168
+#: modules/cart/includes/shopping-settings.php:171
 msgid "Your name in emails"
 msgstr ""
 
-#: modules/cart/includes/orders/includes/save-order.php:230
+#: modules/cart/includes/orders/includes/save-order.php:232
 msgid "Your Orders"
 msgstr ""
 
-#: includes/settings/general.php:198 includes/settings/general.php:232
+#: includes/welcome/new.php:114
+msgid ""
+"Your reviews on WordPress.org help us to spread the word about this awesome "
+"catalog plugin."
+msgstr ""
+
+#: includes/settings/general.php:206 includes/settings/general.php:240
 msgid ""
 "your theme default template files will be used to display catalog pages."
 msgstr ""
@@ -7504,7 +7921,7 @@ msgstr ""
 msgid "Zambia"
 msgstr ""
 
-#: modules/price/config/currencies.php:353
+#: modules/price/config/currencies.php:356
 msgid "Zambian kwacha"
 msgstr ""
 
