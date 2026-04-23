@@ -29,18 +29,30 @@ class ic_shopping_ecommerce_shortcodes {
 	 * @return string
 	 */
 	static function implement_shortcodes( $content ) {
-		//$shopping_cart_settings = get_shopping_cart_settings();
-		remove_filter( 'the_content', array( __CLASS__, 'implement_shortcodes' ) );
-		if ( is_ic_shopping_cart() && ! has_shortcode( $content, 'shopping_cart' ) ) {
-			if ( ! ic_string_contains( $content, 'shopping-cart-container' ) ) {
-				$content .= '[shopping_cart]';
+		if ( is_ic_shopping_cart() && ! has_shortcode( $content, 'shopping_cart' ) && ! ic_string_contains( $content, 'shopping-cart-container' ) ) {
+			$page_id = ic_shopping_cart_page_id();
+			if ( ! empty( $page_id ) ) {
+				$page_content = get_post( $page_id )->post_content;
+				if ( ! ic_string_contains( $page_content, 'shopping-cart-container' ) && ! has_shortcode( $page_content, 'shopping_cart' ) ) {
+					$content .= '[shopping_cart]';
+				}
 			}
-		} else if ( is_ic_shopping_order() && ! has_shortcode( $content, 'cart_submit_form' ) ) {
-			if ( ! ic_string_contains( $content, 'shopping-cart-submit-container' ) ) {
-				$content .= '[cart_submit_form]';
+		} elseif ( is_ic_shopping_order() && ! has_shortcode( $content, 'cart_submit_form' ) && ! ic_string_contains( $content, 'shopping-cart-submit-container' ) ) {
+			$page_id = ic_shopping_submit_page_id();
+			if ( ! empty( $page_id ) ) {
+				$page_content = get_post( $page_id )->post_content;
+				if ( ! ic_string_contains( $page_content, 'shopping-cart-submit-container' ) && ! has_shortcode( $page_content, 'cart_submit_form' ) ) {
+					$content .= '[cart_submit_form]';
+				}
 			}
-		} else if ( is_ic_shopping_thank_you() && ! has_shortcode( $content, 'success_page' ) ) {
-			$content .= '[success_page]';
+		} elseif ( is_ic_shopping_thank_you() && ! has_shortcode( $content, 'success_page' ) ) {
+			$page_id = ic_shopping_thank_you_page_id();
+			if ( ! empty( $page_id ) ) {
+				$page_content = get_post( $page_id )->post_content;
+				if ( ! has_shortcode( $page_content, 'success_page' ) && ! has_shortcode( $page_content, 'success_page' ) ) {
+					$content .= '[success_page]';
+				}
+			}
 		}
 
 		return $content;
@@ -63,7 +75,7 @@ class ic_shopping_ecommerce_shortcodes {
 		} else {
 			$button_class = 'link';
 		}
-		$form = apply_filters( 'shopping_cart_start', '' );
+		$form  = apply_filters( 'shopping_cart_start', '' );
 		$form .= '<div id="shopping-cart-container" class="' . $shopping_cart_settings['cart_page_template'] . '">';
 		$form .= apply_filters( 'shopping_cart_container_start', '' );
 		if ( isset( $_POST['p_quantity'] ) ) {
@@ -73,7 +85,7 @@ class ic_shopping_ecommerce_shortcodes {
 			$form .= '<div class="wrong_message">' . __( 'Please choose product variations.', 'ecommerce-product-catalog' ) . '</div>';
 		}
 		$back_url = ic_get_shopping_back_url();
-		$form     .= '<form method="post" action="' . ic_shopping_submit_page_url() . '">';
+		$form    .= '<form method="post" action="' . ic_shopping_submit_page_url() . '">';
 		if ( $shopping_cart_settings['cart_page_template'] == 'no_qty' ) {
 			$form .= '<div class="form-buttons">';
 			if ( ! empty( $shopping_cart_settings['contnue_shopping_label'] ) ) {
@@ -91,11 +103,11 @@ class ic_shopping_ecommerce_shortcodes {
 		$form .= '</form></div>';
 		/*
 		$form .= '<script>
-jQuery(document).ready(function() {
-if(typeof window.history.pushState == "function") {
-var url = document.URL.split("?");
-window.history.replaceState({}, "Hide", url[0]);
-}});</script>';
+		jQuery(document).ready(function() {
+		if(typeof window.history.pushState == "function") {
+		var url = document.URL.split("?");
+		window.history.replaceState({}, "Hide", url[0]);
+		}});</script>';
 		*/
 		if ( in_the_loop() ) {
 			ic_save_global( 'shopping_cart_displayed', 1 );
@@ -132,7 +144,7 @@ window.history.replaceState({}, "Hide", url[0]);
 		$shopping_cart_settings = get_shopping_cart_settings();
 
 		$form = '<div class="shopping-form"><div class="address-form">';
-//$form .= implecode_formbuilder_output('cart_', false, false, $captcha, __('Submit', 'implecode-shopping-cart') );
+		// $form .= implecode_formbuilder_output('cart_', false, false, $captcha, __('Submit', 'implecode-shopping-cart') );
 		$form_fields            = get_shopping_checkout_form_fields();
 		$success                = __( 'Thank you. We have received your order. We will contact you shortly.', 'ecommerce-product-catalog' );
 		$receive_cart           = $shopping_cart_settings['receive_cart'];
@@ -143,13 +155,12 @@ window.history.replaceState({}, "Hide", url[0]);
 		$redirect_url           = ic_get_permalink( $shopping_cart_settings['thank_you_page'] );
 		$checkout_form_settings = get_cart_form_editor_settings();
 		$button_class           = design_schemes( 'box', 0 );
-		$form                   .= formbuilder_form( $form_fields, 'cart_', '', $checkout_form_settings['form_button_label'], $checkout_form_settings['form_type'], true, $success, '<br>', true, $send_cart, $receive_cart, $subject, $button_class, true, $customer_subject, $site_name, $redirect_url );
-		$form                   .= '</div></div>';
+		$form                  .= formbuilder_form( $form_fields, 'cart_', '', $checkout_form_settings['form_button_label'], $checkout_form_settings['form_type'], true, $success, '<br>', true, $send_cart, $receive_cart, $subject, $button_class, true, $customer_subject, $site_name, $redirect_url );
+		$form                  .= '</div></div>';
 
 		return $form;
 	}
-
 }
 
 global $ic_shopping_ecommerce_shortcodes;
-$ic_shopping_ecommerce_shortcodes = new ic_shopping_ecommerce_shortcodes;
+$ic_shopping_ecommerce_shortcodes = new ic_shopping_ecommerce_shortcodes();

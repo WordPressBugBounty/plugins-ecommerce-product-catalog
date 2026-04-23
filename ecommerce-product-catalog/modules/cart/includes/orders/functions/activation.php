@@ -32,7 +32,7 @@ class ic_orders_caps {
 			'read_private_digital_orders',
 			'delete_private_digital_orders',
 			'delete_published_digital_orders',
-			'edit_published_digital_orders'
+			'edit_published_digital_orders',
 		);
 	}
 
@@ -75,12 +75,12 @@ class ic_orders_caps {
 		if ( is_object( $manager_role ) ) {
 			if ( empty( $capabilities ) ) {
 				$manager_role->add_cap( 'moderate_comments' );
-				//$manager_role->add_cap( 'manage_categories' );
+				// $manager_role->add_cap( 'manage_categories' );
 				$manager_role->add_cap( 'manage_links' );
 				$manager_role->add_cap( 'upload_files' );
 				$manager_role->add_cap( 'unfiltered_html' );
 				$manager_role->add_cap( 'edit_posts' );
-				//$manager_role->add_cap( 'edit_others_posts' );
+				// $manager_role->add_cap( 'edit_others_posts' );
 				$manager_role->add_cap( 'edit_published_posts' );
 				$manager_role->add_cap( 'publish_posts' );
 				$manager_role->add_cap( 'edit_pages' );
@@ -141,7 +141,6 @@ class ic_orders_caps {
 
 		return $caps;
 	}
-
 }
 
-$ic_orders_caps = new ic_orders_caps;
+$ic_orders_caps = new ic_orders_caps();

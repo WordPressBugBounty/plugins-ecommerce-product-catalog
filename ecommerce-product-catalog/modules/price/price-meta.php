@@ -21,15 +21,15 @@ add_filter( 'admin_product_details', 'ic_price_metabox', 5, 2 );
 function ic_price_metabox( $product_details, $product_id ) {
 	if ( is_ic_price_enabled() ) {
 		$set = get_currency_settings();
-		//$price			 = get_post_meta( $product_id, '_price', true );
+		// $price             = get_post_meta( $product_id, '_price', true );
 		$price = product_price( $product_id, 1 );
 		if ( ! empty( $price ) ) {
 			$formatted_price = price_format( $price, 1, 0 );
 		} else {
 			$formatted_price = $price;
 		}
-		$product_details .= apply_filters( 'admin_price_table', '<table><tr><td class="label-column">' . __( 'Price', 'ecommerce-product-catalog' ) . ':</td><td class="price-column"><input type="text" title="' . sprintf( __( 'Example price format: %s or %s', 'ecommerce-product-catalog' ), price_format( '1587.89', 1, 0 ), '1587' . $set['dec_sep'] . '89' ) . ' (' . __( 'you can change it in product settings', 'ecommerce-product-catalog' ) . ')" pattern="^(([1-9](\\d*|\\d{0,2}(' . $set['th_sep'] . '\\d{3})*))|0)(' . $set['dec_sep'] . '\\d{1,' . ic_price_display::decimals() . '})?$" name="_price" value="' . $formatted_price . '" class="widefat ic-input ic-product-meta-field" /></td><td>' . product_currency() . '</td></tr></table>', $product_id );
-		$product_details .= '<div id="invalid-_price" class="ui-state-error ui-corner-all message" style="padding: 0 .7em; display: none;"><p>' . sprintf( __( 'Please provide a correct price format according to your currency settings. Example price format: %s or %s', 'ecommerce-product-catalog' ), price_format( '1587.89', 1, 0 ), '1587' . $set['dec_sep'] . '89' ) . '</p></div>';
+		$product_details .= apply_filters( 'admin_price_table', '<table><tr><td class="label-column">' . __( 'Price', 'ecommerce-product-catalog' ) . ':</td><td class="price-column"><input type="text" title="' . sprintf( __( 'Example price format: %1$s or %2$s', 'ecommerce-product-catalog' ), price_format( '1587.89', 1, 0 ), '1587' . $set['dec_sep'] . '89' ) . ' (' . __( 'you can change it in product settings', 'ecommerce-product-catalog' ) . ')" pattern="^(([1-9](\\d*|\\d{0,2}(' . $set['th_sep'] . '\\d{3})*))|0)(' . $set['dec_sep'] . '\\d{1,' . ic_price_display::decimals() . '})?$" name="_price" value="' . $formatted_price . '" class="widefat ic-input ic-product-meta-field" /></td><td>' . product_currency() . '</td></tr></table>', $product_id );
+		$product_details .= '<div id="invalid-_price" class="ui-state-error ui-corner-all message" style="padding: 0 .7em; display: none;"><p>' . sprintf( __( 'Please provide a correct price format according to your currency settings. Example price format: %1$s or %2$s', 'ecommerce-product-catalog' ), price_format( '1587.89', 1, 0 ), '1587' . $set['dec_sep'] . '89' ) . '</p></div>';
 	}
 
 	return $product_details;
@@ -119,11 +119,12 @@ add_action( 'product_quickedit', 'ic_price_quickedit' );
  */
 function ic_price_quickedit( $column_name ) {
 	if ( $column_name == 'price' ) {
-		?><span class="title"><?php _e( 'Price', 'ecommerce-product-catalog' ) ?></span><input type="number" min="0"
-                                                                                               step="0.01" name="_price"
-                                                                                               value=""
-                                                                                               class="widefat"/><?php
-		echo product_currency();
+		?><span class="title"><?php _e( 'Price', 'ecommerce-product-catalog' ); ?></span><input type="number" min="0"
+																								step="0.01" name="_price"
+																								value=""
+																								class="widefat"/>
+																								<?php
+																								echo product_currency();
 	}
 }
 
@@ -147,12 +148,12 @@ function ic_price_register_meta( $post_type ) {
 	register_post_meta(
 		$post_type,
 		'_price',
-		[
+		array(
 			'auth_callback' => '__return_true',
 			'show_in_rest'  => true,
 			'single'        => true,
 			'type'          => 'string',
-		]
+		)
 	);
 }
 

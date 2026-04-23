@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product header template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -19,8 +25,11 @@ do_action( 'single_product_header', $post, $single_names );
 $header_content = ob_get_clean();
 if ( ! empty( $header_content ) ) {
 	?>
-    <header class="entry-header product-page-header">
-		<?php echo $header_content ?>
-    </header>
+	<header class="entry-header product-page-header">
+		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		echo $header_content;
+		?>
+	</header>
 	<?php
 }

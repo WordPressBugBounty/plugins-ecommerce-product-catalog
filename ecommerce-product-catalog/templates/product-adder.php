@@ -2,12 +2,13 @@
 /**
  * Template Name:  Product Template
  *
- * @version		1.1.2
- * @package		ecommerce-product-catalog/templates
- * @author 		impleCode
+ * @version     1.1.2
+ * @package     ecommerce-product-catalog/templates
+ * @author      impleCode
  */
-if ( !defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 
 get_header();

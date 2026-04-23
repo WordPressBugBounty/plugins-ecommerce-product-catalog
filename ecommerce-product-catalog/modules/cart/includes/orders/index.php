@@ -1,20 +1,20 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-define( 'AL_PO_BASE_PATH', dirname( __FILE__ ) );
+define( 'AL_PO_BASE_PATH', __DIR__ );
 define( 'AL_PO_PLUGIN_BASE_URL', plugins_url( '/', __FILE__ ) );
 
-require_once(AL_PO_BASE_PATH . '/functions/activation.php');
+require_once AL_PO_BASE_PATH . '/functions/activation.php';
 
 add_action( 'ecommerce-prodct-catalog-addons', 'start_digital_products_orders', 20 );
 
 function start_digital_products_orders() {
-	require_once(AL_PO_BASE_PATH . '/includes/index.php');
-	require_once(AL_PO_BASE_PATH . '/functions/index.php');
-	require_once(AL_PO_BASE_PATH . '/ext/index.php');
+	require_once AL_PO_BASE_PATH . '/includes/index.php';
+	require_once AL_PO_BASE_PATH . '/functions/index.php';
+	require_once AL_PO_BASE_PATH . '/ext/index.php';
 	do_action( 'digital_product_orders_addons' );
 }
 
@@ -47,7 +47,7 @@ add_action( 'enqueue_catalog_admin_styles', 'country_chosen_admin_select_script'
 function country_chosen_admin_select_script() {
 	if ( is_ic_order_edit_screen() ) {
 		wp_enqueue_script( 'digital_order_edit_script', AL_PO_PLUGIN_BASE_URL . 'js/edit-order.js' . ic_filemtime( AL_PO_BASE_PATH . '/js/edit-order.js' ), array( 'ic_chosen' ) );
-		//	if ( ic_ic_order_manual() ) {
+		// if ( ic_ic_order_manual() ) {
 		if ( function_exists( 'start_digital_products' ) ) {
 			$translation_array = array(
 				'digital_products_dropdown_action' => digital_products_dropdown( 'new_manual_order_product_id', __( 'Choose product from catalog', 'ecommerce-product-catalog' ), '' ),
@@ -58,6 +58,6 @@ function country_chosen_admin_select_script() {
 			);
 		}
 		wp_localize_script( 'digital_order_edit_script', 'digital_order_edit_script_trans', apply_filters( 'digital_order_edit_sctipt_translations', $translation_array ) );
-		//}
+		// }
 	}
 }

@@ -1,6 +1,12 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+/**
+ * Listing header template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -8,9 +14,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Copy it to your theme implecode folder to edit the output: your-theme-folder-name/implecode/listing-header.php
  *
- * @version		1.1.2
- * @package		ecommerce-product-catalog/templates/template-parts/product-listing
- * @author 		impleCode
+ * @version     1.1.2
+ * @package     ecommerce-product-catalog/templates/template-parts/product-listing
+ * @author      impleCode
  */
 global $post;
 $archive_names = get_archive_names();

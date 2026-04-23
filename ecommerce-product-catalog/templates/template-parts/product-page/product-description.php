@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product description template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -17,17 +23,19 @@ $product_id          = ic_get_product_id();
 $product_description = get_product_description( $product_id );
 if ( ! empty( $product_description ) ) {
 	?>
-    <div id="product_description" class="product-description">
+	<div id="product_description" class="product-description">
 		<?php if ( ! empty( $single_names['product_description'] ) ) { ?>
-            <h3 class="catalog-header"><?php echo $single_names['product_description'] ?></h3>
+			<h3 class="catalog-header"><?php echo esc_html( $single_names['product_description'] ); ?></h3>
 			<?php
 		}
-		if ( get_integration_type() == 'simple' && ! is_ic_shortcode_integration() ) {
+		if ( 'simple' === get_integration_type() && ! is_ic_shortcode_integration() ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 			echo apply_filters( 'product_simple_description', $product_description );
 		} else {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 			echo apply_filters( 'the_content', $product_description );
 		}
 		?>
-    </div>
+	</div>
 	<?php
 }

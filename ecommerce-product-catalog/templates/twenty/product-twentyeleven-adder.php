@@ -1,12 +1,15 @@
 <?php
-/** 
-* Template Name:  Product Template [NO SIDEBAR]
-*
- * @version		1.0.0
- * @package		ecommerce-product-catalog/templates
- * @author 		impleCode
-*/
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+/**
+ * Template Name:  Product Template [NO SIDEBAR]
+ *
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/templates
+ * @author      impleCode
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 get_header(); ?>
 
@@ -20,5 +23,8 @@ get_header(); ?>
 		</div><!-- #content -->
 	
 
-<?php if (is_archive()) {get_sidebar(); } ?>
+<?php
+if ( is_archive() ) {
+	get_sidebar(); }
+?>
 <?php get_footer(); ?>

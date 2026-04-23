@@ -47,7 +47,7 @@ if ( ! function_exists( 'ic_order_details_fields' ) ) {
 			'vat_name',
 			'vat_address',
 			'vat_country',
-			'vat_ver_id'
+			'vat_ver_id',
 		);
 
 		return $fields;
@@ -87,7 +87,7 @@ function ic_get_manual_order_products( $order_id ) {
 	$custom_products = array();
 	if ( is_array( $order_products ) ) {
 		foreach ( $order_products as $key => $product ) {
-			if ( $product["id"] != '' ) {
+			if ( $product['id'] != '' ) {
 				$custom_products[ $key ] = $product;
 			}
 		}
@@ -139,7 +139,7 @@ function ic_get_custom_manual_order_products( $order_id ) {
 	$custom_products = array();
 	if ( ! empty( $order_products ) ) {
 		foreach ( $order_products as $product ) {
-			if ( $product["id"] == '' ) {
+			if ( $product['id'] == '' ) {
 				$custom_products[] = $product;
 			}
 		}
@@ -166,11 +166,11 @@ function ic_get_digital_product_name( $product_id ) {
 
 function ic_add_row_button() {
 	?>
-    <div class="add-digital-product">
-        <input type="button" id="add-digital-product" class="button" name="add_product"
-               value="<?php _e( 'Add Product', 'ecommerce-product-catalog' ) ?>"/>
-        <input type="button" id="add-custom-digital-product" class="button" name="add_custom_product"
-               value="<?php _e( 'Add Custom Product', 'ecommerce-product-catalog' ) ?>"/></div>
+	<div class="add-digital-product">
+		<input type="button" id="add-digital-product" class="button" name="add_product"
+				value="<?php _e( 'Add Product', 'ecommerce-product-catalog' ); ?>"/>
+		<input type="button" id="add-custom-digital-product" class="button" name="add_custom_product"
+				value="<?php _e( 'Add Custom Product', 'ecommerce-product-catalog' ); ?>"/></div>
 	<?php
 }
 
@@ -178,14 +178,12 @@ function ic_get_manual_products( $manual_order_product, $custom_id = null ) {
 	$manual_products = array();
 	if ( ! empty( $manual_order_product ) ) {
 		foreach ( $manual_order_product as $manual_product ) {
-			if ( ! empty( $manual_product["id"] ) ) {
-				$manual_product_ids[] = $manual_product["id"];
+			if ( ! empty( $manual_product['id'] ) ) {
+				$manual_product_ids[] = $manual_product['id'];
+			} elseif ( ! empty( $custom_id ) ) {
+					$custom_manual_products[] = $manual_product['name'] . '|' . $manual_product['c_id'];
 			} else {
-				if ( ! empty( $custom_id ) ) {
-					$custom_manual_products[] = $manual_product["name"] . '|' . $manual_product["c_id"];
-				} else {
-					$custom_manual_products[] = $manual_product["name"];
-				}
+				$custom_manual_products[] = $manual_product['name'];
 			}
 		}
 		$manual_product_ids                        = isset( $manual_product_ids ) ? implode( ',', $manual_product_ids ) : '';
@@ -300,18 +298,18 @@ function ic_send_error_message( $topic, $message ) {
 	if ( function_exists( 'start_shopping_cart' ) ) {
 		$settings = get_shopping_cart_settings();
 		$email    = $settings['receive_cart'];
-	} else if ( function_exists( 'start_easy_orders' ) ) {
+	} elseif ( function_exists( 'start_easy_orders' ) ) {
 		$email = get_option( 'easy_email' );
 	}
 	wp_mail( $email, $topic, $message, 'From: Error Message <' . $email . '>' );
 }
 
-//add_action( 'auto_order_completed', 'ic_order_completed_message', 15, 4 );
+// add_action( 'auto_order_completed', 'ic_order_completed_message', 15, 4 );
 
 /**
  * Sends order to customer
  *
- * @param int $order_id
+ * @param int   $order_id
  * @param array $payment_details
  * @param array $order_products
  * @param array $manual_order_product
@@ -326,12 +324,12 @@ function ic_order_completed_message( $order_id, $payment_details, $order_product
 	$p              = ic_email_paragraph();
 	$ep             = ic_email_paragraph_end();
 	$message_intro  = sprintf( __( 'Dear %s,', 'ecommerce-product-catalog' ), trim( $payment_details['name'] ) ) . $line . $line;
-	$message_intro  .= sprintf( __( 'Thank you for you order placed on %s.', 'ecommerce-product-catalog' ), $site_name ) . $line . $line;
-	$message_intro  .= __( 'We\'ve received your payment.', 'ecommerce-product-catalog' ) . $line . $line;
+	$message_intro .= sprintf( __( 'Thank you for you order placed on %s.', 'ecommerce-product-catalog' ), $site_name ) . $line . $line;
+	$message_intro .= __( 'We\'ve received your payment.', 'ecommerce-product-catalog' ) . $line . $line;
 	$message        = apply_filters( 'digital_order_message_intro', $message_intro, $order_id );
-	$message        .= __( 'Feel free to contact us in case of any questions or issues.', 'ecommerce-product-catalog' ) . $line . $line;
-	$message        .= __( 'Kind regards,', 'ecommerce-product-catalog' ) . $line;
-	$message        .= sprintf( __( '%s Team', 'ecommerce-product-catalog' ), $site_name ) . $line . $line;
+	$message       .= __( 'Feel free to contact us in case of any questions or issues.', 'ecommerce-product-catalog' ) . $line . $line;
+	$message       .= __( 'Kind regards,', 'ecommerce-product-catalog' ) . $line;
+	$message       .= sprintf( __( '%s Team', 'ecommerce-product-catalog' ), $site_name ) . $line . $line;
 	ic_mail( $p . $message . $ep, $site_name, $admin_email, $customer_email, __( 'Order Completed', 'ecommerce-product-catalog' ), true, $attachment );
 }
 
@@ -339,7 +337,7 @@ function ic_format_vat_address( $address ) {
 	if ( ! empty( $address ) ) {
 		if ( strpos( $address, '::' ) !== false ) {
 			$address = explode( '::', $address );
-		} else if ( strpos( $address, '  ' ) !== false ) {
+		} elseif ( strpos( $address, '  ' ) !== false ) {
 			$address = explode( '  ', $address );
 		} else {
 			$address = explode( ', ', $address );
@@ -350,9 +348,9 @@ function ic_format_vat_address( $address ) {
 				$new_address[ $i - 1 ] = $add;
 			}
 			$address = $new_address;
-			//$address[ 0 ]	 = isset( $address[ 1 ] ) ? $address[ 1 ] : '';
-			//$address[ 1 ]	 = isset( $address[ 2 ] ) ? $address[ 2 ] : '';
-			//$address[ 2 ]	 = '';
+			// $address[ 0 ]  = isset( $address[ 1 ] ) ? $address[ 1 ] : '';
+			// $address[ 1 ]  = isset( $address[ 2 ] ) ? $address[ 2 ] : '';
+			// $address[ 2 ]  = '';
 		}
 		foreach ( $address as $key => $val ) {
 			if ( $key != 0 && $key != 1 && $val != '' ) {
@@ -381,7 +379,7 @@ function ic_get_order_product_price( $order_id, $product_id ) {
 		if ( $index !== false && isset( $order_products['product_price'][ $index ] ) ) {
 			return $order_products['product_price'][ $index ];
 		}
-	} else if ( isset( $order_products['product_price'] ) && ! is_array( $order_products['product_price'] ) ) {
+	} elseif ( isset( $order_products['product_price'] ) && ! is_array( $order_products['product_price'] ) ) {
 		return $order_products['product_price'];
 	}
 

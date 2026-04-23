@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here includes folder files defined and managed.
  *
- * @version		1.0.0
- * @package		implecode-shopping-cart/includes
- * @author 		Norbert Dreszer
+ * @version     1.0.0
+ * @package     implecode-shopping-cart/includes
+ * @author      Norbert Dreszer
  */
 add_filter( 'filter_ic_cart', 'ic_remove_multiple_qty_in_cart' );
 

@@ -18,20 +18,20 @@ add_action( 'after_product_details', 'show_product_attributes', 20, 1 );
  * Shows product attributes table on product page
  *
  * @param object $post
- * @param array $single_names
+ * @param array  $single_names
  */
 function show_product_attributes( $product_id = false ) {
 	if ( is_object( $product_id ) && isset( $product_id->ID ) ) {
 		$product_id = $product_id->ID;
 	}
 	ic_show_template_file( 'product-page/product-attributes.php', AL_BASE_TEMPLATES_PATH, $product_id );
-	//echo get_product_attributes( $post->ID, $single_names );
+	// echo get_product_attributes( $post->ID, $single_names );
 }
 
 /**
  * Returns product attributes HTML table
  *
- * @param int $product_id
+ * @param int   $product_id
  * @param array $v_single_names
  *
  * @return string
@@ -55,14 +55,18 @@ function get_attribute_label( $i = 1, $product_id = null ) {
 	if ( empty( $product_id ) ) {
 		$product_id = ic_get_product_id();
 	}
-	$field_name = apply_filters( 'ic_attribute_label_field_name', "_attribute-label" ) . $i;
+	$field_name = apply_filters( 'ic_attribute_label_field_name', '_attribute-label' ) . $i;
 	$label      = ic_get_global( $product_id . $field_name );
 	if ( $label === false ) {
-		$label         = get_post_meta( $product_id, $field_name, true );
+		if ( ic_product_attribute_labels_per_product() ) {
+			$label = get_post_meta( $product_id, $field_name, true );
+		} else {
+			$label = get_default_product_attribute_label( $i );
+		}
 		$default_label = get_default_product_attribute_label( $i );
 		if ( empty( $label ) ) {
 			$label = $default_label;
-		} else if ( $label === $default_label ) {
+		} elseif ( ic_product_attribute_labels_per_product() && $label === $default_label ) {
 			delete_post_meta( $product_id, $field_name );
 		}
 		ic_save_global( $product_id . $field_name, $label );
@@ -84,11 +88,19 @@ function get_attribute_value( $i = 1, $product_id = null ) {
 		$product_id = ic_get_product_id();
 	}
 	$field_name = ic_attr_value_field_name( $i );
+	$mode       = get_attributes_source_mode();
 	$value      = ic_get_global( $product_id . $field_name );
 	if ( $value === false ) {
-		$value = get_post_meta( $product_id, $field_name, true );
+		if ( $mode !== 'global' ) {
+			$value = get_post_meta( $product_id, $field_name, true );
+		} else {
+			$value = '';
+		}
 	}
-	if ( ! is_array( $value ) && apply_filters( 'ic_get_attr_value_from_tax', true ) ) {
+	if ( $mode === 'global' || ( $mode === 'value_per_product' && ! ic_attribute_has_value( $value ) ) ) {
+		$value = get_default_product_attribute_value( $i );
+	}
+	if ( $mode === 'label_value_per_product' && ! is_array( $value ) && apply_filters( 'ic_get_attr_value_from_tax', true ) ) {
 		$label         = get_attribute_label( $i, $product_id );
 		$default_label = get_default_product_attribute_label( $i );
 		if ( ! empty( $label ) && ! empty( $default_label ) && $default_label === $label ) {
@@ -104,23 +116,22 @@ function get_attribute_value( $i = 1, $product_id = null ) {
 				}
 			}
 			$sanitized = ic_sanitize_product_attribute( $value );
-			//if ( $values !== false ) {
+			// if ( $values !== false ) {
 			if ( ! empty( $values[0] ) && $values[0] !== $sanitized ) {
 				$value = $values[0];
-				//update_post_meta( $product_id, $field_name, $value );
-			} else if ( ! empty( $sanitized ) && empty( $values [0] ) ) {
+				// update_post_meta( $product_id, $field_name, $value );
+			} elseif ( ! empty( $sanitized ) && empty( $values [0] ) ) {
 				$all_attribute_values = get_all_attribute_values( $product_id );
 				if ( ! empty( $all_attribute_values ) && is_array( $all_attribute_values ) && in_array( $sanitized, $all_attribute_values ) ) {
 					$value = '';
 				}
 			}
-			//}
+			// }
 		}
 	}
 	if ( is_array( $value ) && ! function_exists( 'start_attributes_pro' ) ) {
 		$value = implode( ',', $value );
 	}
-
 
 	if ( function_exists( 'is_ic_product_page' ) && is_ic_product_page() && ! is_array( $value ) ) {
 		$value = str_replace( 'rel="nofollow"', '', make_clickable( $value ) );
@@ -150,7 +161,7 @@ function ic_attr_value_field_name( $i ) {
  * @return string
  */
 function ic_attr_value_field_base() {
-	$base = apply_filters( 'ic_attribute_value_field_name', "_attribute" );
+	$base = apply_filters( 'ic_attribute_value_field_name', '_attribute' );
 
 	return $base;
 }
@@ -167,11 +178,12 @@ function get_attribute_unit( $i = 1, $product_id = null ) {
 	if ( empty( $product_id ) ) {
 		$product_id = ic_get_product_id();
 	}
-	$field_name = apply_filters( 'ic_attribute_unit_field_name', "_attribute-unit" ) . $i;
+	$field_name = apply_filters( 'ic_attribute_unit_field_name', '_attribute-unit' ) . $i;
 	$unit       = ic_get_global( $product_id . $field_name );
 	if ( $unit === false ) {
-		$unit = get_post_meta( $product_id, $field_name, true );
-		if ( empty( $unit ) ) {
+		if ( ic_product_attribute_labels_per_product() ) {
+			$unit = get_post_meta( $product_id, $field_name, true );
+		} else {
 			$unit = get_default_product_attribute_unit( $i );
 		}
 		ic_save_global( $product_id . $field_name, $unit );
@@ -183,18 +195,18 @@ function get_attribute_unit( $i = 1, $product_id = null ) {
 if ( ! function_exists( 'get_attribute_label_id' ) ) {
 
 	function get_attribute_label_id( $label ) {
-		//$cache_meta      = 'attr_label_id' . $label;
+		// $cache_meta      = 'attr_label_id' . $label;
 		$cache_label_ids = ic_get_global( 'attr_label_id' );
 		if ( empty( $cache_label_ids ) ) {
 			$cache_label_ids = array();
-		} else if ( ! empty( $cache_label_ids[ $label ] ) ) {
+		} elseif ( ! empty( $cache_label_ids[ $label ] ) ) {
 			return $cache_label_ids[ $label ];
 		}
 		$args ['taxonomy'] = 'al_product-attributes';
 		$args ['name']     = $label;
 		$args['parent']    = 0;
 		$args['fields']    = 'ids';
-		//$args[ 'update_term_meta_cache' ]	 = false;
+		// $args[ 'update_term_meta_cache' ]  = false;
 		$label_ids = ic_get_terms( $args );
 		if ( ! empty( $label_ids ) && ! is_wp_error( $label_ids ) ) {
 			$label_id = intval( $label_ids[0] );
@@ -238,7 +250,7 @@ if ( ! function_exists( 'get_attribute_value_id' ) ) {
 		$value_ids        = ic_get_terms( $args );
 		if ( ! empty( $value_ids ) && ! is_wp_error( $value_ids ) ) {
 			$value_id = intval( $value_ids[0] );
-		} else if ( ! $by_name ) {
+		} elseif ( ! $by_name ) {
 			$value_id = get_attribute_value_id( $label_id, $value, true );
 		}
 		if ( ! empty( $value_id ) ) {
@@ -259,7 +271,7 @@ add_action( 'product_details', 'ic_show_size', 9, 1 );
  * Shows product SKU table
  *
  * @param object $post
- * @param array $single_names
+ * @param array  $single_names
  */
 function ic_show_size( $product_id = false ) {
 	if ( is_object( $product_id ) && isset( $product_id->ID ) ) {
@@ -274,7 +286,7 @@ add_action( 'product_details', 'ic_show_weight', 9, 1 );
  * Shows product SKU table
  *
  * @param object $post
- * @param array $single_names
+ * @param array  $single_names
  */
 function ic_show_weight( $product_id = false ) {
 	if ( is_object( $product_id ) && isset( $product_id->ID ) ) {

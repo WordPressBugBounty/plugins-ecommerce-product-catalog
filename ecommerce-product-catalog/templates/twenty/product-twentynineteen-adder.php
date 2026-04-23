@@ -1,13 +1,19 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+/**
+ * Twenty Nineteen product template.
+ *
+ * @package ecommerce-product-catalog
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 /**
  * Template Name:  Product Template [NO SIDEBAR]
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/templates
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/templates
+ * @author      impleCode
  */
 get_header();
 ?>

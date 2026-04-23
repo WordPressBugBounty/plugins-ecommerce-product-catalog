@@ -138,11 +138,11 @@ class ic_attribute_default_filters {
 						$session['filters'] = array();
 					}
 					$session['filters'][ $field_name ] = $min_max;
-				} else if ( isset( $session['filters'][ $field_name ] ) && $filter_value === 'all' ) {
+				} elseif ( isset( $session['filters'][ $field_name ] ) && $filter_value === 'all' ) {
 					unset( $session['filters'][ $field_name ] );
 				}
 				$save = true;
-			} else if ( isset( $session['filters'][ $field_name ] ) ) {
+			} elseif ( isset( $session['filters'][ $field_name ] ) ) {
 				unset( $session['filters'][ $field_name ] );
 				$save = true;
 			}
@@ -210,14 +210,18 @@ class ic_attribute_default_filters {
 			return array();
 		}
 
-		return array_unique( array_filter(
-			array_map(
-				array(
-					$this,
-					'filter'
+		return array_unique(
+			array_filter(
+				array_map(
+					array(
+						$this,
+						'filter',
+					),
+					array_filter( array_unique( $array ) )
 				),
-				array_filter( array_unique( $array ) ) ),
-			'is_numeric' ) );
+				'is_numeric'
+			)
+		);
 	}
 
 	function filter( $value ) {
@@ -250,11 +254,14 @@ class ic_attribute_default_filters {
 		$supplementary_key = '_1' . $key . '_filterable';
 		if ( $r === false ) {
 			if ( ( is_ic_taxonomy_page( $query ) || is_ic_product_search( $query ) ) && ! is_ic_product_listing( $query ) /* || !empty( $ic_product_filters_query ) || (is_ic_ajax() && !is_ic_product_listing()) */ ) {
-				//$product_ids = $this->get_current_products( $key );
+				// $product_ids = $this->get_current_products( $key );
 				$product_ids = ic_get_current_products( array(), array(), $this->query_meta_keys() );
 				if ( ! empty( $product_ids ) && is_array( $product_ids ) ) {
 					$product_ids_string = implode( ',', $product_ids );
-					$r                  = $wpdb->get_results( stripslashes( $wpdb->prepare( "
+					$r                  = $wpdb->get_results(
+						stripslashes(
+							$wpdb->prepare(
+								"
         SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm
         LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
         WHERE
@@ -262,16 +269,31 @@ class ic_attribute_default_filters {
         AND p.post_status = '%s'
         AND p.post_type = '%s'
 		AND p.ID IN ($product_ids_string)
-    ", implode( "','", $this->query_meta_keys() ), $status, $type ) ) );
+    ",
+								implode( "','", $this->query_meta_keys() ),
+								$status,
+								$type
+							)
+						)
+					);
 				}
 			} else {
-				$r = $wpdb->get_results( stripslashes( $wpdb->prepare( "
+				$r = $wpdb->get_results(
+					stripslashes(
+						$wpdb->prepare(
+							"
         SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm
         LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
         WHERE pm.meta_key IN (%s)
         AND p.post_status = '%s'
         AND p.post_type = '%s'
-    ", implode( "','", $this->query_meta_keys() ), $status, $type ) ) );
+    ",
+							implode( "','", $this->query_meta_keys() ),
+							$status,
+							$type
+						)
+					)
+				);
 			}
 			ic_save_global( 'size_get_meta_values', $r, true );
 		}
@@ -328,8 +350,7 @@ class ic_attribute_default_filters {
 			return $product_ids;
 		}
 	*/
-
 }
 
 global $ic_attribute_default_filters;
-$ic_attribute_default_filters = new ic_attribute_default_filters;
+$ic_attribute_default_filters = new ic_attribute_default_filters();

@@ -24,7 +24,7 @@ class ic_customer_panel_security {
 		add_action( 'wp_login_failed', array( __CLASS__, 'login_fail' ) );
 		add_action( 'authenticate', array( __CLASS__, 'check_password' ), 1, 3 );
 		add_filter( 'customer_login_actions', array( __CLASS__, 'login_errors' ) );
-		//add_action( 'init', array( __CLASS__, 'set_session_ref' ), 1 );
+		// add_action( 'init', array( __CLASS__, 'set_session_ref' ), 1 );
 		add_filter( 'login_form_bottom', array( __CLASS__, 'set_session_ref' ), 1 );
 	}
 
@@ -94,7 +94,7 @@ class ic_customer_panel_security {
 			}
 		}
 		if ( function_exists( 'is_ic_shopping_cart' ) && is_ic_shopping_cart() ||
-		     function_exists( 'is_ic_shopping_order' ) && is_ic_shopping_order() ) {
+			function_exists( 'is_ic_shopping_order' ) && is_ic_shopping_order() ) {
 			$panel_url = ic_current_page_url();
 		}
 		if ( ! empty( $panel_url ) && is_ic_digital_customer( $customer_id ) && ! in_array( 'administrator', $user->roles, true ) ) {
@@ -126,7 +126,7 @@ class ic_customer_panel_security {
 	/**
 	 * Redirects to customer panel when username or password is empty
 	 *
-	 * @param type $login
+	 * @param type   $login
 	 * @param string $username
 	 * @param string $password
 	 */
@@ -137,7 +137,7 @@ class ic_customer_panel_security {
 		}
 		$referrer = $ic_session['referrer'];
 		if ( ! empty( $referrer ) && ! strstr( $referrer, 'wp-login' ) && ! strstr( $referrer, 'wp-admin' ) ) {
-			if ( $username == "" || $password == "" ) {
+			if ( $username == '' || $password == '' ) {
 				$url = ic_customer_panel_panel_url();
 				if ( ! empty( $url ) ) {
 					$url = add_query_arg( 'login', 'empty', $url );
@@ -158,8 +158,8 @@ class ic_customer_panel_security {
 	static function login_errors( $actions ) {
 		if ( isset( $_GET['login'] ) && $_GET['login'] == 'failed' ) {
 			$redirect = ic_customer_panel_panel_url();
-			$actions  .= implecode_warning( sprintf( __( 'The password you entered is incorrect, please try again or %sreset password%s.' ), '<a href="' . wp_lostpassword_url( $redirect ) . '">', '</a>' ), 0 );
-		} else if ( isset( $_GET['login'] ) && $_GET['login'] == 'empty' ) {
+			$actions .= implecode_warning( sprintf( __( 'The password you entered is incorrect, please try again or %1$sreset password%2$s.' ), '<a href="' . wp_lostpassword_url( $redirect ) . '">', '</a>' ), 0 );
+		} elseif ( isset( $_GET['login'] ) && $_GET['login'] == 'empty' ) {
 			$actions .= implecode_warning( __( 'Please enter both username and password.' ), 0 );
 		}
 
@@ -168,7 +168,6 @@ class ic_customer_panel_security {
 
 	/**
 	 * Define session referrer
-	 *
 	 */
 	static function set_session_ref( $login_form = '' ) {
 		if ( is_admin() && ( function_exists( 'is_ic_ajax' ) && ! is_ic_ajax() ) ) {
@@ -178,20 +177,19 @@ class ic_customer_panel_security {
 		if ( isset( $ic_session['next_referrer'] ) ) {
 			// Get existing referrer
 			$ic_session['referrer'] = $ic_session['next_referrer'];
-		} else if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+		} elseif ( isset( $_SERVER['HTTP_REFERER'] ) ) {
 			// Use given referrer
 			$ic_session['referrer'] = $_SERVER['HTTP_REFERER'];
 		} else {
 			$ic_session['referrer'] = '';
 		}
 
-// Save current page as next page's referrer
+		// Save current page as next page's referrer
 		$ic_session['next_referrer'] = ic_current_page_url();
 		set_product_catalog_session( $ic_session );
 
 		return $login_form;
 	}
-
 }
 
-$ic_customer_panel_security = new ic_customer_panel_security;
+$ic_customer_panel_security = new ic_customer_panel_security();

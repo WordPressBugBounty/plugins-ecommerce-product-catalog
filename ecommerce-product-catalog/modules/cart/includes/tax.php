@@ -37,15 +37,20 @@ if ( ! function_exists( 'get_cart_tax_rate' ) ) {
 if ( ! function_exists( 'ic_get_checkout_field_selector' ) ) {
 
 	function ic_get_checkout_field_selector(
-		$fields, $pre_name, $name, $selected, $attr = 'multiple',
-		$include_empty = false, $placeholder = null
+		$fields,
+		$pre_name,
+		$name,
+		$selected,
+		$attr = 'multiple',
+		$include_empty = false,
+		$placeholder = null
 	) {
-		//$product_currency_settings	 = get_currency_settings();
+		// $product_currency_settings     = get_currency_settings();
 		if ( $placeholder == null ) {
 			$placeholder = __( 'Select Checkout Fields', 'ecommerce-product-catalog' );
 		}
 		$selector = '<select class="chosen checkout_limit_selector_' . $pre_name . '" ' . $attr . ' data-placeholder="' . $placeholder . '" name="' . $name . '">';
-		//$pre_name					 = 'cart_';
+		// $pre_name                  = 'cart_';
 		if ( $include_empty ) {
 			$selector .= '<option value=""></option>';
 		}
@@ -81,7 +86,7 @@ function ic_add_tax_settings() {
 	implecode_settings_number( __( 'Tax rate', 'ecommerce-product-catalog' ), 'product_currency_settings[tax_rate]', $tax_rate['tax_rate'], '%', 1, 0.1 );
 
 	implecode_settings_dropdown( __( 'Tax round', 'ecommerce-product-catalog' ), 'product_currency_settings[tax_rate_round]', $tax_rate['tax_rate_round'], ic_round_options(), 1, null );
-	//implecode_settings_number( __( 'Tax round', 'ecommerce-product-catalog' ), 'product_currency_settings[tax_rate_round]', $tax_rate[ 'tax_rate_round' ], product_currency(), 1, 0.01 );
+	// implecode_settings_number( __( 'Tax round', 'ecommerce-product-catalog' ), 'product_currency_settings[tax_rate_round]', $tax_rate[ 'tax_rate_round' ], product_currency(), 1, 0.01 );
 	implecode_settings_text( __( 'Tax label', 'ecommerce-product-catalog' ), 'product_currency_settings[tax_label]', $tax_rate['tax_label'] );
 }
 
@@ -91,7 +96,7 @@ function ic_round_options() {
 		'0.1'    => '0.1',
 		'0.01'   => '0.01',
 		'0.001'  => '0.001',
-		'0.0001' => '0.0001'
+		'0.0001' => '0.0001',
 	);
 }
 
@@ -142,7 +147,7 @@ function ic_cart_update_tax( $product_id, $p_total, $p_quantity, $cart_id ) {
 		return;
 	}
 	$tax_rate_c      = $tax_rate / 100;
-	$tax_rate_string = sprintf( "%.2f", $tax_rate );
+	$tax_rate_string = sprintf( '%.2f', $tax_rate );
 	if ( ! isset( $current_cart_tax[ $tax_rate_string ] ) ) {
 		$current_cart_tax[ $tax_rate_string ] = 0;
 	}
@@ -178,7 +183,7 @@ function ic_cart_get_tax( $return_array = false ) {
 				$tax_sum = ic_round_tax( $tax_sum );
 			}
 			$array[ $key ] = $tax_sum;
-			$tax           += $tax_sum;
+			$tax          += $tax_sum;
 		}
 	}
 	if ( $return_array ) {

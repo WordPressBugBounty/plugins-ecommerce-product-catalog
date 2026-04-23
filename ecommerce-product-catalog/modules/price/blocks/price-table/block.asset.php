@@ -1,7 +1,7 @@
 <?php
 return array(
 	'dependencies' => array(
-		'ic_blocks_framework'
+		'ic_blocks_framework',
 	),
-	'version'      => '6'
+	'version'      => '6',
 );

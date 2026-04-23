@@ -23,7 +23,7 @@ class ic_orders_customer {
 
 	/**
 	 *
-	 * @param int $trans_id
+	 * @param int   $trans_id
 	 * @param array $payment_details
 	 * @param array $order_products
 	 * @param array $manual_order_product
@@ -74,12 +74,12 @@ class ic_orders_customer {
 				$prev_product_id_array = explode( ',', $prev_product_id );
 				if ( ! in_array( $trans_id, $prev_trans_array ) ) {
 					$prev_trans_id .= ',' . $trans_id;
-					$new_trans_ids = $prev_trans_id;
+					$new_trans_ids  = $prev_trans_id;
 					update_user_meta( $customer_id, 'transaction_ids', $new_trans_ids );
 				}
 				if ( ! empty( $product_id ) && ! in_array( $product_id, $prev_product_id_array ) ) {
 					$prev_product_id .= ',' . $product_id;
-					$new_product_ids = $prev_product_id;
+					$new_product_ids  = $prev_product_id;
 					update_user_meta( $customer_id, 'product_ids', $new_product_ids );
 				}
 				if ( ! empty( $payment_details ) ) {
@@ -93,7 +93,7 @@ class ic_orders_customer {
 				$old_manual_products = get_user_meta( $customer_id, 'manual_product_ids', true );
 				if ( ! empty( $old_manual_products ) ) {
 					$old_manual_products .= ',' . $manual_products['manual_product_ids'];
-					$new_manual_products = $old_manual_products;
+					$new_manual_products  = $old_manual_products;
 				} else {
 					$new_manual_products = $manual_products['manual_product_ids'];
 				}
@@ -103,7 +103,7 @@ class ic_orders_customer {
 				$old_custom_manual_products = get_user_meta( $customer_id, 'custom_manual_products', true );
 				if ( ! empty( $old_custom_manual_products ) ) {
 					$old_custom_manual_products .= ',' . $manual_products['custom_manual_products'];
-					$new_custom_manual_products = $old_custom_manual_products;
+					$new_custom_manual_products  = $old_custom_manual_products;
 				} else {
 					$new_custom_manual_products = $manual_products['custom_manual_products'];
 				}
@@ -126,19 +126,19 @@ class ic_orders_customer {
 			if ( ! empty( $userdata ) && ! empty( $userdata['user_login'] ) && ! empty( $userdata['user_pass'] ) ) {
 				$panel_url = ic_customer_panel_panel_url();
 				if ( ! empty( $panel_url ) ) {
-					$p                 = ic_email_paragraph();
-					$ep                = ic_email_paragraph_end();
-					$ul                = ic_email_ul();
-					$eul               = ic_email_ul_end();
-					$li                = ic_email_li();
-					$eli               = ic_email_li_end();
-					$user_account_info = $p . __( 'Please see your account info below', 'ecommerce-product-catalog' ) . ':' . $ep;
+					$p                  = ic_email_paragraph();
+					$ep                 = ic_email_paragraph_end();
+					$ul                 = ic_email_ul();
+					$eul                = ic_email_ul_end();
+					$li                 = ic_email_li();
+					$eli                = ic_email_li_end();
+					$user_account_info  = $p . __( 'Please see your account info below', 'ecommerce-product-catalog' ) . ':' . $ep;
 					$user_account_info .= $ul;
 					$user_account_info .= $li . __( 'Login', 'ecommerce-product-catalog' ) . ': ' . $userdata['user_login'] . $eli;
 					$user_account_info .= $li . __( 'Password', 'ecommerce-product-catalog' ) . ': ' . $userdata['user_pass'] . $eli;
 					$user_account_info .= $eul;
 					$user_account_info .= ic_email_button( $panel_url ) . __( 'Login Now', 'ecommerce-product-catalog' ) . '</a>';
-					$message           = str_replace( '[account_info]', $user_account_info, $message );
+					$message            = str_replace( '[account_info]', $user_account_info, $message );
 				}
 			}
 			$message = str_replace( '[account_info]', '', $message );
@@ -146,7 +146,6 @@ class ic_orders_customer {
 
 		return $message;
 	}
-
 }
 
-$ic_orders_customer = new ic_orders_customer;
+$ic_orders_customer = new ic_orders_customer();

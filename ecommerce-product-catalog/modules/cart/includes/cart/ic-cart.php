@@ -43,12 +43,12 @@ class ic_cart {
 		if ( empty( $settings ) ) {
 			$settings = get_shopping_cart_settings();
 		}
-		$cart_content   = $this->content( true, $cart );
-		$products_array = ic_cart_products_array( $cart_content, $cart );
-		$products_table = '<div class="before-cart-products">';
+		$cart_content    = $this->content( true, $cart );
+		$products_array  = ic_cart_products_array( $cart_content, $cart );
+		$products_table  = '<div class="before-cart-products">';
 		$products_table .= apply_filters( 'ic_cart_products_before', '<input hidden type="hidden" name="' . $cart . '" value=\'' . $cart_content . '\'>', $products_array, $raw, $cart, $price );
 		$products_table .= '</div>';
-		$table_class    = 'cart-products';
+		$table_class     = 'cart-products';
 		if ( $raw == 1 ) {
 			$table_class .= ' raw';
 		}
@@ -63,7 +63,7 @@ class ic_cart {
 
 			$products_table .= apply_filters( 'cart_checkout_table_header_product_name', '<th class="th_name">' . __( 'Product name', 'ecommerce-product-catalog' ) . '</th>' );
 			if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
-				$single_names   = get_single_names();
+				$single_names    = get_single_names();
 				$products_table .= '<th class="th_sku">' . str_replace( ':', '', $single_names['product_sku'] ) . '</th>';
 			}
 			$products_table .= '<th class="th_qty">' . __( 'Quantity', 'ecommerce-product-catalog' ) . '</th>';
@@ -77,7 +77,7 @@ class ic_cart {
 			$products_table .= '</tr></thead>';
 		}
 		$products_table .= '<tbody>';
-		$total          = 0;
+		$total           = 0;
 		if ( $raw == 1 ) {
 			foreach ( $products_array as $cart_id => $quantity ) {
 				if ( $cart_id != '' ) {
@@ -140,9 +140,9 @@ class ic_cart {
 
 	function delete_button( $products_table, $cart_id, $quantity, $settings, $raw ) {
 		if ( ! $raw && isset( $settings['cart_page_template'] ) && $settings['cart_page_template'] == 'no_qty' ) {
-			$product_id     = cart_id_to_product_id( $cart_id );
+			$product_id      = cart_id_to_product_id( $cart_id );
 			$products_table .= '<td><input hidden type="hidden" name="p_id[]" class="product_id" value="' . $cart_id . '">';
-			$p_price        = product_price( $product_id, 1 );
+			$p_price         = product_price( $product_id, 1 );
 			if ( ! empty( $p_price ) ) {
 				$p_price = price_format( $p_price, 1, 0 );
 			}
@@ -157,7 +157,7 @@ class ic_cart {
 		$product_id = cart_id_to_product_id( $cart_id );
 		if ( isset( $settings['cart_page_template'] ) && $settings['cart_page_template'] == 'no_qty' ) {
 			$products_table .= '<td class="td-image">' . get_product_image( $product_id ) . '</td>';
-		} else if ( ! empty( $settings['cart_page_image'] ) ) {
+		} elseif ( ! empty( $settings['cart_page_image'] ) ) {
 			$products_table .= '<td class="td-image">' . $this->product_image( $cart_id ) . '</td>';
 		}
 
@@ -166,8 +166,8 @@ class ic_cart {
 
 	function sku_td( $products_table, $cart_id ) {
 		if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
-			$product_id     = cart_id_to_product_id( $cart_id );
-			$sku            = get_product_sku( $product_id );
+			$product_id      = cart_id_to_product_id( $cart_id );
+			$sku             = get_product_sku( $product_id );
 			$products_table .= '<td class="td-sku">' . $sku . '</td>';
 		}
 
@@ -183,11 +183,11 @@ class ic_cart {
 			$product_name_url = get_product_name( $product_id );
 		}
 		if ( $raw ) {
-			$filter_name = 'cart_summary_product_name';
+			$name = apply_filters( 'cart_summary_product_name', $product_name_url, $cart_id, $product_id );
 		} else {
-			$filter_name = 'cart_product_name';
+			$name = apply_filters( 'cart_product_name', $product_name_url, $cart_id, $product_id );
 		}
-		$products_table .= apply_filters( 'cart_summary_product_name_td', '<td class="td-name">' . apply_filters( $filter_name, $product_name_url, $cart_id, $product_id ) . '</td>', $product_id );
+		$products_table .= apply_filters( 'cart_summary_product_name_td', '<td class="td-name">' . $name . '</td>', $product_id, $cart_id, $raw );
 
 		return $products_table;
 	}
@@ -205,9 +205,9 @@ class ic_cart {
 				if ( ! empty( $product_price ) ) {
 					$p_price = price_format( $product_price, 1, 0 );
 				}
-				$qty_box   = '<input class="edit-product-quantity" data-p_id="' . $product_id . '" data-price="' . $p_price . '" type="number" min="' . $min . '" max="' . $max . '" step="1" name="p_quantity[]" value="' . $quantity . '">';
+				$qty_box    = '<input class="edit-product-quantity" data-p_id="' . $product_id . '" data-price="' . $p_price . '" type="number" min="' . $min . '" max="' . $max . '" step="1" name="p_quantity[]" value="' . $quantity . '">';
 				$qty_field .= apply_filters( 'shopping_cart_quantity_box', $qty_box, $cart_id );
-				$quantity  = $qty_field;
+				$quantity   = $qty_field;
 			}
 			$products_table .= '<td class="td-qty">' . $quantity . '</td>';
 		}
@@ -235,7 +235,7 @@ class ic_cart {
 				$products_table .= '<td class="td-total"><input type="hidden" hidden name="product_price_' . sanitize_title( $cart_id ) . '" value="' . price_format( $price, 1, 0 ) . '">' . apply_filters( 'ic_cart_td_total', price_format( $p_total, 1, 0 ), $cart_id ) . '</td>';
 			} else {
 				$products_table .= '<td class="' . $product_id . '_total product_total td-total">' . apply_filters( 'ic_cart_td_total', price_format( $p_total, 1, 0 ), $cart_id );
-				$sep_settings   = get_currency_settings();
+				$sep_settings    = get_currency_settings();
 				$products_table .= '<input type="hidden" hidden class="dec_sep" value="' . $sep_settings['dec_sep'] . '" /><input type="hidden" hidden class="th_sep" value="' . $sep_settings['th_sep'] . '" />';
 				$products_table .= '</td>';
 			}
@@ -254,48 +254,48 @@ class ic_cart {
 			$tax_rate_c   = floatval( $tax_rate['tax_rate'] ) / 100;
 			$total        = apply_filters( 'ic_cart_order_total', ic_get_global( 'current_cart_total' ) );
 			/*
-			  if ( !empty( $sep_settings[ 'tax_included' ] ) ) {
-			  $total = ic_roundto( $total / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
-			  }
+				if ( !empty( $sep_settings[ 'tax_included' ] ) ) {
+				$total = ic_roundto( $total / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
+				}
 			 *
 			 */
 			$tax = ic_cart_get_tax();
 			if ( is_ic_tax_included() ) {
 				$total = $total - $tax;
 			}
-			//$tax		 = ic_roundto( $total * $tax_rate_c, $tax_rate[ 'tax_rate_round' ] );
+			// $tax       = ic_roundto( $total * $tax_rate_c, $tax_rate[ 'tax_rate_round' ] );
 			$currency = product_currency();
 			$label    = __( 'Total', 'ecommerce-product-catalog' );
 			if ( ! empty( $tax_rate['tax_rate'] ) ) {
 				$label = __( 'Total NET', 'ecommerce-product-catalog' );
 			}
 			$products_table .= '<tr class="section_sep">';
-			$def_colspan    = 3;
+			$def_colspan     = 3;
 			if ( $settings['cart_page_template'] == 'no_qty' ) {
 				$def_colspan = 1;
 			}
 			if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
-				$def_colspan ++;
+				++$def_colspan;
 			}
 			$colspan                          = apply_filters( 'ic_cart_checkout_table_colspan', $def_colspan );
-			$products_table                   .= '<td colspan="' . $colspan . '"></td><td></td></tr>';
+			$products_table                  .= '<td colspan="' . $colspan . '"></td><td></td></tr>';
 			$ic_shopping_cart_totals['total'] = $total;
 			$ic_shopping_cart_totals['tax']   = $tax;
 			$total_net                        = price_format( $total, 1, 0 );
-			$products_table                   .= apply_filters( 'ic_before_cart_total', '', $total, $tax );
+			$products_table                  .= apply_filters( 'ic_before_cart_total', '', $total, $tax );
 			if ( ! empty( $total_net ) ) {
 				$products_table .= '<tr class="new_section"><td colspan="' . $colspan . '" class="currency-td"><input type="hidden" hidden name="total_net" value="' . price_format( $total, 1, 0 ) . '" />' . $label . ' = ' . $currency . '</td><td class="total_net">' . apply_filters( 'cart_table_total_net', $total_net, $total ) . '</td></tr>';
 			}
 			if ( ! empty( $tax_rate['tax_rate'] ) ) {
-				//$current_cart_tax	 = ic_get_global( 'current_cart_tax' );
+				// $current_cart_tax  = ic_get_global( 'current_cart_tax' );
 				$current_cart_tax = ic_cart_get_tax( true );
 				if ( ! empty( $current_cart_tax ) && is_array( $current_cart_tax ) ) {
 					foreach ( $current_cart_tax as $rate => $tax_sum ) {
 						$products_table .= '<tr class="order-checkout-tax"><td colspan="' . $colspan . '" class="currency-vat">' . $tax_rate['tax_label'] . ' ' . floatval( $rate ) . '% = ' . $currency . '</td><td class="total_vat">' . apply_filters( 'cart_table_total_tax', price_format( $tax_sum, 1, 0 ), $tax_sum ) . '</td></tr>';
 					}
 				}
-				//$products_table	 .= '<tr class="order-checkout-tax"><td colspan="' . $colspan . '" class="currency-vat"><input type="hidden" hidden class="vat_rate" value="' . $tax_rate[ 'tax_rate' ] . '" /><input type="hidden" hidden class="vat_included" value="' . $tax_rate[ 'tax_included' ] . '" /><input type="hidden" hidden class="vat_rate_round" value="' . $tax_rate[ 'tax_rate_round' ] . '" /><input typ="hidden" hidden name="total_tax" value="' . price_format( $tax, 1, 0 ) . '" />' . $tax_rate[ 'tax_label' ] . ' ' . $tax_rate[ 'tax_rate' ] . '% = ' . $currency . '</td><td class="total_vat">' . apply_filters( 'cart_table_total_tax', price_format( $tax, 1, 0 ), $tax ) . '</td></tr>';
-				$total_with_tax = $total + $tax;
+				// $products_table    .= '<tr class="order-checkout-tax"><td colspan="' . $colspan . '" class="currency-vat"><input type="hidden" hidden class="vat_rate" value="' . $tax_rate[ 'tax_rate' ] . '" /><input type="hidden" hidden class="vat_included" value="' . $tax_rate[ 'tax_included' ] . '" /><input type="hidden" hidden class="vat_rate_round" value="' . $tax_rate[ 'tax_rate_round' ] . '" /><input typ="hidden" hidden name="total_tax" value="' . price_format( $tax, 1, 0 ) . '" />' . $tax_rate[ 'tax_label' ] . ' ' . $tax_rate[ 'tax_rate' ] . '% = ' . $currency . '</td><td class="total_vat">' . apply_filters( 'cart_table_total_tax', price_format( $tax, 1, 0 ), $tax ) . '</td></tr>';
+				$total_with_tax  = $total + $tax;
 				$products_table .= '<tr class="section_sep"><td td colspan="' . $colspan . '"></td><td></td></tr>';
 				$products_table .= '<tr class="new_section"><td colspan="' . $colspan . '" class="currency-gross"><input type="hidden" hidden name="total_with_tax" value="' . price_format( $total_with_tax, 1, 0 ) . '" />' . __( 'Total GROSS', 'ecommerce-product-catalog' ) . ' = ' . $currency . '</td><td class="total_gross">' . apply_filters( 'cart_table_total_gross', price_format( $total_with_tax, 1, 0 ), $total_with_tax ) . '</td></tr>';
 			}
@@ -326,7 +326,7 @@ class ic_cart {
 		$cart_id    = $product_id;
 		foreach ( $_POST['selected_variation'] as $var_value ) {
 			$var_value = ( $var_value == 'not_selected' ) ? '' : $var_value;
-			$cart_id   .= '_' . $var_value;
+			$cart_id  .= '_' . $var_value;
 		}
 		$product_price = get_shopping_cart_product_price( $product_id, $cart_id, $_POST['quantity'] );
 		echo $product_price;
@@ -334,9 +334,15 @@ class ic_cart {
 	}
 
 	function content( $json = null, $cart = 'cart_content' ) {
-//$cart_content = '';
+		// $cart_content = '';
 		$cart_content = array();
 		global $cart_just_created;
+		if ( $json ) {
+			$submitted_cart_content = $this->submitted_content( $cart );
+			if ( null !== $submitted_cart_content ) {
+				return $submitted_cart_content;
+			}
+		}
 		if ( ! isset( $cart_just_created ) && $json ) {
 			$save_cart = false;
 			if ( isset( $_POST['p_id'] ) ) {
@@ -345,31 +351,32 @@ class ic_cart {
 					$product_id                 = get_cart_id_without_variations( $product_id );
 					$current_product_variations = get_current_product_variations_string( $product_id, $product_variations_settings );
 					if ( $current_product_variations ) {
-						$product_id = create_variation_id( $cart_content, $product_id, $current_product_variations );
+						$product_id  = create_variation_id( $cart_content, $product_id, $current_product_variations );
 						$product_id .= $current_product_variations;
 					}
 					/*
-					  for ( $i = 1; $i <= $_POST[ 'p_quantity' ][ $num ]; $i++ ) {
-					  $cart_content .= $product_id . ',';
-					  }
+						for ( $i = 1; $i <= $_POST[ 'p_quantity' ][ $num ]; $i++ ) {
+						$cart_content .= $product_id . ',';
+						}
 					 */
 					$cart_content[ $product_id ] = intval( $_POST['p_quantity'][ $num ] );
 				}
 				do_action( 'ic_cart_updated', $cart_content );
-				/* foreach ( $_POST[ 'p_id' ] as $num => $_product_id ) {
-				  $product_id		 = strval( $_product_id );
-				  $quantity		 = intval( $_POST[ 'p_quantity' ][ $num ] );
-				  $cart_content	 = ic_cart_insert( $product_id, $quantity, 'cart_content' );
-				  } */
+				/*
+				foreach ( $_POST[ 'p_id' ] as $num => $_product_id ) {
+					$product_id        = strval( $_product_id );
+					$quantity      = intval( $_POST[ 'p_quantity' ][ $num ] );
+					$cart_content  = ic_cart_insert( $product_id, $quantity, 'cart_content' );
+					} */
 				$save_cart = true;
-			} else if ( isset( $_POST[ $cart ] ) ) {
+			} elseif ( isset( $_POST[ $cart ] ) ) {
 				$current_product    = isset( $_POST['current_product'] ) ? intval( $_POST['current_product'] ) : '';
 				$additional_product = isset( $_POST['additional_product'] ) ? $_POST['additional_product'] : '';
 				$current_product_id = $current_product;
 				$current_quantity   = isset( $_POST['current_quantity'] ) ? intval( $_POST['current_quantity'] ) : 1;
-				//$cart_content				 = isset( $_POST[ $cart ] ) ? ic_decode_json_cart( stripslashes( $_POST[ $cart ] ), false ) : array();
+				// $cart_content              = isset( $_POST[ $cart ] ) ? ic_decode_json_cart( stripslashes( $_POST[ $cart ] ), false ) : array();
 				$cart_content = ic_decode_json_cart( ic_cart_get( $cart ) );
-				//$cart_content				 = isset( $_SESSION[ $cart ] ) ? ic_decode_json_cart( stripslashes( $_SESSION[ $cart ] ), false ) : '';
+				// $cart_content              = isset( $_SESSION[ $cart ] ) ? ic_decode_json_cart( stripslashes( $_SESSION[ $cart ] ), false ) : '';
 				$product_variations_settings = get_product_variations_settings();
 
 				$current_product_variations = get_current_product_variations_string( $current_product_id, $product_variations_settings );
@@ -378,16 +385,16 @@ class ic_cart {
 					$current_product .= $current_product_variations;
 				}
 				/*
-				  if ( $current_quantity > 1 ) {
-				  $current_products = '';
-				  for ( $i = 1; $i <= $current_quantity; $i++ ) {
-				  $current_products .= ',' . $current_product;
-				  }
-				  $current_product = $current_products;
-				  }
+					if ( $current_quantity > 1 ) {
+					$current_products = '';
+					for ( $i = 1; $i <= $current_quantity; $i++ ) {
+					$current_products .= ',' . $current_product;
+					}
+					$current_product = $current_products;
+					}
 				 */
 				if ( $current_product != '' ) {
-					//$cart_content = $cart_content . ',' . $current_product;
+					// $cart_content = $cart_content . ',' . $current_product;
 					if ( isset( $cart_content[ $current_product ] ) ) {
 						$cart_content[ $current_product ] += $current_quantity;
 					} else {
@@ -413,26 +420,28 @@ class ic_cart {
 					$cart_content = $cart_content;
 				}
 				$save_cart = true;
-			} else if ( is_ic_cart_initialized( $cart ) ) {
+			} elseif ( is_ic_cart_initialized( $cart ) ) {
 				$cart_content = ic_decode_json_cart( ic_cart_get( $cart ) );
 			}
-			/* else if ( isset( $_POST[ 'current_product' ] ) ) {
-			  $product_id	 = intval( $_POST[ 'current_product' ] );
-			  $quantity	 = 1;
-			  if ( $_POST[ 'current_quantity' ] ) {
-			  $quantity = intval( $_POST[ 'current_quantity' ] );
-			  }
-			  $cart_content = ic_cart_insert( $product_id, $quantity, 'cart_content' );
-			  } else {
-			  $cart_content = ic_cart_get( 'cart_content' );
-			  } */
-			//$cart_content	 = implode( ',', array_filter( explode( ',', $cart_content ) ) );
-			$cart_content = array_filter( $cart_content );
-			$cart_content = $this->filter( $cart_content, null, $cart );
-			if ( ! isset( $_POST['cart_type'] ) && $save_cart ) {
-				//$_SESSION[ $cart ] = ic_encode_string_cart( $cart_content );
+			/*
+			else if ( isset( $_POST[ 'current_product' ] ) ) {
+				$product_id    = intval( $_POST[ 'current_product' ] );
+				$quantity  = 1;
+				if ( $_POST[ 'current_quantity' ] ) {
+				$quantity = intval( $_POST[ 'current_quantity' ] );
+				}
+				$cart_content = ic_cart_insert( $product_id, $quantity, 'cart_content' );
+				} else {
+				$cart_content = ic_cart_get( 'cart_content' );
+				} */
+			// $cart_content  = implode( ',', array_filter( explode( ',', $cart_content ) ) );
+			$cart_content              = array_filter( $cart_content );
+			$cart_content              = $this->filter( $cart_content, null, $cart );
+				$persist_checkout_cart = isset( $_POST['cart_type'] ) && isset( $_POST[ $cart ] );
+			if ( $save_cart && ( ! isset( $_POST['cart_type'] ) || $persist_checkout_cart ) ) {
+				// $_SESSION[ $cart ] = ic_encode_string_cart( $cart_content );
 				ic_cart_save( ic_encode_string_cart( $cart_content ), $cart );
-				//session_write_close();
+				// session_write_close();
 			}
 			if ( $json ) {
 				$cart_content      = ic_encode_string_cart( $cart_content );
@@ -443,6 +452,107 @@ class ic_cart {
 		}
 
 		return $cart_content;
+	}
+
+	/**
+	 * Returns submitted cart content for active checkout submit requests.
+	 *
+	 * @param string|null $cart Cart bucket name.
+	 *
+	 * @return string|null
+	 */
+	function submitted_content( $cart = null ) {
+		if ( empty( $cart ) || ! is_string( $cart ) ) {
+			return null;
+		}
+
+		$cart    = sanitize_key( $cart );
+		$sources = array();
+
+		if ( function_exists( 'get_submitted_form_submit_name' ) && function_exists( 'get_submitted_form_content_name' ) ) {
+			$submit_name = sanitize_key( get_submitted_form_submit_name() );
+			$cart_name   = sanitize_key( get_submitted_form_content_name() );
+			if ( ! empty( $submit_name ) && ! empty( $cart_name ) ) {
+				$sources[] = array(
+					'submit_name' => $submit_name,
+					'cart_name'   => $cart_name,
+				);
+			}
+		}
+		if ( 'quote_cart_content' === $cart ) {
+			$sources[] = array(
+				'submit_name' => 'quote_cart_submit',
+				'cart_name'   => 'quote_cart_content',
+			);
+		} elseif ( 'cart_content' === $cart ) {
+			$sources[] = array(
+				'submit_name' => 'cart_submit',
+				'cart_name'   => 'cart_content',
+			);
+		}
+
+		foreach ( $sources as $source ) {
+			if ( $cart !== $source['cart_name'] ) {
+				continue;
+			}
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Active checkout submit payload is read directly to avoid mutating session state during cart reads.
+			if ( ! empty( $_POST[ $source['submit_name'] ] ) && array_key_exists( $source['cart_name'], $_POST ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Active checkout submit payload is read directly to avoid mutating session state during cart reads.
+				return $this->sanitize_submitted_cart_content( $_POST[ $source['cart_name'] ] );
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Validates and sanitizes submitted checkout cart JSON.
+	 *
+	 * @param mixed $submitted_cart_source Raw submitted cart payload.
+	 *
+	 * @return string
+	 */
+	function sanitize_submitted_cart_content( $submitted_cart_source ) {
+		if ( ! is_scalar( $submitted_cart_source ) ) {
+			return '';
+		}
+
+		$submitted_cart_source = wp_unslash( (string) $submitted_cart_source );
+		if ( '' === $submitted_cart_source || ! is_ic_json_cart( $submitted_cart_source ) ) {
+			return '';
+		}
+
+		$submitted_cart = json_decode( $submitted_cart_source, true );
+		if ( ! is_array( $submitted_cart ) ) {
+			return '';
+		}
+
+		$sanitized_cart = array();
+		foreach ( $submitted_cart as $cart_id => $quantity ) {
+			$cart_id = (string) $cart_id;
+			if ( sanitize_text_field( $cart_id ) !== $cart_id ) {
+				continue;
+			}
+			if ( ! preg_match( '/^[A-Za-z0-9:_-]+$/', $cart_id ) ) {
+				continue;
+			}
+			if ( is_bool( $quantity ) || ! is_numeric( $quantity ) ) {
+				continue;
+			}
+
+			$quantity = absint( $quantity );
+			if ( empty( $quantity ) ) {
+				continue;
+			}
+
+			$sanitized_cart[ $cart_id ] = $quantity;
+		}
+
+		if ( empty( $sanitized_cart ) ) {
+			return '';
+		}
+
+		return wp_json_encode( $sanitized_cart );
 	}
 
 	function filter( $cart_content, $find_value = null, $cart = null ) {
@@ -483,11 +593,10 @@ class ic_cart {
 
 		return apply_filters( 'filter_ic_cart_empty', $cart_content );
 	}
-
 }
 
 global $ic_cart;
-$ic_cart = new ic_cart;
+$ic_cart = new ic_cart();
 
 function ic_cart_products( $raw = 1, $price = true, $cart = 'cart_content', $settings = null ) {
 	global $ic_cart;
@@ -507,7 +616,6 @@ if ( ! function_exists( 'get_shopping_cart_product_price' ) ) {
 
 function ic_cart_content( $json = null, $cart = 'cart_content' ) {
 	global $ic_cart;
-
 	return $ic_cart->content( $json, $cart );
 }
 
@@ -527,7 +635,7 @@ function ic_cart_products_array( $cart_content = null, $cart = null ) {
 	if ( ! empty( $cart_content ) ) {
 		if ( is_ic_json_cart( $cart_content ) ) {
 			$product_array = json_decode( $cart_content, true );
-		} else if ( ! is_array( $cart_content ) ) {
+		} elseif ( ! is_array( $cart_content ) ) {
 			$product_array = array_count_values( explode( ',', $cart_content ) );
 		}
 	} else {
@@ -549,15 +657,15 @@ function ic_decode_json_cart( $cart_content, $count = false, $filter = false ) {
 				$value = $ic_cart->filter( $json_content, $value );
 
 				/*
-				  for ( $i = 1; $i <= $quantity; $i++ ) {
-				  if ( !empty( $cart_content ) ) {
-				  $cart_content .= ',';
-				  }
-				  $cart_content .= $value;
-				  }
+					for ( $i = 1; $i <= $quantity; $i++ ) {
+					if ( !empty( $cart_content ) ) {
+					$cart_content .= ',';
+					}
+					$cart_content .= $value;
+					}
 				 */
 				$cart_content[ $value ] = $quantity;
-				$item_count             += $quantity;
+				$item_count            += $quantity;
 			}
 		} else {
 			$cart_content = $json_content;
@@ -568,7 +676,7 @@ function ic_decode_json_cart( $cart_content, $count = false, $filter = false ) {
 			$temp_content['count']   = $item_count;
 			$cart_content            = $temp_content;
 		}
-	} else if ( $count ) {
+	} elseif ( $count ) {
 		if ( ! is_array( $cart_content ) ) {
 			$cart_content = array();
 		}
@@ -610,7 +718,7 @@ if ( ! function_exists( 'cart_id_to_product_id' ) ) {
 			$temp       = explode( '::', $cart_id );
 			$temp       = explode( '_', $temp[1] );
 			$product_id = $temp[0];
-		} else if ( strpos( $cart_id, '_' ) !== false ) {
+		} elseif ( strpos( $cart_id, '_' ) !== false ) {
 			$temp       = explode( '_', $cart_id );
 			$product_id = $temp[0];
 		}

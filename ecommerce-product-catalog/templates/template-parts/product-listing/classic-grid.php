@@ -1,6 +1,12 @@
 <?php
+/**
+ * Classic grid template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -15,20 +21,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 $product               = ic_get_product_object();
 $classic_grid_settings = get_classic_grid_settings();
 ?>
-    <div class="archive-listing product-<?php echo $product->ID ?> classic-grid <?php echo product_class( $product->ID ) ?>">
-        <a href="<?php echo $product->url() ?>">
-            <div class="classic-grid-image-wrapper">
-                <div class="pseudo"></div>
-                <div class="image"><?php echo $product->listing_image_html() ?></div>
-            </div>
-            <h3 class="product-name"><?php echo $product->name() ?></h3><?php echo $product->archive_price_html() ?>
+	<div class="archive-listing product-<?php echo esc_attr( $product->ID ); ?> classic-grid <?php echo esc_attr( product_class( $product->ID ) ); ?>">
+		<a href="<?php echo esc_url( $product->url() ); ?>">
+			<div class="classic-grid-image-wrapper">
+				<div class="pseudo"></div>
+				<div class="image">
+				<?php
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				echo $product->listing_image_html();
+				?>
+				</div>
+			</div>
+			<h3 class="product-name"><?php echo esc_html( $product->name() ); ?></h3>
 			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			echo $product->archive_price_html();
+			?>
+			<?php
+			do_action( 'ic_product_listing_element_inside', $product->ID, $classic_grid_settings );
 			do_action( 'classic_grid_product_listing_element_inside', $product->ID, $classic_grid_settings );
 			?>
-        </a>
+		</a>
 		<?php
 		do_action( 'classic_grid_product_listing_element', $product->ID, $classic_grid_settings );
 		?>
-    </div>
+	</div>
 
 <?php

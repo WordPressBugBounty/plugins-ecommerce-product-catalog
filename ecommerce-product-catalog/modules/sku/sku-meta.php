@@ -24,7 +24,7 @@ function ic_sku_metabox( $product_details, $product_id, $field_name = '_sku', $s
 		if ( $sku === null ) {
 			$sku = get_product_sku( $product_id );
 		}
-		$single_names    = get_single_names();
+		$single_names     = get_single_names();
 		$product_details .= apply_filters( 'admin_sku_table', '<table><tr><td class="label-column">' . str_replace( ':', '', $single_names['product_sku'] ) . ':</td><td class="sku-column"><input type="text" name="' . $field_name . '" value="' . $sku . '" class="widefat" /></td></tr></table>', $product_id );
 	}
 

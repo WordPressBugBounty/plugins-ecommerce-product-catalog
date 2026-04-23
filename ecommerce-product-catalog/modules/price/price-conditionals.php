@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all product attributes are defined and managed.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/includes
+ * @author      impleCode
  */
 
 /**
@@ -20,7 +20,7 @@ if ( !defined( 'ABSPATH' ) ) {
  */
 function is_ic_price_enabled() {
 	$product_currency = get_currency_settings();
-	if ( $product_currency[ 'price_enable' ] == 'on' ) {
+	if ( $product_currency['price_enable'] == 'on' ) {
 		return true;
 	}
 	return apply_filters( 'is_ic_price_enabled', false );
@@ -28,13 +28,14 @@ function is_ic_price_enabled() {
 
 /**
  * Checks if product has price set
+ *
  * @param type $product_id
  * @return boolean
  */
 function has_product_price( $product_id = null ) {
-	$product_id	 = empty( $product_id ) ? get_the_ID() : $product_id;
-	$price		 = product_price( $product_id, 1 );
-	if ( !empty( $price ) ) {
+	$product_id = empty( $product_id ) ? get_the_ID() : $product_id;
+	$price      = product_price( $product_id, 1 );
+	if ( ! empty( $price ) ) {
 		return true;
 	}
 	return false;

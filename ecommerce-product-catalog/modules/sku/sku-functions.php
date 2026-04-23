@@ -17,7 +17,7 @@ add_action( 'product_details', 'show_sku', 8, 1 );
  * Shows product SKU table
  *
  * @param object $post
- * @param array $single_names
+ * @param array  $single_names
  */
 function show_sku( $product_id = false ) {
 	if ( is_object( $product_id ) && isset( $product_id->ID ) ) {
@@ -29,7 +29,7 @@ function show_sku( $product_id = false ) {
 /**
  * Returns sku table for product page
  *
- * @param int $product_id
+ * @param int   $product_id
  * @param array $single_names
  *
  * @return string
@@ -72,6 +72,6 @@ function ic_sku_structured_data( $product_id ) {
 		}
 	}
 	?>
-    "sku": "<?php echo $sku ?>",
+	"sku": "<?php echo $sku; ?>",
 	<?php
 }

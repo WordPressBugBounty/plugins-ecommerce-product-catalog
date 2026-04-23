@@ -16,10 +16,9 @@ add_action( 'wp', 'ic_shopping_cart_redirect_empty_cart' );
 
 /**
  * Redirect checkout to cart if cart empty
- *
  */
 function ic_shopping_cart_redirect_empty_cart() {
-	if ( current_user_can( "manage_product_settings" ) ) {
+	if ( current_user_can( 'manage_product_settings' ) ) {
 		return;
 	}
 	if ( is_ic_shopping_order() && ! is_ic_shopping_cart() && ! is_ic_ajax() ) {
@@ -35,7 +34,6 @@ add_action( 'init', 'ic_add_recent_new_product_in_cart', 5 );
 
 /**
  * Add recently added product to session
- *
  */
 function ic_add_recent_new_product_in_cart() {
 	if ( ! is_admin() ) {
@@ -47,7 +45,7 @@ function ic_add_recent_new_product_in_cart() {
 				$session['recent_cart_added'] = $product_id;
 				$variation_values             = get_product_variations_values( $product_id, true );
 				foreach ( $variation_values as $i => $variation ) {
-					$i ++;
+					++$i;
 					if ( ! empty( $_POST[ $i . '_variation_' . $product_id ] ) ) {
 						$session['recent_cart_added_variation'][ $i . '_variation_' . $product_id ] = sanitize_text_field( $_POST[ $i . '_variation_' . $product_id ] );
 					}
@@ -87,7 +85,7 @@ if ( ! function_exists( 'ic_payment_number_format' ) ) {
 
 	function ic_payment_number_format( $number ) {
 		if ( is_numeric( $number ) ) {
-			$number = number_format( floatval( $number ), 2, ".", "" );
+			$number = number_format( floatval( $number ), 2, '.', '' );
 		} else {
 			$number = 0;
 		}

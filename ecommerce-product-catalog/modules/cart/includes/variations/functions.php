@@ -19,7 +19,7 @@ function ic_get_post_product_variations( $_product_id ) {
 	$product_variations          = false;
 	if ( isset( $_POST[ '1_variation_' . $product_id ] ) && ! empty( $product_id ) && $product_variations_settings['count'] > 0 ) {
 		$product_variations = array();
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			if ( isset( $_POST[ $i . '_variation_' . $product_id ] ) && $_POST[ $i . '_variation_' . $product_id ] != '' ) {
 				$product_variations[] = strval( $_POST[ $i . '_variation_' . $product_id ] );
 			} else {
@@ -83,7 +83,7 @@ function ic_variations_number() {
 
 function ic_get_variation_label( $product_id, $var_num ) {
 	$variation_labels = get_product_variations_labels( $product_id );
-	$var_num --;
+	--$var_num;
 	$label = empty( $variation_labels[ $var_num ] ) ? '' : $variation_labels[ $var_num ];
 
 	return $label;
@@ -91,7 +91,7 @@ function ic_get_variation_label( $product_id, $var_num ) {
 
 function ic_get_variation_values( $product_id, $var_num ) {
 	$variation_values = get_product_variations_values( $product_id );
-	$var_num --;
+	--$var_num;
 	$values = empty( $variation_values[ $var_num ] ) ? array() : $variation_values[ $var_num ];
 
 	return $values;
@@ -109,15 +109,15 @@ function ic_show_add_to_cart_variations( $show, $product_id ) {
 		if ( empty( $prices ) ) {
 			return $show;
 		}
-		if ( ! in_array( "%", $mod_type ) ) {
+		if ( ! in_array( '%', $mod_type ) ) {
 			return true;
 		}
 		/*
-		  foreach ( $mod_type as $type ) {
-		  if ( $type === '=' ) {
-		  return true;
-		  }
-		  }
+			foreach ( $mod_type as $type ) {
+			if ( $type === '=' ) {
+			return true;
+			}
+			}
 		 *
 		 */
 	}
@@ -125,18 +125,18 @@ function ic_show_add_to_cart_variations( $show, $product_id ) {
 	return $show;
 }
 
-add_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
-add_filter( 'product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
+add_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
+add_filter( 'product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
 
 function ic_equal_variations_price_to_zero( $price, $product_id ) {
 	if ( $price === '' && ! is_ic_admin() && ic_is_variations_price_effect_active() ) {
-		remove_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
-		remove_filter( 'product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
+		remove_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
+		remove_filter( 'product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
 		if ( ic_show_add_to_cart_variations( false, $product_id ) ) {
 			$price = 0;
 		}
-		add_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
-		add_filter( 'product_price', 'ic_equal_variations_price_to_zero', 10, 2 );
+		add_filter( 'unfiltered_product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
+		add_filter( 'product_price', 'ic_equal_variations_price_to_zero', 9, 2 );
 	}
 
 	return $price;

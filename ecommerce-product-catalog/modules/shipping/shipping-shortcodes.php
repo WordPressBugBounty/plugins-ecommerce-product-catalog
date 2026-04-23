@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all product attributes are defined and managed.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/includes
+ * @author      impleCode
  */
 add_shortcode( 'product_shipping', 'ic_product_shipping' );
 
@@ -21,8 +21,11 @@ add_shortcode( 'product_shipping', 'ic_product_shipping' );
  * @return string
  */
 function ic_product_shipping( $atts ) {
-	$args = shortcode_atts( array(
-		'product' => get_the_ID(),
-	), $atts );
-	return get_shipping_options_table( $args[ 'product' ] );
+	$args = shortcode_atts(
+		array(
+			'product' => get_the_ID(),
+		),
+		$atts
+	);
+	return get_shipping_options_table( $args['product'] );
 }

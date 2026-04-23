@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product size template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -15,14 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 $product_id = ic_get_product_id();
 $size       = ic_get_product_size( $product_id );
 if ( is_ic_attributes_size_enabled() && ! empty( $size ) && is_string( $size ) ) {
-    ?>
+	?>
 
-    <table class="size-table">
-        <tr>
-            <td><?php echo ic_attributes_get_size_label() ?>:</td>
-            <td class="size-value"><?php echo $size ?></td>
-        </tr>
-    </table>
+	<table class="size-table">
+		<tr>
+			<td><?php echo esc_html( ic_attributes_get_size_label() ); ?>:</td>
+			<td class="size-value"><?php echo esc_html( $size ); ?></td>
+		</tr>
+	</table>
 
-    <?php
+	<?php
 }

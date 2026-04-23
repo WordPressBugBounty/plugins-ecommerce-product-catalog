@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here compatibility is defined and managed.
  *
- * @version		1.0.0
- * @package		digital-products-order/includes
- * @author 		Norbert Dreszer
+ * @version     1.0.0
+ * @package     digital-products-order/includes
+ * @author      Norbert Dreszer
  */
 add_filter( 'expected_order_amout', 'ic_discount_modify_expected_amount', 10, 3 );
 

@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Save cart individual product array
  *
- * @param int $_product_id
+ * @param int       $_product_id
  * @param array|int $cart_product Product array or quantity
- * @param string $cart
+ * @param string    $cart
  *
  * @return array
  */
@@ -30,7 +30,7 @@ function ic_cart_insert( $_product_id, $cart_product, $cart = 'cart_content' ) {
 		$product_array['qty'] = 1;
 		if ( is_array( $cart_product ) ) {
 			$product_array = $cart_product;
-		} else if ( is_int( $cart_product ) ) {
+		} elseif ( is_int( $cart_product ) ) {
 			$product_array['qty'] = $cart_product;
 		}
 		$product_id                  = apply_filters( 'ic_cart_insert_id', $product_id, $cart_content, $cart );
@@ -45,9 +45,9 @@ function ic_cart_insert( $_product_id, $cart_product, $cart = 'cart_content' ) {
 /**
  * Increase product quantity in cart
  *
- * @param int $product_id
+ * @param int    $product_id
  * @param string $cart
- * @param int $qty
+ * @param int    $qty
  *
  * @return array
  */
@@ -123,7 +123,7 @@ function ic_cart_save( $new_cart, $cart = 'cart_content' ) {
  * Add product(s) to cart
  *
  * @param array|string $insert
- * @param atring $cart
+ * @param atring       $cart
  */
 function ic_cart_products_array_save( $insert, $cart = 'cart_content' ) {
 	if ( is_array( $insert ) ) {
@@ -134,7 +134,7 @@ function ic_cart_products_array_save( $insert, $cart = 'cart_content' ) {
 		}
 
 		return ic_cart_save( $cart_content, $cart );
-	} else if ( is_int( $insert ) ) {
+	} elseif ( is_int( $insert ) ) {
 		$cart_id = apply_filters( 'ic_cart_insert_product_id', $insert );
 
 		return ic_cart_change_qty( $cart_id, $cart );

@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product category columns management.
+ *
+ * @package ecommerce-product-catalog/includes
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 /**
  * Manages product category columns
@@ -14,23 +20,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'al_product-cat_add_form', 'add_product_category_helper' );
 
 /**
- * Adds info box on product category page
- *
+ * Adds info box on product category page.
  */
 function add_product_category_helper() {
-	doc_helper( __( 'category', 'ecommerce-product-catalog' ), 'product-categories', 'left' );
+	ic_epc_doc_helper( __( 'category', 'ecommerce-product-catalog' ), 'product-categories', 'left' );
 }
 
 add_action( 'al_product-cat_edit_form', 'product_category_edit_form' );
 add_action( 'al_product-cat_add_form', 'product_category_edit_form' );
 
+/**
+ * Adds multipart form support to category forms.
+ */
 function product_category_edit_form() {
 	?>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            jQuery('#edittag').attr("enctype", "multipart/form-data").attr("encoding", "multipart/form-data");
-        });
-    </script>
+	<script type="text/javascript">
+		jQuery(document).ready(function () {
+			jQuery('#edittag').attr("enctype", "multipart/form-data").attr("encoding", "multipart/form-data");
+		});
+	</script>
 	<?php
 }
 
@@ -40,14 +48,17 @@ add_action( 'create_al_product-cat', 'save_product_cat_image' );
 /**
  * Saves category image assignment option
  *
- * @param int $term_id
+ * @param int $term_id Term ID.
  */
 function save_product_cat_image( $term_id ) {
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core term forms handle this admin request.
 	if ( isset( $_POST['product_cat_image'] ) ) {
 		if ( function_exists( 'update_term_meta' ) ) {
-			update_term_meta( $term_id, 'thumbnail_id', intval( $_POST['product_cat_image'] ) );
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core term forms handle this admin request.
+			update_term_meta( $term_id, 'thumbnail_id', intval( wp_unslash( $_POST['product_cat_image'] ) ) );
 		} else {
-			update_option( 'al_product_cat_image_' . $term_id, intval( $_POST['product_cat_image'] ) );
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core term forms handle this admin request.
+			update_option( 'al_product_cat_image_' . $term_id, intval( wp_unslash( $_POST['product_cat_image'] ) ) );
 		}
 		do_action( 'ic_save_product_category', $term_id );
 	}
@@ -58,7 +69,7 @@ add_action( 'delete_al_product-cat', 'delete_product_cat_image' );
 /**
  * Deletes category image assignmend from database
  *
- * @param int $term_id
+ * @param int $term_id Term ID.
  */
 function delete_product_cat_image( $term_id ) {
 	delete_option( 'al_product_cat_image_' . $term_id );
@@ -70,6 +81,11 @@ function delete_product_cat_image( $term_id ) {
 
 add_action( 'al_product-cat_add_form_fields', 'product_category_add_form_fields' );
 
+/**
+ * Renders category add form fields.
+ *
+ * @param WP_Term|object $field Current term-like field object.
+ */
 function product_category_add_form_fields( $field ) {
 	if ( isset( $field->term_id ) ) {
 		$cat_img_src = get_product_category_image_id( $field->term_id );
@@ -82,6 +98,11 @@ function product_category_add_form_fields( $field ) {
 
 add_action( 'al_product-cat_edit_form_fields', 'product_category_edit_form_fields' );
 
+/**
+ * Renders category edit form fields.
+ *
+ * @param WP_Term|object $field Current term-like field object.
+ */
 function product_category_edit_form_fields( $field ) {
 	if ( isset( $field->term_id ) ) {
 		$cat_img_src = get_product_category_image_id( $field->term_id );
@@ -90,7 +111,7 @@ function product_category_edit_form_fields( $field ) {
 	}
 	echo '<tr class="form-field">';
 	echo '<th scrope="row">';
-	echo __( 'Category Image', 'ecommerce-product-catalog' );
+	echo esc_html__( 'Category Image', 'ecommerce-product-catalog' );
 	echo '</td>';
 	echo '<td>';
 	implecode_upload_image( __( 'Category Image', 'ecommerce-product-catalog' ), 'product_cat_image', $cat_img_src, null, 'id' );
@@ -104,7 +125,7 @@ add_filter( 'manage_edit-al_product-cat_columns', 'product_cat_columns' );
 /**
  * Adds product category specific column names
  *
- * @param string $product_columns
+ * @param array $product_columns Existing columns.
  *
  * @return array
  */
@@ -130,9 +151,9 @@ add_action( 'manage_al_product-cat_custom_column', 'manage_product_category_colu
 /**
  * Adds product category specific column values
  *
- * @param type $depr
- * @param string $column_name
- * @param int $term_id
+ * @param string $depr Deprecated column content.
+ * @param string $column_name Column name.
+ * @param int    $term_id Term ID.
  */
 function manage_product_category_columns( $depr, $column_name, $term_id ) {
 	switch ( $column_name ) {
@@ -141,7 +162,7 @@ function manage_product_category_columns( $depr, $column_name, $term_id ) {
 			echo wp_get_attachment_image( $attachment_id, array( 40, 40 ) );
 			break;
 		case 'id':
-			echo $term_id;
+				echo esc_html( (string) $term_id );
 			break;
 
 		case 'shortcode':
@@ -160,7 +181,7 @@ function manage_product_category_columns( $depr, $column_name, $term_id ) {
 				$has_count = true;
 			}
 			if ( $has_count ) {
-				echo '[show_products category="' . $term_id . '"][show_categories include="' . $term_id . '"]';
+					echo esc_html( '[show_products category="' . $term_id . '"][show_categories include="' . $term_id . '"]' );
 			}
 			break;
 
@@ -172,7 +193,7 @@ function manage_product_category_columns( $depr, $column_name, $term_id ) {
 /**
  * Returns category image ID
  *
- * @param int $cat_id
+ * @param int $cat_id Category term ID.
  *
  * @return int
  */
@@ -201,6 +222,9 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 
 	add_action( 'al_product-cat_add_form_fields', 'ic_category_add_tinymce', 1, 0 );
 
+		/**
+		 * Adds TinyMCE to the add-category screen.
+		 */
 	function ic_category_add_tinymce() {
 		global $wp_filter;
 		$settings = array(
@@ -209,32 +233,37 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 			'editor_class'  => 'i18n-multilingual',
 		);
 		?>
-        <div class="form-field term-description-wrap">
-            <label for="tag-description"><?php _e( 'Description' ); ?></label>
-			<?php
-			wp_editor( '', 'html-tag-description', $settings );
-			ic_category_editor_word_count();
-			?>
-            <p><?php _e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
+		<div class="form-field term-description-wrap">
+				<label for="tag-description"><?php esc_html_e( 'Description' ); ?></label>
+		<?php
+		wp_editor( '', 'html-tag-description', $settings );
+		ic_category_editor_word_count();
+		?>
+				<p><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
 
-            <script type="text/javascript">
-                // Remove the non-html field
-                jQuery('textarea#tag-description').closest('.form-field').remove();
+			<script type="text/javascript">
+				// Remove the non-html field
+				jQuery('textarea#tag-description').closest('.form-field').remove();
 
-                jQuery(function () {
-                    // Trigger save
-                    jQuery('#addtag').on('mousedown', '#submit', function () {
-                        tinyMCE.triggerSave();
-                    });
-                });
+				jQuery(function () {
+					// Trigger save
+					jQuery('#addtag').on('mousedown', '#submit', function () {
+						tinyMCE.triggerSave();
+					});
+				});
 
-            </script>
-        </div>
+			</script>
+		</div>
 		<?php
 	}
 
 	add_action( 'al_product-cat_edit_form_fields', 'ic_category_edit_tinymce', 0, 1 );
 
+		/**
+		 * Adds TinyMCE to the edit-category screen.
+		 *
+		 * @param WP_Term|object $tag Current term object.
+		 */
 	function ic_category_edit_tinymce( $tag ) {
 		global $wp_filter;
 		if ( ! empty( $wp_filter['al_product-cat_edit_form_fields']->callbacks ) ) {
@@ -243,11 +272,10 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 				if ( ! empty( $value ) ) {
 					foreach ( $value as $sub_key => $val ) {
 						if ( ic_string_contains( $sub_key, 'category_description_editor' ) || ic_string_contains( $sub_key, 'tax_desc_wp_editor' ) ) {
-							/* Rank Math or SEO Press is doing the same */
+								/* Rank Math or SEO Press is doing the same. */
 							return;
 						}
 					}
-
 				}
 			}
 		}
@@ -258,35 +286,37 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 			'editor_class'  => 'i18n-multilingual',
 		);
 		?>
-        <tr class="form-field term-description-wrap">
-            <th scope="row"><label for="description"><?php _e( 'Description' ); ?></label></th>
-            <td>
-				<?php
-				wp_editor( htmlspecialchars_decode( $tag->description ), 'html-tag-description', $settings );
-				ic_category_editor_word_count();
-				?>
-                <p class="description"><?php _e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
-            </td>
-            <script type="text/javascript">
-                // Remove the non-html field
-                jQuery('textarea#description').closest('.form-field').remove();
-            </script>
-        </tr>
+			<tr class="form-field term-description-wrap">
+				<th scope="row"><label for="description"><?php esc_html_e( 'Description' ); ?></label></th>
+			<td>
+			<?php
+			wp_editor( htmlspecialchars_decode( $tag->description ), 'html-tag-description', $settings );
+			ic_category_editor_word_count();
+			?>
+					<p class="description"><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
+			</td>
+			<script type="text/javascript">
+				// Remove the non-html field
+				jQuery('textarea#description').closest('.form-field').remove();
+			</script>
+		</tr>
 		<?php
 	}
 
+		/**
+		 * Outputs the category editor word count container.
+		 */
 	function ic_category_editor_word_count() {
 		?>
-        <div id="post-status-info">
-            <div id="description-word-count" class="hide-if-no-js" style="padding: 5px 10px;">
-				<?php
-				printf(
-					__( 'Word count: %s' ), '<span class="word-count">0</span>'
-				);
-				?>
-            </div>
-        </div>
-		<?php
+		<div id="post-status-info">
+				<div id="description-word-count" class="hide-if-no-js" style="padding: 5px 10px;">
+					<?php
+						echo esc_html__( 'Word count:', 'ecommerce-product-catalog' );
+					?>
+					<span class="word-count">0</span>
+				</div>
+			</div>
+			<?php
 	}
 
 	add_action( 'admin_init', 'ic_category_remove_filters' );
@@ -294,6 +324,13 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 
 	add_filter( 'pre_insert_term', 'ic_category_remove_filters', 10, 2 );
 
+		/**
+		 * Removes restrictive filters from product category descriptions.
+		 *
+		 * @param int|string|null $term_id Current term ID or passthrough value.
+		 * @param string|null     $taxonomy Current taxonomy.
+		 * @return int|string|null
+		 */
 	function ic_category_remove_filters( $term_id = null, $taxonomy = null ) {
 		if ( empty( $taxonomy ) ) {
 			if ( ! empty( $term_id ) ) {
@@ -301,20 +338,29 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 				if ( ! empty( $term->taxonomy ) ) {
 					$taxonomy = $term->taxonomy;
 				}
-			} else if ( isset( $_GET['taxonomy'] ) && $_GET['taxonomy'] === 'al_product-cat' ) {
-				$taxonomy = $_GET['taxonomy'];
-			} else if ( isset( $_POST['action'] ) && $_POST['action'] === 'editedtag' && isset( $_POST['taxonomy'] ) && $_POST['taxonomy'] === 'al_product-cat' ) {
-				$taxonomy = $_POST['taxonomy'];
+			} else {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core taxonomy requests supply this admin state.
+				$get_taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_key( wp_unslash( $_GET['taxonomy'] ) ) : '';
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core taxonomy requests supply this admin state.
+				$post_action = isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '';
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core taxonomy requests supply this admin state.
+				$post_taxonomy = isset( $_POST['taxonomy'] ) ? sanitize_key( wp_unslash( $_POST['taxonomy'] ) ) : '';
+
+				if ( 'al_product-cat' === $get_taxonomy ) {
+					$taxonomy = $get_taxonomy;
+				} elseif ( 'editedtag' === $post_action && 'al_product-cat' === $post_taxonomy ) {
+					$taxonomy = $post_taxonomy;
+				}
 			}
 		}
 
-		if ( current_user_can( 'edit_product_categories' ) && ( isset( $taxonomy ) && $taxonomy === 'al_product-cat' ) ) {
+		if ( current_user_can( 'edit_product_categories' ) && isset( $taxonomy ) && 'al_product-cat' === $taxonomy ) {
 
-			/* Remove the filters which disallow HTML in term descriptions */
+			/* Remove the filters which disallow HTML in term descriptions. */
 			remove_filter( 'pre_term_description', 'wp_filter_kses' );
 			remove_filter( 'term_description', 'wp_kses_data' );
 
-			/* Add filters to disallow unsafe HTML tags */
+			/* Add filters to disallow unsafe HTML tags. */
 			if ( ! current_user_can( 'unfiltered_html' ) ) {
 				add_filter( 'pre_term_description', 'wp_kses_post' );
 				add_filter( 'term_description', 'wp_kses_post' );

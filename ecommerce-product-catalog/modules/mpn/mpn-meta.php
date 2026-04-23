@@ -24,7 +24,7 @@ function ic_mpn_metabox( $product_details, $product_id, $field_name = '_mpn', $m
 		if ( $mpn === null ) {
 			$mpn = get_product_mpn( $product_id );
 		}
-		$single_names    = get_single_names();
+		$single_names     = get_single_names();
 		$product_details .= apply_filters( 'admin_mpn_table', '<table><tr><td class="label-column">' . str_replace( ':', '', $single_names['product_mpn'] ) . ':</td><td class="mpn-column"><input type="text" name="' . $field_name . '" value="' . $mpn . '" class="widefat" /></td></tr></table>', $product_id );
 	}
 
@@ -45,5 +45,3 @@ function ic_save_product_mpn( $product_meta ) {
 
 	return $product_meta;
 }
-
-

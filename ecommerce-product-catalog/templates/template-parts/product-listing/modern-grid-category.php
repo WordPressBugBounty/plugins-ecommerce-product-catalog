@@ -1,6 +1,12 @@
 <?php
+/**
+ * Modern grid category template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -19,12 +25,16 @@ if ( empty( $product_cat ) ) {
 ?>
 
 
-    <div class="al_archive category-<?php echo $product_cat->term_id ?> modern-grid-element <?php echo design_schemes( 'box', 0 ) ?> <?php echo product_category_class( $product_cat->term_id ) ?>">
-        <a class="pseudo-a" href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>"></a>
-        <div class="pseudo"></div>
-        <a href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>"><?php echo ic_get_category_listing_image_html( $product_cat->term_id ) ?>
-            <h3 class="product-name <?php echo design_schemes( 'box', 0 ) ?>"><?php echo $product_cat->name ?></h3>
-        </a>
-    </div>
+	<div class="al_archive category-<?php echo esc_attr( $product_cat->term_id ); ?> modern-grid-element <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?> <?php echo esc_attr( product_category_class( $product_cat->term_id ) ); ?>">
+		<a class="pseudo-a" href="<?php echo esc_url( ic_get_category_url( $product_cat->term_id ) ); ?>"></a>
+		<div class="pseudo"></div>
+		<a href="<?php echo esc_url( ic_get_category_url( $product_cat->term_id ) ); ?>">
+		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		echo ic_get_category_listing_image_html( $product_cat->term_id );
+		?>
+			<h3 class="product-name <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?>"><?php echo esc_html( $product_cat->name ); ?></h3>
+		</a>
+	</div>
 
 <?php

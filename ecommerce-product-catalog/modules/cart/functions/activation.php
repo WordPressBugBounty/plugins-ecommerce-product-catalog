@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -9,9 +9,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all plugin activation functions are defined and managed.
  *
- * @version		1.0.0
- * @package		implecode-shopping-cart/functions
- * @author 		Norbert Dreszer
+ * @version     1.0.0
+ * @package     implecode-shopping-cart/functions
+ * @author      Norbert Dreszer
  */
 add_action( 'admin_init', 'ic_cart_add_customer_role' );
 

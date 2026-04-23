@@ -22,9 +22,12 @@ add_shortcode( 'product_attributes', 'ic_product_attributes' );
  * @return string
  */
 function ic_product_attributes( $atts ) {
-	$args       = shortcode_atts( array(
-		'product' => get_the_ID(),
-	), $atts );
+	$args       = shortcode_atts(
+		array(
+			'product' => get_the_ID(),
+		),
+		$atts
+	);
 	$product_id = intval( $args['product'] );
 	if ( empty( $product_id ) ) {
 		return '';
@@ -43,9 +46,12 @@ add_shortcode( 'product_weight', 'ic_product_weight_shortcode' );
  * @return string
  */
 function ic_product_weight_shortcode( $atts ) {
-	$args = shortcode_atts( array(
-		'product' => get_the_ID(),
-	), $atts );
+	$args = shortcode_atts(
+		array(
+			'product' => get_the_ID(),
+		),
+		$atts
+	);
 
 	$product_id = intval( $args['product'] );
 	if ( empty( $product_id ) ) {
@@ -65,9 +71,12 @@ add_shortcode( 'product_size', 'ic_product_size_shortcode' );
  * @return string
  */
 function ic_product_size_shortcode( $atts ) {
-	$args = shortcode_atts( array(
-		'product' => get_the_ID(),
-	), $atts );
+	$args = shortcode_atts(
+		array(
+			'product' => get_the_ID(),
+		),
+		$atts
+	);
 
 	$product_id = intval( $args['product'] );
 	if ( empty( $product_id ) ) {

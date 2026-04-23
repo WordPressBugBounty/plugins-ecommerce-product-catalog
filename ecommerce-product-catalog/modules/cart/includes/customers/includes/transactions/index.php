@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -11,8 +11,8 @@ if ( !defined( 'ABSPATH' ) ) {
  * Time: 14:45
  * Package: index.php
  */
-//require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/transactions-client-list.php');
-require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/transactions-customer.php');
-require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel.php');
-require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel-settings.php');
-require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel-security.php');
+// require_once(AL_CUSTOMERS_BASE_PATH . '/includes/transactions/transactions-client-list.php');
+require_once AL_CUSTOMERS_BASE_PATH . '/includes/transactions/transactions-customer.php';
+require_once AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel.php';
+require_once AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel-settings.php';
+require_once AL_CUSTOMERS_BASE_PATH . '/includes/transactions/customer-panel-security.php';

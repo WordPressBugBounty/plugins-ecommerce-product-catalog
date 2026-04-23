@@ -48,9 +48,8 @@ class ic_cart_checkout_form {
 	 */
 	static function add_checkout_hidden_fields( $content, $pre_name ) {
 		if ( $pre_name == 'cart_' ) {
-			$cart_content = '<input hidden type="hidden" name="cart_content" value=\'' . ic_shopping_cart_content() . '\'>';
-			$cart_type    = '<input hidden type="hidden" name="cart_type" value="order">';
-			$content      .= apply_filters( 'cart_mail_hidden_fields', $cart_content . $cart_type );
+			$cart_type = '<input hidden type="hidden" name="cart_type" value="order">';
+			$content  .= apply_filters( 'cart_mail_hidden_fields', $cart_type );
 		}
 
 		return $content;
@@ -65,7 +64,7 @@ class ic_cart_checkout_form {
 			$total_gross            = 0;
 			$total_tax              = 0;
 			$taxed                  = function_exists( 'is_ic_order_taxed' ) ? is_ic_order_taxed() : false;
-			//$currency_settings		 = get_currency_settings();
+			// $currency_settings         = get_currency_settings();
 			$tax_rate = function_exists( 'get_cart_tax_rate' ) ? get_cart_tax_rate() : 0;
 			foreach ( $products_array as $cart_id => $p_quantity ) {
 				$product_id            = cart_id_to_product_id( $cart_id );
@@ -73,7 +72,7 @@ class ic_cart_checkout_form {
 				$order['product_id'][] = $product_id;
 				$order['quantity'][]   = $p_quantity;
 				$order['cart_id'][]    = $cart_id;
-				//$product_price			 = apply_filters( 'shopping_cart_product_price', product_price( $product_id, 1 ), $cart_id, $p_quantity );
+				// $product_price             = apply_filters( 'shopping_cart_product_price', product_price( $product_id, 1 ), $cart_id, $p_quantity );
 				$product_net_price = get_shopping_cart_product_price( $product_id, $cart_id, $p_quantity );
 				$product_net_price = floatval( $product_net_price );
 
@@ -81,7 +80,7 @@ class ic_cart_checkout_form {
 					if ( is_ic_tax_included() ) {
 						$tax_rate_c    = $tax_rate['tax_rate'] / 100;
 						$taxed_product = $product_net_price;
-						//$product_net_price	 = ic_roundto( $product_net_price / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
+						// $product_net_price     = ic_roundto( $product_net_price / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
 						$product_net_price = $product_net_price / ( 1 + $tax_rate_c );
 						$product_tax       = $taxed_product - $product_net_price;
 						if ( function_exists( 'ic_tax_round_per_item' ) && ic_tax_round_per_item() ) {
@@ -99,7 +98,7 @@ class ic_cart_checkout_form {
 					if ( ! is_ic_tax_included() ) {
 						$taxed_product = $product_net_price + $product_tax;
 						$taxed_total   = $taxed_product * $p_quantity;
-						//$taxed_product	 = ic_roundto( $product_net_price + $product_tax, $tax_rate[ 'tax_rate_round' ] );
+						// $taxed_product     = ic_roundto( $product_net_price + $product_tax, $tax_rate[ 'tax_rate_round' ] );
 					}
 					$order['product_gross'][]       = ic_payment_number_format( $taxed_product );
 					$order['product_total_net'][]   = ic_payment_number_format( $product_total_net );
@@ -139,18 +138,21 @@ class ic_cart_checkout_form {
 
 		return $order;
 	}
-
 }
 
-$ic_cart_checkout_form = new ic_cart_checkout_form;
+$ic_cart_checkout_form = new ic_cart_checkout_form();
 
 class ic_cart_checkout_form_email {
 
 	function __construct() {
 		add_filter( 'ic_formbuilder_admin_email', array( $this, 'modify_admin_email' ), 5, 2 );
+		add_filter( 'ic_formbuilder_admin_email', array( $this, 'ensure_shipping_in_email' ), 7, 2 );
+		add_filter( 'ic_formbuilder_admin_email', array( $this, 'ensure_shipping_address_in_email' ), 8, 2 );
 		add_filter( 'ic_formbuilder_admin_email', 'strip_shortcodes', 99 );
 
 		add_filter( 'ic_formbuilder_user_email', array( $this, 'modify_user_email' ), 5, 2 );
+		add_filter( 'ic_formbuilder_user_email', array( $this, 'ensure_shipping_in_email' ), 7, 2 );
+		add_filter( 'ic_formbuilder_user_email', array( $this, 'ensure_shipping_address_in_email' ), 8, 2 );
 		add_filter( 'ic_formbuilder_user_email', 'strip_shortcodes', 99 );
 	}
 
@@ -171,8 +173,8 @@ class ic_cart_checkout_form_email {
 			$new_message = wpautop( $email_settings['admin_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
 			$order_data  = $this->products_summary( 'admin' );
-			//$order_data	 .= $p . trim( $message, "<br>" ) . $ep;
-			$order_data  .= $p . $message . $ep;
+			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
+			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
 			return $new_message;
@@ -198,14 +200,143 @@ class ic_cart_checkout_form_email {
 			$new_message = wpautop( $email_settings['user_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
 			$order_data  = $this->products_summary( 'user' );
-			//$order_data	 .= $p . trim( $message, "<br>" ) . $ep;
-			$order_data  .= $p . $message . $ep;
+			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
+			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
 			return $new_message;
 		}
 
 		return $message;
+	}
+
+	/**
+	 * Ensures selected shipping is present in notification templates.
+	 *
+	 * @param string $message Email message.
+	 * @param string $pre_name Form field prefix.
+	 *
+	 * @return string
+	 */
+	function ensure_shipping_in_email( $message, $pre_name ) {
+		if ( $pre_name !== 'cart_' ) {
+			return $message;
+		}
+
+		$shipping_line = $this->shipping_email_line( $pre_name );
+		if ( empty( $shipping_line['html'] ) ) {
+			return $message;
+		}
+
+		if ( strpos( $message, $shipping_line['plain'] ) !== false ) {
+			return $message;
+		}
+
+		if ( strpos( $message, '[payment_details]' ) !== false ) {
+			return str_replace( '[payment_details]', $shipping_line['html'] . '[payment_details]', $message );
+		}
+
+		return $message . $shipping_line['html'];
+	}
+
+	/**
+	 * Ensures selected shipping address is present in notification templates.
+	 *
+	 * @param string $message Email message.
+	 * @param string $pre_name Form field prefix.
+	 *
+	 * @return string
+	 */
+	function ensure_shipping_address_in_email( $message, $pre_name ) {
+		if ( $pre_name !== 'cart_' || strpos( $message, '[shipping_address]' ) !== false ) {
+			return $message;
+		}
+
+		$shipping_address = $this->shipping_address_email_block( $pre_name );
+		if ( empty( $shipping_address['html'] ) ) {
+			return $message;
+		}
+
+		if ( strpos( $message, $shipping_address['plain'] ) !== false ) {
+			return $message;
+		}
+
+		if ( strpos( $message, '[payment_details]' ) !== false ) {
+			return str_replace( '[payment_details]', $shipping_address['html'] . '[payment_details]', $message );
+		}
+
+		return $message . $shipping_address['html'];
+	}
+
+	/**
+	 * Returns selected shipping line for notification emails.
+	 *
+	 * @param string $pre_name Form field prefix.
+	 *
+	 * @return array
+	 */
+	function shipping_email_line( $pre_name = 'cart_' ) {
+		$shipping_label = '';
+		$shipping       = 0;
+
+		if ( function_exists( 'ic_count_shipping_cost_payment' ) ) {
+			ic_shopping_cart_content( true );
+			$shipping = ic_count_shipping_cost_payment( 0, $pre_name );
+			$labels   = function_exists( 'ic_get_order_shipping_labels' ) ? ic_get_order_shipping_labels( $pre_name ) : '';
+			if ( ! empty( $labels ) ) {
+				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' ) . ' (' . $labels . ')';
+			} elseif ( ! empty( $shipping ) ) {
+				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' );
+			}
+		}
+
+		if ( empty( $shipping_label ) ) {
+			return array(
+				'html'  => '',
+				'plain' => '',
+			);
+		}
+
+		$plain = $shipping_label . ': ' . price_format( $shipping );
+
+		return array(
+			'html'  => ic_email_paragraph() . $plain . ic_email_paragraph_end(),
+			'plain' => $plain,
+		);
+	}
+
+	/**
+	 * Returns selected shipping-address block for notification emails.
+	 *
+	 * @param string $pre_name Form field prefix.
+	 *
+	 * @return array
+	 */
+	function shipping_address_email_block( $pre_name = 'cart_' ) {
+		ic_shopping_cart_content( true );
+		$shipping_address = apply_filters( 'ic_notification_shipping_address', '', $pre_name );
+		if ( empty( $shipping_address ) ) {
+			return array(
+				'html'  => '',
+				'plain' => '',
+			);
+		}
+
+		$plain_address = trim( wp_strip_all_tags( str_replace( array( '<br />', '<br/>', '<br>' ), "\n", $shipping_address ) ) );
+		if ( '' === $plain_address ) {
+			return array(
+				'html'  => '',
+				'plain' => '',
+			);
+		}
+
+		$plain = __( 'Delivery:', 'ecommerce-product-catalog' ) . "\n" . $plain_address;
+		$html  = ic_email_paragraph( 'margin-bottom:0px;font-weight:bold;' ) . __( 'Delivery:', 'ecommerce-product-catalog' ) . ic_email_paragraph_end() . $shipping_address;
+
+		return array(
+			'html'  => $html,
+			'plain' => $plain,
+		);
 	}
 
 	/**
@@ -222,15 +353,17 @@ class ic_cart_checkout_form_email {
 		$pre_message    = '';
 		$line           = '<br>';
 		$total_net      = 0;
+		$shipping       = 0;
+		$shipping_label = '';
 		$td             = ic_email_table_td();
 		$etd            = ic_email_table_td_end();
-		$pre_message    .= ic_email_table();
-		$pre_message    .= ic_email_table_th();
+		$pre_message   .= ic_email_table();
+		$pre_message   .= ic_email_table_th();
 
 		$pre_message .= apply_filters( 'ic_cart_checkout_email_name_header', ic_email_table_td_first() . __( 'Product name', 'ecommerce-product-catalog' ) . ic_email_table_td_end(), $products_array );
 		if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
 			$single_names = get_single_names();
-			$pre_message  .= $td . str_replace( ':', '', $single_names['product_sku'] ) . $etd;
+			$pre_message .= $td . str_replace( ':', '', $single_names['product_sku'] ) . $etd;
 		}
 		$pre_message .= $td . __( 'Quantity', 'ecommerce-product-catalog' ) . $etd;
 		$pre_message .= $td . __( 'Price', 'ecommerce-product-catalog' ) . $etd;
@@ -239,17 +372,17 @@ class ic_cart_checkout_form_email {
 		global $ic_shopping_cart_totals;
 		$ic_shopping_cart_totals['total'] = 0;
 		foreach ( $products_array as $cart_id => $p_quantity ) {
-			$product_id  = cart_id_to_product_id( $cart_id );
+			$product_id   = cart_id_to_product_id( $cart_id );
 			$pre_message .= ic_email_table_tr();
 			$pre_message .= apply_filters( 'ic_cart_checkout_email_name_td', ic_email_table_td_first() . apply_filters( 'cart_email_product_name', html_entity_decode( get_the_title( $product_id ), ENT_QUOTES, get_bloginfo( 'charset' ) ), $product_id, $cart_id ) . ic_email_table_td_end(), $product_id );
 			if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
-				$sku         = get_product_sku( $product_id );
+				$sku          = get_product_sku( $product_id );
 				$pre_message .= $td . $sku . $etd;
 			}
 			$pre_message .= $td . $p_quantity . $etd;
-			//$product_price	 = apply_filters( 'shopping_cart_product_price', product_price( $product_id, 1 ), $cart_id, $p_quantity );
+			// $product_price     = apply_filters( 'shopping_cart_product_price', product_price( $product_id, 1 ), $cart_id, $p_quantity );
 			$product_price = get_shopping_cart_product_price( $product_id, $cart_id, $p_quantity );
-			$pre_message   .= $td . price_format( $product_price, 1, 0 ) . $etd;
+			$pre_message  .= $td . price_format( $product_price, 1, 0 ) . $etd;
 			$product_total = $product_price * $p_quantity;
 			ic_cart_update_tax( $product_id, $product_total, $p_quantity, $cart_id );
 			$pre_message                      .= $td . price_format( $product_total, 1, 0 ) . $etd;
@@ -258,8 +391,8 @@ class ic_cart_checkout_form_email {
 			$ic_shopping_cart_totals['total'] += $product_total;
 		}
 		$pre_message .= ic_email_table_end();
-		$p           = ic_email_paragraph();
-		$ep          = ic_email_paragraph_end();
+		$p            = ic_email_paragraph();
+		$ep           = ic_email_paragraph_end();
 		global $order_price_effect_data;
 		if ( isset( $order_price_effect_data ) && ! empty( $order_price_effect_data['message'] ) ) {
 			$pre_message .= $p . $order_price_effect_data['message'] . $ep;
@@ -269,38 +402,37 @@ class ic_cart_checkout_form_email {
 		}
 		if ( function_exists( 'ic_count_shipping_cost_payment' ) ) {
 			$shipping = ic_count_shipping_cost_payment( 0, 'cart_' );
-			if ( ! empty( $shipping ) ) {
-				$labels = ic_get_order_shipping_labels( 'cart_' );
-				if ( ! empty( $labels ) ) {
-					$labels = ' (' . $labels . ')';
-				}
-				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' ) . $labels;
+			$labels   = function_exists( 'ic_get_order_shipping_labels' ) ? ic_get_order_shipping_labels( 'cart_' ) : '';
+			if ( ! empty( $labels ) ) {
+				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' ) . ' (' . $labels . ')';
+			} elseif ( ! empty( $shipping ) ) {
+				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' );
 			}
 		}
 		if ( is_ic_order_taxed() ) {
-			//$currency_settings	 = get_currency_settings();
+			// $currency_settings     = get_currency_settings();
 			$total_tax = ic_cart_get_tax();
 			/*
-			  if ( !empty( $currency_settings[ 'tax_included' ] ) ) {
-			  $tax_rate	 = get_cart_tax_rate();
-			  $tax_rate_c	 = $tax_rate[ 'tax_rate' ] / 100;
-			  $total_net	 = ic_roundto( $total_net / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
-			  }
+				if ( !empty( $currency_settings[ 'tax_included' ] ) ) {
+				$tax_rate  = get_cart_tax_rate();
+				$tax_rate_c    = $tax_rate[ 'tax_rate' ] / 100;
+				$total_net     = ic_roundto( $total_net / (1 + $tax_rate_c), $tax_rate[ 'tax_rate_round' ] );
+				}
 			 *
 			 */
 			if ( is_ic_tax_included() ) {
 				$total_net = $total_net - $total_tax;
 			}
 			/*
-			  if ( !empty( $order_price_effect_data[ 'total' ] ) ) {
-			  $taxation_subect = $total_net - $order_price_effect_data[ 'total' ];
-			  } else {
-			  $taxation_subect = $total_net;
-			  }
+				if ( !empty( $order_price_effect_data[ 'total' ] ) ) {
+				$taxation_subect = $total_net - $order_price_effect_data[ 'total' ];
+				} else {
+				$taxation_subect = $total_net;
+				}
 			 *
 			 */
-			//$total_tax	 = ic_get_price_tax( $taxation_subect );
-			$order_total = $total_net + $total_tax + $shipping;
+			// $total_tax     = ic_get_price_tax( $taxation_subect );
+			$order_total  = $total_net + $total_tax + $shipping;
 			$pre_message .= $p . __( 'Total Net:', 'ecommerce-product-catalog' ) . ' ' . price_format( $total_net, 1, 0 ) . $ep;
 			$pre_message .= $p . __( 'Tax:', 'ecommerce-product-catalog' ) . ' ' . price_format( $total_tax, 1, 0 ) . $ep;
 			if ( ! empty( $shipping_label ) ) {
@@ -319,8 +451,7 @@ class ic_cart_checkout_form_email {
 
 		return $pre_message;
 	}
-
 }
 
 global $ic_cart_checkout_form_email;
-$ic_cart_checkout_form_email = new ic_cart_checkout_form_email;
+$ic_cart_checkout_form_email = new ic_cart_checkout_form_email();

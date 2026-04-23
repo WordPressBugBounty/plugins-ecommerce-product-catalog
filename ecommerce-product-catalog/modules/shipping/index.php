@@ -12,14 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package        ecommerce-product-catalog/includes
  * @author        impleCode
  */
-$dirname = dirname( __FILE__ );
+$dirname = __DIR__;
 
-require_once( $dirname . '/shipping-conditionals.php' );
-require_once( $dirname . '/shipping-functions.php' );
-require_once( $dirname . '/shipping-meta.php' );
-require_once( $dirname . '/shipping-settings.php' );
-require_once( $dirname . '/shipping-shortcodes.php' );
-require_once( $dirname . '/ext/index.php' );
-
-
-
+require_once $dirname . '/shipping-conditionals.php';
+require_once $dirname . '/shipping-functions.php';
+require_once $dirname . '/class-ic-shipping-address-form.php';
+require_once $dirname . '/shipping-meta.php';
+require_once $dirname . '/shipping-settings.php';
+require_once $dirname . '/shipping-shortcodes.php';
+require_once $dirname . '/ext/index.php';

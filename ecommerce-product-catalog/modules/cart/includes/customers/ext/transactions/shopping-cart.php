@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -24,13 +24,13 @@ class ic_customers_checkout {
 	 * Disables customer_email field to prevent logged user to change it
 	 *
 	 * @param string $attributes
-	 * @param type $field
-	 * @param type $pre_name
-	 * @param type $default_value
+	 * @param type   $field
+	 * @param type   $pre_name
+	 * @param type   $default_value
 	 * @return string
 	 */
 	function disable_email_field( $attributes, $field, $pre_name, $default_value ) {
-		if ( $field->cid == 'customer_email' && !empty( $default_value ) && is_ic_digital_customer() ) {
+		if ( $field->cid == 'customer_email' && ! empty( $default_value ) && is_ic_digital_customer() ) {
 			$attributes = ' readonly';
 		}
 		return $attributes;
@@ -56,7 +56,6 @@ class ic_customers_checkout {
 		}
 		return $redirect;
 	}
-
 }
 
-$ic_customers_checkout = new ic_customers_checkout;
+$ic_customers_checkout = new ic_customers_checkout();

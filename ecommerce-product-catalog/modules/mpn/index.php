@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,13 +8,12 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all plugin includes folder is defined and managed.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/includes
+ * @author      impleCode
  */
-$dirname = dirname( __FILE__ );
-require_once($dirname . '/mpn-functions.php');
-require_once($dirname . '/mpn-meta.php');
-require_once($dirname . '/mpn-settings.php');
-require_once($dirname . '/mpn-shortcodes.php');
-
+$dirname = __DIR__;
+require_once $dirname . '/mpn-functions.php';
+require_once $dirname . '/mpn-meta.php';
+require_once $dirname . '/mpn-settings.php';
+require_once $dirname . '/mpn-shortcodes.php';

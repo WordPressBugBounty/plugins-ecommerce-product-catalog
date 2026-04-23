@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -20,25 +20,24 @@ class ic_transaction_client_list {
 	}
 
 	function columns( $columns ) {
-		$columns[ 'products' ]	 = __( 'Products', 'ecommerce-product-catalog' );
-		$columns[ 'license' ]	 = __( 'License', 'ecommerce-product-catalog' );
-		$columns[ 'orders' ]	 = __( 'Orders', 'ecommerce-product-catalog' );
-		$columns[ 'total' ]		 = __( 'Total Spendings', 'ecommerce-product-catalog' );
+		$columns['products'] = __( 'Products', 'ecommerce-product-catalog' );
+		$columns['license']  = __( 'License', 'ecommerce-product-catalog' );
+		$columns['orders']   = __( 'Orders', 'ecommerce-product-catalog' );
+		$columns['total']    = __( 'Total Spendings', 'ecommerce-product-catalog' );
 		return $columns;
 	}
 
 	function data( $data, $customer_id ) {
-		$customer_transactions_urls	 = ic_get_user_urls( $customer_id, 'transaction_ids' );
-		$customer_products_urls		 = ic_get_user_urls( $customer_id, 'product_ids' );
-		$customer_license_url		 = ic_get_user_urls( $customer_id, 'customer_license_id' );
-		$total						 = ic_get_customer_total_spending( $customer_id );
-		$data[ 'products' ]			 = $customer_products_urls;
-		$data[ 'license' ]			 = $customer_license_url;
-		$data[ 'orders' ]			 = $customer_transactions_urls;
-		$data[ 'total' ]			 = $total;
+		$customer_transactions_urls = ic_get_user_urls( $customer_id, 'transaction_ids' );
+		$customer_products_urls     = ic_get_user_urls( $customer_id, 'product_ids' );
+		$customer_license_url       = ic_get_user_urls( $customer_id, 'customer_license_id' );
+		$total                      = ic_get_customer_total_spending( $customer_id );
+		$data['products']           = $customer_products_urls;
+		$data['license']            = $customer_license_url;
+		$data['orders']             = $customer_transactions_urls;
+		$data['total']              = $total;
 		return $data;
 	}
-
 }
 
-$ic_transaction_client_list = new ic_transaction_client_list;
+$ic_transaction_client_list = new ic_transaction_client_list();

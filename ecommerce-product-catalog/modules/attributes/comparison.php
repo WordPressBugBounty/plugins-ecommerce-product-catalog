@@ -26,7 +26,7 @@ class ic_attribute_comparison {
 		$products  = $this->products();
 		$shortcode = '';
 		if ( ! empty( $products ) && is_array( $products ) ) {
-			$rows      = $this->rows();
+			$rows       = $this->rows();
 			$shortcode .= '<div class="ic-comparison-table-container">';
 			$shortcode .= '<div class="table ic-comparison-table">';
 			foreach ( $rows as $row ) {
@@ -159,7 +159,6 @@ class ic_attribute_comparison {
 
 	/**
 	 * Registers advanced attributes settings
-	 *
 	 */
 	function register_setting() {
 		register_setting( 'product_attributes', 'ic_attributes_compare' );
@@ -172,11 +171,11 @@ class ic_attribute_comparison {
 			return;
 		}
 		?>
-        <div class="ic-compare-container">
-            <a class="button ic-compare-product" href="<?php echo $url ?>">
-                <span><?php echo $this->label() ?></span>
-            </a>
-        </div>
+		<div class="ic-compare-container">
+			<a class="button ic-compare-product" href="<?php echo $url; ?>">
+				<span><?php echo $this->label(); ?></span>
+			</a>
+		</div>
 		<?php
 	}
 
@@ -207,18 +206,18 @@ class ic_attribute_comparison {
 	function settings_page() {
 		$settings = $this->settings();
 		?>
-        <h3><?php _e( 'Comparison', 'ecommerce-product-catalog' ); ?></h3>
-        <table>
-            <tr>
-                <td><?php _e( 'Comparison Page', 'ecommerce-product-catalog' ) ?>:</td>
-                <td>
+		<h3><?php _e( 'Comparison', 'ecommerce-product-catalog' ); ?></h3>
+		<table>
+			<tr>
+				<td><?php _e( 'Comparison Page', 'ecommerce-product-catalog' ); ?>:</td>
+				<td>
 					<?php
 					ic_select_page( 'ic_attributes_compare[url]', __( 'Comparison Disabled', 'ecommerce-product-catalog' ), $settings['url'] );
 					?>
-                </td>
-            </tr>
-			<?php do_action( 'ic_comparison_settings_html', $settings ) ?>
-        </table>
+				</td>
+			</tr>
+			<?php do_action( 'ic_comparison_settings_html', $settings ); ?>
+		</table>
 		<?php
 	}
 
@@ -243,8 +242,7 @@ class ic_attribute_comparison {
 
 		return '';
 	}
-
 }
 
 global $ic_attribute_comparison;
-$ic_attribute_comparison = new ic_attribute_comparison;
+$ic_attribute_comparison = new ic_attribute_comparison();

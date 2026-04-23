@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product name template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -17,6 +23,6 @@ if ( ! function_exists( 'get_product_name' ) ) {
 }
 ?>
 
-    <h1 class="entry-title product-name"><?php echo get_product_name() ?></h1>
+	<h1 class="entry-title product-name"><?php echo esc_html( get_product_name() ); ?></h1>
 
 <?php

@@ -1,25 +1,28 @@
 <?php
+/**
+ * Product content helpers.
+ *
+ * @package Ecommerce_Product_Catalog
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
-
-/**
- * Manages product content functions
- *
- * Here all plugin content functions are defined and managed.
- *
- * @version        1.0.0
- * @package        ecommerce-product-catalog/functions
- * @author        impleCode
- */
 /* Classic List */
 
+/**
+ * Returns the truncated list description for a product.
+ *
+ * @param int|null    $post_id Optional. Product ID.
+ * @param string|null $shortdesc Optional. Raw short description.
+ *
+ * @return string
+ */
 function c_list_desc( $post_id = null, $shortdesc = null ) {
-	if ( $shortdesc == '' && ! empty( $post_id ) ) {
+	if ( '' === $shortdesc && ! empty( $post_id ) ) {
 		$shortdesc = clean_short_description( $post_id );
-	} else if ( ! empty( $shortdesc ) ) {
-		$shortdesc = strip_tags( $shortdesc );
+	} elseif ( ! empty( $shortdesc ) ) {
+		$shortdesc = wp_strip_all_tags( $shortdesc );
 		$shortdesc = trim( strip_shortcodes( $shortdesc ) );
 		$shortdesc = str_replace( array( "\r\n" ), ' ', $shortdesc );
 	} else {
@@ -36,15 +39,16 @@ function c_list_desc( $post_id = null, $shortdesc = null ) {
 }
 
 /**
- * Returns short description text without HTML
+ * Returns short description text without HTML.
  *
- * @param int $product_id
+ * @param int    $product_id Product ID.
+ * @param string $new_line Line break replacement.
  *
  * @return string
  */
 function clean_short_description( $product_id, $new_line = ' ' ) {
 	$shortdesc = get_product_short_description( $product_id );
-	$shortdesc = strip_tags( $shortdesc );
+	$shortdesc = wp_strip_all_tags( $shortdesc );
 	$shortdesc = trim( strip_shortcodes( $shortdesc ) );
 	$shortdesc = str_replace( array( "\r\n", "\r", "\n" ), $new_line, $shortdesc );
 
@@ -55,22 +59,23 @@ function clean_short_description( $product_id, $new_line = ' ' ) {
 add_action( 'single_product_end', 'add_back_to_products_url', 99, 2 );
 
 /**
+ * Outputs the back-to-products URL.
  *
- * @param object $post
- * @param array $single_names
- * @param string $taxonomies
+ * @param object $post Product post object.
+ * @param array  $single_names Product single labels.
  */
 function add_back_to_products_url( $post, $single_names ) {
 	$force_back_url = apply_filters( 'force_back_to_products_url', false );
 	if ( is_ic_product_listing_enabled() || $force_back_url ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 		echo get_back_to_products_url( $single_names );
 	}
 }
 
 /**
- * Returns back to products URL
+ * Returns back to products URL.
  *
- * @param array $v_single_names
+ * @param array|null $v_single_names Optional. Product single labels.
  *
  * @return string
  */
@@ -79,13 +84,11 @@ function get_back_to_products_url( $v_single_names = null ) {
 		$single_names = isset( $v_single_names ) ? $v_single_names : get_single_names();
 		$listing_url  = product_listing_url();
 		if ( ! empty( $listing_url ) ) {
-			$url = '<a class="back-to-products" href="' . product_listing_url() . '">' . $single_names['return_to_archive'] . '</a>';
+			$url = '<a class="back-to-products" href="' . esc_url( $listing_url ) . '">' . esc_html( $single_names['return_to_archive'] ) . '</a>';
 
 			return $url;
 		}
 	}
-
-	return;
 }
 
 /**
@@ -95,12 +98,17 @@ function product_search_form() {
 	$search_button_text = __( 'Search', 'ecommerce-product-catalog' );
 	$search_placeholder = ic_get_search_widget_placeholder();
 	echo '<form role="search" method="get" class="search-form product_search_form" action="' . esc_url( home_url( '/' ) ) . '">
-<input type="hidden" name="post_type" value="' . get_current_screen_post_type() . '" />
-<input class="product-search-box" type="search" value="' . get_search_query() . '" id="s" name="s" placeholder="' . $search_placeholder . '" />
+<input type="hidden" name="post_type" value="' . esc_attr( get_current_screen_post_type() ) . '" />
+<input class="product-search-box" type="search" value="' . get_search_query() . '" id="s" name="s" placeholder="' . esc_attr( $search_placeholder ) . '" />
 <input class="search-submit product-search-submit" type="submit" value="' . esc_attr( $search_button_text ) . '" />
 </form>';
 }
 
+/**
+ * Enqueues the main catalog frontend assets.
+ *
+ * @return void
+ */
 function ic_enqueue_main_catalog_js_css() {
 	$enqueued = ic_get_global( 'enqueued_main_js_css' );
 	if ( $enqueued ) {
@@ -118,22 +126,29 @@ function ic_enqueue_main_catalog_js_css() {
 
 add_action( 'ic_catalog_localize_scripts', 'ic_localize_main_catalog_js' );
 
+/**
+ * Localizes the main catalog script data.
+ *
+ * @return void
+ */
 function ic_localize_main_catalog_js() {
 	if ( ! function_exists( 'admin_url' ) ) {
 		return;
 	}
 	$colorbox_set = json_decode( apply_filters( 'colorbox_set', '{"transition": "elastic", "initialWidth": 200, "maxWidth": "90%", "maxHeight": "90%", "rel":"gal"}', ic_get_product_id() ) );
-	$localize     = apply_filters( 'ic_catalog_product_object_js', array(
-		'ajaxurl'             => admin_url( 'admin-ajax.php' ),
-		'post_id'             => ic_get_product_id(),
-		'lightbox_settings'   => $colorbox_set,
-		'filter_button_label' => __( 'Filter', 'ecommerce-product-catalog' ),
-		'design_schemes'      => design_schemes( 'box', 0 ),
-		'loading'             => get_site_url() . '/wp-includes/js/thickbox/loadingAnimation.gif',
-	) );
-	//if ( is_user_logged_in() ) {
+	$localize     = apply_filters(
+		'ic_catalog_product_object_js',
+		array(
+			'ajaxurl'             => admin_url( 'admin-ajax.php' ),
+			'post_id'             => ic_get_product_id(),
+			'lightbox_settings'   => $colorbox_set,
+			'filter_button_label' => __( 'Filter', 'ecommerce-product-catalog' ),
+			'design_schemes'      => design_schemes( 'box', 0 ),
+			'loading'             => get_site_url() . '/wp-includes/js/thickbox/loadingAnimation.gif',
+		)
+	);
+	// Keep the popup nonce available for frontend AJAX requests.
 	$localize['nonce'] = wp_create_nonce( 'ic-ajax-nonce' );
-	//}
 	wp_localize_script( 'al_product_scripts', 'product_object', $localize );
 }
 
@@ -141,19 +156,20 @@ if ( ! function_exists( 'ic_popup' ) ) {
 	/**
 	 * Renders a popup with customizable content, buttons, and classes.
 	 *
-	 * @param string $content The content to display in the popup.
-	 * @param string $class Optional. Additional CSS classes for the popup. Default is an empty string.
+	 * @param string            $content The content to display in the popup.
+	 * @param string            $class Optional. Additional CSS classes for the popup. Default is an empty string.
 	 * @param string|array|null $ok_url Optional. URL or array of buttons for the "OK" action. Default is null.
-	 * @param string $ok_label Optional. Label for the "OK" button. Default is an empty string.
-	 * @param string $cancel_label Optional. Label for the "Cancel" button. Default is an empty string.
-	 * @param string $ok_class Optional. CSS classes for the "OK" button. Default is 'ic-popup-ok'.
-	 * @param string $cancel_class Optional. CSS classes for the "Cancel" button. Default is 'ic-popup-cancel'.
-	 * @param array $additional_buttons Optional. Additional buttons to display in the popup. Default is an empty array.
+	 * @param string            $ok_label Optional. Label for the "OK" button. Default is an empty string.
+	 * @param string            $cancel_label Optional. Label for the "Cancel" button. Default is an empty string.
+	 * @param string            $ok_class Optional. CSS classes for the "OK" button. Default is 'ic-popup-ok'.
+	 * @param string            $cancel_class Optional. CSS classes for the "Cancel" button. Default is 'ic-popup-cancel'.
+	 * @param array             $additional_buttons Optional. Additional buttons to display in the popup. Default is an empty array.
+	 * @param bool              $show_by_default Optional. Whether to show the popup immediately. Default is false.
 	 *
 	 * @return void
 	 */
 	function ic_popup( $content, $class = '', $ok_url = null, $ok_label = '', $cancel_label = '', $ok_class = 'ic-popup-ok', $cancel_class = 'ic-popup-cancel', $additional_buttons = array(), $show_by_default = false ) {
-		$html = new ic_html_util;
+		$html = new IC_Html_Util();
 		if ( ! $show_by_default ) {
 			$class .= ' ic-hidden';
 		}
@@ -164,13 +180,16 @@ if ( ! function_exists( 'ic_popup' ) ) {
 			if ( empty( $cancel_label ) ) {
 				$cancel_label = __( 'Cancel', 'implecode-quote-cart' );
 			}
-			$buttons   = array_merge( array(
+			$buttons   = array_merge(
 				array(
-					'label' => $ok_label,
-					'class' => $ok_class,
-					'url'   => $ok_url
+					array(
+						'label' => $ok_label,
+						'class' => $ok_class,
+						'url'   => $ok_url,
+					),
 				),
-			), $additional_buttons );
+				$additional_buttons
+			);
 			$buttons[] = array(
 				'label' => $cancel_label,
 				'class' => 'ic-secondary-button ' . $cancel_class,
@@ -181,16 +200,21 @@ if ( ! function_exists( 'ic_popup' ) ) {
 					'class' => 'ic-secondary-button ic-popup-never-show',
 				);
 			}
-		} else if ( is_array( $ok_url ) ) {
+		} elseif ( is_array( $ok_url ) ) {
 			$buttons = $ok_url;
 		} else {
 			$buttons = '';
 		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 		echo $html->popup( $content, $buttons, $class );
 	}
 }
 if ( ! function_exists( 'create_ic_overlay' ) ) {
-
+	/**
+	 * Outputs the popup overlay container.
+	 *
+	 * @return void
+	 */
 	function create_ic_overlay() {
 		echo '<div id="ic_overlay" class="ic-overlay" style="display:none"></div>';
 	}
@@ -208,7 +232,11 @@ add_action( 'wp_ajax_nopriv_ic_user_hide_content', 'ic_hide_content_for_user' );
  * @return void Terminates script execution after processing the request.
  */
 function ic_hide_content_for_user() {
-	$popup_hash = isset( $_POST['hash'] ) ? $_POST['hash'] : '';
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) ) {
+		wp_die();
+	}
+	$popup_hash = isset( $_POST['hash'] ) ? sanitize_text_field( wp_unslash( $_POST['hash'] ) ) : '';
 	if ( ! empty( $popup_hash ) ) {
 		ic_user_hide_content( $popup_hash );
 	}
@@ -219,7 +247,7 @@ function ic_hide_content_for_user() {
 /**
  * Hides specific content for a user by adding the content hash to the user's hidden content metadata.
  *
- * @param string $content_hash The hash of the content to be hidden.
+ * @param string     $content_hash The hash of the content to be hidden.
  * @param int|string $user_id Optional. The ID of the user. Defaults to the current logged-in user's ID.
  *
  * @return void
@@ -266,7 +294,7 @@ function ic_user_hidden_content( $user_id ) {
 /**
  * Checks if the specified content is hidden for a given user.
  *
- * @param string $content_hash The unique identifier for the content being checked.
+ * @param string     $content_hash The unique identifier for the content being checked.
  * @param int|string $user_id Optional. The user ID. Defaults to the current user's ID.
  *
  * @return bool Returns true if the content is hidden for the user, false otherwise.
@@ -282,7 +310,7 @@ function ic_is_user_hidden_content( $content_hash, $user_id = '' ) {
 		return false;
 	}
 	$hidden_content = ic_user_hidden_content( $user_id );
-	if ( in_array( $content_hash, $hidden_content ) ) {
+	if ( in_array( $content_hash, $hidden_content, true ) ) {
 		return true;
 	}
 

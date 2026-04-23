@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
@@ -9,9 +9,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here shopping cart functions are defined and managed.
  *
- * @version		1.0.0
- * @package		implecode-quote-cart/includes
- * @author 		Norbert Dreszer
+ * @version     1.0.0
+ * @package     implecode-quote-cart/includes
+ * @author      Norbert Dreszer
  */
 add_filter( 'body_class', 'ic_cache_body_class' );
 
@@ -22,7 +22,7 @@ add_filter( 'body_class', 'ic_cache_body_class' );
  * @return string
  */
 function ic_cache_body_class( $classes ) {
-	if ( defined( 'WP_CACHE' ) && WP_CACHE && $_SERVER[ 'REQUEST_METHOD' ] !== 'POST' ) {
+	if ( defined( 'WP_CACHE' ) && WP_CACHE && $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 		$classes[] = 'ic_cache';
 	}
 	return $classes;

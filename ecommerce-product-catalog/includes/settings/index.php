@@ -1,26 +1,27 @@
 <?php
-
-if ( !defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
 /**
- * Manages product functions folder
+ * Loads the plugin settings layer.
  *
- * Here all plugin functions folder is defined and managed.
+ * The plugin settings folder is defined and managed here.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes/settings
- * @author 		impleCode
+ * @version 1.0.0
+ * @package ecommerce-product-catalog/includes/settings
+ * @author  impleCode
  */
-require_once(AL_BASE_PATH . '/includes/settings/settings-functions.php');
-require_once(AL_BASE_PATH . '/includes/settings/tooltips.php');
 
-require_once(AL_BASE_PATH . '/includes/settings/general.php' );
-//require_once(AL_BASE_PATH . '/includes/settings/attributes.php' );
-//require_once(AL_BASE_PATH . '/includes/settings/shipping.php' );
-require_once(AL_BASE_PATH . '/includes/settings/custom-design.php' );
-require_once(AL_BASE_PATH . '/includes/settings/custom-names.php' );
-require_once(AL_BASE_PATH . '/includes/settings/csv.php' );
-require_once(AL_BASE_PATH . '/includes/settings/image-sizes.php' );
-require_once(AL_BASE_PATH . '/includes/settings/extension-info.php' );
-require_once(AL_BASE_PATH . '/includes/settings/search.php' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+require_once AL_BASE_PATH . '/includes/settings/settings-functions.php';
+require_once AL_BASE_PATH . '/includes/settings/tooltips.php';
+
+require_once AL_BASE_PATH . '/includes/settings/general.php';
+// Attribute settings remain disabled in this bootstrap file.
+// Shipping settings remain disabled in this bootstrap file.
+require_once AL_BASE_PATH . '/includes/settings/custom-design.php';
+require_once AL_BASE_PATH . '/includes/settings/custom-names.php';
+require_once AL_BASE_PATH . '/includes/settings/csv.php';
+require_once AL_BASE_PATH . '/includes/settings/image-sizes.php';
+require_once AL_BASE_PATH . '/includes/settings/extension-info.php';
+require_once AL_BASE_PATH . '/includes/settings/search.php';

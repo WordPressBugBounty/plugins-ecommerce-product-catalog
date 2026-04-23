@@ -40,7 +40,8 @@ function ic_block_price_filter_localize( $localize ) {
 }
 
 
-register_block_type( __DIR__,
+register_block_type(
+	__DIR__,
 	array(
 		'title'           => __( 'Catalog Price Filter', 'ecommerce-product-catalog' ),
 		'render_callback' => 'ic_block_render_price_filter',

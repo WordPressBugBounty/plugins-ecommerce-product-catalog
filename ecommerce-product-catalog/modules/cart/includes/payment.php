@@ -69,7 +69,7 @@ class ic_cart_payments {
 	 */
 	function payment_options_html( $content, $pre_name ) {
 		if ( $pre_name == 'order_form_' || $pre_name == 'cart_' ) {
-			$payment_options = apply_filters( "payment_options", '' );
+			$payment_options = apply_filters( 'payment_options', '' );
 			if ( ! empty( $payment_options ) ) {
 				$content .= '<div class="form_section payment-options-section">';
 				$content .= '<div class="order_form_row row section_break"><h5 class="section-break"><strong>' . __( 'PAYMENT', 'ecommerce-product-catalog' ) . '</strong></h5></div>';
@@ -164,7 +164,6 @@ class ic_cart_payments {
 
 		return $status;
 	}
-
 }
 
-$ic_cart_payments = new ic_cart_payments;
+$ic_cart_payments = new ic_cart_payments();

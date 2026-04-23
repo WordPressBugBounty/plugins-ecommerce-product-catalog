@@ -17,6 +17,7 @@ if ( ! function_exists( 'ic_clear_variable' ) ) {
 
 	/**
 	 * For hooks to clear the output
+	 *
 	 * @return string
 	 */
 	function ic_clear_variable() {

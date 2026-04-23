@@ -1,6 +1,12 @@
 <?php
+/**
+ * Classic list category template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -17,7 +23,7 @@ if ( empty( $product_cat ) ) {
 	return;
 }
 
-if ( $product_cat->parent == 0 ) {
+if ( 0 === (int) $product_cat->parent ) {
 	$class = 'top-category';
 } else {
 	$class = 'child-category';
@@ -25,14 +31,24 @@ if ( $product_cat->parent == 0 ) {
 ?>
 
 
-    <div class="archive-listing category-<?php echo $product_cat->term_id ?> list <?php echo $class ?>">
-        <a href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>"><span class="div-link"></span></a>
-        <div class="classic-list-image-wrapper">
-            <div class="pseudo"></div><?php echo ic_get_category_listing_image_html( $product_cat->term_id ) ?></div>
-        <div class="product-name"><?php echo $product_cat->name ?></div>
-        <div class="product-short-descr">
-            <p><?php echo c_list_desc( null, $product_cat->description ) ?></p>
-        </div>
-    </div>
+	<div class="archive-listing category-<?php echo esc_attr( $product_cat->term_id ); ?> list <?php echo esc_attr( $class ); ?>">
+		<a href="<?php echo esc_url( ic_get_category_url( $product_cat->term_id ) ); ?>"><span class="div-link"></span></a>
+		<div class="classic-list-image-wrapper">
+			<div class="pseudo"></div>
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			echo ic_get_category_listing_image_html( $product_cat->term_id );
+			?>
+			</div>
+		<div class="product-name"><?php echo esc_html( $product_cat->name ); ?></div>
+		<div class="product-short-descr">
+			<p>
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			echo c_list_desc( null, $product_cat->description );
+			?>
+			</p>
+		</div>
+	</div>
 
 <?php

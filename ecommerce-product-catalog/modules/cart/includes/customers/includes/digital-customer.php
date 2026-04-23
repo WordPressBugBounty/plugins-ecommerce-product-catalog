@@ -18,15 +18,18 @@ add_shortcode( 'login_form', 'ic_digital_customer_login_form' );
  * Defines customer login form shortcode
  *
  * @param boolean $show
- * @param string $form_class
+ * @param string  $form_class
  * @param boolean $closer
- * @param string $title
- * @param string $desc
+ * @param string  $title
+ * @param string  $desc
  *
  * @return string
  */
 function ic_digital_customer_login_form(
-	$show = true, $form_class = 'login_form', $closer = false, $title = null,
+	$show = true,
+	$form_class = 'login_form',
+	$closer = false,
+	$title = null,
 	$desc = ''
 ) {
 	digital_customers_styles();
@@ -47,7 +50,7 @@ function ic_digital_customer_login_form(
 		'id_submit'      => 'wp-submit',
 		'remember'       => true,
 		'value_username' => '',
-		'value_remember' => false
+		'value_remember' => false,
 	);
 	$style              = '';
 	if ( ! $show ) {
@@ -57,7 +60,7 @@ function ic_digital_customer_login_form(
 	if ( is_user_logged_in() ) {
 		$class = 'logged';
 	}
-	$form = '<div class="' . $form_class . ' ' . $class . '" ' . $style . '>';
+	$form  = '<div class="' . $form_class . ' ' . $class . '" ' . $style . '>';
 	$form .= '<div class="inside_login ui-tabs">';
 	if ( $closer ) {
 		$form .= '<span class="closer"></span>';
@@ -77,7 +80,7 @@ function ic_digital_customer_login_form(
  * Shows customer login url
  *
  * @param boolean $echo
- * @param string $label
+ * @param string  $label
  *
  * @return string
  */
@@ -97,7 +100,7 @@ function ic_digital_customer_login_url( $echo = 1, $desc = '', $lower = false, $
 	$redirect = $panel_redirect ? $panel_url : ic_current_page_url();
 	$link     = $lower ? strtolower( wp_loginout( $redirect, false ) ) : wp_loginout( $redirect, false );
 	$return   = '<span class="login_button ' . $class . '">' . $button . $link . ' ' . $desc . '</span>';
-	$return   .= ic_digital_customer_login_form( false, 'login_form popup_login_form', true );
+	$return  .= ic_digital_customer_login_form( false, 'login_form popup_login_form', true );
 
 	return echo_ic_setting( $return, $echo );
 }
@@ -116,7 +119,7 @@ if ( ! function_exists( 'ic_current_page_url' ) ) {
 			} else {
 				return product_listing_url();
 			}
-		} else if ( isset( $_SERVER['HTTP_HOST'] ) ) {
+		} elseif ( isset( $_SERVER['HTTP_HOST'] ) ) {
 			$page_url = 'http';
 			if ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ) {
 				$page_url .= 's';

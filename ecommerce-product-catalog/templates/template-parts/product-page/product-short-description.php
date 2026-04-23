@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product short description template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -17,10 +23,11 @@ $shortdesc  = apply_filters( 'product_short_description', get_product_short_desc
 if ( ! empty( $shortdesc ) ) {
 	?>
 
-    <div class="shortdesc">
+	<div class="shortdesc">
 		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 		echo $shortdesc;
 		?>
-    </div>
+	</div>
 	<?php
 }

@@ -12,14 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package        implecode-quote-cart/includes
  * @author        Norbert Dreszer
  */
-require_once( dirname( __FILE__ ) . '/cart-conditionals.php' );
-require_once( dirname( __FILE__ ) . '/functions.php' );
-require_once( dirname( __FILE__ ) . '/ic_cached_cart.php' );
-require_once( dirname( __FILE__ ) . '/ic-cart.php' );
-require_once( dirname( __FILE__ ) . '/cart-info.php' );
-require_once( dirname( __FILE__ ) . '/ic-cart-ajax.php' );
+require_once __DIR__ . '/cart-conditionals.php';
+require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/ic_cached_cart.php';
+require_once __DIR__ . '/ic-cart.php';
+require_once __DIR__ . '/cart-info.php';
+require_once __DIR__ . '/ic-cart-ajax.php';
 if ( function_exists( 'is_ic_shipping_enabled' ) ) {
-	require_once( dirname( __FILE__ ) . '/cart-shipping.php' );
+	require_once __DIR__ . '/cart-shipping.php';
 }
-
-

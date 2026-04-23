@@ -39,8 +39,8 @@ if ( ! function_exists( 'ic_validate_payment_data' ) ) {
  * Verifies if payment amount is the same or more than expected amount
  *
  * @param array|int $item_id
- * @param float $payment_amount
- * @param string $payment_currency
+ * @param float     $payment_amount
+ * @param string    $payment_currency
  *
  * @return boolean
  */
@@ -50,22 +50,22 @@ function ic_verify_payment_price( $item_id, $payment_amount, $payment_currency, 
 	if ( ! is_array( $item_id ) ) {
 		$product_price  = product_price( $item_id, 'unfiltered' );
 		$expected_total = apply_filters( 'expected_order_amout', $product_price, $payment_amount, $item_id, $trans_id, $order_products );
-	} else if ( isset( $item_id[0]['product_id'] ) ) {
+	} elseif ( isset( $item_id[0]['product_id'] ) ) {
 		foreach ( $item_id as $product ) {
 			$product_price   = product_price( $product['product_id'], 'unfiltered' );
 			$expected_amount = apply_filters( 'expected_order_amout', $product_price, $payment_amount, $product['product_id'], $trans_id, $order_products );
-			$expected_total  += $expected_amount;
+			$expected_total += $expected_amount;
 		}
 	} else {
 		foreach ( $item_id as $product_id ) {
 			$product_price   = product_price( $product_id, 'unfiltered' );
 			$expected_amount = apply_filters( 'expected_order_amout', $product_price, $payment_amount, $product_id, $trans_id, $order_products );
-			$expected_total  += $expected_amount;
+			$expected_total += $expected_amount;
 		}
 	}
 	$expected_total = apply_filters( 'expected_total_amount', $expected_total, $trans_id );
 	if ( $expected_total - $payment_amount > 0.01 || strval( $expected_currency ) !== strval( $payment_currency ) ) {
-		//ic_send_error_message( 'error', 'expected ' . floatval( $expected_total ) . 'paid ' . floatval( $payment_amount ) . 'curr exp ' . $expected_currency . 'paid curr ' . $payment_currency );
+		// ic_send_error_message( 'error', 'expected ' . floatval( $expected_total ) . 'paid ' . floatval( $payment_amount ) . 'curr exp ' . $expected_currency . 'paid curr ' . $payment_currency );
 		return false;
 	}
 
@@ -81,7 +81,13 @@ function ic_digital_order_status( $trans_id ) {
 }
 
 function ic_create_digital_order() {
-	$order_id = wp_insert_post( array( 'post_type' => 'al_digital_orders', 'post_status' => 'publish' ), true );
+	$order_id = wp_insert_post(
+		array(
+			'post_type'   => 'al_digital_orders',
+			'post_status' => 'publish',
+		),
+		true
+	);
 
 	return $order_id;
 }
@@ -95,9 +101,9 @@ function ic_order_exists( $trans_id ) {
 		return $order_id;
 	}
 	global $wpdb;
-	$querystr = "SELECT wposts.*
-FROM " . $wpdb->posts . " AS wposts
-INNER JOIN " . $wpdb->postmeta . " AS wpostmeta
+	$querystr = 'SELECT wposts.*
+FROM ' . $wpdb->posts . ' AS wposts
+INNER JOIN ' . $wpdb->postmeta . " AS wpostmeta
 ON wpostmeta.post_id = wposts.ID
 AND wpostmeta.meta_key = '_order_id'
 AND wpostmeta.meta_value = '$trans_id'
@@ -111,12 +117,14 @@ AND wposts.post_status = 'publish'";
 
 			return $r->ID;
 		}
-
 	}
 }
 
 function ic_update_digital_order_status(
-	$payment_details, $order_products, $order_summary, $trans_id,
+	$payment_details,
+	$order_products,
+	$order_summary,
+	$trans_id,
 	$just_status = false
 ) {
 	$order_id     = ic_order_exists( $trans_id );
@@ -132,7 +140,7 @@ function ic_update_digital_order_status(
 		$prev_payment_details = get_post_meta( $order_id, '_payment_details', true );
 		$new_payment_details  = array_merge( $prev_payment_details, $payment_details );
 		update_post_meta( $order_id, '_payment_details', $new_payment_details );
-	} else if ( ! empty( $order_id ) ) {
+	} elseif ( ! empty( $order_id ) ) {
 		if ( ! is_email( $payment_details['shipping_email'] ) ) {
 			$prev_payment_details = get_post_meta( $order_id, '_payment_details', true );
 			if ( isset( $prev_payment_details['shipping_email'] ) && is_email( $prev_payment_details['shipping_email'] ) ) {

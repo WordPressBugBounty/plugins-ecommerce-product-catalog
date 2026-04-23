@@ -67,5 +67,5 @@ function ic_product_cart_added_info() {
 }
 
 function ic_product_cart_added_info_html( $class = '', $cart_page = '' ) {
-	return '<span class="al-box success cart-added-info ' . $class . '">' . sprintf( __( 'Added! %sSee your cart%s.', 'ecommerce-product-catalog' ), '<a href="' . $cart_page . '">', '</a>' ) . '</span>';
+	return '<span class="al-box success cart-added-info ' . $class . '">' . sprintf( __( 'Added! %1$sSee your cart%2$s.', 'ecommerce-product-catalog' ), '<a href="' . $cart_page . '">', '</a>' ) . '</span>';
 }

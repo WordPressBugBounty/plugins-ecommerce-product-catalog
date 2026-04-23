@@ -87,7 +87,7 @@ class ic_orders_columns {
 					foreach ( $manual_products['manual_product_ids'] as $product_id ) {
 						echo '<a href="' . ic_product_edit_url( $product_id ) . '">' . get_the_title( $product_id ) . '</a><br>';
 					}
-				} else if ( ! empty( $manual_products['custom_manual_products'] ) ) {
+				} elseif ( ! empty( $manual_products['custom_manual_products'] ) ) {
 					$manual_products['custom_manual_products'] = explode( ',', $manual_products['custom_manual_products'] );
 					foreach ( $manual_products['custom_manual_products'] as $product_name ) {
 						echo $product_name;
@@ -101,7 +101,6 @@ class ic_orders_columns {
 				break;
 		} // end switch
 	}
-
 }
 
-$ic_orders_columns = new ic_orders_columns;
+$ic_orders_columns = new ic_orders_columns();

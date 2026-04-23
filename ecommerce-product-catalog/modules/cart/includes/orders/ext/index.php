@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,10 +8,10 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all compatibility files are defined and managed.
  *
- * @version		1.0.0
- * @package		implecode-update-server/ext
- * @author 		Norbert Dreszer
+ * @version     1.0.0
+ * @package     implecode-update-server/ext
+ * @author      Norbert Dreszer
  */
 if ( defined( 'IC_PD_PLUGIN_BASE_URL' ) ) {
-	require_once(AL_PO_BASE_PATH . '/ext/product-discounts.php');
+	require_once AL_PO_BASE_PATH . '/ext/product-discounts.php';
 }

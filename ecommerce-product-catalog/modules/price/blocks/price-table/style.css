@@ -3,5 +3,5 @@
  * editor-specific styles using the same selectors will take precedence.
  */
 .ic-font-size-custom .price-value, .ic-font-size-custom .price-value.small-price {
-    font-size: inherit;
+	font-size: inherit;
 }

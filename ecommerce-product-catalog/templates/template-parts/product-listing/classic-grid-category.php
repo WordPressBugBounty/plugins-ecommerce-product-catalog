@@ -1,6 +1,12 @@
 <?php
+/**
+ * Classic grid category template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -21,14 +27,19 @@ $classic_grid_settings = get_classic_grid_settings();
 ?>
 
 
-    <div class="archive-listing category-<?php echo $product_cat->term_id ?> classic-grid <?php echo product_category_class( $product_cat->term_id ) ?>">
-        <a href="<?php echo ic_get_category_url( $product_cat->term_id ) ?>">
-            <div class="classic-grid-image-wrapper">
-                <div class="pseudo"></div>
-                <div class="image"><?php echo ic_get_category_listing_image_html( $product_cat->term_id ) ?></div>
-            </div>
-            <h3 class="product-name"><?php echo $product_cat->name ?></h3>
-        </a>
-    </div>
+	<div class="archive-listing category-<?php echo esc_attr( $product_cat->term_id ); ?> classic-grid <?php echo esc_attr( product_category_class( $product_cat->term_id ) ); ?>">
+		<a href="<?php echo esc_url( ic_get_category_url( $product_cat->term_id ) ); ?>">
+			<div class="classic-grid-image-wrapper">
+				<div class="pseudo"></div>
+				<div class="image">
+				<?php
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				echo ic_get_category_listing_image_html( $product_cat->term_id );
+				?>
+				</div>
+			</div>
+			<h3 class="product-name"><?php echo esc_html( $product_cat->name ); ?></h3>
+		</a>
+	</div>
 
 <?php

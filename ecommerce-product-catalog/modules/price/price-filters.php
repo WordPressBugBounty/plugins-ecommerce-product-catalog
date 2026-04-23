@@ -27,10 +27,10 @@ function ic_price_filter() {
 				$session['filters'] = array();
 			}
 			$session['filters']['min-price'] = $filter_value;
-		} else if ( isset( $session['filters']['min-price'] ) ) {
+		} elseif ( isset( $session['filters']['min-price'] ) ) {
 			unset( $session['filters']['min-price'] );
 		}
-	} else if ( isset( $session['filters']['min-price'] ) ) {
+	} elseif ( isset( $session['filters']['min-price'] ) ) {
 		unset( $session['filters']['min-price'] );
 	}
 	if ( isset( $_GET['max-price'] ) ) {
@@ -40,10 +40,10 @@ function ic_price_filter() {
 				$session['filters'] = array();
 			}
 			$session['filters']['max-price'] = $filter_value;
-		} else if ( isset( $session['filters']['max-price'] ) ) {
+		} elseif ( isset( $session['filters']['max-price'] ) ) {
 			unset( $session['filters']['max-price'] );
 		}
-	} else if ( isset( $session['filters']['max-price'] ) ) {
+	} elseif ( isset( $session['filters']['max-price'] ) ) {
 		unset( $session['filters']['max-price'] );
 	}
 	set_product_catalog_session( $session );
@@ -68,7 +68,7 @@ function ic_price_filter_apply( $query ) {
 				'key'     => apply_filters( 'ic_price_meta_name', '_price' ),
 				'compare' => '>=',
 				'value'   => $min_price,
-				'type'    => 'DECIMAL'
+				'type'    => 'DECIMAL',
 			);
 		}
 		$max_price = get_product_filter_value( 'max-price' );
@@ -80,16 +80,16 @@ function ic_price_filter_apply( $query ) {
 				'key'     => apply_filters( 'ic_price_meta_name', '_price' ),
 				'compare' => '<=',
 				'value'   => $max_price,
-				'type'    => 'DECIMAL'
+				'type'    => 'DECIMAL',
 			);
 		}
 		$query->set( 'meta_query', $metaquery );
 	}
 }
 
-//add_filter( 'shortcode_query', 'ic_price_filter_shortcode_apply' );
-//add_filter( 'home_product_listing_query', 'ic_price_filter_shortcode_apply' );
-//add_filter( 'category_count_query', 'ic_price_filter_shortcode_apply', 10, 2 );
+// add_filter( 'shortcode_query', 'ic_price_filter_shortcode_apply' );
+// add_filter( 'home_product_listing_query', 'ic_price_filter_shortcode_apply' );
+// add_filter( 'category_count_query', 'ic_price_filter_shortcode_apply', 10, 2 );
 add_filter( 'apply_shortcode_product_filters', 'ic_price_filter_shortcode_apply', 10, 2 );
 
 /**
@@ -115,7 +115,7 @@ function ic_price_filter_shortcode_apply( $shortcode_query, $taxonomy = null ) {
 				'key'     => apply_filters( 'ic_price_meta_name', '_price' ),
 				'compare' => '>=',
 				'value'   => $min_price,
-				'type'    => 'DECIMAL'
+				'type'    => 'DECIMAL',
 			);
 		}
 		if ( ! empty( $max_price ) ) {
@@ -126,7 +126,7 @@ function ic_price_filter_shortcode_apply( $shortcode_query, $taxonomy = null ) {
 				'key'     => apply_filters( 'ic_price_meta_name', '_price' ),
 				'compare' => '<=',
 				'value'   => $max_price,
-				'type'    => 'DECIMAL'
+				'type'    => 'DECIMAL',
 			);
 		}
 		$shortcode_query['meta_query'] = $metaquery;
@@ -147,8 +147,8 @@ function ic_catalog_price_filter_reset() {
 			$reset_url .= '#product_filters_bar';
 		}
 		?>
-        <a class="price-filter-reset"
-           href="<?php echo esc_url( $reset_url ) ?>"><?php _e( 'Reset', 'ecommerce-product-catalog' ) ?></a>
+		<a class="price-filter-reset"
+			href="<?php echo esc_url( $reset_url ); ?>"><?php _e( 'Reset', 'ecommerce-product-catalog' ); ?></a>
 		<?php
 	}
 }

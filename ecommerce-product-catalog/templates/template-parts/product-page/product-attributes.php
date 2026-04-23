@@ -1,6 +1,12 @@
 <?php
+/**
+ * Product attributes template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -27,33 +33,38 @@ if ( has_product_any_attributes( $product_id ) && function_exists( 'is_ic_attrib
 		$container_id = 'product_features';
 	}
 	?>
-    <div id="<?php echo $container_id ?>" class="product-features">
+	<div id="<?php echo esc_attr( $container_id ); ?>" class="product-features">
 		<?php if ( ! empty( $single_names['product_features'] ) ) { ?>
-            <h3 class="catalog-header"><?php echo $single_names['product_features'] ?></h3>
+			<h3 class="catalog-header"><?php echo esc_html( $single_names['product_features'] ); ?></h3>
 		<?php } ?>
-        <table class="features-table">
+		<table class="features-table">
 			<?php
-			for ( $i = 1; $i <= $attributes_number; $i ++ ) {
+			for ( $i = 1; $i <= $attributes_number; $i++ ) {
 				$attribute_value = get_attribute_value( $i, $product_id );
 				if ( ! empty( $attribute_value ) ) {
 					$label         = get_attribute_label( $i, $product_id );
 					$display_value = apply_filters( 'ic_catalog_attr_val_display', $attribute_value, $label, $i, $product_id );
 					$unit          = get_attribute_unit( $i, $product_id );
 					?>
-                    <tr>
-                        <td class="attribute-label-single <?php echo sanitize_title( $label . '-label' ) ?>"><?php echo $label ?></td>
-                        <td class="attribute-value-unit-single"><span
-                                    class="attribute-value-single <?php echo sanitize_title( $label . '-value' ) ?> <?php echo sanitize_title( $display_value ) ?>"><?php echo $display_value ?></span>
-                            <span
-                                    class="attribute-unit-single <?php echo sanitize_title( $label . '-unit' ) ?> <?php echo sanitize_title( $unit ) ?>"><?php echo $unit ?></span>
-                        </td>
-                    </tr>
+					<tr>
+						<td class="attribute-label-single <?php echo esc_attr( sanitize_title( $label . '-label' ) ); ?>"><?php echo esc_html( $label ); ?></td>
+						<td class="attribute-value-unit-single"><span
+									class="attribute-value-single <?php echo esc_attr( sanitize_title( $label . '-value' ) ); ?> <?php echo esc_attr( sanitize_title( $display_value ) ); ?>">
+									<?php
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+									echo $display_value;
+									?>
+									</span>
+							<span
+									class="attribute-unit-single <?php echo esc_attr( sanitize_title( $label . '-unit' ) ); ?> <?php echo esc_attr( sanitize_title( $unit ) ); ?>"><?php echo esc_html( $unit ); ?></span>
+						</td>
+					</tr>
 					<?php
 				}
 			}
 			do_action( 'ic_attributes_table', $product_id );
 			?>
-        </table>
-    </div>
+		</table>
+	</div>
 	<?php
 }

@@ -1,6 +1,12 @@
 <?php
+/**
+ * Modern grid template part.
+ *
+ * @package ecommerce-product-catalog
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -17,17 +23,23 @@ $modern_grid_settings = get_modern_grid_settings();
 ?>
 
 
-    <div class="al_archive product-<?php echo $product->ID ?> modern-grid-element <?php echo design_schemes( 'box', 0 ) ?> <?php echo product_class( $product->ID ) ?>">
-		<?php do_action( 'modern_grid_product_start', $product->ID, $modern_grid_settings ) ?>
-        <div class="pseudo"></div>
-        <a href="<?php echo $product->url() ?>"><?php echo $product->listing_image_html() ?>
-            <h3 class="product-name <?php echo design_schemes( 'box', 0 ) ?>"><?php echo wp_strip_all_tags( $product->name() ) ?></h3>
+	<div class="al_archive product-<?php echo esc_attr( $product->ID ); ?> modern-grid-element <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?> <?php echo esc_attr( product_class( $product->ID ) ); ?>">
+		<?php do_action( 'modern_grid_product_start', $product->ID, $modern_grid_settings ); ?>
+		<div class="pseudo"></div>
+		<a href="<?php echo esc_url( $product->url() ); ?>">
+		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		echo $product->listing_image_html();
+		?>
+			<h3 class="product-name <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?>"><?php echo esc_html( wp_strip_all_tags( $product->name() ) ); ?></h3>
 			<?php
+			do_action( 'ic_product_listing_element_inside', $product->ID, $modern_grid_settings );
 			do_action( 'modern_grid_entry_inside', $product->ID, $modern_grid_settings );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 			echo $product->archive_price_html();
 			?>
-        </a>
-		<?php do_action( 'modern_grid_product_end', $product->ID, $modern_grid_settings ) ?>
-    </div>
+		</a>
+		<?php do_action( 'modern_grid_product_end', $product->ID, $modern_grid_settings ); ?>
+	</div>
 
 <?php

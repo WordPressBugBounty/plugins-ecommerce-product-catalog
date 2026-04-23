@@ -1,24 +1,51 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
-
-/*
+/**
+ * Sitewide bar integration.
  *
- *
- *
- *
- *  @version       1.0.0
- *  @package       responsive-bar
- *  @author        impleCode
-
+ * @package responsive-bar
  */
 
-class ic_sitewide_bar {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
-	private $display = '', $search = '', $catalog = '', $search_type = '';
+/**
+ * Handles sitewide catalog bar rendering and settings.
+ */
+class IC_Sitewide_Bar {
 
-	function __construct() {
+	/**
+	 * Icons display mode.
+	 *
+	 * @var string
+	 */
+	private $display = '';
+
+	/**
+	 * Search icon display flag.
+	 *
+	 * @var string
+	 */
+	private $search = '';
+
+	/**
+	 * Catalog icon display flag.
+	 *
+	 * @var string
+	 */
+	private $catalog = '';
+
+	/**
+	 * Search icon mode.
+	 *
+	 * @var string
+	 */
+	private $search_type = '';
+
+	/**
+	 * Hooks the sitewide bar integrations.
+	 */
+	public function __construct() {
 		add_action( 'wp_footer', array( $this, 'show' ) );
 		add_filter( 'wp_nav_menu_items', array( $this, 'show' ), 99, 2 );
 
@@ -37,12 +64,22 @@ class ic_sitewide_bar {
 		add_action( 'wp', array( $this, 'init' ) );
 	}
 
-	function enqueue() {
+	/**
+	 * Enqueues frontend styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue() {
 		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_style( 'al_product_styles' );
 	}
 
-	function init() {
+	/**
+	 * Loads the current design scheme settings.
+	 *
+	 * @return void
+	 */
+	public function init() {
 		$design_schemes    = ic_get_design_schemes();
 		$this->display     = $design_schemes['icons_display'];
 		$this->search      = $design_schemes['icons_display_search'];
@@ -50,13 +87,20 @@ class ic_sitewide_bar {
 		$this->search_type = $design_schemes['icons_search'];
 	}
 
-	function show( $nav_menu = null, $args = null ) {
+	/**
+	 * Outputs the sitewide bar in supported menu locations.
+	 *
+	 * @param string|null $nav_menu Existing menu HTML.
+	 * @param object|null $args     Menu arguments.
+	 * @return string|null
+	 */
+	public function show( $nav_menu = null, $args = null ) {
 		if ( ! $this->is_displayed() ) {
 			return $nav_menu;
 		}
 		if ( ! empty( $nav_menu ) && ! empty( $args ) ) {
 
-			if ( ( ! ic_string_contains( $args->theme_location, 'primary' ) && ! ic_string_contains( $args->theme_location, 'main' ) ) || $this->display !== 'all' ) {
+			if ( ( ! ic_string_contains( $args->theme_location, 'primary' ) && ! ic_string_contains( $args->theme_location, 'main' ) ) || 'all' !== $this->display ) {
 				return $nav_menu;
 			}
 
@@ -66,7 +110,12 @@ class ic_sitewide_bar {
 		return $nav_menu;
 	}
 
-	function icons() {
+	/**
+	 * Builds the sitewide icons markup.
+	 *
+	 * @return string
+	 */
+	public function icons() {
 		ob_start();
 		echo '<div id="ic-catalog-menu-bar">';
 		ic_show_template_file( 'sitewide-icons/icon-bar.php' );
@@ -75,26 +124,43 @@ class ic_sitewide_bar {
 		return ob_get_clean();
 	}
 
-	function icon_container( $content, $class = '' ) {
+	/**
+	 * Outputs an icon container.
+	 *
+	 * @param string $content   Icon HTML content.
+	 * @param string $css_class Optional container class.
+	 * @return void
+	 */
+	public function icon_container( $content, $css_class = '' ) {
 		if ( empty( $content ) ) {
 			return;
 		}
 		if ( is_custom_product_listing_page() ) {
-			if ( ! empty( $class ) ) {
-				$class .= ' ';
+			if ( ! empty( $css_class ) ) {
+				$css_class .= ' ';
 			}
-			$class .= 'current-menu-item';
+			$css_class .= 'current-menu-item';
 		}
 		?>
-        <div class="ic-bar-icon <?php echo $class ?>">
+		<div class="ic-bar-icon <?php echo esc_attr( $css_class ); ?>">
 			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 			echo $content;
 			?>
-        </div>
+		</div>
 		<?php
 	}
 
-	function icon( $url, $icon, $content = null, $container_class = '' ) {
+	/**
+	 * Builds a single icon link.
+	 *
+	 * @param string      $url             Icon URL or HTML content.
+	 * @param string      $icon            Icon class suffix.
+	 * @param string|null $content         Optional hidden content.
+	 * @param string      $container_class Optional container class.
+	 * @return void
+	 */
+	public function icon( $url, $icon, $content = null, $container_class = '' ) {
 		if ( empty( $url ) || empty( $icon ) ) {
 			return;
 		}
@@ -107,7 +173,7 @@ class ic_sitewide_bar {
 		if ( ! empty( $content ) ) {
 			$class .= ' ic-show-content';
 		}
-		$icon_content = '<a class="ic-icon-url' . $class . '" href="' . $url . '">';
+		$icon_content  = '<a class="ic-icon-url' . $class . '" href="' . $url . '">';
 		$icon_content .= '<span class="' . $this->icons_type() . $icon . '"></span>';
 		$icon_content .= '</a>';
 		if ( ! empty( $content ) ) {
@@ -116,27 +182,45 @@ class ic_sitewide_bar {
 		$this->icon_container( $icon_content, $container_class );
 	}
 
-	function text( $text, $class = '' ) {
+	/**
+	 * Outputs text inside the sitewide bar.
+	 *
+	 * @param string $text      Text or trusted HTML content.
+	 * @param string $css_class Optional text class suffix.
+	 * @return void
+	 */
+	public function text( $text, $css_class = '' ) {
 		if ( empty( $text ) ) {
 			return;
 		}
-		if ( ! empty( $class ) ) {
-			$class = 'ic-bar-text-' . $class;
+		if ( ! empty( $css_class ) ) {
+			$css_class = 'ic-bar-text-' . $css_class;
 		}
 		?>
-        <div class="ic-bar-text <?php echo $class ?>">
+		<div class="ic-bar-text <?php echo esc_attr( $css_class ); ?>">
 			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
 			echo $text;
 			?>
-        </div>
+		</div>
 		<?php
 	}
 
-	function icons_type() {
+	/**
+	 * Returns the icon class prefix.
+	 *
+	 * @return string
+	 */
+	public function icons_type() {
 		return apply_filters( 'ic_catalog_bar_icons_type', 'dashicons dashicons-' );
 	}
 
-	function listing() {
+	/**
+	 * Outputs the listing icon when enabled.
+	 *
+	 * @return void
+	 */
+	public function listing() {
 		if ( ! is_ic_product_listing_enabled() ) {
 			return;
 		}
@@ -150,7 +234,12 @@ class ic_sitewide_bar {
 		}
 	}
 
-	function search() {
+	/**
+	 * Outputs the search icon when enabled.
+	 *
+	 * @return void
+	 */
+	public function search() {
 		if ( ! empty( $this->search ) ) {
 			return;
 		}
@@ -164,27 +253,45 @@ class ic_sitewide_bar {
 		}
 	}
 
-	static function box_class( $class ) {
-		if ( ! empty( $class ) ) {
-			$class .= ' ';
+	/**
+	 * Adds the design scheme box class to the search widget.
+	 *
+	 * @param string $box_class Existing search widget classes.
+	 * @return string
+	 */
+	public static function box_class( $box_class ) {
+		if ( ! empty( $box_class ) ) {
+			$box_class .= ' ';
 		}
-		$class .= design_schemes( 'box', 0 );
+		$box_class .= design_schemes( 'box', 0 );
 
-		return $class;
+		return $box_class;
 	}
 
-	function register_block() {
-		register_block_type( __DIR__ . '/blocks/sitewide-icons/',
+	/**
+	 * Registers the sitewide icons block.
+	 *
+	 * @return void
+	 */
+	public function register_block() {
+		register_block_type(
+			__DIR__ . '/blocks/sitewide-icons/',
 			array(
 				'render_callback' => array( $this, 'icons' ),
 			)
 		);
 	}
 
-	function settings( $design_schemes ) {
+	/**
+	 * Outputs the design settings fields.
+	 *
+	 * @param array $design_schemes Current design settings.
+	 * @return void
+	 */
+	public function settings( $design_schemes ) {
 		?>
-        <h3><?php _e( 'Sitewide Icons', 'ecommerce-product-catalog' ); ?></h3>
-        <table>
+		<h3><?php esc_html_e( 'Sitewide Icons', 'ecommerce-product-catalog' ); ?></h3>
+		<table>
 			<?php
 			implecode_settings_radio( __( 'Icons Display', 'ecommerce-product-catalog' ), 'design_schemes[icons_display]', $design_schemes['icons_display'], $this->icons_display_options() );
 			implecode_settings_checkbox( __( 'Hide Catalog Icon', 'ecommerce-product-catalog' ), 'design_schemes[icons_display_catalog]', $design_schemes['icons_display_catalog'] );
@@ -192,11 +299,16 @@ class ic_sitewide_bar {
 			implecode_settings_radio( __( 'Search Icon', 'ecommerce-product-catalog' ), 'design_schemes[icons_search]', $design_schemes['icons_search'], $this->icons_search_options() );
 			do_action( 'ic_catalog_sitewide_icons_settings_html', $design_schemes );
 			?>
-        </table>
+		</table>
 		<?php
 	}
 
-	function icons_display_options() {
+	/**
+	 * Returns display mode options.
+	 *
+	 * @return array
+	 */
+	public function icons_display_options() {
 		return array(
 			'all'   => __( 'All devices', 'ecommerce-product-catalog' ),
 			'small' => __( 'Small screens only', 'ecommerce-product-catalog' ),
@@ -204,14 +316,25 @@ class ic_sitewide_bar {
 		);
 	}
 
-	function icons_search_options() {
+	/**
+	 * Returns search mode options.
+	 *
+	 * @return array
+	 */
+	public function icons_search_options() {
 		return array(
 			'field'    => __( 'Simple Field', 'ecommerce-product-catalog' ),
 			'ic_popup' => __( 'Popup', 'ecommerce-product-catalog' ),
 		);
 	}
 
-	function settings_default( $settings ) {
+	/**
+	 * Adds default values for the sitewide icon settings.
+	 *
+	 * @param array $settings Existing design settings.
+	 * @return array
+	 */
+	public function settings_default( $settings ) {
 		$settings['icons_display']         = isset( $settings['icons_display'] ) ? $settings['icons_display'] : 'none';
 		$settings['icons_display_catalog'] = isset( $settings['icons_display_catalog'] ) ? $settings['icons_display_catalog'] : '';
 		$settings['icons_display_search']  = isset( $settings['icons_display_search'] ) ? $settings['icons_display_search'] : '';
@@ -220,8 +343,13 @@ class ic_sitewide_bar {
 		return apply_filters( 'ic_catalog_sitewide_icons_settings', $settings );
 	}
 
-	function is_displayed() {
-		if ( empty( $this->display ) || ( ! empty( $this->display ) && $this->display === 'none' ) ) {
+	/**
+	 * Determines whether the sitewide bar should be displayed.
+	 *
+	 * @return bool
+	 */
+	public function is_displayed() {
+		if ( empty( $this->display ) || ( ! empty( $this->display ) && 'none' === $this->display ) ) {
 			return false;
 		}
 		if ( empty( $this->catalog ) || empty( $this->search ) ) {
@@ -231,41 +359,72 @@ class ic_sitewide_bar {
 		return apply_filters( 'ic_catalog_sitewide_icons_displayed', false );
 	}
 
-	function is_url( $url ) {
-		if ( $url === esc_url_raw( $url ) ) {
+	/**
+	 * Determines whether the provided value is a URL.
+	 *
+	 * @param string $url Value to validate.
+	 * @return bool
+	 */
+	public function is_url( $url ) {
+		if ( esc_url_raw( $url ) === $url ) {
 			return true;
 		}
 
 		return false;
 	}
 
-	static function container_class() {
+	/**
+	 * Returns the wrapper classes for the sitewide bar.
+	 *
+	 * @return string
+	 */
+	public static function container_class() {
 		$design_schemes = ic_get_design_schemes();
 		$class          = 'ic-catalog-bar device-' . $design_schemes['icons_display'] . ' ' . $design_schemes['icons_search'];
 
 		return $class;
 	}
 
-	function customizer_sections( $wp_customize ) {
+	/**
+	 * Registers Customizer sections for the sitewide bar.
+	 *
+	 * @param WP_Customize_Manager $wp_customize Customizer manager instance.
+	 * @return void
+	 */
+	public function customizer_sections( $wp_customize ) {
 		$message         = __( 'The icons will appear in the main menu.', 'ecommerce-product-catalog' );
 		$site_editor_url = admin_url( 'site-editor.php' );
 		if ( ! empty( $site_editor_url ) ) {
 			$message .= ' ';
-			$message .= sprintf( __( 'You can also %sadd the Catalog Icons block to the menu%s if your theme supports site editing with blocks.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( $site_editor_url ) . '">', '</a>' );
+			/* translators: 1: opening link tag to the Site Editor, 2: closing link tag. */
+			$message .= sprintf( __( 'You can also %1$sadd the Catalog Icons block to the menu%2$s if your theme supports site editing with blocks.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( $site_editor_url ) . '">', '</a>' );
 		}
 
-		$wp_customize->add_section( 'ic_product_catalog_icons', array(
-			'title'       => __( 'Sitewide Icons', 'ecommerce-product-catalog' ),
-			'priority'    => 30,
-			'panel'       => 'ic_product_catalog',
-			'description' => $message
-		) );
+		$wp_customize->add_section(
+			'ic_product_catalog_icons',
+			array(
+				'title'       => __( 'Sitewide Icons', 'ecommerce-product-catalog' ),
+				'priority'    => 30,
+				'panel'       => 'ic_product_catalog',
+				'description' => $message,
+			)
+		);
 	}
 
-	function customizer( $settings, $customizer ) {
+	/**
+	 * Registers Customizer settings for the sitewide bar.
+	 *
+	 * @param array  $settings   Existing Customizer settings.
+	 * @param object $customizer Customizer helper instance.
+	 * @return array
+	 */
+	public function customizer( $settings, $customizer ) {
 		$settings[] = array(
 			'name'    => 'design_schemes[icons_display]',
-			'args'    => array( 'type' => 'option', 'default' => 'none' ),
+			'args'    => array(
+				'type'    => 'option',
+				'default' => 'none',
+			),
 			'control' => array(
 				'name' => 'ic_pc_integration_icons_display',
 				'args' => array(
@@ -273,16 +432,16 @@ class ic_sitewide_bar {
 					'section'  => 'ic_product_catalog_icons',
 					'settings' => 'design_schemes[icons_display]',
 					'type'     => 'radio',
-					'choices'  => $this->icons_display_options()
-				)
-			)
+					'choices'  => $this->icons_display_options(),
+				),
+			),
 		);
 		$settings[] = array(
 			'name'    => 'design_schemes[icons_display_catalog]',
 			'args'    => array(
 				'type'              => 'option',
 				'default'           => '',
-				'sanitize_callback' => array( $customizer, 'sanitize_checkbox' )
+				'sanitize_callback' => array( $customizer, 'sanitize_checkbox' ),
 			),
 			'control' => array(
 				'name' => 'ic_pc_integration_icons_display_catalog',
@@ -291,15 +450,15 @@ class ic_sitewide_bar {
 					'section'  => 'ic_product_catalog_icons',
 					'settings' => 'design_schemes[icons_display_catalog]',
 					'type'     => 'checkbox',
-				)
-			)
+				),
+			),
 		);
 		$settings[] = array(
 			'name'    => 'design_schemes[icons_display_search]',
 			'args'    => array(
 				'type'              => 'option',
 				'default'           => '',
-				'sanitize_callback' => array( $customizer, 'sanitize_checkbox' )
+				'sanitize_callback' => array( $customizer, 'sanitize_checkbox' ),
 			),
 			'control' => array(
 				'name' => 'ic_pc_integration_icons_display_search',
@@ -308,12 +467,15 @@ class ic_sitewide_bar {
 					'section'  => 'ic_product_catalog_icons',
 					'settings' => 'design_schemes[icons_display_search]',
 					'type'     => 'checkbox',
-				)
-			)
+				),
+			),
 		);
 		$settings[] = array(
 			'name'    => 'design_schemes[icons_search]',
-			'args'    => array( 'type' => 'option', 'default' => 'ic_popup' ),
+			'args'    => array(
+				'type'    => 'option',
+				'default' => 'ic_popup',
+			),
 			'control' => array(
 				'name' => 'ic_pc_integration_icons_search',
 				'args' => array(
@@ -321,16 +483,14 @@ class ic_sitewide_bar {
 					'section'  => 'ic_product_catalog_icons',
 					'settings' => 'design_schemes[icons_search]',
 					'type'     => 'radio',
-					'choices'  => $this->icons_search_options()
-				)
-			)
+					'choices'  => $this->icons_search_options(),
+				),
+			),
 		);
 
 		return $settings;
 	}
-
 }
 
 global $ic_sitewide_bar;
-$ic_sitewide_bar = new ic_sitewide_bar;
-
+$ic_sitewide_bar = new IC_Sitewide_Bar();

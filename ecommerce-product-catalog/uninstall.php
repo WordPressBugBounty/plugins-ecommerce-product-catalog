@@ -1,20 +1,21 @@
 <?php
+/**
+ * Uninstall eCommerce Product Catalog.
+ *
+ * Uninstalling eCommerce Product Catalog deletes user roles and options.
+ *
+ * @package ecommerce-product-catalog/uninstall
+ * @version 2.3.7
+ */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
-/**
- * eCommerce Product Catalog Uninstall
- *
- * Uninstalling eCommerce Product Catalog deletes user roles and options.
- *
- * @package     ecommerce-product-catalog/uninstall
- * @version     2.3.7
- */
+
 if ( ! defined( 'AL_BASE_PATH' ) ) {
 	$uninstall_products = get_option( 'ic_delete_products_uninstall', 0 );
 
-	if ( $uninstall_products == 1 ) {
+	if ( 1 === (int) $uninstall_products ) {
 
 		if ( ! function_exists( 'ic_delete_all_attribute_terms' ) ) {
 
@@ -25,15 +26,15 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 			 */
 			function ic_delete_all_attribute_terms() {
 				global $wpdb;
-				$taxonomy = 'al_product-attributes';
-				$terms    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('%s') ORDER BY t.name ASC", $taxonomy ) );
+				$taxonomy  = 'al_product-attributes';
+					$terms = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN (%s) ORDER BY t.name ASC", $taxonomy ) );
 
-				// Delete Terms
+					// Delete terms.
 				if ( $terms ) {
-					foreach ( $terms as $term ) {
-						$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->terms, array( 'term_id' => $term->term_id ) );
+					foreach ( $terms as $attribute_term ) {
+						$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $attribute_term->term_taxonomy_id ) );
+						$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $attribute_term->term_taxonomy_id ) );
+						$wpdb->delete( $wpdb->terms, array( 'term_id' => $attribute_term->term_id ) );
 					}
 				}
 			}
@@ -44,21 +45,21 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 		$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE post_type IN ( 'al_product' );" );
 		$wpdb->query( "DELETE meta FROM {$wpdb->postmeta} meta LEFT JOIN {$wpdb->posts} posts ON posts.ID = meta.post_id WHERE posts.ID IS NULL;" );
 
-		$taxonomy = 'al_product-cat';
-		$terms    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('%s') ORDER BY t.name ASC", $taxonomy ) );
+			$product_category_taxonomy = 'al_product-cat';
+			$terms                     = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN (%s) ORDER BY t.name ASC", $product_category_taxonomy ) );
 
-		// Delete Terms
+			// Delete terms.
 		if ( $terms ) {
-			foreach ( $terms as $term ) {
-				$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-				$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-				$wpdb->delete( $wpdb->terms, array( 'term_id' => $term->term_id ) );
-				delete_option( 'al_product_cat_image_' . $term->term_id );
+			foreach ( $terms as $catalog_term ) {
+				$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $catalog_term->term_taxonomy_id ) );
+				$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $catalog_term->term_taxonomy_id ) );
+				$wpdb->delete( $wpdb->terms, array( 'term_id' => $catalog_term->term_id ) );
+				delete_option( 'al_product_cat_image_' . $catalog_term->term_id );
 			}
 		}
 
-		// Delete Taxonomy
-		$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => $taxonomy ), array( '%s' ) );
+			// Delete taxonomy.
+			$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => $product_category_taxonomy ), array( '%s' ) );
 
 		ic_delete_all_attribute_terms();
 		$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => 'al_product-attributes' ), array( '%s' ) );
@@ -70,11 +71,12 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 
 	if ( ! function_exists( 'all_ic_options' ) ) {
 
-		/**
-		 * Returns all eCommerce Product Catalog option names
-		 * (needs optimisation)
-		 * @return type
-		 */
+			/**
+			 * Returns all eCommerce Product Catalog option names.
+			 *
+			 * @param string $which Option subset selector.
+			 * @return array
+			 */
 		function all_ic_options( $which = 'all' ) {
 			$options = array(
 				'product_adder_theme_support_check',
@@ -103,7 +105,7 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 				'display_shipping',
 				'product_shipping_cost',
 				'product_shipping_label',
-				'product_archive_page_id'
+				'product_archive_page_id',
 			);
 			$tools   = array(
 				'ic_epc_tracking_last_send',
@@ -125,11 +127,11 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 				'old_sort_bar',
 				'first_activation_version',
 				'ic_allow_woo_template_file',
-				'ic_block_woo_template_file'
+				'ic_block_woo_template_file',
 			);
-			if ( $which == 'all' ) {
+			if ( 'all' === $which ) {
 				return array_merge( $options, $tools );
-			} else if ( $which == 'tools' ) {
+			} elseif ( 'tools' === $which ) {
 				return $tools;
 			} else {
 				return $options;

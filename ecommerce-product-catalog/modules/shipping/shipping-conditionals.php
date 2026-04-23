@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all product attributes are defined and managed.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/includes
+ * @author      impleCode
  */
 
 /**

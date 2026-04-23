@@ -12,16 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package        ecommerce-product-catalog/includes
  * @author        impleCode
  */
-$dirname = dirname( __FILE__ );
-require_once( $dirname . '/compatibility.php' );
-require_once( $dirname . '/price-conditionals.php' );
-require_once( $dirname . '/price-filters.php' );
-require_once( $dirname . '/price-functions.php' );
-require_once( $dirname . '/price-meta.php' );
-require_once( $dirname . '/price-settings.php' );
-require_once( $dirname . '/price-shortcodes.php' );
-require_once( $dirname . '/config/currencies.php' );
-require_once( $dirname . '/widgets/index.php' );
-require_once( $dirname . '/blocks/index.php' );
-
-
+$dirname = __DIR__;
+require_once $dirname . '/compatibility.php';
+require_once $dirname . '/price-conditionals.php';
+require_once $dirname . '/price-filters.php';
+require_once $dirname . '/price-functions.php';
+require_once $dirname . '/price-meta.php';
+require_once $dirname . '/price-settings.php';
+require_once $dirname . '/price-shortcodes.php';
+require_once $dirname . '/config/currencies.php';
+require_once $dirname . '/widgets/index.php';
+require_once $dirname . '/blocks/index.php';

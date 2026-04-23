@@ -24,7 +24,7 @@ function is_ic_json_cart( $cart_content ) {
 /**
  * Checks if provided cart id is already in cart
  *
- * @param array $cart_content
+ * @param array  $cart_content
  * @param string $cart_id
  *
  * @return boolean
@@ -40,7 +40,7 @@ function is_ic_product_in_cart( $cart_id, $cart_content = null, $strict = true )
 		}
 		if ( $cart_content_cart_id == $cart_id ) {
 			return true;
-		} else if ( ! $strict ) {
+		} elseif ( ! $strict ) {
 			$cart_content_product_id = cart_id_to_product_id( $cart_content_cart_id );
 			if ( $cart_content_product_id == $cart_id ) {
 				return true;
@@ -56,7 +56,7 @@ function is_ic_cart() {
 		if ( is_ic_quote_cart() || is_ic_ajax( 'quote_cart_products' ) ) {
 			return true;
 		}
-	} else if ( function_exists( 'is_ic_shopping_cart' ) ) {
+	} elseif ( function_exists( 'is_ic_shopping_cart' ) ) {
 		if ( is_ic_shopping_cart() || is_ic_ajax( 'shopping_cart_products' ) ) {
 			return true;
 		}

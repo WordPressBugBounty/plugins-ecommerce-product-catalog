@@ -10,5 +10,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  *  @author        impleCode
  *
  */
-$dirname = dirname( __FILE__ );
-require_once( $dirname . '/polylang.php' );
+$dirname = __DIR__;
+require_once $dirname . '/polylang.php';

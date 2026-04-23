@@ -33,7 +33,6 @@ class ic_cart_variations_front {
 		/* Admin Order Screen */
 		add_filter( 'ic_order_product_name', array( $this, 'variations_in_orders_screen' ), 10, 3 );
 
-
 		/* Styling */
 		add_filter( 'product_page_additional_styles', array( __CLASS__, 'inline_styling' ) );
 		add_filter( 'product_listing_additional_styles', array( __CLASS__, 'inline_styling' ) );
@@ -86,9 +85,12 @@ class ic_cart_variations_front {
 	}
 
 	static function show_selectors_shortcode( $atts ) {
-		$args       = shortcode_atts( array(
-			'product' => ic_get_product_id(),
-		), $atts );
+		$args       = shortcode_atts(
+			array(
+				'product' => ic_get_product_id(),
+			),
+			$atts
+		);
 		$product_id = $args['product'];
 		if ( empty( $product_id ) ) {
 			$product_id = ic_get_product_id();
@@ -99,7 +101,7 @@ class ic_cart_variations_front {
 	}
 
 	function variations_in_shopping_cart( $content, $product_id ) {
-//$product_id = cart_id_to_product_id( $product_id );
+		// $product_id = cart_id_to_product_id( $product_id );
 		$content .= '<br>' . $this->show_selectors( $product_id, 0 );
 
 		return $content;
@@ -108,7 +110,7 @@ class ic_cart_variations_front {
 	function variations_in_orders_screen( $product_name, $order_products, $i = null ) {
 		if ( $i !== null && ! empty( $order_products['variations'][ $i ] ) ) {
 			$variations = $order_products['variations'][ $i ];
-		} else if ( $i === null && ! empty( $order_products['variations'] ) ) {
+		} elseif ( $i === null && ! empty( $order_products['variations'] ) ) {
 			$variations = $order_products['variations'];
 		}
 		if ( ! empty( $variations ) ) {
@@ -142,17 +144,17 @@ class ic_cart_variations_front {
 		$product_id                  = cart_id_to_product_id( $cart_id );
 		$product_variations_settings = get_product_variations_settings();
 		$cart_id_non_var             = get_cart_id_without_variations( $cart_id );
-//$content .= '<br>';
+		// $content .= '<br>';
 		$variation_value = false;
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			$variation_label = get_product_variation_label( $product_id, $i );
-			if ( isset( $_POST[ $i . "_variation_" . $cart_id ] ) && $_POST[ $i . "_variation_" . $cart_id ] != '' ) {
-				$variation_value = sanitize_text_field( $_POST[ $i . "_variation_" . $cart_id ] );
+			if ( isset( $_POST[ $i . '_variation_' . $cart_id ] ) && $_POST[ $i . '_variation_' . $cart_id ] != '' ) {
+				$variation_value = sanitize_text_field( $_POST[ $i . '_variation_' . $cart_id ] );
 			} else {
 				$variation_value = get_variation_value_from_cart_id( $cart_id, $i );
 			}
 			if ( $variation_value || is_numeric( $variation_value ) ) {
-				$content .= apply_filters( 'ic_cart_summary_variation', '<input name="' . $i . "_variation_" . $cart_id_non_var . '" type="hidden" hidden value="' . sanitize_title( $variation_value ) . '" /><span class="chosen_variation">' . $variation_label . $this->equal() . $variation_value . '</span>', $i, $cart_id );
+				$content .= apply_filters( 'ic_cart_summary_variation', '<input name="' . $i . '_variation_' . $cart_id_non_var . '" type="hidden" hidden value="' . sanitize_title( $variation_value ) . '" /><span class="chosen_variation">' . $variation_label . $this->equal() . $variation_value . '</span>', $i, $cart_id );
 			}
 		}
 
@@ -172,7 +174,7 @@ class ic_cart_variations_front {
 		$product_variations_settings = get_product_variations_settings();
 		$inside_content              = '';
 		if ( $product_variations_settings['mode'] == 'normal' ) {
-			for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+			for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 				$variation_label = get_product_variation_label( $product_id, $i );
 				$variation_value = get_variation_value_from_cart_id( $cart_id, $i );
 				if ( isset( $variation_value ) && $variation_value != '' ) {
@@ -186,7 +188,7 @@ class ic_cart_variations_front {
 				$content .= apply_filters( 'ic_catalog_notification_variation', ' (' . $inside_content . ')' );
 			}
 		} else {
-			for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+			for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 				$variation_value = get_variation_value_from_cart_id( $cart_id, $i );
 				if ( isset( $variation_value ) && $variation_value != '' ) {
 					$inside_content .= $variation_value;
@@ -205,8 +207,7 @@ class ic_cart_variations_front {
 
 		return $styles;
 	}
-
 }
 
 global $ic_cart_variations_front;
-$ic_cart_variations_front = new ic_cart_variations_front;
+$ic_cart_variations_front = new ic_cart_variations_front();

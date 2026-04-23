@@ -14,23 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package implecode-digital-customers/includes/transactions
  */
 /*
-  function customer_products_table_cells( $product_id ) {
-  $product_name = get_product_name( $product_id );
-  if ( !empty( $product_name ) ) {
-  $permalink = get_product_url( $product_id, 1 );
-  if ( !empty( $permalink ) ) {
-  $product_url = '<a href="' . $permalink . '">' . $product_name . '</a>';
-  } else {
-  $product_url = $product_name;
-  }
-  return apply_filters( 'customer_products_table_cells', array( $product_url ), $product_id );
-  }
-  return;
-  }
+	function customer_products_table_cells( $product_id ) {
+	$product_name = get_product_name( $product_id );
+	if ( !empty( $product_name ) ) {
+	$permalink = get_product_url( $product_id, 1 );
+	if ( !empty( $permalink ) ) {
+	$product_url = '<a href="' . $permalink . '">' . $product_name . '</a>';
+	} else {
+	$product_url = $product_name;
+	}
+	return apply_filters( 'customer_products_table_cells', array( $product_url ), $product_id );
+	}
+	return;
+	}
 
-  function customer_products_table_heads() {
-  return apply_filters( 'customer_products_table_heads', array( __( 'Name', 'ecommerce-product-catalog' ) ) );
-  }
+	function customer_products_table_heads() {
+	return apply_filters( 'customer_products_table_heads', array( __( 'Name', 'ecommerce-product-catalog' ) ) );
+	}
  *
  */
 
@@ -48,7 +48,7 @@ class ic_customer_panel {
 		ic_enqueue_main_catalog_js_css();
 		$customer_id = ic_get_logged_customer_id();
 		if ( is_ic_digital_customer( $customer_id ) ) {
-			$panel = '<div id="customer_panel">';
+			$panel  = '<div id="customer_panel">';
 			$panel .= '<div id="customer_email">' . __( 'Login', 'ecommerce-product-catalog' ) . ': ' . ic_get_digital_customer_login( $customer_id ) . '</div>';
 			$panel .= apply_filters( 'ic_customer_panel_top', '' );
 			$panel .= '<div id="customer_logout"><a href="' . wp_logout_url( network_site_url( $_SERVER['REQUEST_URI'] ) ) . '" class="button ' . design_schemes( 'box', 0 ) . '">' . __( 'Logout', 'ecommerce-product-catalog' ) . '</a></div>';
@@ -65,7 +65,7 @@ class ic_customer_panel {
 
 			return $panel;
 		} else {
-			$pre_panel = ic_customer_panel_actions();
+			$pre_panel  = ic_customer_panel_actions();
 			$pre_panel .= ic_digital_customer_login_form( true, 'login_form panel_login' );
 
 			return $pre_panel;
@@ -94,7 +94,7 @@ class ic_customer_panel {
 	}
 
 	function password_reset_container( $customer_id ) {
-		$form = implecode_info( __( 'Please use a strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols for better security.', 'ecommerce-product-catalog' ), 0 );
+		$form  = implecode_info( __( 'Please use a strong password with at least 8 characters, including uppercase and lowercase letters, numbers, and symbols for better security.', 'ecommerce-product-catalog' ), 0 );
 		$form .= '<div class="new-password"><label for="new_password_1">New Password</label><input type="password" name="new_password_1" id="new_password_1"></div>';
 		$form .= '<div class="repeat-new-password"><label for="new_password_2">Repeat New Password</label><input type="password" name="new_password_2" id="new_password_2"></div>';
 		$form .= '<div class="password-reset-result"></div>';
@@ -130,7 +130,7 @@ class ic_customer_panel {
 		// Validate Password Strength
 		$min_length = 8; // Minimum length for the password
 		if ( strlen( $new_password ) < $min_length ) {
-			return sprintf( __( 'Password must be at least %d characters long. Auto refresh in %s seconds.', 'ecommerce-product-catalog' ), $min_length, '<span class="time">5</span>' );
+			return sprintf( __( 'Password must be at least %1$d characters long. Auto refresh in %2$s seconds.', 'ecommerce-product-catalog' ), $min_length, '<span class="time">5</span>' );
 		}
 
 		// Check for at least one number
@@ -155,10 +155,9 @@ class ic_customer_panel {
 
 		return true;
 	}
-
 }
 
-$ic_customer_panel = new ic_customer_panel;
+$ic_customer_panel = new ic_customer_panel();
 
 function ic_customer_panel_actions() {
 	return apply_filters( 'customer_panel_actions', '' );

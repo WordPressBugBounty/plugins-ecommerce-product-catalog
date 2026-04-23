@@ -62,7 +62,7 @@ class ic_simple_quote_cart {
 			'view_item'          => __( 'View Quote', 'ecommerce-product-catalog' ),
 			'search_items'       => __( 'Search Quotes', 'ecommerce-product-catalog' ),
 			'not_found'          => __( 'No quotes found', 'ecommerce-product-catalog' ),
-			'not_found_in_trash' => __( 'No quotes found in the trash', 'ecommerce-product-catalog' )
+			'not_found_in_trash' => __( 'No quotes found in the trash', 'ecommerce-product-catalog' ),
 		);
 		foreach ( $labels as $key => $value ) {
 			if ( isset( $quote_labels[ $key ] ) ) {
@@ -76,14 +76,24 @@ class ic_simple_quote_cart {
 	function init() {
 		global $ic_cart_checkout_form_email;
 		if ( ! empty( $ic_cart_checkout_form_email ) ) {
-			remove_filter( 'ic_formbuilder_admin_email', array(
-				$ic_cart_checkout_form_email,
-				'modify_admin_email'
-			), 5, 2 );
-			remove_filter( 'ic_formbuilder_user_email', array(
-				$ic_cart_checkout_form_email,
-				'modify_user_email'
-			), 5, 2 );
+			remove_filter(
+				'ic_formbuilder_admin_email',
+				array(
+					$ic_cart_checkout_form_email,
+					'modify_admin_email',
+				),
+				5,
+				2
+			);
+			remove_filter(
+				'ic_formbuilder_user_email',
+				array(
+					$ic_cart_checkout_form_email,
+					'modify_user_email',
+				),
+				5,
+				2
+			);
 			add_filter( 'ic_formbuilder_admin_email', array( $this, 'modify_admin_email' ), 5, 2 );
 			add_filter( 'ic_formbuilder_user_email', array( $this, 'modify_user_email' ), 5, 2 );
 		}
@@ -91,13 +101,17 @@ class ic_simple_quote_cart {
 	}
 
 	function override_settings_labels( $settings_html ) {
-		$settings_html = str_replace( array(
-			__( 'Order', 'ecommerce-product-catalog' ),
-			' ' . __( 'order', 'ecommerce-product-catalog' )
-		), array(
-			__( 'Quote', 'ecommerce-product-catalog' ),
-			' ' . __( 'quote', 'ecommerce-product-catalog' )
-		), $settings_html );
+		$settings_html = str_replace(
+			array(
+				__( 'Order', 'ecommerce-product-catalog' ),
+				' ' . __( 'order', 'ecommerce-product-catalog' ),
+			),
+			array(
+				__( 'Quote', 'ecommerce-product-catalog' ),
+				' ' . __( 'quote', 'ecommerce-product-catalog' ),
+			),
+			$settings_html
+		);
 
 		return $settings_html;
 	}
@@ -121,17 +135,22 @@ class ic_simple_quote_cart {
 	}
 
 	function email_text( $text ) {
-		return str_replace( array
-		(
-			__(
-				'order', 'ecommerce-product-catalog' ),
-			__( 'Order', 'ecommerce-product-catalog' ),
-			'[payment_details]' . "\n\r"
-		), array(
-			__( 'quote', 'ecommerce-product-catalog' ),
-			__( 'Quote', 'ecommerce-product-catalog' ),
-			''
-		), $text );
+		return str_replace(
+			array(
+				__(
+					'order',
+					'ecommerce-product-catalog'
+				),
+				__( 'Order', 'ecommerce-product-catalog' ),
+				'[payment_details]' . "\n\r",
+			),
+			array(
+				__( 'quote', 'ecommerce-product-catalog' ),
+				__( 'Quote', 'ecommerce-product-catalog' ),
+				'',
+			),
+			$text
+		);
 	}
 
 	function show_add_button( $product ) {
@@ -182,8 +201,8 @@ class ic_simple_quote_cart {
 			$new_message = wpautop( $email_settings['admin_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
 			$order_data  = $this->products_summary( 'admin' );
-			//$order_data	 .= $p . trim( $message, "<br>" ) . $ep;
-			$order_data  .= $p . $message . $ep;
+			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
+			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
 			return $new_message;
@@ -209,8 +228,8 @@ class ic_simple_quote_cart {
 			$new_message = wpautop( $email_settings['user_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
 			$order_data  = $this->products_summary( 'user' );
-			//$order_data	 .= $p . trim( $message, "<br>" ) . $ep;
-			$order_data  .= $p . $message . $ep;
+			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
+			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
 			return $new_message;
@@ -234,52 +253,51 @@ class ic_simple_quote_cart {
 		$line           = '<br>';
 		$td             = ic_email_table_td();
 		$etd            = ic_email_table_td_end();
-		$pre_message    .= ic_email_table();
-		$pre_message    .= ic_email_table_th();
+		$pre_message   .= ic_email_table();
+		$pre_message   .= ic_email_table_th();
 
 		$pre_message .= apply_filters( 'ic_cart_checkout_email_name_header', ic_email_table_td_first() . __( 'Product name', 'ecommerce-product-catalog' ) . ic_email_table_td_end(), $products_array );
 		if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
 			$single_names = get_single_names();
-			$pre_message  .= $td . str_replace( ':', '', $single_names['product_sku'] ) . $etd;
+			$pre_message .= $td . str_replace( ':', '', $single_names['product_sku'] ) . $etd;
 		}
 		$pre_message .= $td . __( 'Quantity', 'ecommerce-product-catalog' ) . $etd;
-		//$pre_message						 .= $td . __( 'Price', 'ecommerce-product-catalog' ) . $etd;
-		//$pre_message						 .= $td . __( 'Subtotal', 'ecommerce-product-catalog' ) . $etd;
+		// $pre_message                       .= $td . __( 'Price', 'ecommerce-product-catalog' ) . $etd;
+		// $pre_message                       .= $td . __( 'Subtotal', 'ecommerce-product-catalog' ) . $etd;
 		$pre_message .= ic_email_table_th_end();
 		global $ic_shopping_cart_totals;
 		$ic_shopping_cart_totals['total'] = 0;
 		$order_total                      = 0;
 		$total_tax                        = 0;
 		foreach ( $products_array as $cart_id => $p_quantity ) {
-			$product_id  = cart_id_to_product_id( $cart_id );
+			$product_id   = cart_id_to_product_id( $cart_id );
 			$pre_message .= ic_email_table_tr();
 			$pre_message .= apply_filters( 'ic_cart_checkout_email_name_td', ic_email_table_td_first() . apply_filters( 'cart_email_product_name', html_entity_decode( get_the_title( $product_id ), ENT_QUOTES, get_bloginfo( 'charset' ) ), $product_id, $cart_id ) . ic_email_table_td_end(), $product_id );
 			if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
-				$sku         = get_product_sku( $product_id );
+				$sku          = get_product_sku( $product_id );
 				$pre_message .= $td . $sku . $etd;
 			}
 			$pre_message .= $td . $p_quantity . $etd;
 			$pre_message .= ic_email_table_tr_end();
 		}
 		$pre_message .= ic_email_table_end();
-		$p           = ic_email_paragraph();
-		$ep          = ic_email_paragraph_end();
-		$pre_message = apply_filters( 'cart_checkout_' . $who . '_product_data', $pre_message, $order_total, $total_tax, $p, $ep, $line );
+		$p            = ic_email_paragraph();
+		$ep           = ic_email_paragraph_end();
+		$pre_message  = apply_filters( 'cart_checkout_' . $who . '_product_data', $pre_message, $order_total, $total_tax, $p, $ep, $line );
 
 		return $pre_message;
 	}
-
 }
 
 global $ic_simple_quote_cart;
-$ic_simple_quote_cart = new ic_simple_quote_cart;
+$ic_simple_quote_cart = new ic_simple_quote_cart();
 
 function default_quote_checkout_settings() {
 	$shopping_cart_settings = get_shopping_cart_settings();
-	//$supported_states       = implecode_supported_states();
-	//$supported_countries    = implecode_supported_countries();
-//$default = '{"fields":[{"label":"Name","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"name"},{"label":"Email","field_type":"email","required":true,"field_options":{"size":"medium"},"cid":"email"},{"label":"Subject","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"subject"},{"label":"Message","field_type":"paragraph","required":true,"field_options":{"size":"medium"},"cid":"message"}]}';
-	$default = '{"fields":[';
+	// $supported_states       = implecode_supported_states();
+	// $supported_countries    = implecode_supported_countries();
+	// $default = '{"fields":[{"label":"Name","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"name"},{"label":"Email","field_type":"email","required":true,"field_options":{"size":"medium"},"cid":"email"},{"label":"Subject","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"subject"},{"label":"Message","field_type":"paragraph","required":true,"field_options":{"size":"medium"},"cid":"message"}]}';
+	$default  = '{"fields":[';
 	$default .= '{"label":"<strong>' . __( 'DELIVERY ADDRESS', 'ecommerce-product-catalog' ) . '</strong>","field_type":"section_break","required":false,"cid":"inside_header_1"},{"label":"' . __( 'Company', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"company"},{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"name"},{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"address"},{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"postal"},{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"city"}';
 	$default .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":true,"field_options":{"size":"medium"';
 	/*
@@ -306,7 +324,7 @@ function default_quote_checkout_settings() {
 		$privacy_url = get_privacy_policy_url();
 	}
 	if ( ! empty( $privacy_url ) ) {
-		$message = sprintf( __( 'I agree to let %1$s process my personal data to process my inquiry and for other purposes described in %1$s %2$sPrivacy Notice%3$s.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ), "<a href='" . $privacy_url . "'>", '</a>' );
+		$message  = sprintf( __( 'I agree to let %1$s process my personal data to process my inquiry and for other purposes described in %1$s %2$sPrivacy Notice%3$s.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ), "<a href='" . $privacy_url . "'>", '</a>' );
 		$default .= ',{"label":"' . __( 'Privacy Notice', 'ecommerce-product-catalog' ) . ':","field_type":"checkboxes","required":true,"field_options":{"size":"medium","options":[{"label":"' . $message . '", "checked":false}]},"cid":"privacy_notice"}';
 	}
 	$default .= ']}';

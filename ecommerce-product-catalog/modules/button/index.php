@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ic_catalog_button {
 
 	private $settings;
-	private $meta_name = '_ic_button_url';
-	private $option_name = 'ic_catalog_button';
+	private $meta_name    = '_ic_button_url';
+	private $option_name  = 'ic_catalog_button';
 	private $menu_element = 'affiliate_button';
 
 	function __construct() {
@@ -33,7 +33,7 @@ class ic_catalog_button {
 	}
 
 	function enable() {
-		//add_action( 'after_price_table', array( $this, 'show' ), 10, 0 );
+		// add_action( 'after_price_table', array( $this, 'show' ), 10, 0 );
 		add_action( 'product_details', array( $this, 'show' ), 10, 0 );
 	}
 
@@ -41,9 +41,9 @@ class ic_catalog_button {
 		$url = $this->button_url();
 		if ( ! empty( $url ) ) {
 			?>
-            <div class="ic-affiliate-button-container"><a href="<?php echo esc_url( $url ) ?>"
-                                                          class="button"><?php echo $this->settings['label'] ?></a>
-            </div>
+			<div class="ic-affiliate-button-container"><a href="<?php echo esc_url( $url ); ?>"
+															class="button"><?php echo $this->settings['label']; ?></a>
+			</div>
 			<?php
 		}
 	}
@@ -69,10 +69,17 @@ class ic_catalog_button {
 
 	function metabox( $post ) {
 		if ( ! empty( $this->settings['individual'] ) ) {
-			add_meta_box( 'ic_catalog_button', __( 'Button', 'ecommerce-product-catalog' ), array(
-				$this,
-				'metabox_content'
-			), 'al_product', 'side', 'default' );
+			add_meta_box(
+				'ic_catalog_button',
+				__( 'Button', 'ecommerce-product-catalog' ),
+				array(
+					$this,
+					'metabox_content',
+				),
+				'al_product',
+				'side',
+				'default'
+			);
 		}
 	}
 
@@ -93,14 +100,14 @@ class ic_catalog_button {
 		$submenu = isset( $_GET['submenu'] ) ? $_GET['submenu'] : '';
 		if ( $submenu == $this->menu_element ) {
 			?>
-            <script>
-                jQuery('.settings-submenu a').removeClass('current');
-                jQuery('.settings-submenu a#affiliate-button-settings').addClass('current');
-            </script>
-            <div class="affiliate-button-settings setting-content submenu">
-                <form method="post" action="options.php">
+			<script>
+				jQuery('.settings-submenu a').removeClass('current');
+				jQuery('.settings-submenu a#affiliate-button-settings').addClass('current');
+			</script>
+			<div class="affiliate-button-settings setting-content submenu">
+				<form method="post" action="options.php">
 					<?php settings_fields( $this->option_name ); ?>
-                    <h2><?php _e( 'Product Button Options', 'ecommerce-product-catalog' ) ?></h2>
+					<h2><?php _e( 'Product Button Options', 'ecommerce-product-catalog' ); ?></h2>
 					<?php
 					echo '<table>';
 					implecode_settings_text( __( 'Button Label', 'ecommerce-product-catalog' ), $this->option_name . '[label]', $this->settings['label'] );
@@ -110,20 +117,21 @@ class ic_catalog_button {
 					do_action( 'ic_affiliate_button_settings', $this->settings, $this->option_name );
 					echo '</table>';
 					?>
-                    <p class="submit">
-                        <input type="submit" class="button-primary"
-                               value="<?php _e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
-                    </p>
-                </form>
-            </div>
+					<p class="submit">
+						<input type="submit" class="button-primary"
+								value="<?php _e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
+					</p>
+				</form>
+			</div>
 			<?php
 		}
 	}
 
 	function settings_menu() {
 		?>
-        <a id="affiliate-button-settings" class="element"
-           href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=' . $this->menu_element ) ?>"><?php _e( 'Affiliate Button', 'ecommerce-product-catalog' ); ?> </a><?php
+		<a id="affiliate-button-settings" class="element"
+			href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=' . $this->menu_element ); ?>"><?php _e( 'Affiliate Button', 'ecommerce-product-catalog' ); ?> </a>
+			<?php
 	}
 
 	function register_settings() {
@@ -145,8 +153,7 @@ class ic_catalog_button {
 
 		return apply_filters( 'ic_affiliate_settings', $this->settings );
 	}
-
 }
 
 global $ic_catalog_button;
-$ic_catalog_button = new ic_catalog_button;
+$ic_catalog_button = new ic_catalog_button();

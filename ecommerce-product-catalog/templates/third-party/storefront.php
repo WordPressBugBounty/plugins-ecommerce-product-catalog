@@ -1,6 +1,6 @@
 <?php
 /**
- * eCommerce Product Catalog template for Storefront
+ * Ecommerce Product Catalog template for Storefront.
  *
  * @package storefront
  */
@@ -10,7 +10,7 @@ get_header(); ?>
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
 
-			<?php content_product_adder() ?>
+			<?php content_product_adder(); ?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->

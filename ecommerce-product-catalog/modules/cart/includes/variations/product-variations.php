@@ -14,7 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @author        Norbert Dreszer
  */
 function get_variations_modificators(
-	$product_id = null, $selected = null, $variation_id = null, $format = true,
+	$product_id = null,
+	$selected = null,
+	$variation_id = null,
+	$format = true,
 	$price_value = null
 ) {
 	$product_id       = empty( $product_id ) ? get_the_ID() : cart_id_to_product_id( $product_id );
@@ -49,10 +52,10 @@ function get_variations_modificators(
 		}
 
 		return $modificators;
-	} else if ( is_array( $selected ) ) {
+	} elseif ( is_array( $selected ) ) {
 		$price_mod = 0;
 		foreach ( $selected as $var_id => $var_selected ) {
-			$var_id = current( explode( "_", $var_id ) ) - 1;
+			$var_id = current( explode( '_', $var_id ) ) - 1;
 			$found  = false;
 			if ( ! is_array( $variation_values[ $var_id ] ) ) {
 				$values = explode( "\r\n", $variation_values[ $var_id ] );
@@ -90,7 +93,7 @@ function get_variations_modificators(
 		} else {
 			return $modified_price;
 		}
-	} else if ( $selected != 'not_selected' && ! is_array( $selected ) ) {
+	} elseif ( $selected != 'not_selected' && ! is_array( $selected ) ) {
 		$variation_id = $variation_id - 1;
 		$found        = false;
 		if ( ! is_array( $variation_values[ $variation_id ] ) ) {
@@ -148,17 +151,20 @@ function ic_get_variation_lp( $product_id, $variation_value, $var_id ) {
 /**
  * Returns variation modified shipping price array
  *
- * @param int $product_id Product ID (Cart ID will be transformed to Product ID)
+ * @param int          $product_id Product ID (Cart ID will be transformed to Product ID)
  * @param string|array $selected Selected product variations
- * @param int $variation_id Required if $selected is set and is not array
- * @param boolean $format If output formatted price for front-end
- * @param array $shipping_price_a Shipping prices array (it will get it if not provided)
+ * @param int          $variation_id Required if $selected is set and is not array
+ * @param boolean      $format If output formatted price for front-end
+ * @param array        $shipping_price_a Shipping prices array (it will get it if not provided)
  *
  * @return type
  */
 function get_variations_shipping_modificators(
-	$product_id = null, $selected = null, $variation_id = null,
-	$format = true, $shipping_price_a = null
+	$product_id = null,
+	$selected = null,
+	$variation_id = null,
+	$format = true,
+	$shipping_price_a = null
 ) {
 	$product_id         = empty( $product_id ) ? get_the_ID() : cart_id_to_product_id( $product_id );
 	$variation_shipping = get_product_variations_shipping( $product_id );
@@ -192,10 +198,10 @@ function get_variations_shipping_modificators(
 				}
 			}
 		}
-	} else if ( is_array( $selected ) ) {
+	} elseif ( is_array( $selected ) ) {
 		$price_mod = 0;
 		foreach ( $selected as $var_id => $var_selected ) {
-			$var_id = current( explode( "_", $var_id ) ) - 1;
+			$var_id = current( explode( '_', $var_id ) ) - 1;
 			$found  = false;
 			if ( ! is_array( $variation_values[ $var_id ] ) ) {
 				$values = explode( "\r\n", $variation_values[ $var_id ] );
@@ -223,7 +229,7 @@ function get_variations_shipping_modificators(
 		$modified_shipping = variation_modify_shipping( $shipping_price_a, $price_mod, $format );
 
 		return $modified_shipping;
-	} else if ( $selected != 'not_selected' && ! is_array( $selected ) ) {
+	} elseif ( $selected != 'not_selected' && ! is_array( $selected ) ) {
 		$variation_id = $variation_id - 1;
 		$found        = false;
 		if ( ! is_array( $variation_values[ $variation_id ] ) ) {
@@ -261,8 +267,8 @@ function get_variations_shipping_modificators(
 /**
  * Returns variation shipping price modificator
  *
- * @param array $shipping_price_a Product shipping price array
- * @param float $variation_shipping Selected variation shipping effect value
+ * @param array  $shipping_price_a Product shipping price array
+ * @param float  $variation_shipping Selected variation shipping effect value
  * @param string $variation_mod Variation modificator type
  *
  * @return int
@@ -287,9 +293,9 @@ function get_shipping_price_mod( $shipping_price_a, $variation_shipping, $variat
 /**
  * Returns variation modified shipping array
  *
- * @param array $shipping_a
+ * @param array       $shipping_a
  * @param array|float $price_mod Modification array or value
- * @param boolean $format
+ * @param boolean     $format
  *
  * @return array
  */
@@ -327,7 +333,7 @@ function encode_variation_mod( $var_mod ) {
 /**
  * Returns product variations values array
  *
- * @param int $product_id
+ * @param int     $product_id
  * @param boolean $show_empty
  *
  * @return array
@@ -338,7 +344,7 @@ function get_product_variations_values( $product_id, $show_empty = true ) {
 	if ( ! $variation_values ) {
 		$product_variations_settings = get_product_variations_settings();
 		$variation_values            = array();
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			$values = get_post_meta( $product_id, $i . '_variation_values', true );
 			if ( ! is_array( $values ) ) {
 				$values = explode( "\r\n", $values );
@@ -357,7 +363,7 @@ function get_product_variations_values( $product_id, $show_empty = true ) {
 /**
  * Returns product variations price modificators array
  *
- * @param int $product_id
+ * @param int     $product_id
  * @param boolean $array Will make array from each textarea value if true
  *
  * @return array
@@ -368,7 +374,7 @@ function get_product_variations_prices( $product_id ) {
 	if ( ! $variation_prices ) {
 		$product_variations_settings = get_product_variations_settings();
 		$variation_prices            = array();
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			$prices_meta = get_post_meta( $product_id, $i . '_variation_prices', true );
 			if ( ! is_array( $prices_meta ) ) {
 				$prices_meta = explode( "\r\n", $prices_meta );
@@ -384,7 +390,7 @@ function get_product_variations_prices( $product_id ) {
 /**
  * Returns product variations shipping price modificators array
  *
- * @param int $product_id
+ * @param int     $product_id
  * @param boolean $array Will make array from each textarea value if true
  *
  * @return array
@@ -395,7 +401,7 @@ function get_product_variations_shipping( $product_id ) {
 	if ( ! $variation_shipping ) {
 		$product_variations_settings = get_product_variations_settings();
 		$variation_shipping          = array();
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			$variation_shipping[] = get_post_meta( $product_id, $i . '_variation_shipping', true );
 		}
 		ic_save_global( $product_id . '_product_variations_shipping', $variation_shipping );
@@ -417,7 +423,7 @@ function get_product_variations_labels( $product_id ) {
 	if ( ! $labels ) {
 		$labels                      = array();
 		$product_variations_settings = get_product_variations_settings();
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			$labels [] = get_product_variation_label( $product_id, $i );
 		}
 		ic_save_global( $product_id . '_product_variations_labels', $labels );
@@ -443,7 +449,7 @@ function get_product_variations_price_mod_type( $product_id ) {
 	$product_id                  = cart_id_to_product_id( $product_id );
 	$product_variations_settings = get_product_variations_settings();
 	$mod_types                   = array();
-	for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+	for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 		$mod_types[] = get_post_meta( $product_id, $i . '_variation_mod', true );
 	}
 
@@ -488,9 +494,9 @@ function get_variation_value_from_cart_id( $cart_id, $i = null ) {
 }
 
 function unescape_variation_cart_value( $encoded ) {
-//    $unescaped = preg_replace_callback('/(?<!\\\\)\\\\u(\w{4})/', function ($matches) {
-//        return html_entity_decode(' & #x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
-//    }, $encoded);
+	// $unescaped = preg_replace_callback('/(?<!\\\\)\\\\u(\w{4})/', function ($matches) {
+	// return html_entity_decode(' & #x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
+	// }, $encoded);
 	$unescaped = mb_decode_numericentity( $encoded, array( 0x80, 0xffff, 0, 0xffff ), 'UTF-8' );
 
 	return $unescaped;
@@ -506,7 +512,7 @@ function add_variations_to_payment_summary( $order ) {
 		$a                           = 0;
 		foreach ( $products_array as $cart_id => $p_quantity ) {
 			$product_id = cart_id_to_product_id( $cart_id );
-			for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+			for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 				$variation_label = get_product_variation_label( $product_id, $i );
 				$variation_value = get_variation_value_from_cart_id( $cart_id, $i );
 				if ( $variation_value ) {
@@ -523,15 +529,15 @@ function add_variations_to_payment_summary( $order ) {
 function get_current_product_variations_string( $current_product_id, $product_variations_settings ) {
 	$current_product_variations = false;
 	if ( $current_product_id != '' && $product_variations_settings['count'] > 0 ) {
-		for ( $i = 1; $i <= $product_variations_settings['count']; $i ++ ) {
+		for ( $i = 1; $i <= $product_variations_settings['count']; $i++ ) {
 			if ( isset( $_POST[ $i . '_variation_' . $current_product_id ] ) && $_POST[ $i . '_variation_' . $current_product_id ] != '' ) {
-				$current_product_variations = isset( $current_product_variations ) ? $current_product_variations : '';
+				$current_product_variations  = isset( $current_product_variations ) ? $current_product_variations : '';
 				$current_product_variations .= '_' . $_POST[ $i . '_variation_' . $current_product_id ];
-			} else if ( isset( $_POST[ $i . '_variation_' . $current_product_id ] ) ) {
-				$current_product_variations = isset( $current_product_variations ) ? $current_product_variations : '';
+			} elseif ( isset( $_POST[ $i . '_variation_' . $current_product_id ] ) ) {
+				$current_product_variations  = isset( $current_product_variations ) ? $current_product_variations : '';
 				$current_product_variations .= '_';
 			} else {
-				$current_product_variations = isset( $current_product_variations ) ? $current_product_variations : '';
+				$current_product_variations  = isset( $current_product_variations ) ? $current_product_variations : '';
 				$current_product_variations .= '_';
 			}
 		}
@@ -548,7 +554,7 @@ function create_variation_id( $cart_content, $product_id, $variations_string ) {
 		$count         = 1;
 		$lastPos       = 0;
 		$same_products = array();
-		//$unique_products = implode( ',', array_unique( $cart_content ) );
+		// $unique_products = implode( ',', array_unique( $cart_content ) );
 		while ( ( $lastPos = strpos( $string_cart_content, '::' . $product_id, $lastPos ) ) !== false ) {
 			$same_products[] = $lastPos;
 			$lastPos         = $lastPos + strlen( '::' . $product_id );
@@ -558,12 +564,12 @@ function create_variation_id( $cart_content, $product_id, $variations_string ) {
 	}
 
 	/*
-	  else if ($cart_content != '' && $product_id != '' && $variations_string && strpos($cart_content,$product_id.$variations_string) !== false) {
-	  $count = get_variation_id($product_id.$variations_string, $cart_content);
-	  if (!empty($count)) {
-	  $variation_id = $count.'::'.$product_id;
-	  }
-	  } */
+		else if ($cart_content != '' && $product_id != '' && $variations_string && strpos($cart_content,$product_id.$variations_string) !== false) {
+		$count = get_variation_id($product_id.$variations_string, $cart_content);
+		if (!empty($count)) {
+		$variation_id = $count.'::'.$product_id;
+		}
+		} */
 
 	return $variation_id;
 }
@@ -613,8 +619,8 @@ add_filter( 'post_class', 'add_variations_product_class', 10, 1 );
  * Adds variable product class
  *
  * @param string $product_class
- * @param type $class
- * @param type $product_id
+ * @param type   $class
+ * @param type   $product_id
  *
  * @return string
  */
@@ -630,7 +636,7 @@ function add_variations_product_class( $product_class ) {
 			$settings        = get_product_variations_settings();
 			if ( is_ic_multi_variation_price_effect( $product_id ) ) {
 				$product_class[] = 'variable-multi-price-effect';
-			} else if ( ! ic_has_multiple_product_variations( $product_id ) && $settings['info'] === 'full-price' ) {
+			} elseif ( ! ic_has_multiple_product_variations( $product_id ) && $settings['info'] === 'full-price' ) {
 				$product_class[] = 'variable-single-price-effect';
 			}
 		}
@@ -640,21 +646,21 @@ function add_variations_product_class( $product_class ) {
 }
 
 /*
-  function get_variation_id( $cart_id, $cart_content ) {
-  $cart_content = explode( ',', $cart_content );
-  foreach ( $cart_content as $item ) {
-  if ( strpos( $item, $cart_id ) !== FALSE ) {
-  if ( strpos( $item, '::' ) !== FALSE ) {
-  $item = explode( '::', $item );
-  return $item[ 0 ];
-  break;
-  } else {
-  return '';
-  break;
-  }
-  }
-  }
-  }
+	function get_variation_id( $cart_id, $cart_content ) {
+	$cart_content = explode( ',', $cart_content );
+	foreach ( $cart_content as $item ) {
+	if ( strpos( $item, $cart_id ) !== FALSE ) {
+	if ( strpos( $item, '::' ) !== FALSE ) {
+	$item = explode( '::', $item );
+	return $item[ 0 ];
+	break;
+	} else {
+	return '';
+	break;
+	}
+	}
+	}
+	}
  */
 
 

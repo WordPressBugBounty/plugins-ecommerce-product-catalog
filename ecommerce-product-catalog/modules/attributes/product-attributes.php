@@ -16,7 +16,6 @@ add_action( 'init', 'ic_create_product_attributes' );
 
 /**
  * Registers attributes taxonomy
- *
  */
 function ic_create_product_attributes() {
 	$args = array(
@@ -57,7 +56,7 @@ function ic_add_product_attribute_label( $label ) {
 		$term = wp_insert_term( $label, 'al_product-attributes' );
 		if ( ! is_wp_error( $term ) ) {
 			return $term['term_id'];
-		} else if ( ! empty( $term->error_data['term_exists'] ) ) {
+		} elseif ( ! empty( $term->error_data['term_exists'] ) ) {
 			return intval( $term->error_data['term_exists'] );
 		}
 	}
@@ -87,7 +86,7 @@ function ic_add_product_attribute_value( $label_id, $value ) {
 			$term = wp_insert_term( strval( $value ), 'al_product-attributes', array( 'parent' => intval( $label_id ) ) );
 			if ( ! is_wp_error( $term ) ) {
 				$term_id = $term['term_id'];
-			} else if ( ! empty( $term->error_data['term_exists'] ) ) {
+			} elseif ( ! empty( $term->error_data['term_exists'] ) ) {
 				return intval( $term->error_data['term_exists'] );
 			}
 		}
@@ -96,7 +95,7 @@ function ic_add_product_attribute_value( $label_id, $value ) {
 	return $term_id;
 }
 
-//add_filter( 'product_meta_save', 'ic_assign_product_attributes', 2, 2 );
+// add_filter( 'product_meta_save', 'ic_assign_product_attributes', 2, 2 );
 add_action( 'product_meta_save_update', 'ic_assign_product_attributes', 2, 2 );
 
 /**
@@ -117,14 +116,14 @@ function ic_assign_product_attributes( $product_meta, $post, $clear_empty = true
 		$attr_ids             = array();
 		$process_product_meta = $product_meta;
 		if ( function_exists( 'ic_visible_product_status' ) && in_array( $post->post_status, ic_visible_product_status() ) ) {
-			for ( $i = 1; $i <= $max_attr; $i ++ ) {
+			for ( $i = 1; $i <= $max_attr; $i++ ) {
 				$attr_ids   = apply_filters( 'ic_assign_product_attribute', $attr_ids, $process_product_meta, $i );
 				$value_meta = ic_attr_value_field_name( $i );
 				$label_meta = '_attribute-label' . $i;
 				if ( empty( $process_product_meta[ $value_meta ] ) || ( is_array( $process_product_meta[ $value_meta ] ) && isset( $process_product_meta[ $value_meta ][0] ) && empty( $process_product_meta[ $value_meta ][0] ) ) ) {
 					continue;
 				}
-				//$process_product_meta[ $value_meta ] = get_post_meta( $product_id, $value_meta, true );
+				// $process_product_meta[ $value_meta ] = get_post_meta( $product_id, $value_meta, true );
 				$attr_ids = array_merge( $attr_ids, ic_assign_product_attribute( $process_product_meta, $label_meta, $value_meta, $i ) );
 			}
 		}
@@ -144,12 +143,20 @@ function ic_assign_product_attributes( $product_meta, $post, $clear_empty = true
 
 function ic_assign_product_attribute( $product_meta, $label_meta, $value_meta, $i ) {
 	$default_label = get_default_product_attribute_label( $i );
-	if ( ! empty( $product_meta[ $label_meta ] ) ) {
+	if ( ic_product_attribute_labels_per_product() && ! empty( $product_meta[ $label_meta ] ) ) {
 		$label = ic_sanitize_product_attribute( $product_meta[ $label_meta ] );
 	} else {
 		$label = ic_sanitize_product_attribute( $default_label );
 	}
-	$value = ic_sanitize_product_attribute( $product_meta[ $value_meta ], $label );
+	if ( ic_product_attribute_values_per_product() ) {
+		$value = isset( $product_meta[ $value_meta ] ) ? $product_meta[ $value_meta ] : '';
+		if ( get_attributes_source_mode() === 'value_per_product' && ! ic_attribute_has_value( $value ) ) {
+			$value = get_default_product_attribute_value( $i );
+		}
+	} else {
+		$value = get_default_product_attribute_value( $i );
+	}
+	$value = ic_sanitize_product_attribute( $value, $label );
 
 	return ic_add_product_attribute( $label, $value );
 }
@@ -179,7 +186,6 @@ add_action( 'ic_scheduled_attributes_clear', 'ic_clear_empty_attributes' );
 
 /**
  * Clears empty product attributes
- *
  */
 function ic_clear_empty_attributes() {
 	if ( wp_defer_term_counting() ) {
@@ -190,12 +196,14 @@ function ic_clear_empty_attributes() {
 		return;
 	}
 	$max_attr   = product_attributes_number();
-	$attributes = ic_get_terms( array(
-		'taxonomy'   => 'al_product-attributes',
-		'orderby'    => 'count',
-		'hide_empty' => 0,
-		'number'     => $max_attr
-	) );
+	$attributes = ic_get_terms(
+		array(
+			'taxonomy'   => 'al_product-attributes',
+			'orderby'    => 'count',
+			'hide_empty' => 0,
+			'number'     => $max_attr,
+		)
+	);
 	$schedule   = false;
 	if ( ! empty( $attributes ) && is_array( $attributes ) && ! is_wp_error( $attributes ) ) {
 		$prev_suspend = wp_suspend_cache_invalidation();
@@ -210,7 +218,7 @@ function ic_clear_empty_attributes() {
 		}
 		wp_suspend_cache_invalidation( $prev_suspend );
 		if ( /* !wp_get_schedule( 'ic_scheduled_attributes_clear' ) && */ $schedule ) {
-			//wp_schedule_event( time(), 'hourly', 'ic_scheduled_attributes_clear' );
+			// wp_schedule_event( time(), 'hourly', 'ic_scheduled_attributes_clear' );
 			wp_schedule_single_event( time(), 'ic_scheduled_attributes_clear' );
 		} else {
 			wp_clear_scheduled_hook( 'ic_scheduled_attributes_clear' );
@@ -287,11 +295,11 @@ function ic_reassign_products_attributes( $done, $start_time = 0, $repeat = true
 		}
 		$product_meta = get_post_meta( $post->ID );
 		ic_assign_product_attributes( $product_meta, $post, false );
-		$done ++;
-		$rounds ++;
+		++$done;
+		++$rounds;
 		$time_elapsed_secs = microtime( true ) - $start_time;
 		if ( $safe_max_time > 30 && $time_elapsed_secs < $safe_max_time ) {
-			$max_round ++;
+			++$max_round;
 		} else {
 			$repeat = false;
 		}
@@ -314,11 +322,10 @@ add_action( 'ic_system_tools', 'ic_system_tools_attributes_upgrade' );
 
 /**
  * Shows a database upgrade button in system tools
- *
  */
 function ic_system_tools_attributes_upgrade() {
 	$done = get_option( 'ic_product_upgrade_done', 0 );
-	//$products_count = ic_products_count();
+	// $products_count = ic_products_count();
 	if ( ! empty( $done ) || isset( $_GET['reassign_all_products_attributes'] ) ) {
 		if ( empty( $done ) && isset( $_GET['reassign_all_products_attributes'] ) && check_admin_referer( 'ic_reassign_all_products_attributes' ) ) {
 			$done = ic_reassign_all_products_attributes();
@@ -334,7 +341,6 @@ function ic_system_tools_attributes_upgrade() {
 				if ( $done < 0 ) {
 					$done = 0;
 				}
-
 			}
 			$message = $done;
 			if ( is_numeric( $done ) ) {
@@ -344,7 +350,7 @@ function ic_system_tools_attributes_upgrade() {
 
 		}
 		echo '</td></tr>';
-	} else if ( empty( $done ) ) {
+	} elseif ( empty( $done ) ) {
 		echo '<tr>';
 		echo '<td>Reassign Attributes</td>';
 		$reassign_attributes_url = wp_nonce_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reassign_all_products_attributes=1' ), 'ic_reassign_all_products_attributes' );
@@ -430,7 +436,7 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 			'hide_empty'   => true,
 			'parent'       => $attribute_id,
 			'fields'       => 'id=>name',
-			'ic_post_type' => array( get_current_screen_post_type() )
+			'ic_post_type' => array( get_current_screen_post_type() ),
 		);
 		if ( ! empty( $product_ids ) && is_array( $product_ids ) ) {
 			$args['object_ids'] = array_map( 'intval', $product_ids );
@@ -446,9 +452,9 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 			$current_products = ic_get_current_products( array(), $exclude_tax );
 			if ( ! empty( $current_products ) && $current_products !== 'all' ) {
 				$args['object_ids'] = $current_products;
-				$cache_key          .= md5( serialize( $current_products ) );
+				$cache_key         .= md5( serialize( $current_products ) );
 				$attributes         = ic_get_global( $cache_key, true );
-			} else if ( empty( $current_products ) ) {
+			} elseif ( empty( $current_products ) ) {
 				return false;
 			}
 		}
@@ -477,9 +483,9 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 		$cache_term_ids = array();
 	}
 	foreach ( $attributes as $term_id => $term_name ) {
-		//$cache_meta                                    = 'attr_value_id' . $attribute_id . $term_name;
+		// $cache_meta                                    = 'attr_value_id' . $attribute_id . $term_name;
 		$cache_term_ids[ $attribute_id ][ $term_name ] = $term_id;
-		//ic_save_global( $cache_meta, $term_id );
+		// ic_save_global( $cache_meta, $term_id );
 	}
 	ic_save_global( 'attr_value_id', $cache_term_ids );
 
@@ -488,7 +494,7 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 		if ( ! empty( $current_cache_meta ) ) {
 			ic_save_global( $current_cache_meta, $attributes );
 		}
-	} else if ( $format === 'ids' ) {
+	} elseif ( $format === 'ids' ) {
 		$attributes = array_keys( $attributes );
 	}
 
@@ -511,13 +517,13 @@ function ic_sanitize_product_attribute( $attribute, $label = null ) {
 				$sanitized_attribute[ $key ] = $sanitized;
 			}
 		}
-		//$sanitized_attribute = array_map( 'ic_sanitize_product_attribute', $attribute );
+		// $sanitized_attribute = array_map( 'ic_sanitize_product_attribute', $attribute );
 		if ( ! empty( $sanitized_attribute[0] ) && is_array( $sanitized_attribute[0] ) ) {
 			return $sanitized_attribute[0];
 		}
 
 		return $sanitized_attribute;
-	} else if ( is_serialized( $attribute ) ) {
+	} elseif ( is_serialized( $attribute ) ) {
 		$unserialized = unserialize( $attribute );
 		if ( ! empty( $unserialized ) && is_array( $unserialized ) ) {
 			return ic_sanitize_product_attribute( $unserialized, $label );
@@ -558,13 +564,15 @@ if ( ! function_exists( 'get_all_attribute_labels' ) ) {
 		$cache_key         = 'all_attribute_labels_' . $post_type;
 		$attributes_labels = ic_get_global( $cache_key );
 		if ( false === $attributes_labels ) {
-			$attributes_labels = ic_get_terms( array(
-				'taxonomy'     => 'al_product-attributes',
-				'parent'       => 0,
-				'fields'       => 'names',
-				'hide_empty'   => true,
-				'ic_post_type' => array( $post_type )
-			) );
+			$attributes_labels = ic_get_terms(
+				array(
+					'taxonomy'     => 'al_product-attributes',
+					'parent'       => 0,
+					'fields'       => 'names',
+					'hide_empty'   => true,
+					'ic_post_type' => array( $post_type ),
+				)
+			);
 
 			if ( ! empty( $cache_key ) ) {
 				ic_save_global( $cache_key, $attributes_labels );
@@ -596,7 +604,7 @@ if ( ! function_exists( 'get_all_attribute_values' ) ) {
 				'taxonomy'   => 'al_product-attributes',
 				'fields'     => 'names',
 				'hide_empty' => true,
-				'childless'  => true
+				'childless'  => true,
 			);
 			if ( ! empty( $product_id ) ) {
 				$args['object_ids'] = intval( $product_id );
@@ -629,7 +637,7 @@ function ic_wp_unique_slug_bug_fix( $slug, $term ) {
 		$num = 2;
 		do {
 			$alt_slug = $slug . "-$num";
-			$num ++;
+			++$num;
 			$slug_check = $wpdb->get_var( $wpdb->prepare( "SELECT slug FROM $wpdb->terms WHERE slug = %s", $alt_slug ) );
 		} while ( $slug_check );
 		$slug = $alt_slug;

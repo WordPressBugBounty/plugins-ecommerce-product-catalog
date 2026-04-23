@@ -7,7 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Manages product custom status
  *
- *
  * @version        1.0.0
  * @package        implecode-quote-cart/includes
  * @author        Norbert Dreszer
@@ -18,23 +17,26 @@ if ( ! function_exists( 'product_sold_post_status' ) ) {
 
 	/**
 	 * Registers product sold status
-	 *
 	 */
 	function product_sold_post_status() {
-		register_post_status( 'sold', array(
-			'label'                     => _x( 'Sold', 'ecommerce-product-catalog' ),
-			'public'                    => true,
-			'exclude_from_search'       => false,
-			'show_in_admin_all_list'    => true,
-			'show_in_admin_status_list' => true,
-			'label_count'               => _n_noop( 'Sold <span class="count">(%s)</span>', 'Sold <span class="count">(%s)</span>' ),
-		) );
+		register_post_status(
+			'sold',
+			array(
+				'label'                     => _x( 'Sold', 'ecommerce-product-catalog' ),
+				'public'                    => true,
+				'exclude_from_search'       => false,
+				'show_in_admin_all_list'    => true,
+				'show_in_admin_status_list' => true,
+				'label_count'               => _n_noop( 'Sold <span class="count">(%s)</span>', 'Sold <span class="count">(%s)</span>' ),
+			)
+		);
 	}
 
 	add_action( 'post_submitbox_misc_actions', 'ic_append_product_status_list' );
 
 	/**
 	 * Adds sold product status to product page publish box status dropdown
+	 *
 	 * @global type $post
 	 */
 	function ic_append_product_status_list() {

@@ -18,7 +18,6 @@ add_action( 'wp_ajax_nopriv_get_viariation_details', 'ic_ajax_get_viariation_det
 
 /**
  * Handles ajax variations fields
- *
  */
 function ic_ajax_get_viariation_details() {
 	$what               = is_array( $_POST['variation_field'] ) ? array_map( 'sanitize_text_field', $_POST['variation_field'] ) : sanitize_text_field( $_POST['variation_field'] );
@@ -51,7 +50,7 @@ function ic_ajax_get_viariation_details() {
 				if ( is_ic_product_in_cart( $cart_id, $cart_content ) ) {
 					echo 1;
 				}
-			} else if ( $element == 'price' ) {
+			} elseif ( $element == 'price' ) {
 				$price_modifier = 0;
 				if ( ! empty( $selected_variation ) && ! empty( $_POST['variation_id'] ) && ! empty( $_POST['product_id'] ) ) {
 					$_POST['format'] = isset( $_POST['format'] ) ? false : true;
@@ -59,7 +58,7 @@ function ic_ajax_get_viariation_details() {
 					$price_modifier  = get_variations_modificators( $_POST['product_id'], $selected_variation, $_POST['variation_id'], $_POST['format'], $_POST['price'], $var_qties );
 				}
 				echo html_entity_decode( $price_modifier );
-			} else if ( ! empty( $selected_variation ) && ! empty( $product_id ) ) {
+			} elseif ( ! empty( $selected_variation ) && ! empty( $product_id ) ) {
 				do_action( 'ic_ajax_get_variation_details', $element, $selected_variation, $variation_id, $product_id, $var_lp );
 			}
 			$out[] = ob_get_clean();

@@ -26,6 +26,19 @@ function ic_shopping_cart_page_url() {
 	return '';
 }
 
+function ic_shopping_cart_page_id() {
+	$shopping_cart_settings = get_option( 'shopping_cart_settings' );
+	if ( empty( $shopping_cart_settings['shopping_cart_page'] ) ) {
+		return '';
+	}
+	$status = get_post_status( $shopping_cart_settings['shopping_cart_page'] );
+	if ( $status && $status !== 'trash' ) {
+		return intval( $shopping_cart_settings['shopping_cart_page'] );
+	}
+
+	return '';
+}
+
 function ic_shopping_submit_page_url() {
 	$shopping_cart_settings = get_option( 'shopping_cart_settings' );
 	if ( empty( $shopping_cart_settings['cart_submit_page'] ) ) {
@@ -34,6 +47,32 @@ function ic_shopping_submit_page_url() {
 	$status = get_post_status( $shopping_cart_settings['cart_submit_page'] );
 	if ( $status && $status !== 'trash' ) {
 		return ic_get_permalink( $shopping_cart_settings['cart_submit_page'] );
+	}
+
+	return '';
+}
+
+function ic_shopping_submit_page_id() {
+	$shopping_cart_settings = get_option( 'shopping_cart_settings' );
+	if ( empty( $shopping_cart_settings['cart_submit_page'] ) ) {
+		return '';
+	}
+	$status = get_post_status( $shopping_cart_settings['cart_submit_page'] );
+	if ( $status && $status !== 'trash' ) {
+		return intval( $shopping_cart_settings['cart_submit_page'] );
+	}
+
+	return '';
+}
+
+function ic_shopping_thank_you_page_id() {
+	$shopping_cart_settings = get_option( 'shopping_cart_settings' );
+	if ( empty( $shopping_cart_settings['thank_you_page'] ) ) {
+		return '';
+	}
+	$status = get_post_status( $shopping_cart_settings['thank_you_page'] );
+	if ( $status && $status !== 'trash' ) {
+		return intval( $shopping_cart_settings['thank_you_page'] );
 	}
 
 	return '';
@@ -72,7 +111,6 @@ if ( ! function_exists( 'ic_clear_shopping_cart' ) ) {
 
 	/**
 	 * Deletes Shopping cart contents
-	 *
 	 */
 	function ic_clear_shopping_cart() {
 		ic_cart_clear( 'cart_content' );
@@ -85,7 +123,6 @@ add_action( 'wp', 'ic_shopping_form_output_buffer' );
 
 /**
  * For payment gateway redirect page
- *
  */
 function ic_shopping_form_output_buffer() {
 	if ( is_ic_shopping_order() ) {
@@ -97,7 +134,6 @@ add_action( 'wp', 'ic_shopping_cart_add_redirect' );
 
 /**
  * To avoid browser back button form resubmit message
- *
  */
 function ic_shopping_cart_add_redirect() {
 	$shopping_cart_settings = get_shopping_cart_settings();
@@ -131,7 +167,7 @@ if ( ! function_exists( 'ic_country_selector' ) ) {
 
 	function ic_country_selector( $name, $required = null, $selected = null, $echo = 1 ) {
 		$return              = '<select ' . $required . ' data-placeholder="' . __( 'Choose your country...', 'ecommerce-product-catalog' ) . '" id="country-selector" name="' . $name . '" class="country-selector">';
-		$return              .= '<option value=""></option>';
+		$return             .= '<option value=""></option>';
 		$supported_countries = implecode_supported_countries();
 		foreach ( $supported_countries as $code => $country ) {
 			$return .= '<option value="' . $code . '"' . selected( $selected, $code, 0 ) . '>' . $country . '</option>';

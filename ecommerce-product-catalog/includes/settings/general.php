@@ -1,44 +1,18 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
-
 /**
- * Manages general settings
+ * General catalog settings.
  *
- * Here general settings are defined and managed.
- *
- * @version        1.1.4
- * @package        ecommerce-product-catalog/functions
- * @author        impleCode
+ * @package ecommerce-product-catalog
  */
-function general_menu() {
-	if ( current_user_can( 'manage_product_settings' ) && function_exists( 'admin_url' ) ) {
-		?>
-        <a id="general-settings" class="nav-tab"
-           href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings' ) ?>"><?php _e( 'General Settings', 'ecommerce-product-catalog' ); ?></a>
-		<?php
-	}
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
-
-add_action( 'settings-menu', 'general_menu' );
-
-function general_settings() {
-	register_setting( 'product_settings', 'product_listing_url' );
-	register_setting( 'product_settings', 'product_currency' );
-	register_setting( 'product_settings', 'product_currency_settings' );
-	register_setting( 'product_settings', 'product_archive' );
-	register_setting( 'product_settings', 'enable_product_listing' );
-	register_setting( 'product_settings', 'archive_multiple_settings' );
-}
-
-add_action( 'product-settings-list', 'general_settings' );
 
 /**
  * Validates archive multiple settings
  *
- * @param array $new_value
- * @param array $old_value
+ * @param array $new_value New settings value.
  *
  * @return array
  */
@@ -47,7 +21,7 @@ function archive_multiple_settings_validation( $new_value ) {
 		ic_force_clear_cache();
 	}
 	$product_slug = get_product_slug();
-	if ( isset( $new_value['category_archive_url'] ) && $new_value['category_archive_url'] == $product_slug ) {
+	if ( isset( $new_value['category_archive_url'] ) && $new_value['category_archive_url'] === $product_slug ) {
 		$new_value['category_archive_url'] = $new_value['category_archive_url'] . '-1';
 	}
 
@@ -57,7 +31,7 @@ function archive_multiple_settings_validation( $new_value ) {
 /**
  * Validates product currency settings
  *
- * @param array $new_value
+ * @param array $new_value New currency settings value.
  *
  * @return array
  */
@@ -65,8 +39,8 @@ function product_currency_settings_validation( $new_value ) {
 	if ( empty( $new_value ) ) {
 		return $new_value;
 	}
-	if ( $new_value['th_sep'] == $new_value['dec_sep'] ) {
-		if ( $new_value['th_sep'] == ',' ) {
+	if ( $new_value['th_sep'] === $new_value['dec_sep'] ) {
+		if ( ',' === $new_value['th_sep'] ) {
 			$new_value['th_sep'] = '.';
 		} else {
 			$new_value['th_sep'] = ',';
@@ -80,476 +54,793 @@ add_action( 'init', 'general_options_validation_filters' );
 
 /**
  * Initializes validation filters for general settings
- *
  */
 function general_options_validation_filters() {
 	add_filter( 'pre_update_option_archive_multiple_settings', 'archive_multiple_settings_validation' );
 	add_filter( 'pre_update_option_product_currency_settings', 'product_currency_settings_validation' );
 }
 
-function general_settings_content() {
-	$submenu = isset( $_GET['submenu'] ) ? $_GET['submenu'] : '';
+add_action( 'ic_settings_page_before_form', 'ic_epc_general_settings_page_before_form', 10, 3 );
+add_action( 'ic_settings_page_sections_end', 'ic_epc_general_settings_page_sections_end', 10, 3 );
+
+/**
+ * Returns the shared general settings page instance.
+ *
+ * @return IC_Settings_Page
+ */
+function ic_epc_general_settings_page() {
+	static $page = null;
+	if ( null === $page ) {
+		$page = new IC_Settings_Page(
+			array(
+				'title'              => __( 'General Settings', 'ecommerce-product-catalog' ),
+				'option_group'       => 'product_settings',
+				'option_name'        => 'archive_multiple_settings',
+				'registered_options' => array(
+					'product_listing_url',
+					'product_currency',
+					'product_currency_settings',
+					'product_archive',
+					'enable_product_listing',
+					'archive_multiple_settings',
+				),
+				'submenu'            => array( 'general-settings', '' ),
+				'screen'             => 'product-settings.php',
+				'screen_tab'         => 'product-settings',
+				'screen_tab_label'   => __( 'General Settings', 'ecommerce-product-catalog' ),
+				'screen_tab_menu_item_id' => 'general-settings',
+				'screen_tab_query_args' => array(
+					'submenu' => 'general-settings',
+				),
+				'screen_tab_default' => true,
+				'screen_tab_content_wrapper_class' => 'overall-product-settings',
+				'screen_tab_content_wrapper_style' => 'clear:both;',
+				'screen_submenu_label' => __( 'General Settings', 'ecommerce-product-catalog' ),
+				'submenu_item_id'    => 'general-settings',
+				'container_class'    => 'setting-content submenu',
+				'settings'           => ic_epc_general_settings_page_settings(),
+				'content_settings'   => array(),
+				'sections'           => ic_epc_general_settings_page_sections(),
+				'helpers'            => array(
+					'ic_epc_main_helper',
+					array(
+						'callback' => 'ic_epc_doc_helper',
+						'args'     => array( __( 'shortcode', 'ecommerce-product-catalog' ), 'product-catalog-shortcodes' ),
+					),
+					array(
+						'callback' => 'ic_epc_doc_helper',
+						'args'     => array( __( 'sorting', 'ecommerce-product-catalog' ), 'product-order-settings' ),
+					),
+				),
+				'submit_label'       => __( 'Save changes', 'ecommerce-product-catalog' ),
+			)
+		);
+	}
+
+	return $page;
+}
+
+/**
+ * Returns current general settings values used by the shared settings page.
+ *
+ * @return array
+ */
+function ic_epc_general_settings_page_settings() {
+	$item_name = ic_catalog_item_name();
+
+	return array(
+		'archive_multiple_settings' => get_multiple_settings(),
+		'enable_product_listing'    => get_option( 'enable_product_listing', 1 ),
+		'product_archive'           => get_product_listing_id(),
+		'item_name'                 => $item_name,
+		'uc_item_name'              => ic_ucfirst( $item_name ),
+	);
+}
+
+/**
+ * Returns the general settings page sections.
+ *
+ * @return array
+ */
+function ic_epc_general_settings_page_sections() {
+	$page_settings             = ic_epc_general_settings_page_settings();
+	$archive_multiple_settings = $page_settings['archive_multiple_settings'];
+	$sections                  = array(
+		array(
+			'title'            => __( 'Catalog Layout Integration', 'ecommerce-product-catalog' ),
+			'settings'         => $page_settings,
+			'content_callback' => 'ic_epc_render_general_layout_section',
+		),
+		array(
+			'title'       => __( 'Catalog Label', 'ecommerce-product-catalog' ),
+			'table_class' => 'IC_Settings_Standard_Table',
+			'settings'    => array(
+				'rows' => array(
+					array(
+						'type'  => 'text',
+						'label' => __( 'Catalog Singular Name', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[catalog_singular]',
+						'value' => $archive_multiple_settings['catalog_singular'],
+						'tip'   => __( 'Admin panel customisation setting. Change it to what you sell.', 'ecommerce-product-catalog' ),
+					),
+					array(
+						'type'  => 'text',
+						'label' => __( 'Catalog Plural Name', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[catalog_plural]',
+						'value' => $archive_multiple_settings['catalog_plural'],
+						'tip'   => __( 'Admin panel customisation setting. Change it to what you sell.', 'ecommerce-product-catalog' ),
+					),
+				),
+			),
+		),
+		array(
+			'title'       => __( 'Main listing page', 'ecommerce-product-catalog' ),
+			'table_class' => 'IC_Settings_Standard_Table',
+			'table_args'  => array(
+				'settings' => ic_epc_general_main_listing_table_settings( $page_settings ),
+			),
+		),
+		array(
+			'title'           => __( 'Categories Settings', 'ecommerce-product-catalog' ),
+			'table_class'     => 'IC_Settings_Standard_Table',
+			'table_args'      => array(
+				'settings' => ic_epc_general_categories_table_settings( $page_settings ),
+			),
+			'container_class' => 'ic-settings-section advanced_mode_settings_inline',
+		),
+		array(
+			'title'           => __( 'SEO Settings', 'ecommerce-product-catalog' ),
+			'table_class'     => 'IC_Settings_Standard_Table',
+			'container_class' => 'ic-settings-section advanced_mode_settings_inline',
+			'settings'        => array(
+				'rows' => array(
+					array(
+						'type'  => 'text',
+						'label' => __( 'Archive SEO Title', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[seo_title]',
+						'value' => $archive_multiple_settings['seo_title'],
+						'tip'   => __( 'The title tag for selected product listing page. If you are using separate SEO plugin you should set it there. E.g. in Yoast SEO look for it in Custom Post Types archive titles section.', 'ecommerce-product-catalog' ),
+					),
+					array(
+						'type'  => 'checkbox',
+						'label' => __( 'Enable SEO title separator', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[seo_title_sep]',
+						'value' => $archive_multiple_settings['seo_title_sep'],
+					),
+					array(
+						'type'  => 'checkbox',
+						'label' => __( 'Enable Structured Data', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[enable_structured_data]',
+						'value' => $archive_multiple_settings['enable_structured_data'],
+						'tip'   => __( 'Enable to show structured data on each single product page. Test it with Google’s Structured Data Testing Tool. You can modify the output with the structured-data.php template file.', 'ecommerce-product-catalog' ),
+					),
+				),
+			),
+		),
+		array(
+			'title'           => __( 'Breadcrumbs Settings', 'ecommerce-product-catalog' ),
+			'table_class'     => 'IC_Settings_Standard_Table',
+			'container_class' => 'ic-settings-section advanced_mode_settings_inline',
+			'settings'        => array(
+				'rows' => array(
+					array(
+						'type'  => 'checkbox',
+						'label' => __( 'Enable Catalog Breadcrumbs', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[enable_product_breadcrumbs]',
+						'value' => $archive_multiple_settings['enable_product_breadcrumbs'],
+						'tip'   => __( 'Shows a path to the currently displayed product catalog page with URLs to parent pages and correct schema markup for SEO.', 'ecommerce-product-catalog' ),
+					),
+					array(
+						'type'  => 'text',
+						'label' => __( 'Main listing breadcrumbs title', 'ecommerce-product-catalog' ),
+						'name'  => 'archive_multiple_settings[breadcrumbs_title]',
+						'value' => $archive_multiple_settings['breadcrumbs_title'],
+						'tip'   => __( 'The title for main product listing in breadcrumbs.', 'ecommerce-product-catalog' ),
+					),
+				),
+			),
+		),
+	);
+
+	if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
+		array_splice(
+			$sections,
+			1,
+			0,
+			array(
+				array(
+					'title'       => __( 'Catalog Mode', 'ecommerce-product-catalog' ),
+					'table_class' => 'IC_Settings_Standard_Table',
+					'settings'    => array(
+						'rows' => array(
+							array(
+								'type'    => 'radio',
+								'label'   => __( 'Catalog Mode', 'ecommerce-product-catalog' ),
+								'name'    => 'archive_multiple_settings[catalog_mode]',
+								'value'   => $archive_multiple_settings['catalog_mode'],
+								'options' => array(
+									'store'     => __( 'Web Store', 'ecommerce-product-catalog' ),
+									'inquiry'   => __( 'Inquiry Catalog', 'ecommerce-product-catalog' ),
+									'affiliate' => __( 'Affiliate Catalog', 'ecommerce-product-catalog' ),
+									'simple'    => __( 'Simple Catalog', 'ecommerce-product-catalog' ),
+								),
+								'tip'     => __( 'Choose your usage scenario.', 'ecommerce-product-catalog' ),
+							),
+						),
+					),
+				),
+			)
+		);
+	}
+
+	$sections = apply_filters( 'ic_epc_general_settings_page_sections', $sections, $page_settings );
+
+	return $sections;
+}
+
+/**
+ * Returns main listing section table settings.
+ *
+ * @param array $page_settings Page settings.
+ *
+ * @return array
+ */
+function ic_epc_general_main_listing_table_settings( $page_settings ) {
+	$archive_multiple_settings = $page_settings['archive_multiple_settings'];
+	$item_name                 = $page_settings['item_name'];
+	$uc_item_name              = $page_settings['uc_item_name'];
+
+	return array(
+		'archive_multiple_settings' => $archive_multiple_settings,
+		'enable_product_listing'    => $page_settings['enable_product_listing'],
+		'product_archive'           => $page_settings['product_archive'],
+		'rows'                      => array(
+			array(
+				'type'  => 'checkbox',
+				'label' => __( 'Enable Main Listing Page', 'ecommerce-product-catalog' ),
+				'name'  => 'enable_product_listing',
+				'value' => $page_settings['enable_product_listing'],
+				/* translators: %s: Product catalog shortcode. */
+				'tip'   => sprintf( __( 'Disable and use %s shortcode to display the products.', 'ecommerce-product-catalog' ), '[show_products]' ),
+			),
+			array(
+				'callback' => 'ic_epc_render_main_listing_page_row',
+				'settings' => $page_settings,
+			),
+			array(
+				'type'  => 'number',
+				'label' => __( 'Listing shows at most', 'ecommerce-product-catalog' ),
+				'name'  => 'archive_multiple_settings[archive_products_limit]',
+				'value' => $archive_multiple_settings['archive_products_limit'],
+				'unit'  => $item_name,
+				'step'  => 1,
+				'min'   => 1,
+				/* translators: %s: Product catalog shortcode. */
+				'tip'   => __( 'You can also use shortcode with products_limit attribute to set this.', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'type'    => 'radio',
+				'label'   => __( 'Main listing shows', 'ecommerce-product-catalog' ),
+				'name'    => 'archive_multiple_settings[product_listing_cats]',
+				'value'   => $archive_multiple_settings['product_listing_cats'],
+				'options' => array(
+					'off'              => $uc_item_name,
+					'on'               => $uc_item_name . ' & ' . __( 'Main Categories', 'ecommerce-product-catalog' ),
+					/* translators: %s: Catalog singular name. */
+					'cats_only'        => sprintf( __( 'Main Categories & Uncategorized %s', 'ecommerce-product-catalog' ), $uc_item_name ),
+					'forced_cats_only' => __( 'Main Categories', 'ecommerce-product-catalog' ),
+				),
+			),
+			array(
+				'type'    => 'radio',
+				'label'   => __( 'Default order', 'ecommerce-product-catalog' ),
+				'name'    => 'archive_multiple_settings[product_order]',
+				'value'   => $archive_multiple_settings['product_order'],
+				'options' => get_product_sort_options(),
+				'tip'     => __( 'This is also the default setting for sorting drop-down.', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'callback'                  => 'ic_epc_render_product_listing_page_settings_row',
+				'archive_multiple_settings' => $archive_multiple_settings,
+			),
+		),
+		'notices'                   => ic_epc_general_main_listing_table_notices(),
+	);
+}
+
+/**
+ * Returns categories section table settings.
+ *
+ * @param array $page_settings Page settings.
+ *
+ * @return array
+ */
+function ic_epc_general_categories_table_settings( $page_settings ) {
+	$archive_multiple_settings = $page_settings['archive_multiple_settings'];
+	$uc_item_name              = $page_settings['uc_item_name'];
+
+	return array(
+		'archive_multiple_settings' => $archive_multiple_settings,
+		'rows'                      => array(
+			array(
+				'callback'                  => 'ic_epc_render_category_archive_url_row',
+				'archive_multiple_settings' => $archive_multiple_settings,
+			),
+			array(
+				'type'    => 'radio',
+				'label'   => __( 'Category Page shows', 'ecommerce-product-catalog' ),
+				'name'    => 'archive_multiple_settings[category_top_cats]',
+				'value'   => $archive_multiple_settings['category_top_cats'],
+				'options' => array(
+					'off'                => $uc_item_name,
+					'on'                 => $uc_item_name . ' & ' . __( 'Subcategories', 'ecommerce-product-catalog' ),
+					'only_subcategories' => __( 'Subcategories', 'ecommerce-product-catalog' ),
+				),
+				'tip'     => __( 'The main listing can show only products, top-level categories and products or only the categories. With the subcategories option selected the products will show up only if they are directly assigned to the category. If you want to display the products only on the bottom category level, please assign the products only to it (not to all categories in the tree).', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'type'    => 'radio',
+				'label'   => __( 'Categories Display', 'ecommerce-product-catalog' ),
+				'name'    => 'archive_multiple_settings[cat_template]',
+				'value'   => $archive_multiple_settings['cat_template'],
+				'options' => array(
+					'template' => __( 'Template', 'ecommerce-product-catalog' ),
+					'link'     => __( 'URLs', 'ecommerce-product-catalog' ),
+				),
+				'tip'     => __( 'Template option will display categories with the same listing theme as products. Link option will show categories as simple URLs without image.', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'type'  => 'checkbox',
+				'label' => __( 'Disable Image on Category Page', 'ecommerce-product-catalog' ),
+				'name'  => 'archive_multiple_settings[cat_image_disabled]',
+				'value' => $archive_multiple_settings['cat_image_disabled'],
+				'tip'   => __( 'If you disable the image, it will be only used for categories listing.', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'type'    => 'radio',
+				'label'   => __( 'Show Related', 'ecommerce-product-catalog' ),
+				'name'    => 'archive_multiple_settings[related]',
+				'value'   => $archive_multiple_settings['related'],
+				'options' => array(
+					'products'   => $uc_item_name,
+					'categories' => __( 'Categories', 'ecommerce-product-catalog' ),
+					'none'       => __( 'Nothing', 'ecommerce-product-catalog' ),
+				),
+				'tip'     => __( 'The related products or categories will be shown on the bottom of product pages.', 'ecommerce-product-catalog' ),
+			),
+			array(
+				'callback'                  => 'ic_epc_render_product_category_settings_row',
+				'archive_multiple_settings' => $archive_multiple_settings,
+			),
+		),
+		'notices'                   => ic_epc_general_categories_table_notices(),
+	);
+}
+
+/**
+ * Renders the general settings action buttons above the shared form.
+ *
+ * @param string $option_group Option group.
+ *
+ * @return void
+ */
+function ic_epc_general_settings_page_before_form( $option_group ) {
+	if ( 'product_settings' !== $option_group ) {
+		return;
+	}
 	?>
-    <div class="overall-product-settings settings-wrapper" style="clear:both;">
-        <div class="settings-submenu">
-            <h3>
-                <a id="general-settings" class="element current"
-                   href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=general-settings' ) ?>"><?php _e( 'General Settings', 'ecommerce-product-catalog' ); ?></a>
-				<?php do_action( 'general_submenu' ); ?>
-            </h3>
-        </div>
-
-		<?php if ( $submenu == 'general-settings' or $submenu == '' ) { ?>
-            <div class="setting-content submenu">
-                <script>
-                    jQuery('.settings-submenu a').removeClass('current');
-                    jQuery('.settings-submenu a#general-settings').addClass('current');
-                </script>
-                <h2 style="display:inline-block;vertical-align:middle;"><?php _e( 'General Settings', 'ecommerce-product-catalog' ); ?></h2>
-                <a style="display: inline-block;vertical-align: middle;margin-left: 10px;" class="button-secondary"
-                   href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=implecode_welcome' ) ) ?>"><?php _e( 'Configuration Wizard', 'ecommerce-product-catalog' ) ?></a>
-                <a style="display: inline-block;vertical-align: middle;margin-left: 10px;" class="button-secondary"
-                   href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reset_product_settings=1' ) ) ?>"><?php _e( 'Reset Catalog Settings', 'ecommerce-product-catalog' ) ?></a>
-                <form method="post" action="options.php">
-					<?php
-					settings_fields( 'product_settings' );
-					$create_new_button      = ic_create_new_listing_page();
-					$enable_product_listing = get_option( 'enable_product_listing', 1 );
-					//$product_listing_url		 = product_listing_url();
-					$product_archive           = get_product_listing_id();
-					$archive_multiple_settings = get_multiple_settings();
-					$item_name                 = ic_catalog_item_name();
-					$uc_item_name              = ic_ucfirst( $item_name );
-
-					/*
-					  $page_get					 = get_page_by_path( $product_listing_url );
-
-					  if ( $product_archive != '' ) {
-					  $new_product_listing_url = get_page_uri( $product_archive );
-					  if ( $new_product_listing_url != '' ) {
-					  update_option( 'product_listing_url', $new_product_listing_url );
-					  } else {
-					  update_option( 'product_listing_url', __( 'products', 'ecommerce-product-catalog' ) );
-					  }
-					  } else if ( !empty( $page_get->ID ) ) {
-					  update_option( 'product_archive', $page_get->ID );
-					  $product_archive = $page_get->ID;
-					  } */
-					$disabled = '';
-					if ( ! is_advanced_mode_forced() || ic_is_woo_template_available() || is_ic_shortcode_integration() ) {
-						$integration_panel_shown = 1;
-						?>
-                        <div class="ic-important-settings">
-							<?php
-							/*
-							  implecode_info(
-							  '<p>' . __( 'Select a page to display your products.', 'ecommerce-product-catalog' ) . '</p>' .
-							  '<p>' . __( 'This is the most important setting. The selected page slug will be included in individual product urls.', 'ecommerce-product-catalog' ) . '</p>' .
-							  '<p>' . sprintf( __( 'Place %s on this page.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>'
-							  );
-							 *
-							 */
-							$tip = __( 'Select a page to display your products.', 'ecommerce-product-catalog' );
-							$tip .= ' ' . __( 'The selected page will become a parent for each product.', 'ecommerce-product-catalog' );
-							$tip .= ' ' . sprintf( __( 'Place %s on this page.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
-							?>
-                            <div></div>
-
-                            <span><span style="vertical-align: middle;" title="<?php echo $tip ?>"
-                                        class="dashicons dashicons-editor-help ic_tip"></span><?php _e( 'Main Catalog Page', 'ecommerce-product-catalog' ); ?>: </span>
-							<?php
-							if ( $enable_product_listing == 1 ) {
-								$listing_url = product_listing_url();
-								ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true, $listing_url, 1, false, $create_new_button );
-							} else {
-								ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true, false, 1, false, $create_new_button );
-							}
-							do_action( 'ic_after_main_catalog_page_setting_html' );
-							?>
-
-                            <h3><?php
-								$theme = wp_get_theme();
-								if ( $theme->exists() ) {
-									echo __( 'Catalog Layout Integration with the theme', 'ecommerce-product-catalog' ) . ' (' . $theme->display( 'Name' ) . ')';
-								}
-								?>
-                            </h3>
-							<?php
-							if ( ic_has_listing_shortcode() ) {
-							if ( ! is_integraton_file_active() ) {
-								$alert_message = sprintf( __( 'You have to remove the %s from the main catalog page to switch the integration method.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
-								$alert_message .= '\r\n';
-								$alert_message .= '\r\n';
-								$alert_message .= __( 'How to do it?', 'ecommerce-product-catalog' );
-								$alert_message .= '\r\n';
-								$alert_message .= '1. ' . __( 'Click the Edit button near the Main Catalog Page option.', 'ecommerce-product-catalog' );
-								$alert_message .= '\r\n';
-								$alert_message .= '2. ' . sprintf( __( 'Remove the %s on the page edit screen.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
-								$alert_message .= '\r\n';
-								$alert_message .= '3. ' . sprintf( __( 'Save the page without the %s', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
-								$alert_message .= '\r\n';
-								$alert_message .= '4. ' . __( 'Get back here (refresh this page) and switch the layout mode again.', 'ecommerce-product-catalog' );
-								?>
-                                <script>
-                                    jQuery(document).ready(function () {
-                                        jQuery("input[name=ic-fake-empty-feature]").click(function () {
-                                            alert("<?php echo $alert_message ?>");
-                                            jQuery("input[name=ic-fake-empty-feature]").attr("checked", false);
-                                            jQuery("input[name=ic-fake-empty-feature]:last-child").prop("checked", true);
-                                        });
-                                    });
-                                </script>
-                                <table>
-									<?php
-									$descriptions['simple']   = '<strong>' . __( 'Simple Mode', 'ecommerce-product-catalog' ) . '</strong> (' . __( 'recommended', 'ecommerce-product-catalog' ) . ') - ' . __( 'will use your theme page template with catalog custom styling applied.', 'ecommerce-product-catalog' );
-									$descriptions['advanced'] = '<strong>' . __( 'Advanced Mode', 'ecommerce-product-catalog' ) . '</strong>' . ' - ' . __( 'fully customizable layout with the visual configuration wizard.', 'ecommerce-product-catalog' );
-									$descriptions['theme']    = '<strong>' . __( 'Theme Mode', 'ecommerce-product-catalog' ) . '</strong>' . ' - ' . __( 'your theme default template files will be used to display catalog pages.', 'ecommerce-product-catalog' );
-									implecode_settings_radio( __( 'Layout mode', 'ecommerce-product-catalog' ), 'ic-fake-empty-feature', 'simple', array(
-										'advanced' => $descriptions['advanced'],
-										'theme'    => $descriptions['theme'],
-										'simple'   => $descriptions['simple']
-									), 1, __( 'Simple mode is recommended. Choose Advanced Mode if you want more control over the layout or theme mode if your theme should control the layout. ', 'ecommerce-product-catalog' ), '<br>', "integration-mode-selection" );
-									?>
-                                </table>
-							<?php
-							}
-							implecode_info( sprintf( __( 'You are currently using %s on your product listing to integrate the catalog with the theme.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>' . '<p>' . sprintf( __( 'If you have any problems with catalog layout, you can remove the %s and use the theme integration wizard to fix it.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>' );
-							ic_shortcode_mode_settings();
-							//echo sample_product_button( 'p', __( 'Remove the Shortcode and Start Visual Wizard', 'ecommerce-product-catalog' ), 'button' );
-							} else if ( ic_is_woo_template_available() ) {
-								echo '<p>' . __( 'If you have any problems with catalog layout, you can use the theme integration wizard to fix it.', 'ecommerce-product-catalog' ) . '</p>';
-								echo sample_product_button( 'p', __( 'Advanced Mode Visual Wizard', 'ecommerce-product-catalog' ) );
-							} else {
-							if ( get_integration_type() == 'simple' ) {
-								$disabled = 'disabled';
-							}
-							$theme = get_option( 'template' );
-							//$selected	 = is_integration_mode_selected();
-							/*
-							  implecode_info(
-							  '<p>' . sprintf( __( 'Place %s on the page where you would like the product list to be displayed.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>' .
-							  '<p>' . __( 'Simple mode is recommended.', 'ecommerce-product-catalog' ) . '</p>'
-							  );
-							 *
-							 */
-							?>
-                                <table>
-									<?php
-									$descriptions['simple']   = '<strong>' . __( 'Simple Mode', 'ecommerce-product-catalog' ) . '</strong> (' . __( 'recommended', 'ecommerce-product-catalog' ) . ') - ' . __( 'will use your theme page template with catalog custom styling applied.', 'ecommerce-product-catalog' );
-									$descriptions['advanced'] = '<strong>' . __( 'Advanced Mode', 'ecommerce-product-catalog' ) . '</strong>' . ' - ' . __( 'fully customizable layout with the visual configuration wizard.', 'ecommerce-product-catalog' );
-									$descriptions['theme']    = '<strong>' . __( 'Theme Mode', 'ecommerce-product-catalog' ) . '</strong>' . ' - ' . __( 'your theme default template files will be used to display catalog pages.', 'ecommerce-product-catalog' );
-									implecode_settings_radio( __( 'Layout mode', 'ecommerce-product-catalog' ), 'archive_multiple_settings[integration_type][' . $theme . ']', ic_catalog_theme_integration::get_real_integration_mode(), array(
-										'advanced' => $descriptions['advanced'],
-										'theme'    => $descriptions['theme'],
-										'simple'   => $descriptions['simple']
-									), 1, __( 'Simple mode is recommended. Choose Advanced Mode if you want more control over the layout or theme mode if your theme should control the layout. ', 'ecommerce-product-catalog' ), '<br>', "integration-mode-selection" );
-									?>
-                                </table>
-
-                                <div class="simple_mode_settings">
-									<?php
-									implecode_info( __( 'Use the options below to adjust the output.', 'ecommerce-product-catalog' ), 1, 0, false );
-									/*
-									  implecode_info(
-									  '<p>' . __( 'In simple mode you will have to use shortcodes to display category pages. The advanced mode will display them for you automatically.', 'ecommerce-product-catalog' ) . '</p>' .
-									  '<p>' . __( 'Simple mode will use your theme layout so it can show some unwanted elements on product catalog pages.', 'ecommerce-product-catalog' ) . '</p>' .
-									  '<p>' . sprintf( __( 'If you want to switch to advanced mode easily, please insert %s on your product listing page.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>'
-									  )
-									 *
-									 */
-									?>
-                                </div>
-                                <div class="advanced_mode_settings" style="display: none">
-									<?php
-									implecode_info(
-										'<p>' . sprintf( __( 'In Advanced Mode %s must figure out your theme markup to display products properly.', 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME ) . '</p>' .
-										'<p>' . __( 'Use the button below to begin the easy auto adjustment.', 'ecommerce-product-catalog' ) . '</p>' .
-										'<p>' . sprintf( __( 'If you have access to the server files, you can also use our %sTheme Integration Guide%s to achieve it quickly.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=general-integration-info">', '</a>' ) . '</p>' .
-										'<p>' . sprintf( __( 'If you have any problems with the integration, please insert %s on any page to display the catalog.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>'
-									);
-
-									foreach ( $archive_multiple_settings['integration_type'] as $integration_theme => $value ) {
-										if ( $integration_theme == $theme ) {
-											continue;
-										}
-										echo '<input type="hidden" name="archive_multiple_settings[integration_type][' . $integration_theme . ']" value="' . $value . '">';
-									}
-									foreach ( $archive_multiple_settings['container_width'] as $container_width_theme => $value ) {
-										if ( $container_width_theme == $theme ) {
-											continue;
-										}
-										echo '<input type="hidden" name="archive_multiple_settings[container_width][' . $container_width_theme . ']" value="' . $value . '">';
-									}
-									foreach ( $archive_multiple_settings['container_bg'] as $container_bg_theme => $value ) {
-										if ( $container_bg_theme == $theme ) {
-											continue;
-										}
-										echo '<input type="hidden" name="archive_multiple_settings[container_bg][' . $container_bg_theme . ']" value="' . $value . '">';
-									}
-									foreach ( $archive_multiple_settings['container_padding'] as $container_width_padding => $value ) {
-										if ( $container_width_padding == $theme ) {
-											continue;
-										}
-										echo '<input type="hidden" name="archive_multiple_settings[container_padding][' . $container_width_padding . ']" value="' . $value . '">';
-									}
-									?>
-                                    <table class="advanced_mode_settings_hidden">
-                                        <tr>
-                                            <td style="min-width: 250px"></td>
-                                            <td></td>
-                                        </tr>
-										<?php
-										implecode_settings_number( __( 'Catalog Container Width', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_width][' . $theme . ']', $archive_multiple_settings['container_width'][ $theme ], '%' );
-										implecode_settings_text_color( __( 'Catalog Container Background', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_bg][' . $theme . ']', $archive_multiple_settings['container_bg'][ $theme ] );
-										implecode_settings_number( __( 'Catalog Container Padding', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_padding][' . $theme . ']', $archive_multiple_settings['container_padding'][ $theme ], 'px' );
-										if ( ! defined( 'AL_SIDEBAR_BASE_URL' ) ) {
-											implecode_settings_radio( __( 'Default Sidebar', 'ecommerce-product-catalog' ), 'archive_multiple_settings[default_sidebar]', $archive_multiple_settings['default_sidebar'], array(
-												'none'  => __( 'Disabled', 'ecommerce-product-catalog' ),
-												'left'  => __( 'Left', 'ecommerce-product-catalog' ),
-												'right' => __( 'Right', 'ecommerce-product-catalog' )
-											) );
-										}
-										implecode_settings_checkbox( __( 'Disable Product Name', 'ecommerce-product-catalog' ), 'archive_multiple_settings[disable_name]', $archive_multiple_settings['disable_name'] );
-										?>
-                                    </table>
-									<?php
-									echo sample_product_button( 'p', __( 'Advanced Mode Visual Wizard', 'ecommerce-product-catalog' ) );
-									/*
-									  if ( get_integration_type() == 'advanced' ) {
-									  echo sample_product_button( 'p', __( 'Restart Integration Wizard', 'ecommerce-product-catalog' ) );
-									  }
-									 *
-									 */
-									?>
-                                </div>
-                                <div class="theme_mode_settings" style="display: none">
-									<?php
-									implecode_info(
-										'<p>' . __( 'In theme mode the catalog will use your theme layout for all the catalog pages.', 'ecommerce-product-catalog' ) . '</p>' .
-										'<p>' . sprintf( __( 'If you have access to the server files, you can also use our %sTheme Integration Guide%s to have full control over the layout.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=general-integration-info">', '</a>' ) . '</p>' .
-										'<p>' . sprintf( __( 'If you have any problems with the integration, please insert %s on any page to display the catalog.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>'
-									)
-									?>
-                                </div>
-								<?php
-								ic_shortcode_mode_settings();
-							}
-							?>
-                        </div>
-						<?php
-					} else {
-						if ( ! empty( $product_archive ) && $product_archive !== 'noid' ) {
-							$url = get_edit_post_link( $product_archive );
-						}
-						if ( ! empty( $url ) ) {
-							$message = sprintf( __( 'Add %1$s to the %2$smain catalog page%3$s to have more styling options.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name(), '<a href="' . $url . '">', '</a>' );
-						} else {
-							$url     = admin_url( 'post-new.php?post_type=page' );
-							$message = sprintf( __( '%1$sCreate a main catalog listing page%2$s with %3$s to have more styling options.', 'ecommerce-product-catalog' ), '<a href="' . $url . '">', '</a>', ic_catalog_shortcode_name() );
-						}
-						implecode_info( $message );
-					}
-					do_action( 'ic_after_layout_integration_setting_html', $archive_multiple_settings );
-
-					if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
-						?>
-                        <h3><?php _e( 'Catalog Mode', 'ecommerce-product-catalog' ); ?></h3>
-                        <table><?php
-							implecode_settings_radio( __( 'Catalog Mode', 'ecommerce-product-catalog' ), 'archive_multiple_settings[catalog_mode]', $archive_multiple_settings['catalog_mode'], array(
-								'store'     => __( 'Web Store', 'ecommerce-product-catalog' ),
-								'inquiry'   => __( 'Inquiry Catalog', 'ecommerce-product-catalog' ),
-								'affiliate' => __( 'Affiliate Catalog', 'ecommerce-product-catalog' ),
-								'simple'    => __( 'Simple Catalog', 'ecommerce-product-catalog' )
-							), 1, __( 'Choose your usage scenario.', 'ecommerce-product-catalog' ) );
-							?>
-                        </table>
-						<?php
-					}
-					?>
-                    <h3><?php _e( 'Catalog Label', 'ecommerce-product-catalog' ); ?></h3>
-                    <table><?php
-						implecode_settings_text( __( 'Catalog Singular Name', 'ecommerce-product-catalog' ), 'archive_multiple_settings[catalog_singular]', $archive_multiple_settings['catalog_singular'], null, 1, null, __( 'Admin panel customisation setting. Change it to what you sell.', 'ecommerce-product-catalog' ) );
-						implecode_settings_text( __( 'Catalog Plural Name', 'ecommerce-product-catalog' ), 'archive_multiple_settings[catalog_plural]', $archive_multiple_settings['catalog_plural'], null, 1, null, __( 'Admin panel customisation setting. Change it to what you sell.', 'ecommerce-product-catalog' ) );
-						?>
-                    </table>
-
-                    <h3><?php _e( 'Main listing page', 'ecommerce-product-catalog' ); ?></h3><?php
-					/* if ( $disabled == 'disabled' ) {
-					  implecode_warning( sprintf( __( 'Product listing page is disabled with simple theme integration. See <a href="%s">Theme Integration Guide</a> to enable product listing page with pagination or use [show_products] shortcode on the page selected below.', 'ecommerce-product-catalog' ), 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=product-listing' ) );
-					  } */
-					if ( ! ic_check_rewrite_compatibility() ) {
-						implecode_warning( __( 'It seems that this page is already set to be a listing for different elements. Please change the product listing page to make sure that product pages work fine.<br><br>This is probably caused by other plugin being set to show items on the same page.', 'ecommerce-product-catalog' ) );
-					}
-					?>
-                    <table>
-                        <tr>
-                            <td style="width: 180px;min-width:180px;">
-                            </td>
-                            <td></td>
-                        </tr>
-						<?php
-						implecode_settings_checkbox( __( 'Enable Main Listing Page', 'ecommerce-product-catalog' ), 'enable_product_listing', $enable_product_listing, 1, sprintf( __( 'Disable and use %s shortcode to display the products.', 'ecommerce-product-catalog' ), '[show_products]' ) );
-						if ( empty( $integration_panel_shown ) ) {
-							?>
-                            <tr>
-                                <td>
-                                    <span title="<?php _e( 'The page where the main product listing shows. Also this page slug will be included in product url.', 'ecommerce-product-catalog' ) ?>"
-                                          class="dashicons dashicons-editor-help ic_tip"></span>
-									<?php _e( 'Choose Main Listing Page', 'ecommerce-product-catalog' ); ?>:
-                                </td>
-                                <td><?php
-									if ( $enable_product_listing == 1 ) {
-										$listing_url = product_listing_url();
-										ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true, $listing_url );
-									} else {
-										ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true );
-									}
-									?>
-                                </td>
-                            </tr> <?php
-						}
-						implecode_settings_number( __( 'Listing shows at most', 'ecommerce-product-catalog' ), 'archive_multiple_settings[archive_products_limit]', $archive_multiple_settings['archive_products_limit'], $item_name, 1, 1, __( 'You can also use shortcode with products_limit attribute to set this.', 'ecommerce-product-catalog' ), 1 );
-						implecode_settings_radio( __( 'Main listing shows', 'ecommerce-product-catalog' ), 'archive_multiple_settings[product_listing_cats]', $archive_multiple_settings['product_listing_cats'], array(
-							'off'              => $uc_item_name,
-							'on'               => $uc_item_name . ' & ' . __( 'Main Categories', 'ecommerce-product-catalog' ),
-							'cats_only'        => sprintf( __( 'Main Categories & Uncategorized %s', 'ecommerce-product-catalog' ), $uc_item_name ),
-							'forced_cats_only' => __( 'Main Categories', 'ecommerce-product-catalog' )
-						) );
-						$sort_options = get_product_sort_options();
-						implecode_settings_radio( __( 'Default order', 'ecommerce-product-catalog' ), 'archive_multiple_settings[product_order]', $archive_multiple_settings['product_order'], $sort_options, true, __( 'This is also the default setting for sorting drop-down.', 'ecommerce-product-catalog' ) );
-						do_action( 'product_listing_page_settings' );
-						?>
-                    </table><?php
-					//implecode_info(__('You can also use shortcode to show your products whenever you want on the website. Just paste on any page: [show_products] and you will display all products in place of the shortcode. <br><br>To show products from just one category, use: [show_products category="2"] where 2 is category ID (you can display several categories by inserting comma separated IDs). <br><br>To display products by IDs, use: [show_products product="5"], where 5 is product ID.', 'ecommerce-product-catalog'));
-					?>
-                    <div class="advanced_mode_settings_inline">
-                        <h3><?php _e( 'Categories Settings', 'ecommerce-product-catalog' ); ?></h3><?php
-						/*
-						  if ( $disabled != '' ) {
-						  implecode_warning( __( 'Automatic category pages are disabled with simple integration. Switch to Advanced Integration to enable category pages or use [show_products category="1"] (where "1" is category ID) on any page to show products from certain category.', 'ecommerce-product-catalog' ) );
-						  }
-						 *
-						 */
-						if ( ! ic_check_tax_rewrite_compatibility() ) {
-							implecode_warning( __( 'It seems that this categories parent URL is already set to be a parent for different elements. Please change the Categories Parent URL to make sure that product category pages work fine.<br><br>This is probably caused by other plugin being set to show categories with the same parent.', 'ecommerce-product-catalog' ) );
-						}
-						?>
-                        <table>
-							<?php if ( is_ic_permalink_product_catalog() ) { ?>
-                                <tr>
-                                <td>
-                                    <span title="<?php echo sprintf( __( 'By default, the category parent slug cannot be the same as for products. If you want them to be the same, please look for %s extension in the catalog extensions menu.', 'ecommerce-product-catalog' ), 'Smarter Product URLs' ) ?>"
-                                          class="dashicons dashicons-editor-help ic_tip"></span>
-									<?php _e( 'Categories Parent URL', 'ecommerce-product-catalog' ); ?>:
-                                </td>
-								<?php
-								$site_url = site_url();
-								$urllen   = strlen( $site_url );
-								if ( $urllen > 25 ) {
-									$site_url = ic_substr( $site_url, 0, 11 ) . '...' . ic_substr( $site_url, $urllen - 11, $urllen );
-								}
-								?>
-                                <td class="longer">
-									<?php echo $site_url ?>/<input type="text"
-                                                                   name="archive_multiple_settings[category_archive_url]"
-                                                                   title="<?php _e( 'Cannot be the same as product listing page slug', 'ecommerce-product-catalog' ) ?> (<?php echo get_product_slug() ?>)."
-                                                                   id="category_archive_url"
-                                                                   value="<?php echo urldecode( sanitize_title( $archive_multiple_settings['category_archive_url'] ) ); ?>"/>/<?php _e( 'category-name', 'ecommerce-product-catalog' ) ?>
-                                    /
-                                </td>
-                                </tr><?php
-							}
-							implecode_settings_radio( __( 'Category Page shows', 'ecommerce-product-catalog' ), 'archive_multiple_settings[category_top_cats]', $archive_multiple_settings['category_top_cats'], array(
-								'off'                => $uc_item_name,
-								'on'                 => $uc_item_name . ' & ' . __( 'Subcategories', 'ecommerce-product-catalog' ),
-								'only_subcategories' => __( 'Subcategories', 'ecommerce-product-catalog' )
-							), 1, __( 'The main listing can show only products, top-level categories and products or only the categories. With the subcategories option selected the products will show up only if they are directly assigned to the category. If you want to display the products only on the bottom category level, please assign the products only to it (not to all categories in the tree).', 'ecommerce-product-catalog' ) );
-							implecode_settings_radio( __( 'Categories Display', 'ecommerce-product-catalog' ), 'archive_multiple_settings[cat_template]', $archive_multiple_settings['cat_template'], array(
-								'template' => __( 'Template', 'ecommerce-product-catalog' ),
-								'link'     => __( 'URLs', 'ecommerce-product-catalog' )
-							), true, __( 'Template option will display categories with the same listing theme as products. Link option will show categories as simple URLs without image.', 'ecommerce-product-catalog' ) );
-							implecode_settings_checkbox( __( 'Disable Image on Category Page', 'ecommerce-product-catalog' ), 'archive_multiple_settings[cat_image_disabled]', $archive_multiple_settings['cat_image_disabled'], 1, __( 'If you disable the image, it will be only used for categories listing.', 'ecommerce-product-catalog' ) );
-							implecode_settings_radio( __( 'Show Related', 'ecommerce-product-catalog' ), 'archive_multiple_settings[related]', $archive_multiple_settings['related'], array(
-								'products'   => $uc_item_name,
-								'categories' => __( 'Categories', 'ecommerce-product-catalog' ),
-								'none'       => __( 'Nothing', 'ecommerce-product-catalog' )
-							), 1, __( 'The related products or categories will be shown on the bottom of product pages.', 'ecommerce-product-catalog' ) );
-							do_action( 'product_category_settings', $archive_multiple_settings );
-							?>
-                        </table>
-
-                        <h3><?php _e( 'SEO Settings', 'ecommerce-product-catalog' ); ?></h3><?php
-						/*
-						  if ( $disabled != '' ) {
-						  if ( $selected ) {
-						  implecode_warning( sprintf( __( 'SEO settings are disabled with simple theme integration. See <a href="%s">Theme Integration Guide</a> to enable SEO settings.', 'ecommerce-product-catalog' ), 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=seo-settings' ) );
-						  } else {
-						  implecode_warning( sprintf( __( 'SEO settings are disabled due to a lack of theme integration.%s', 'ecommerce-product-catalog' ), sample_product_button( 'p' ) ) );
-						  }
-						  }
-						 *
-						 */
-						?>
-                        <table>
-							<?php
-							implecode_settings_text( __( 'Archive SEO Title', 'ecommerce-product-catalog' ), 'archive_multiple_settings[seo_title]', $archive_multiple_settings['seo_title'], null, 1, null, __( 'The title tag for selected product listing page. If you are using separate SEO plugin you should set it there. E.g. in Yoast SEO look for it in Custom Post Types archive titles section.', 'ecommerce-product-catalog' ) );
-							implecode_settings_checkbox( __( 'Enable SEO title separator', 'ecommerce-product-catalog' ), 'archive_multiple_settings[seo_title_sep]', $archive_multiple_settings['seo_title_sep'] );
-							implecode_settings_checkbox( __( 'Enable Structured Data', 'ecommerce-product-catalog' ), 'archive_multiple_settings[enable_structured_data]', $archive_multiple_settings['enable_structured_data'], 1, __( 'Enable to show structured data on each single product page. Test it with Google’s Structured Data Testing Tool. You can modify the output with the structured-data.php template file.', 'ecommerce-product-catalog' ) )
-							?>
-
-                        </table>
-
-                        <h3><?php _e( 'Breadcrumbs Settings', 'ecommerce-product-catalog' ); ?></h3><?php
-						/*
-						  if ( $disabled != '' ) {
-						  if ( $selected ) {
-						  implecode_warning( sprintf( __( 'Breadcrumbs are disabled with simple theme integration. See <a href="%s">Theme Integration Guide</a> to enable product breadcrumbs.', 'ecommerce-product-catalog' ), 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=breadcrumbs-settings' ) );
-						  } else {
-						  implecode_warning( sprintf( __( 'Breadcrumbs are disabled due to a lack of theme integration.%s', 'ecommerce-product-catalog' ), sample_product_button( 'p' ) ) );
-						  }
-						  }
-						 *
-						 */
-						?>
-                        <table>
-							<?php
-							implecode_settings_checkbox( __( 'Enable Catalog Breadcrumbs', 'ecommerce-product-catalog' ), 'archive_multiple_settings[enable_product_breadcrumbs]', $archive_multiple_settings['enable_product_breadcrumbs'], 1, __( 'Shows a path to the currently displayed product catalog page with URLs to parent pages and correct schema markup for SEO.', 'ecommerce-product-catalog' ) );
-							implecode_settings_text( __( 'Main listing breadcrumbs title', 'ecommerce-product-catalog' ), 'archive_multiple_settings[breadcrumbs_title]', $archive_multiple_settings['breadcrumbs_title'], null, 1, null, __( 'The title for main product listing in breadcrumbs.', 'ecommerce-product-catalog' ) );
-							?>
-                        </table>
-                    </div>
-					<?php do_action( 'general-settings', $archive_multiple_settings ); ?>
-                    <p class="submit">
-                        <input type="submit" class="button-primary"
-                               value="<?php _e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
-                    </p>
-                </form>
-            </div>
-            <div class="helpers">
-                <div class="wrapper"><?php
-					main_helper();
-					doc_helper( __( 'shortcode', 'ecommerce-product-catalog' ), 'product-catalog-shortcodes' );
-					doc_helper( __( 'sorting', 'ecommerce-product-catalog' ), 'product-order-settings' );
-					//did_know_helper('support', __('You can get instant support by email','ecommerce-product-catalog'), 'https://implecode.com/wordpress/plugins/premium-support/')
-					?>
-                </div>
-            </div>
-			<?php
+	<p class="ic-general-settings-actions">
+		<a class="button-secondary" href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=implecode_welcome' ) ); ?>"><?php esc_html_e( 'Configuration Wizard', 'ecommerce-product-catalog' ); ?></a>
+		<a class="button-secondary" href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reset_product_settings=1' ) ); ?>"><?php esc_html_e( 'Reset Catalog Settings', 'ecommerce-product-catalog' ); ?></a>
+	</p>
+	<style>
+		.ic-general-settings-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin: 0 0 16px;
 		}
-		do_action( 'product-settings' );
-
-
-		//permalink_options_update();
-		?>
-    </div>
-
+	</style>
 	<?php
 }
 
+/**
+ * Renders the catalog layout integration section.
+ *
+ * @param array $settings Page settings.
+ *
+ * @return void
+ */
+function ic_epc_render_general_layout_section( $settings ) {
+	$archive_multiple_settings = $settings['archive_multiple_settings'];
+	$enable_product_listing    = $settings['enable_product_listing'];
+	$product_archive           = $settings['product_archive'];
+	$create_new_button         = ic_create_new_listing_page();
+
+	if ( ! is_advanced_mode_forced() || ic_is_woo_template_available() || is_ic_shortcode_integration() ) {
+		$integration_panel_shown = 1;
+		?>
+		<div class="ic-important-settings">
+			<?php
+			$tip  = __( 'Select a page to display your products.', 'ecommerce-product-catalog' );
+			$tip .= ' ' . __( 'The selected page will become a parent for each product.', 'ecommerce-product-catalog' );
+			/* translators: %s: Product catalog shortcode. */
+			$tip .= ' ' . sprintf( __( 'Place %s on this page.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
+			?>
+			<div></div>
+			<span><span style="vertical-align: middle;" title="<?php echo esc_attr( $tip ); ?>" class="dashicons dashicons-editor-help ic_tip"></span><?php esc_html_e( 'Main Catalog Page', 'ecommerce-product-catalog' ); ?>: </span>
+			<?php
+			if ( 1 === (int) $enable_product_listing ) {
+				$listing_url = product_listing_url();
+				ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true, $listing_url, 1, false, $create_new_button );
+			} else {
+				ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $product_archive, true, false, 1, false, $create_new_button );
+			}
+			do_action( 'ic_after_main_catalog_page_setting_html' );
+			?>
+			<h4>
+				<?php
+				$theme = wp_get_theme();
+				if ( $theme->exists() ) {
+					/* translators: %s: Current theme name. */
+					echo esc_html( sprintf( __( 'Catalog Layout Integration with the theme (%s)', 'ecommerce-product-catalog' ), $theme->display( 'Name' ) ) );
+				}
+				?>
+			</h4>
+			<?php
+			if ( ic_has_listing_shortcode() ) {
+				if ( ! is_integraton_file_active() ) {
+					/* translators: %s: Product catalog shortcode. */
+					$alert_message  = sprintf( __( 'You have to remove the %s from the main catalog page to switch the integration method.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
+					$alert_message .= '\r\n';
+					$alert_message .= '\r\n';
+					$alert_message .= __( 'How to do it?', 'ecommerce-product-catalog' );
+					$alert_message .= '\r\n';
+					$alert_message .= '1. ' . __( 'Click the Edit button near the Main Catalog Page option.', 'ecommerce-product-catalog' );
+					$alert_message .= '\r\n';
+					/* translators: %s: Product catalog shortcode. */
+					$alert_message .= '2. ' . sprintf( __( 'Remove the %s on the page edit screen.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
+					$alert_message .= '\r\n';
+					/* translators: %s: Product catalog shortcode. */
+					$alert_message .= '3. ' . sprintf( __( 'Save the page without the %s', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() );
+					$alert_message .= '\r\n';
+					$alert_message .= '4. ' . __( 'Get back here (refresh this page) and switch the layout mode again.', 'ecommerce-product-catalog' );
+					?>
+					<script>
+						jQuery( document ).ready( function () {
+							jQuery( 'input[name=ic-fake-empty-feature]' ).click( function () {
+								alert( <?php echo wp_json_encode( $alert_message ); ?> );
+								jQuery( 'input[name=ic-fake-empty-feature]' ).attr( 'checked', false );
+								jQuery( 'input[name=ic-fake-empty-feature]:last-child' ).prop( 'checked', true );
+							} );
+						} );
+					</script>
+					<table>
+						<?php
+						$descriptions = array(
+							'simple'   => '<strong>' . __( 'Simple Mode', 'ecommerce-product-catalog' ) . '</strong> (' . __( 'recommended', 'ecommerce-product-catalog' ) . ') - ' . __( 'will use your theme page template with catalog custom styling applied.', 'ecommerce-product-catalog' ),
+							'advanced' => '<strong>' . __( 'Advanced Mode', 'ecommerce-product-catalog' ) . '</strong> - ' . __( 'fully customizable layout with the visual configuration wizard.', 'ecommerce-product-catalog' ),
+							'theme'    => '<strong>' . __( 'Theme Mode', 'ecommerce-product-catalog' ) . '</strong> - ' . __( 'your theme default template files will be used to display catalog pages.', 'ecommerce-product-catalog' ),
+						);
+						implecode_settings_radio(
+							__( 'Layout mode', 'ecommerce-product-catalog' ),
+							'ic-fake-empty-feature',
+							'simple',
+							array(
+								'advanced' => $descriptions['advanced'],
+								'theme'    => $descriptions['theme'],
+								'simple'   => $descriptions['simple'],
+							),
+							1,
+							__( 'Simple mode is recommended. Choose Advanced Mode if you want more control over the layout or theme mode if your theme should control the layout. ', 'ecommerce-product-catalog' ),
+							'<br>',
+							'integration-mode-selection'
+						);
+						?>
+					</table>
+					<?php
+				}
+				/* translators: %s: Product catalog shortcode. */
+				implecode_info( sprintf( __( 'You are currently using %s on your product listing to integrate the catalog with the theme.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p><p>' . sprintf( __( 'If you have any problems with catalog layout, you can remove the %s and use the theme integration wizard to fix it.', 'ecommerce-product-catalog' ), ic_catalog_shortcode_name() ) . '</p>' );
+				ic_shortcode_mode_settings();
+			} elseif ( ic_is_woo_template_available() ) {
+				echo '<p>' . esc_html__( 'If you have any problems with catalog layout, you can use the theme integration wizard to fix it.', 'ecommerce-product-catalog' ) . '</p>';
+				echo wp_kses_post( sample_product_button( 'p', __( 'Advanced Mode Visual Wizard', 'ecommerce-product-catalog' ) ) );
+			} else {
+				$theme        = get_option( 'template' );
+				$descriptions = array(
+					'simple'   => '<strong>' . __( 'Simple Mode', 'ecommerce-product-catalog' ) . '</strong> (' . __( 'recommended', 'ecommerce-product-catalog' ) . ') - ' . __( 'will use your theme page template with catalog custom styling applied.', 'ecommerce-product-catalog' ),
+					'advanced' => '<strong>' . __( 'Advanced Mode', 'ecommerce-product-catalog' ) . '</strong> - ' . __( 'fully customizable layout with the visual configuration wizard.', 'ecommerce-product-catalog' ),
+					'theme'    => '<strong>' . __( 'Theme Mode', 'ecommerce-product-catalog' ) . '</strong> - ' . __( 'your theme default template files will be used to display catalog pages.', 'ecommerce-product-catalog' ),
+				);
+				?>
+				<table>
+					<?php
+					implecode_settings_radio(
+						__( 'Layout mode', 'ecommerce-product-catalog' ),
+						'archive_multiple_settings[integration_type][' . $theme . ']',
+						IC_Catalog_Theme_Integration::get_real_integration_mode(),
+						array(
+							'advanced' => $descriptions['advanced'],
+							'theme'    => $descriptions['theme'],
+							'simple'   => $descriptions['simple'],
+						),
+						1,
+						__( 'Simple mode is recommended. Choose Advanced Mode if you want more control over the layout or theme mode if your theme should control the layout. ', 'ecommerce-product-catalog' ),
+						'<br>',
+						'integration-mode-selection'
+					);
+					?>
+				</table>
+				<div class="simple_mode_settings">
+					<?php implecode_info( __( 'Use the options below to adjust the output.', 'ecommerce-product-catalog' ), 1, 0, false ); ?>
+				</div>
+				<div class="advanced_mode_settings" style="display: none">
+					<?php
+					/* translators: %s: Plugin name. */
+					$advanced_mode_intro = sprintf( __( 'In Advanced Mode %s must figure out your theme markup to display products properly.', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) );
+					/* translators: %1$s: Opening guide link. %2$s: Closing guide link. */
+					$advanced_mode_guide = sprintf( __( 'If you have access to the server files, you can also use our %1$sTheme Integration Guide%2$s to achieve it quickly.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=general-integration-info' ) . '">', '</a>' );
+					/* translators: %s: Product catalog shortcode. */
+					$advanced_mode_shortcode = sprintf( __( 'If you have any problems with the integration, please insert %s on any page to display the catalog.', 'ecommerce-product-catalog' ), esc_html( ic_catalog_shortcode_name() ) );
+					implecode_info(
+						'<p>' . $advanced_mode_intro . '</p>' .
+						'<p>' . __( 'Use the button below to begin the easy auto adjustment.', 'ecommerce-product-catalog' ) . '</p>' .
+						'<p>' . $advanced_mode_guide . '</p>' .
+						'<p>' . $advanced_mode_shortcode . '</p>'
+					);
+					foreach ( $archive_multiple_settings['integration_type'] as $integration_theme => $value ) {
+						if ( $integration_theme === $theme ) {
+							continue;
+						}
+						printf(
+							'<input type="hidden" name="%1$s" value="%2$s">',
+							esc_attr( 'archive_multiple_settings[integration_type][' . $integration_theme . ']' ),
+							esc_attr( $value )
+						);
+					}
+					foreach ( $archive_multiple_settings['container_width'] as $container_width_theme => $value ) {
+						if ( $container_width_theme === $theme ) {
+							continue;
+						}
+						printf(
+							'<input type="hidden" name="%1$s" value="%2$s">',
+							esc_attr( 'archive_multiple_settings[container_width][' . $container_width_theme . ']' ),
+							esc_attr( $value )
+						);
+					}
+					foreach ( $archive_multiple_settings['container_bg'] as $container_bg_theme => $value ) {
+						if ( $container_bg_theme === $theme ) {
+							continue;
+						}
+						printf(
+							'<input type="hidden" name="%1$s" value="%2$s">',
+							esc_attr( 'archive_multiple_settings[container_bg][' . $container_bg_theme . ']' ),
+							esc_attr( $value )
+						);
+					}
+					foreach ( $archive_multiple_settings['container_padding'] as $container_width_padding => $value ) {
+						if ( $container_width_padding === $theme ) {
+							continue;
+						}
+						printf(
+							'<input type="hidden" name="%1$s" value="%2$s">',
+							esc_attr( 'archive_multiple_settings[container_padding][' . $container_width_padding . ']' ),
+							esc_attr( $value )
+						);
+					}
+					?>
+					<table class="advanced_mode_settings_hidden">
+						<tr>
+							<td style="min-width: 250px"></td>
+							<td></td>
+						</tr>
+						<?php
+						implecode_settings_number( __( 'Catalog Container Width', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_width][' . $theme . ']', $archive_multiple_settings['container_width'][ $theme ], '%' );
+						implecode_settings_text_color( __( 'Catalog Container Background', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_bg][' . $theme . ']', $archive_multiple_settings['container_bg'][ $theme ] );
+						implecode_settings_number( __( 'Catalog Container Padding', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_padding][' . $theme . ']', $archive_multiple_settings['container_padding'][ $theme ], 'px' );
+						if ( ! defined( 'AL_SIDEBAR_BASE_URL' ) ) {
+							implecode_settings_radio(
+								__( 'Default Sidebar', 'ecommerce-product-catalog' ),
+								'archive_multiple_settings[default_sidebar]',
+								$archive_multiple_settings['default_sidebar'],
+								array(
+									'none'  => __( 'Disabled', 'ecommerce-product-catalog' ),
+									'left'  => __( 'Left', 'ecommerce-product-catalog' ),
+									'right' => __( 'Right', 'ecommerce-product-catalog' ),
+								)
+							);
+						}
+						implecode_settings_checkbox( __( 'Disable Product Name', 'ecommerce-product-catalog' ), 'archive_multiple_settings[disable_name]', $archive_multiple_settings['disable_name'] );
+						?>
+					</table>
+					<?php echo wp_kses_post( sample_product_button( 'p', __( 'Advanced Mode Visual Wizard', 'ecommerce-product-catalog' ) ) ); ?>
+				</div>
+				<div class="theme_mode_settings" style="display: none">
+					<?php
+					/* translators: %1$s: Opening guide link. %2$s: Closing guide link. */
+					$theme_mode_guide = sprintf( __( 'If you have access to the server files, you can also use our %1$sTheme Integration Guide%2$s to have full control over the layout.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=general-integration-info' ) . '">', '</a>' );
+					/* translators: %s: Product catalog shortcode. */
+					$theme_mode_shortcode = sprintf( __( 'If you have any problems with the integration, please insert %s on any page to display the catalog.', 'ecommerce-product-catalog' ), esc_html( ic_catalog_shortcode_name() ) );
+					implecode_info(
+						'<p>' . __( 'In theme mode the catalog will use your theme layout for all the catalog pages.', 'ecommerce-product-catalog' ) . '</p>' .
+						'<p>' . $theme_mode_guide . '</p>' .
+						'<p>' . $theme_mode_shortcode . '</p>'
+					);
+					?>
+				</div>
+				<?php
+				ic_shortcode_mode_settings();
+			}
+			?>
+		</div>
+		<?php
+	} else {
+		if ( ! empty( $product_archive ) && 'noid' !== $product_archive ) {
+			$url = get_edit_post_link( $product_archive );
+		}
+		if ( ! empty( $url ) ) {
+			/* translators: %1$s: Product catalog shortcode. %2$s: Opening edit link. %3$s: Closing edit link. */
+			$message = sprintf( __( 'Add %1$s to the %2$smain catalog page%3$s to have more styling options.', 'ecommerce-product-catalog' ), esc_html( ic_catalog_shortcode_name() ), '<a href="' . esc_url( $url ) . '">', '</a>' );
+		} else {
+			$url = admin_url( 'post-new.php?post_type=page' );
+			/* translators: %1$s: Opening create page link. %2$s: Closing create page link. %3$s: Product catalog shortcode. */
+			$message = sprintf( __( '%1$sCreate a main catalog listing page%2$s with %3$s to have more styling options.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( $url ) . '">', '</a>', esc_html( ic_catalog_shortcode_name() ) );
+		}
+		implecode_info( $message );
+	}
+
+	do_action( 'ic_after_layout_integration_setting_html', $archive_multiple_settings );
+}
+
+/**
+ * Returns main listing table notices.
+ *
+ * @return array
+ */
+function ic_epc_general_main_listing_table_notices() {
+	if ( ic_check_rewrite_compatibility() ) {
+		return array();
+	}
+
+	return array(
+		array(
+			'type'    => 'warning',
+			'message' => __( 'It seems that this page is already set to be a listing for different elements. Please change the product listing page to make sure that product pages work fine.<br><br>This is probably caused by other plugin being set to show items on the same page.', 'ecommerce-product-catalog' ),
+		),
+	);
+}
+
+/**
+ * Renders the conditional main listing page selector row.
+ *
+ * @param array $row Callback row data.
+ *
+ * @return void
+ */
+function ic_epc_render_main_listing_page_row( $row ) {
+	$settings = $row['settings'];
+
+	if ( ! is_advanced_mode_forced() || ic_is_woo_template_available() || is_ic_shortcode_integration() ) {
+		return;
+	}
+	?>
+	<tr>
+		<td>
+			<span title="<?php echo esc_attr__( 'The page where the main product listing shows. Also this page slug will be included in product url.', 'ecommerce-product-catalog' ); ?>" class="dashicons dashicons-editor-help ic_tip"></span>
+			<?php esc_html_e( 'Choose Main Listing Page', 'ecommerce-product-catalog' ); ?>:
+		</td>
+		<td>
+			<?php
+			if ( 1 === (int) $settings['enable_product_listing'] ) {
+				$listing_url = product_listing_url();
+				ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $settings['product_archive'], true, $listing_url );
+			} else {
+				ic_select_page( 'product_archive', __( 'Default', 'ecommerce-product-catalog' ), $settings['product_archive'], true );
+			}
+			?>
+		</td>
+	</tr>
+	<?php
+}
+
+/**
+ * Renders additional listing page settings rows.
+ *
+ * @param array $row Callback row data.
+ *
+ * @return void
+ */
+function ic_epc_render_product_listing_page_settings_row( $row ) {
+	do_action( 'product_listing_page_settings' );
+}
+
+/**
+ * Returns categories table notices.
+ *
+ * @return array
+ */
+function ic_epc_general_categories_table_notices() {
+	if ( ic_check_tax_rewrite_compatibility() ) {
+		return array();
+	}
+
+	return array(
+		array(
+			'type'    => 'warning',
+			'message' => __( 'It seems that this categories parent URL is already set to be a parent for different elements. Please change the Categories Parent URL to make sure that product category pages work fine.<br><br>This is probably caused by other plugin being set to show categories with the same parent.', 'ecommerce-product-catalog' ),
+		),
+	);
+}
+
+/**
+ * Renders the category archive URL row.
+ *
+ * @param array $row Callback row data.
+ *
+ * @return void
+ */
+function ic_epc_render_category_archive_url_row( $row ) {
+	if ( ! is_ic_permalink_product_catalog() ) {
+		return;
+	}
+
+	$archive_multiple_settings = $row['archive_multiple_settings'];
+	$site_url                  = site_url();
+	$urllen                    = strlen( $site_url );
+	if ( $urllen > 25 ) {
+		$site_url = ic_substr( $site_url, 0, 11 ) . '...' . ic_substr( $site_url, $urllen - 11, $urllen );
+	}
+	?>
+	<tr>
+		<td>
+			<span title="<?php echo esc_attr( sprintf( __( 'By default, the category parent slug cannot be the same as for products. If you want them to be the same, please look for %s extension in the catalog extensions menu.', 'ecommerce-product-catalog' ), 'Smarter Product URLs' ) ); ?>" class="dashicons dashicons-editor-help ic_tip"></span>
+			<?php esc_html_e( 'Categories Parent URL', 'ecommerce-product-catalog' ); ?>:
+		</td>
+		<td class="longer">
+			<?php echo esc_html( $site_url ); ?>/<input type="text" name="archive_multiple_settings[category_archive_url]" title="<?php echo esc_attr( sprintf( __( 'Cannot be the same as product listing page slug (%s).', 'ecommerce-product-catalog' ), get_product_slug() ) ); ?>" id="category_archive_url" value="<?php echo esc_attr( urldecode( sanitize_title( $archive_multiple_settings['category_archive_url'] ) ) ); ?>"/>/<?php esc_html_e( 'category-name', 'ecommerce-product-catalog' ); ?>/
+		</td>
+	</tr>
+	<?php
+}
+
+/**
+ * Renders additional category settings rows.
+ *
+ * @param array $row Callback row data.
+ *
+ * @return void
+ */
+function ic_epc_render_product_category_settings_row( $row ) {
+	do_action( 'product_category_settings', $row['archive_multiple_settings'] );
+}
+
+/**
+ * Renders additional general settings registered on the legacy hook.
+ *
+ * @param string $option_group Option group.
+ * @param array  $settings Page settings.
+ *
+ * @return void
+ */
+function ic_epc_general_settings_page_sections_end( $option_group, $settings ) {
+	if ( 'product_settings' !== $option_group || ! has_action( 'general-settings' ) ) {
+		return;
+	}
+
+	// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Existing hook name retained for compatibility.
+	do_action( 'general-settings', $settings['archive_multiple_settings'] );
+}
+
+/**
+ * Returns shortcode integration mode settings.
+ *
+ * @return array
+ */
 function ic_get_shortcode_mode_settings() {
-	$settings                                          = get_multiple_settings();
-	$settings['shortcode_mode']['show_everywhere']     = isset( $settings['shortcode_mode']['show_everywhere'] ) ? $settings['shortcode_mode']['show_everywhere'] : 0;
-	$settings['shortcode_mode']['force_name']          = isset( $settings['shortcode_mode']['force_name'] ) ? $settings['shortcode_mode']['force_name'] : 0;
+	$settings                                      = get_multiple_settings();
+	$settings['shortcode_mode']['show_everywhere'] = isset( $settings['shortcode_mode']['show_everywhere'] ) ? $settings['shortcode_mode']['show_everywhere'] : 0;
+	$settings['shortcode_mode']['force_name']      = isset( $settings['shortcode_mode']['force_name'] ) ? $settings['shortcode_mode']['force_name'] : 0;
 	$settings['shortcode_mode']['force_category_name'] = isset( $settings['shortcode_mode']['force_category_name'] ) ? $settings['shortcode_mode']['force_category_name'] : 0;
 	$settings['shortcode_mode']['move_breadcrumbs']    = isset( $settings['shortcode_mode']['move_breadcrumbs'] ) ? $settings['shortcode_mode']['move_breadcrumbs'] : 0;
 	$settings['shortcode_mode']['template']            = isset( $settings['shortcode_mode']['template'] ) ? $settings['shortcode_mode']['template'] : 0;
@@ -557,6 +848,9 @@ function ic_get_shortcode_mode_settings() {
 	return $settings['shortcode_mode'];
 }
 
+/**
+ * Renders shortcode mode settings fields.
+ */
 function ic_shortcode_mode_settings() {
 	$settings = ic_get_shortcode_mode_settings();
 	if ( is_ic_shortcode_integration() ) {
@@ -567,15 +861,24 @@ function ic_shortcode_mode_settings() {
 		if ( is_ic_breadcrumbs_enabled() ) {
 			implecode_settings_checkbox( __( 'Move breadcrumbs to the top', 'ecommerce-product-catalog' ), 'archive_multiple_settings[shortcode_mode][move_breadcrumbs]', $settings['move_breadcrumbs'], 1, __( 'Breadcrumbs will be displayed before the page title. It may require some additional styling.', 'ecommerce-product-catalog' ) );
 		}
-		do_action( 'ic_shortcode_mode_settings_html', $settings );
-		echo '</table>';
+			do_action( 'ic_shortcode_mode_settings_html', $settings );
+			echo '</table>';
 	} else {
 		foreach ( $settings as $name => $value ) {
-			echo '<input type="hidden" name="archive_multiple_settings[shortcode_mode][' . $name . ']" value="' . $value . '">';
+			printf(
+				'<input type="hidden" name="%1$s" value="%2$s">',
+				esc_attr( 'archive_multiple_settings[shortcode_mode][' . $name . ']' ),
+				esc_attr( $value )
+			);
 		}
 	}
 }
 
+/**
+ * Returns the default archive settings.
+ *
+ * @return array
+ */
 function get_default_multiple_settings() {
 	return array(
 		'archive_products_limit'     => 12,
@@ -587,6 +890,11 @@ function get_default_multiple_settings() {
 	);
 }
 
+/**
+ * Returns archive settings.
+ *
+ * @return array
+ */
 function get_multiple_settings() {
 	$archive_multiple_settings = get_option( 'archive_multiple_settings', get_default_multiple_settings() );
 	if ( empty( $archive_multiple_settings ) || ! is_array( $archive_multiple_settings ) ) {
@@ -600,8 +908,8 @@ function get_multiple_settings() {
 	$theme    = get_option( 'template' );
 	$prev_int = 'simple';
 	if ( ! isset( $archive_multiple_settings['integration_type'] ) || ! is_array( $archive_multiple_settings['integration_type'] ) ) {
-		if ( class_exists( 'ic_catalog_notices' ) ) {
-			$support_check = ic_catalog_notices::theme_support_check();
+		if ( class_exists( 'IC_Catalog_Notices', false ) ) {
+			$support_check = IC_Catalog_Notices::theme_support_check();
 		}
 		if ( ! empty( $support_check[ $theme ] ) ) {
 			$prev_int = isset( $archive_multiple_settings['integration_type'] ) ? $archive_multiple_settings['integration_type'] : 'simple';
@@ -609,7 +917,9 @@ function get_multiple_settings() {
 		$archive_multiple_settings['integration_type'] = array();
 	}
 
-	if ( is_advanced_mode_forced() || ( isset( $_GET['test_advanced'] ) && ( $_GET['test_advanced'] == 1 || $_GET['test_advanced'] == 'ok' ) ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading admin preview state.
+		$test_advanced = isset( $_GET['test_advanced'] ) ? sanitize_text_field( wp_unslash( $_GET['test_advanced'] ) ) : '';
+	if ( is_advanced_mode_forced() || '1' === $test_advanced || 'ok' === $test_advanced ) {
 		$archive_multiple_settings['integration_type'][ $theme ] = 'advanced';
 	} else {
 		$archive_multiple_settings['integration_type'][ $theme ] = isset( $archive_multiple_settings['integration_type'][ $theme ] ) ? $archive_multiple_settings['integration_type'][ $theme ] : $prev_int;
@@ -639,7 +949,6 @@ function get_multiple_settings() {
 	$archive_multiple_settings['breadcrumbs_title']          = isset( $archive_multiple_settings['breadcrumbs_title'] ) ? $archive_multiple_settings['breadcrumbs_title'] : $archive_multiple_settings['catalog_plural'];
 	$archive_multiple_settings['enable_product_breadcrumbs'] = isset( $archive_multiple_settings['enable_product_breadcrumbs'] ) ? $archive_multiple_settings['enable_product_breadcrumbs'] : '';
 	$archive_multiple_settings['enable_structured_data']     = isset( $archive_multiple_settings['enable_structured_data'] ) ? $archive_multiple_settings['enable_structured_data'] : '';
-
 
 	$prev_container_width   = ! is_array( $archive_multiple_settings['container_width'] ) ? $archive_multiple_settings['container_width'] : 100;
 	$prev_container_bg      = ! is_array( $archive_multiple_settings['container_bg'] ) ? $archive_multiple_settings['container_bg'] : '';
@@ -674,6 +983,13 @@ function get_multiple_settings() {
 	return apply_filters( 'catalog_multiple_settings', $archive_multiple_settings );
 }
 
+/**
+ * Returns catalog singular and plural names.
+ *
+ * @param string|null $which Requested name key.
+ *
+ * @return array|string
+ */
 function get_catalog_names( $which = null ) {
 	$multiple_settings = get_multiple_settings();
 	$names['singular'] = $multiple_settings['catalog_singular'];
@@ -686,6 +1002,11 @@ function get_catalog_names( $which = null ) {
 	return $names;
 }
 
+/**
+ * Returns the current integration type.
+ *
+ * @return string
+ */
 function get_integration_type() {
 	$type = ic_get_global( 'ic_integration_type' );
 	if ( empty( $type ) ) {
@@ -698,13 +1019,26 @@ function get_integration_type() {
 	return $type;
 }
 
+/**
+ * Returns product sort options.
+ *
+ * @return array
+ */
 function get_product_sort_options() {
-	return apply_filters( 'product_sort_options', array(
-		'newest'       => __( 'Sort by Newest', 'ecommerce-product-catalog' ),
-		'product-name' => __( 'Sort by Name', 'ecommerce-product-catalog' )
-	) );
+	return apply_filters(
+		'product_sort_options',
+		array(
+			'newest'       => __( 'Sort by Newest', 'ecommerce-product-catalog' ),
+			'product-name' => __( 'Sort by Name', 'ecommerce-product-catalog' ),
+		)
+	);
 }
 
+/**
+ * Returns the main product listing page ID.
+ *
+ * @return int|string
+ */
 function get_product_listing_id() {
 	if ( get_post_type() ) {
 		$cache_key = 'listing_id';
@@ -734,7 +1068,8 @@ function get_product_listing_id() {
  */
 function product_listing_url() {
 	$listing_url = '';
-	if ( /* is_ic_permalink_product_catalog() && */ 'noid' != ( $page_id = get_product_listing_id() ) ) {
+	$page_id     = get_product_listing_id();
+	if ( 'noid' !== $page_id ) {
 		if ( ! empty( $page_id ) ) {
 			$listing_url = ic_get_permalink( $page_id );
 		}
@@ -746,8 +1081,14 @@ function product_listing_url() {
 	return apply_filters( 'product_listing_url', $listing_url );
 }
 
+/**
+ * Returns the product listing page status.
+ *
+ * @return string
+ */
 function ic_get_product_listing_status() {
-	if ( 'noid' != ( $page_id = get_product_listing_id() ) ) {
+	$page_id = get_product_listing_id();
+	if ( 'noid' !== $page_id ) {
 		if ( ! empty( $page_id ) ) {
 			$status = get_post_status( $page_id );
 
@@ -758,9 +1099,14 @@ function ic_get_product_listing_status() {
 	return 'publish';
 }
 
+/**
+ * Returns the product slug.
+ *
+ * @return string
+ */
 function get_product_slug() {
 	$page_id = get_product_listing_id();
-	if ( $page_id !== 'noid' ) {
+	if ( 'noid' !== $page_id ) {
 		$slug = urldecode( untrailingslashit( get_page_uri( $page_id ) ) );
 	}
 	if ( empty( $slug ) ) {
@@ -771,47 +1117,64 @@ function get_product_slug() {
 	return apply_filters( 'product_slug', $slug );
 }
 
+/**
+ * Sanitizes a title while preserving multibyte characters.
+ *
+ * @param string $str Source string.
+ * @param bool   $keep_percent_sign Whether to preserve percent signs.
+ * @param bool   $force_lowercase Whether to lowercase the string.
+ * @param bool   $sanitize_slugs Whether to sanitize as a slug.
+ *
+ * @return string
+ */
 function ic_sanitize_title( $str, $keep_percent_sign = false, $force_lowercase = true, $sanitize_slugs = true ) {
 	if ( ! ic_is_multibyte( $str ) ) {
 		return sanitize_title( $str );
 	}
-	// Remove accents & entities
+		// Remove accents and entities.
 	$clean = remove_accents( $str );
 	$clean = str_replace( array( '&lt', '&gt', '&amp' ), '', $clean );
 
-	$percent_sign   = ( $keep_percent_sign ) ? "\%" : "";
+	$percent_sign   = ( $keep_percent_sign ) ? '\%' : '';
 	$sanitize_regex = "/[^\p{Xan}a-zA-Z0-9{$percent_sign}\/_\.|+, -]/ui";
 	$clean          = preg_replace( $sanitize_regex, '', $clean );
 	$clean          = ( $force_lowercase ) ? strtolower( $clean ) : $clean;
 
-	// Remove amperand
+		// Remove ampersands.
 	$clean = str_replace( array( '%26', '&' ), '', $clean );
 
-	// Remove special characters
-	if ( $sanitize_slugs !== false ) {
-		$clean = preg_replace( "/[\s|+-]+/", "-", $clean );
-		$clean = preg_replace( "/[,]+/", "", $clean );
+		// Remove special characters.
+	if ( false !== $sanitize_slugs ) {
+		$clean = preg_replace( '/[\s|+-]+/', '-', $clean );
+		$clean = preg_replace( '/[,]+/', '', $clean );
 		$clean = preg_replace( '/([\.]+)(?![a-z]{3,4}$)/i', '', $clean );
 		$clean = preg_replace( '/([-\s+]\/[-\s+])/', '-', $clean );
 	} else {
-		$clean = preg_replace( "/[\s]+/", "-", $clean );
+		$clean = preg_replace( '/[\s]+/', '-', $clean );
 	}
 
-	// Remove widow & duplicated slashes
+		// Remove widow and duplicated slashes.
 	$clean = preg_replace( '/([-]*[\/]+[-]*)/', '/', $clean );
 	$clean = preg_replace( '/([\/]+)/', '/', $clean );
 
-	// Trim slashes, dashes and whitespaces
-	$clean = trim( $clean, " /-" );
+		// Trim slashes, dashes, and whitespaces.
+	$clean = trim( $clean, ' /-' );
 
 	return $clean;
 }
 
 add_action( 'updated_option', 'rewrite_permalinks_after_update', 10, 3 );
 
+/**
+ * Flushes rewrite settings after listing changes.
+ *
+ * @param string $option Updated option name.
+ * @param mixed  $old_value Previous value.
+ * @param mixed  $new_value New value.
+ */
 function rewrite_permalinks_after_update( $option, $old_value, $new_value ) {
-	if ( $option == 'product_archive' || $option == 'archive_multiple_settings' ) {
-		if ( $option == 'product_archive' ) {
+	if ( 'product_archive' === $option || 'archive_multiple_settings' === $option ) {
+		if ( 'product_archive' === $option ) {
 			$old_id = intval( $old_value );
 			$new_id = intval( $new_value );
 			if ( ! empty( $new_id ) && $old_id !== $new_id ) {
@@ -822,7 +1185,7 @@ function rewrite_permalinks_after_update( $option, $old_value, $new_value ) {
 					if ( ! empty( $old_post->post_content ) && ic_has_page_catalog_shortcode( $old_post ) ) {
 						$auto_add = true;
 					}
-				} else if ( ! empty( $new_id ) ) {
+				} elseif ( ! empty( $new_id ) ) {
 					$auto_add = true;
 				}
 				if ( $auto_add && ! empty( $new_id ) ) {
@@ -838,23 +1201,48 @@ function rewrite_permalinks_after_update( $option, $old_value, $new_value ) {
 	}
 }
 
+/**
+ * Returns the catalog shortcode label.
+ *
+ * @return string
+ */
 function ic_catalog_shortcode_name() {
 	return apply_filters( 'ic_catalog_shortcode_name', '[show_product_catalog]' );
 }
 
+/**
+ * Returns the default catalog shortcode.
+ *
+ * @return string
+ */
 function ic_catalog_shortcode() {
 	return apply_filters( 'ic_catalog_default_listing_content', '[show_product_catalog]' );
 }
 
+/**
+ * Returns the create-listing-page button HTML.
+ *
+ * @return string
+ */
 function ic_create_new_listing_page() {
 	$button = '';
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Existing admin action toggle.
 	if ( ! empty( $_GET['create_new_listing_page'] ) ) {
 		create_products_page();
 	}
 	$listing_id = get_product_listing_id();
-	if ( empty( $listing_id ) || $listing_id === 'noid' ) {
-		$button = ' <a class="button button-small" style="vertical-align: middle;" href="' . admin_url( 'edit.php?post_type=al_product&page=product-settings.php&create_new_listing_page=1' ) . '">' . __( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
+	if ( empty( $listing_id ) || 'noid' === $listing_id ) {
+		$button = ' <a class="button button-small" style="vertical-align: middle;" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&create_new_listing_page=1' ) ) . '">' . esc_html__( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
 	}
 
 	return $button;
+}
+
+if (!function_exists('general_settings_content')) {
+	/**
+	 * A backward compatibility function for the general settings content. Can be removed in the future.
+	 *
+	 * @return void
+	 */
+    function general_settings_content() {}
 }

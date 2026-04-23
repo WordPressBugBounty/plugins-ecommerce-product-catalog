@@ -19,7 +19,7 @@ if ( ! function_exists( 'ic_blocks_generate_container' ) ) {
 		$class              = 'ic-block-' . $name;
 		if ( $attr['alignment'] === 'center' ) {
 			$class .= ' ic-align-center';
-		} else if ( $attr['alignment'] === 'right' ) {
+		} elseif ( $attr['alignment'] === 'right' ) {
 			$class .= ' ic-align-right';
 		}
 		$container_class = apply_filters( 'ic_block_container_class', $class, $product_id, $name );
@@ -29,9 +29,7 @@ if ( ! function_exists( 'ic_blocks_generate_container' ) ) {
 			$wrapper_attributes .= ' class="' . $container_class . '"';
 		}
 
-
 		return '<div ' . $wrapper_attributes . '>' . $content . '</div>';
 	}
 
 }
-

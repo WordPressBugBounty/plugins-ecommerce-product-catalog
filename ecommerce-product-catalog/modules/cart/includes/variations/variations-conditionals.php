@@ -40,7 +40,7 @@ function is_ic_variations_checkout() {
 		if ( is_ic_shopping_cart() || is_ic_shopping_order() ) {
 			return true;
 		}
-	} else if ( function_exists( 'is_ic_quote_cart' ) ) {
+	} elseif ( function_exists( 'is_ic_quote_cart' ) ) {
 		if ( is_ic_quote_cart() || is_ic_quote_order() ) {
 			return true;
 		}
@@ -167,9 +167,12 @@ function ic_cart_all_variations_selected() {
 			continue;
 		}
 		$available           = get_product_variations_values( $cart_id, false );
-		$selected_variations = array_filter( get_variation_value_from_cart_id( $cart_id ), function ( $value ) {
-			return ! empty( $value ) || is_numeric( $value );
-		} );
+		$selected_variations = array_filter(
+			get_variation_value_from_cart_id( $cart_id ),
+			function ( $value ) {
+				return ! empty( $value ) || is_numeric( $value );
+			}
+		);
 		if ( count( $available ) > count( $selected_variations ) ) {
 			$all_have_variations = false;
 			break;

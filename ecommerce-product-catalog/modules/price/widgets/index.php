@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 /**
@@ -8,9 +8,8 @@ if ( !defined( 'ABSPATH' ) ) {
  *
  * Here all plugin includes folder is defined and managed.
  *
- * @version		1.0.0
- * @package		ecommerce-product-catalog/includes
- * @author 		impleCode
+ * @version     1.0.0
+ * @package     ecommerce-product-catalog/includes
+ * @author      impleCode
  */
-require_once(dirname( __FILE__ ) . '/price-filter-widget.php');
-
+require_once __DIR__ . '/price-filter-widget.php';

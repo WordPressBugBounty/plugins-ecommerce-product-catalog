@@ -40,7 +40,8 @@ function ic_block_price_table_localize( $localize ) {
 
 
 // Register the block by passing the path to it's block.json file.
-register_block_type( __DIR__,
+register_block_type(
+	__DIR__,
 	array(
 		'title'           => __( 'Price Table', 'ecommerce-product-catalog' ),
 		'render_callback' => 'ic_block_price_table_render',
@@ -60,9 +61,12 @@ function ic_block_price_table_render( $attr ) {
 		}
 		if ( isset( $attr['metaField'] ) ) {
 			$new_price = $attr['metaField'];
-			add_filter( 'product_price', function ( $price ) use ( $new_price ) {
-				return $new_price;
-			} );
+			add_filter(
+				'product_price',
+				function ( $price ) use ( $new_price ) {
+					return $new_price;
+				}
+			);
 		}
 		$price_table = ic_price_display::get_product_price_table( $product_id );
 		if ( isset( $removed_add_to_cart ) && $removed_add_to_cart ) {
@@ -73,7 +77,7 @@ function ic_block_price_table_render( $attr ) {
 		}
 
 		return ic_blocks_generate_container( $attr, $price_table, 'price-table', $product_id );
-	} else if ( ic_is_rendering_block() ) {
+	} elseif ( ic_is_rendering_block() ) {
 		return __( 'Price not available.', 'ecommerce-product-catalog' );
 	}
 }
@@ -92,7 +96,7 @@ function ic_block_price_enqueue() {
 			'select_product'     => __( 'Select Product', 'ecommerce-product-catalog' ),
 			'search_placeholder' => __( 'Search by item name and select it in the section below', 'ecommerce-product-catalog' ),
 			'edit_block'         => __( 'Edit selected product.', 'ecommerce-product-catalog' ),
-		)
+		),
 	);
 	if ( has_action( 'price_table', 'ic_cart_add_button' ) ) {
 		$localize['price_add_cart_added'] = 1;
@@ -108,4 +112,3 @@ if ( function_exists( 'wp_set_script_translations' ) ) {
 	wp_set_script_translations( $script_handle, 'ecommerce-product-catalog', IC_EPC_TEXTDOMAIN_PATH );
 }
 */
-
