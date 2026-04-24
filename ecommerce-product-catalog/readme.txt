@@ -5,7 +5,7 @@ Tags: ecommerce, shopping cart, catalog, quote, request a quote
 Requires at least: 3.7
 Tested up to: 7.0
 Requires PHP: 5.6
-Stable tag: 3.5.0
+Stable tag: 3.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -389,15 +389,19 @@ This can be a store but it is not limited to it. It's main purpose is to present
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
 
+= 3.5.1 - 24/04/2026 =
+
+* Added a compatibility notice
+
 = 3.5.0 - 23/04/2026 =
 
-- Added new shipping options modes
-- Added new attribute options modes 
-- Added shipping and attributes bulk override tool
-- Added shipping note feature
-- Added an option to collect shipping address only for selected shipping options
-- Multiple performance improvements
-- WordPress coding standards implementation improvements
+* Added new shipping options modes
+* Added new attribute options modes 
+* Added shipping and attributes bulk override tool
+* Added shipping note feature
+* Added an option to collect shipping address only for selected shipping options
+* Multiple performance improvements
+* WordPress coding standards implementation improvements
 
 = 3.4.13 - 20/01/2026 =
 

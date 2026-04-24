@@ -219,6 +219,7 @@ function total_product_category_count( $cat_id, $taxonomy = null, $post_in = nul
 				ic_save_global( $terms_cache_meta, $terms, false, true );
 		}
 
+
 		$term_object = get_term( $cat_id, $taxonomy );
 
 		if ( ! empty( $term_object->term_id ) && ! empty( $term_object->term_taxonomy_id ) && $term_object->term_id !== $term_object->term_taxonomy_id ) {
@@ -231,6 +232,9 @@ function total_product_category_count( $cat_id, $taxonomy = null, $post_in = nul
 			$children = get_term_children( $cat_id, $taxonomy );
 			if ( ! is_wp_error( $children ) ) {
 				$products_counted = array();
+				if (empty($terms)) {
+					$terms = array();
+				}
 				$terms[ $cat_id ] = isset( $terms[ $cat_id ] ) ? $terms[ $cat_id ] : array();
 				foreach ( $children as $child_id ) {
 					if ( ! empty( $term_ids_count[ $child_id ] ) ) {

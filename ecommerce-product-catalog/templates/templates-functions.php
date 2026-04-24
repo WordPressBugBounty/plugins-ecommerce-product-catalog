@@ -114,7 +114,7 @@ function content_product_adder_single_content() {
 function content_product_adder_archive_before() {
 	$page_id = apply_filters( 'before_archive_post_id', get_product_listing_id() );
 	$page    = empty( $page_id ) ? '' : get_post( $page_id );
-	if ( '' !== $page && ! is_ic_shortcode_integration() ) {
+	if ( !empty($page) && ! is_ic_shortcode_integration() ) {
 		if ( 'simple' !== get_integration_type() ) {
 			if ( ic_has_page_catalog_shortcode( $page ) ) {
 				$page->post_content = str_replace(
@@ -838,6 +838,7 @@ function get_product_listing_title() {
 	$page_id       = apply_filters( 'before_archive_post_id', $def_page_id );
 
 	$page = empty( $page_id ) ? '' : get_post( $page_id );
+	$page_title = '';
 	if ( '' === $page ) {
 		$archive_multiple_settings = get_multiple_settings();
 		if ( 'off' === $archive_multiple_settings['product_listing_cats'] ) {
@@ -845,7 +846,7 @@ function get_product_listing_title() {
 		} else {
 			$page_title = $archive_names['all_main_categories'];
 		}
-	} else {
+	} else if (isset($page->post_title)) {
 		$page_title = apply_filters( 'the_title', $page->post_title, $page_id );
 	}
 

@@ -35,7 +35,7 @@ if ( $attributes_number > 0 && has_product_any_attributes( $product_id ) ) {
 			if ( ! empty( $attribute_value ) ) {
 				?>
 				<div><span class="attribute-label-listing"><?php echo esc_html( get_attribute_label( $i, $product_id ) ); ?>:</span>
-					<span class="attribute-value-listing"><?php echo esc_html( get_attribute_value( $i, $product_id ) ); ?></span>
+					<span class="attribute-value-listing"><?php echo get_attribute_value( $i, $product_id ) ?></span>
 					<span class="attribute-unit-listing"><?php echo esc_html( get_attribute_unit( $i, $product_id ) ); ?></span>
 				</div>
 				<?php

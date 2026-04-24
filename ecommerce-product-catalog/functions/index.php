@@ -19,6 +19,7 @@ require_once AL_BASE_PATH . '/functions/short-functions.php';
 require_once AL_BASE_PATH . '/functions/support.php';
 require_once AL_BASE_PATH . '/functions/conditionals.php';
 require_once AL_BASE_PATH . '/functions/compatibility.php';
+require_once AL_BASE_PATH . '/functions/class-ic-epc-extension-compatibility.php';
 // Cached DB helpers stay disabled in this bootstrap file.
 require_once AL_BASE_PATH . '/functions/globals.php';
 require_once AL_BASE_PATH . '/functions/rewrite.php';

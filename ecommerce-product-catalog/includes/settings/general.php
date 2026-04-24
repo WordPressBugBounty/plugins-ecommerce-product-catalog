@@ -897,14 +897,20 @@ function get_default_multiple_settings() {
  */
 function get_multiple_settings() {
 	$archive_multiple_settings = get_option( 'archive_multiple_settings', get_default_multiple_settings() );
+    $default_multiple_settings = get_default_multiple_settings();
 	if ( empty( $archive_multiple_settings ) || ! is_array( $archive_multiple_settings ) ) {
-		$archive_multiple_settings = get_default_multiple_settings();
+		$archive_multiple_settings = $default_multiple_settings;
 	}
 	foreach ( $archive_multiple_settings as $settings_key => $settings_value ) {
 		if ( ! is_array( $settings_value ) ) {
 			$archive_multiple_settings[ $settings_key ] = sanitize_text_field( $settings_value );
 		}
 	}
+    foreach ($default_multiple_settings as $default_settings_key => $default_settings_value) {
+        if (!isset($archive_multiple_settings[$default_settings_key])) {
+            $archive_multiple_settings[$default_settings_key] = $default_settings_value;
+        }
+    }
 	$theme    = get_option( 'template' );
 	$prev_int = 'simple';
 	if ( ! isset( $archive_multiple_settings['integration_type'] ) || ! is_array( $archive_multiple_settings['integration_type'] ) ) {
