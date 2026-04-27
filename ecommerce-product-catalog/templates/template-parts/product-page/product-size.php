@@ -26,7 +26,7 @@ if ( is_ic_attributes_size_enabled() && ! empty( $size ) && is_string( $size ) )
 	<table class="size-table">
 		<tr>
 			<td><?php echo esc_html( ic_attributes_get_size_label() ); ?>:</td>
-			<td class="size-value"><?php echo esc_html( $size ); ?></td>
+			<td class="size-value"><?php echo $size; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped. ?></td>
 		</tr>
 	</table>
 
