@@ -39,7 +39,7 @@ $product = ic_get_product_object();
 		</p></div>
 		<?php
 		$classic_list_settings = get_classic_list_settings();
-		do_action( 'ic_product_listing_element_inside', $product->ID, add_product_listing_name(), $classic_list_settings );
+		do_action( 'ic_product_listing_element_inside', $product->ID, $classic_list_settings );
 		do_action( 'classic_list_entry_bottom', $product->ID, $classic_list_settings );
 		?>
 	</div>

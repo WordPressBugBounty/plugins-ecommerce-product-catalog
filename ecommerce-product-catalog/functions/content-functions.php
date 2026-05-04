@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function c_list_desc( $post_id = null, $shortdesc = null ) {
-	if ( '' === $shortdesc && ! empty( $post_id ) ) {
+	if ( empty( $shortdesc ) && ! empty( $post_id ) ) {
 		$shortdesc = clean_short_description( $post_id );
 	} elseif ( ! empty( $shortdesc ) ) {
 		$shortdesc = wp_strip_all_tags( $shortdesc );
