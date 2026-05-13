@@ -152,7 +152,7 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 					$return .= '<input type="hidden" name="_wpnonce" value="' . wp_create_nonce( 'ic_catalog_activation_choice' ) . '">';
 
 					$choice_one = reset( $questions );
-					$return    .= esc_html( $choice_one );
+					$return    .= $this->sanitize_choice_markup( $choice_one );
 
 					$return .= '<input type="submit" value="' . esc_attr( __( 'Continue', 'ecommerce-product-catalog' ) ) . '" class="ic_cat-activation-choice">';
 					$return .= '</form>';
@@ -164,6 +164,121 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 				$return            .= '</h4>';
 				self::$box_content .= $return;
 			}
+		}
+
+		/**
+		 * Sanitizes inline wizard form markup for single-choice steps.
+		 *
+		 * @param string $markup Choice markup.
+		 *
+		 * @return string
+		 */
+		public function sanitize_choice_markup( $markup ) {
+			return wp_kses( $markup, $this->choice_allowed_html() );
+		}
+
+		/**
+		 * Returns the allowed HTML for inline wizard form fragments.
+		 *
+		 * @return array
+		 */
+		public function choice_allowed_html() {
+			$allowed_html = wp_kses_allowed_html( 'post' );
+
+			$allowed_html['table']  = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['tbody']  = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['thead']  = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['tfoot']  = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['tr']     = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['td']     = array(
+				'class'   => true,
+				'id'      => true,
+				'style'   => true,
+				'colspan' => true,
+				'rowspan' => true,
+			);
+			$allowed_html['th']     = array(
+				'class'   => true,
+				'id'      => true,
+				'style'   => true,
+				'colspan' => true,
+				'rowspan' => true,
+				'scope'   => true,
+			);
+			$allowed_html['div']    = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['span']   = array(
+				'class' => true,
+				'id'    => true,
+				'style' => true,
+				'title' => true,
+			);
+			$allowed_html['label']  = array(
+				'class' => true,
+				'for'   => true,
+				'id'    => true,
+				'style' => true,
+			);
+			$allowed_html['select'] = array(
+				'class'              => true,
+				'id'                 => true,
+				'multiple'           => true,
+				'name'               => true,
+				'required'           => true,
+				'style'              => true,
+				'data-placeholder'   => true,
+				'data-available_qty' => true,
+			);
+			$allowed_html['option'] = array(
+				'class'    => true,
+				'id'       => true,
+				'label'    => true,
+				'selected' => true,
+				'value'    => true,
+			);
+			$allowed_html['input']  = array(
+				'checked'     => true,
+				'class'       => true,
+				'id'          => true,
+				'max'         => true,
+				'maxlength'   => true,
+				'min'         => true,
+				'multiple'    => true,
+				'name'        => true,
+				'placeholder' => true,
+				'readonly'    => true,
+				'required'    => true,
+				'size'        => true,
+				'step'        => true,
+				'style'       => true,
+				'type'        => true,
+				'value'       => true,
+			);
+
+			return $allowed_html;
 		}
 
 		/**
