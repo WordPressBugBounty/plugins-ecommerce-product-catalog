@@ -123,7 +123,11 @@ if ( ! function_exists( 'implecode_settings_dropdown' ) ) {
 		}
 		$return           .= '<select name="' . $option_name . '" ' . $attr . ' ' . $class . '>';
 		$this_option_value = $option_value;
+		$selected_values   = null;
 		$associative       = false;
+		if ( is_array( $option_value ) ) {
+			$selected_values = array_map( 'strval', $option_value );
+		}
 		if ( array_keys( $elements ) !== range( 0, count( $elements ) - 1 ) ) {
 			$associative = true;
 		}
@@ -131,8 +135,8 @@ if ( ! function_exists( 'implecode_settings_dropdown' ) ) {
 			if ( ! $associative ) {
 				$key = $element;
 			}
-			if ( is_array( $option_value ) ) {
-				if ( in_array( $key, $option_value, true ) ) {
+			if ( null !== $selected_values ) {
+				if ( in_array( (string) $key, $selected_values, true ) ) {
 					$this_option_value = $key;
 				} else {
 					$this_option_value = '';
@@ -709,7 +713,7 @@ if ( ! function_exists( 'implecode_settings_text_color' ) ) {
 		$input_class = null,
 		$change = null
 	) {
-		if ( '' !== $required ) {
+		if ( ! empty( $required ) ) {
 			$regired_field = 'required="required"';
 			$star          = '<span class="star"> *</span>';
 		} else {

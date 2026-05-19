@@ -384,7 +384,8 @@ function ecommerce_product_catalog_upgrade() {
 }
 
 add_action( 'ic_update_product_data', 'ic_update_product_data' );
-add_action( 'ic_update_product_data_frozen', 'ic_update_product_data' );
+add_action( 'ic_update_product_data_frozen', 'ic_update_product_data_watchdog' );
+add_action( 'ic_product_data_reassignment_done', 'ic_update_product_data_clear_scope' );
 
 /**
  * Schedules or runs the product meta update process.
@@ -397,18 +398,40 @@ function ic_update_product_data() {
 	$hook_name        = 'ic_update_product_data';
 	$frozen_hook_name = $hook_name . '_frozen';
 	$done             = get_option( $option_name, 0 );
+	$scope_option     = ic_update_product_data_scope_option_name();
 
-	if ( empty( $done ) || ! wp_doing_cron() ) {
-		if ( ! get_transient( $option_name ) && current_filter() !== $frozen_hook_name ) {
-			if ( empty( $done ) ) {
-				update_option( $option_name, - 1 );
+	if ( ! wp_doing_cron() ) {
+		ic_update_product_data_clear_stale_lock();
+		if ( empty( $done ) ) {
+			if ( get_transient( $option_name ) ) {
+				return __( 'Just Finished! Wait 10 minutes before restarting.', 'ecommerce-product-catalog' );
 			}
-			wp_schedule_single_event( time(), $hook_name );
-		} else {
+			update_option( $option_name, - 1 );
+			ic_update_product_data_save_scope( ic_update_product_data_requested_scope() );
+			ic_update_product_data_schedule();
+
+			return '';
+		}
+
+		if ( false === get_option( $scope_option, false ) ) {
+			ic_update_product_data_save_scope( ic_update_product_data_requested_scope() );
+		}
+		if ( ic_update_product_data_has_lock() ) {
+			return __( 'Product data reassignment is already running.', 'ecommerce-product-catalog' );
+		}
+		if ( wp_next_scheduled( $hook_name ) ) {
+			return __( 'Product data reassignment is already scheduled.', 'ecommerce-product-catalog' );
+		}
+		ic_update_product_data_schedule();
+
+		return '';
+	}
+	if ( empty( $done ) ) {
+		if ( ! get_transient( $option_name ) ) {
 			return __( 'Just Finished! Wait 10 minutes before restarting.', 'ecommerce-product-catalog' );
 		}
 
-		return '';
+		return;
 	}
 	if ( ! wp_next_scheduled( $frozen_hook_name ) ) {
 		wp_schedule_event( time() + ( 3 * HOUR_IN_SECONDS ), 'hourly', $frozen_hook_name );
@@ -416,14 +439,21 @@ function ic_update_product_data() {
 	if ( ! function_exists( 'get_all_catalog_products' ) ) {
 		wp_clear_scheduled_hook( $hook_name );
 		wp_clear_scheduled_hook( $frozen_hook_name );
+		ic_update_product_data_release_lock();
 
 		return '';
 	}
 	if ( $done < 0 ) {
 		$done = 0;
 	}
-	if ( get_transient( 'ic_doing_update_product_data_loop' ) ) {
-		wp_schedule_single_event( time() + MINUTE_IN_SECONDS, $hook_name );
+	if ( false === get_option( $scope_option, false ) ) {
+		ic_update_product_data_save_scope( 'publish' );
+	}
+	$lock_token = ic_update_product_data_acquire_lock( $done );
+	if ( empty( $lock_token ) ) {
+		if ( ! wp_next_scheduled( $hook_name ) ) {
+			ic_update_product_data_schedule( MINUTE_IN_SECONDS );
+		}
 
 		return;
 	}
@@ -431,20 +461,255 @@ function ic_update_product_data() {
 		do_action( 'ic_product_data_reassignment_start' );
 	}
 	set_transient( 'ic_doing_update_product_data_loop', $done, MINUTE_IN_SECONDS * 15 );
+	ic_update_product_data_refresh_lock( $lock_token, $done );
 	wp_defer_term_counting( true );
-	$done = ic_update_product_data_loop( $done, $start_time, $option_name );
+	$done = ic_update_product_data_loop( $done, $start_time, $option_name, $lock_token );
 	wp_defer_term_counting( false );
-	if ( 'done' !== $done ) {
-		update_option( $option_name, $done );
-		wp_schedule_single_event( time(), $hook_name );
-	} else {
-		delete_option( $option_name );
-		wp_clear_scheduled_hook( $hook_name );
-		wp_clear_scheduled_hook( $frozen_hook_name );
-		set_transient( $option_name, 1, MINUTE_IN_SECONDS * 10 );
-		do_action( 'ic_product_data_reassignment_done' );
-	}
 	delete_transient( 'ic_doing_update_product_data_loop' );
+	if ( 'stopped' === $done ) {
+		ic_update_product_data_release_lock( $lock_token );
+
+		return;
+	}
+	if ( 'done' !== $done ) {
+		if ( ic_update_product_data_is_lock_owner( $lock_token ) ) {
+			update_option( $option_name, $done );
+			ic_update_product_data_refresh_lock( $lock_token, $done );
+			ic_update_product_data_schedule();
+		}
+		ic_update_product_data_release_lock( $lock_token );
+	} else {
+		if ( ic_update_product_data_is_lock_owner( $lock_token ) ) {
+			delete_option( $option_name );
+			wp_clear_scheduled_hook( $hook_name );
+			wp_clear_scheduled_hook( $frozen_hook_name );
+			set_transient( $option_name, 1, MINUTE_IN_SECONDS * 10 );
+			ic_update_product_data_release_lock( $lock_token );
+			do_action( 'ic_product_data_reassignment_done' );
+		} else {
+			ic_update_product_data_release_lock( $lock_token );
+		}
+	}
+}
+
+/**
+ * Reschedules the reassignment worker when a batch appears stalled.
+ *
+ * @return void
+ */
+function ic_update_product_data_watchdog() {
+	$hook_name = 'ic_update_product_data';
+
+	if ( ! ic_update_product_data_is_active() ) {
+		wp_clear_scheduled_hook( $hook_name . '_frozen' );
+
+		return;
+	}
+	ic_update_product_data_clear_stale_lock();
+	if ( ! ic_update_product_data_has_lock() && ! wp_next_scheduled( $hook_name ) ) {
+		ic_update_product_data_schedule();
+	}
+}
+
+/**
+ * Schedules the reassignment worker if it is not already queued.
+ *
+ * @param int $delay Delay in seconds.
+ * @return void
+ */
+function ic_update_product_data_schedule( $delay = 0 ) {
+	if ( ! wp_next_scheduled( 'ic_update_product_data' ) ) {
+		wp_schedule_single_event( time() + absint( $delay ), 'ic_update_product_data' );
+	}
+}
+
+/**
+ * Returns the reassignment lock option name.
+ *
+ * @return string
+ */
+function ic_update_product_data_lock_option_name() {
+	return 'ic_update_product_data_lock';
+}
+
+/**
+ * Returns the reassignment lock expiration in seconds.
+ *
+ * @return int
+ */
+function ic_update_product_data_lock_ttl() {
+	return MINUTE_IN_SECONDS * 20;
+}
+
+/**
+ * Returns the normalized reassignment worker lock payload.
+ *
+ * @param mixed $lock Raw lock value.
+ * @return array
+ */
+function ic_update_product_data_normalize_lock( $lock ) {
+	if ( ! is_array( $lock ) || empty( $lock['token'] ) || empty( $lock['timestamp'] ) ) {
+		return array();
+	}
+
+	return array(
+		'token'     => sanitize_text_field( (string) $lock['token'] ),
+		'timestamp' => absint( $lock['timestamp'] ),
+		'done'      => isset( $lock['done'] ) ? intval( $lock['done'] ) : 0,
+	);
+}
+
+/**
+ * Returns the current reassignment worker lock.
+ *
+ * @return array
+ */
+function ic_update_product_data_get_lock() {
+	return ic_update_product_data_normalize_lock( get_option( ic_update_product_data_lock_option_name(), array() ) );
+}
+
+/**
+ * Returns true when the given lock has expired.
+ *
+ * @param array $lock Lock payload.
+ * @return bool
+ */
+function ic_update_product_data_is_stale_lock( $lock ) {
+	return ! empty( $lock ) && ( time() - absint( $lock['timestamp'] ) ) > ic_update_product_data_lock_ttl();
+}
+
+/**
+ * Clears the reassignment lock if it is stale.
+ *
+ * @return bool
+ */
+function ic_update_product_data_clear_stale_lock() {
+	$lock = ic_update_product_data_get_lock();
+	if ( ic_update_product_data_is_stale_lock( $lock ) ) {
+		delete_option( ic_update_product_data_lock_option_name() );
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Returns true when the reassignment worker lock exists.
+ *
+ * @return bool
+ */
+function ic_update_product_data_has_lock() {
+	$lock = ic_update_product_data_get_lock();
+	if ( ic_update_product_data_is_stale_lock( $lock ) ) {
+		delete_option( ic_update_product_data_lock_option_name() );
+
+		return false;
+	}
+
+	return ! empty( $lock );
+}
+
+/**
+ * Acquires the reassignment worker lock.
+ *
+ * @param int $done Current progress counter.
+ * @return string
+ */
+function ic_update_product_data_acquire_lock( $done = 0 ) {
+	$token       = wp_generate_uuid4();
+	$option_name = ic_update_product_data_lock_option_name();
+	$lock        = array(
+		'token'     => $token,
+		'timestamp' => time(),
+		'done'      => intval( $done ),
+	);
+
+	if ( add_option( $option_name, $lock, '', 'no' ) ) {
+		return $token;
+	}
+	if ( ic_update_product_data_clear_stale_lock() && add_option( $option_name, $lock, '', 'no' ) ) {
+		return $token;
+	}
+
+	return '';
+}
+
+/**
+ * Returns true when the current worker owns the reassignment lock.
+ *
+ * @param string $token Worker token.
+ * @return bool
+ */
+function ic_update_product_data_is_lock_owner( $token ) {
+	$lock = ic_update_product_data_get_lock();
+
+	return ! empty( $token ) && ! empty( $lock ) && ! ic_update_product_data_is_stale_lock( $lock ) && $lock['token'] === $token;
+}
+
+/**
+ * Refreshes the reassignment worker lock heartbeat.
+ *
+ * @param string $token Worker token.
+ * @param int    $done  Current progress counter.
+ * @return bool
+ */
+function ic_update_product_data_refresh_lock( $token, $done = 0 ) {
+	if ( ! ic_update_product_data_is_lock_owner( $token ) ) {
+		return false;
+	}
+	update_option(
+		ic_update_product_data_lock_option_name(),
+		array(
+			'token'     => $token,
+			'timestamp' => time(),
+			'done'      => intval( $done ),
+		),
+		false
+	);
+
+	return true;
+}
+
+/**
+ * Releases the reassignment worker lock.
+ *
+ * @param string $token Worker token.
+ * @return bool
+ */
+function ic_update_product_data_release_lock( $token = '' ) {
+	if ( empty( $token ) ) {
+		delete_option( ic_update_product_data_lock_option_name() );
+
+		return true;
+	}
+	if ( ! ic_update_product_data_is_lock_owner( $token ) ) {
+		return false;
+	}
+	delete_option( ic_update_product_data_lock_option_name() );
+
+	return true;
+}
+
+/**
+ * Stops the product data reassignment job and clears its state.
+ *
+ * @return string
+ */
+function ic_stop_update_product_data() {
+	$option_name      = 'ic_update_product_data_done';
+	$hook_name        = 'ic_update_product_data';
+	$frozen_hook_name = $hook_name . '_frozen';
+
+	wp_clear_scheduled_hook( $hook_name );
+	wp_clear_scheduled_hook( $frozen_hook_name );
+	delete_option( $option_name );
+	ic_update_product_data_release_lock();
+	delete_transient( 'ic_doing_update_product_data_loop' );
+	delete_transient( $option_name );
+	do_action( 'ic_product_data_reassignment_done' );
+
+	return __( 'Product data reassignment stopped.', 'ecommerce-product-catalog' );
 }
 
 /**
@@ -458,6 +723,155 @@ function ic_update_product_data() {
  */
 function ic_update_product_data_is_active() {
 	return false !== get_option( 'ic_update_product_data_done', false ) || (bool) get_transient( 'ic_doing_update_product_data_loop' );
+}
+
+/**
+ * Returns the option name storing the reassignment status scope.
+ *
+ * @return string
+ */
+function ic_update_product_data_scope_option_name() {
+	return 'ic_update_product_data_scope';
+}
+
+/**
+ * Returns statuses that can be selected for product data reassignment.
+ *
+ * @return array
+ */
+function ic_update_product_data_status_objects() {
+	$status_objects  = get_post_stati( array( 'internal' => false ), 'objects' );
+	$excluded_status = array( 'trash', 'auto-draft', 'inherit' );
+
+	foreach ( $status_objects as $status => $status_object ) {
+		if ( in_array( $status, $excluded_status, true ) ) {
+			unset( $status_objects[ $status ] );
+		}
+	}
+
+	if ( empty( $status_objects['publish'] ) ) {
+		$status_objects['publish'] = get_post_status_object( 'publish' );
+	}
+
+	return array_filter( $status_objects );
+}
+
+/**
+ * Returns reassignment status scope options.
+ *
+ * @return array
+ */
+function ic_update_product_data_status_options() {
+	$options = array(
+		'all-user-facing' => __( 'All Post Statuses', 'ecommerce-product-catalog' ),
+	);
+
+	foreach ( ic_update_product_data_status_objects() as $status => $status_object ) {
+		$options[ $status ] = $status_object->label;
+	}
+
+	return $options;
+}
+
+/**
+ * Normalizes a reassignment status scope.
+ *
+ * @param string $scope Requested scope.
+ * @return string
+ */
+function ic_update_product_data_normalize_scope( $scope ) {
+	$scope   = sanitize_key( (string) $scope );
+	$options = ic_update_product_data_status_options();
+
+	if ( isset( $options[ $scope ] ) ) {
+		return $scope;
+	}
+
+	return 'publish';
+}
+
+/**
+ * Returns the status scope requested from the system tools UI.
+ *
+ * @return string
+ */
+function ic_update_product_data_requested_scope() {
+	if ( isset( $_GET['reassign_product_data_status'] ) ) {
+		return ic_update_product_data_normalize_scope( wp_unslash( $_GET['reassign_product_data_status'] ) );
+	}
+
+	return 'publish';
+}
+
+/**
+ * Persists the reassignment status scope.
+ *
+ * @param string $scope Selected scope.
+ * @return void
+ */
+function ic_update_product_data_save_scope( $scope ) {
+	update_option( ic_update_product_data_scope_option_name(), ic_update_product_data_normalize_scope( $scope ), false );
+}
+
+/**
+ * Returns the active reassignment status scope.
+ *
+ * @return string
+ */
+function ic_update_product_data_scope() {
+	return ic_update_product_data_normalize_scope( get_option( ic_update_product_data_scope_option_name(), 'publish' ) );
+}
+
+/**
+ * Clears the reassignment status scope.
+ *
+ * @return void
+ */
+function ic_update_product_data_clear_scope() {
+	delete_option( ic_update_product_data_scope_option_name() );
+}
+
+/**
+ * Resolves the reassignment status scope into post statuses.
+ *
+ * @param string $scope Selected scope.
+ * @return array
+ */
+function ic_update_product_data_resolve_statuses( $scope = '' ) {
+	$scope = empty( $scope ) ? ic_update_product_data_scope() : ic_update_product_data_normalize_scope( $scope );
+	if ( 'all-user-facing' === $scope ) {
+		return array_keys( ic_update_product_data_status_objects() );
+	}
+
+	return array( $scope );
+}
+
+/**
+ * Returns a readable label for the reassignment status scope.
+ *
+ * @param string $scope Selected scope.
+ * @return string
+ */
+function ic_update_product_data_scope_label( $scope = '' ) {
+	$scope   = empty( $scope ) ? ic_update_product_data_scope() : ic_update_product_data_normalize_scope( $scope );
+	$options = ic_update_product_data_status_options();
+
+	if ( isset( $options[ $scope ] ) ) {
+		return $options[ $scope ];
+	}
+
+	return $options['publish'];
+}
+
+/**
+ * Returns true when the selected reassignment scope includes the given status.
+ *
+ * @param string $post_status Post status.
+ * @param string $scope       Optional reassignment scope.
+ * @return bool
+ */
+function ic_update_product_data_scope_includes_status( $post_status, $scope = '' ) {
+	return in_array( $post_status, ic_update_product_data_resolve_statuses( $scope ), true );
 }
 
 /**
@@ -507,18 +921,37 @@ function ic_epc_normalize_sync_actions( $actions, $allowed_actions ) {
  * @param int|string $done             Number of processed products or completion marker.
  * @param float      $start_time       Batch start timestamp.
  * @param string     $done_option_name Option name storing progress.
+ * @param string     $lock_token       Active worker lock token.
  * @return int|string
  */
-function ic_update_product_data_loop( $done, $start_time = 0, $done_option_name = '' ) {
+function ic_update_product_data_loop( $done, $start_time = 0, $done_option_name = '', $lock_token = '' ) {
 	if ( empty( $start_time ) ) {
 		$start_time = microtime( true );
 	}
+	if ( ! empty( $lock_token ) && ! ic_update_product_data_is_lock_owner( $lock_token ) ) {
+		return 'stopped';
+	}
 	$safe_max_time = ic_get_safe_time();
-	$products      = get_all_catalog_products( 'date', 'ASC', 300, $done, apply_filters( 'ic_update_product_data_product_args', array() ) );
+	$scope         = ic_update_product_data_scope();
+	$product_args  = apply_filters(
+		'ic_update_product_data_product_args',
+		array(
+			'post_status' => ic_update_product_data_resolve_statuses( $scope ),
+		),
+		$scope,
+		$done
+	);
+	$products      = get_all_catalog_products( 'date', 'ASC', 300, $done, $product_args );
 	foreach ( $products as $post ) {
+		if ( ! empty( $lock_token ) && ! ic_update_product_data_is_lock_owner( $lock_token ) ) {
+			return 'stopped';
+		}
 		ic_update_product_data_post( $post );
 		++$done;
 		clean_post_cache( $post );
+		if ( ! empty( $lock_token ) ) {
+			ic_update_product_data_refresh_lock( $lock_token, $done );
+		}
 		$time_elapsed_secs = microtime( true ) - $start_time;
 		if ( $time_elapsed_secs > $safe_max_time ) {
 			break;
@@ -531,12 +964,12 @@ function ic_update_product_data_loop( $done, $start_time = 0, $done_option_name 
 	$time_elapsed_secs = microtime( true ) - $start_time;
 
 	if ( $time_elapsed_secs < $safe_max_time && ! ic_is_reaching_memory_limit() ) {
-		if ( ! empty( $done_option_name ) ) {
+		if ( ! empty( $done_option_name ) && ( empty( $lock_token ) || ic_update_product_data_is_lock_owner( $lock_token ) ) ) {
 			update_option( $done_option_name, $done );
 		}
 		set_transient( 'ic_doing_update_product_data_loop', $done, MINUTE_IN_SECONDS * 15 );
 
-		return ic_update_product_data_loop( $done, $start_time, $done_option_name );
+		return ic_update_product_data_loop( $done, $start_time, $done_option_name, $lock_token );
 	}
 
 	return $done;
@@ -606,6 +1039,146 @@ function ic_update_product_data_validate_filtered_meta( $filtered_meta, $base_me
 }
 
 /**
+ * Restores missing public SKU from compressed hidden product data when available.
+ *
+ * @param array $product_meta Public product meta collected for reassignment.
+ * @param int   $product_id   Product ID.
+ *
+ * @return string
+ */
+function ic_update_product_data_restore_hidden_sku( $product_meta, $product_id ) {
+	if ( ! empty( $product_meta['_sku'] ) || empty( $product_id ) ) {
+		return '';
+	}
+
+	$hidden_product_data = get_post_meta( $product_id, '_ic_hidden_product_data', true );
+	if ( ! is_array( $hidden_product_data ) || empty( $hidden_product_data['_sku'] ) ) {
+		return '';
+	}
+
+	return $hidden_product_data['_sku'];
+}
+
+/**
+ * Builds the hidden meta payload that should be saved for a private product.
+ *
+ * Hidden product data remains the source of truth. Existing public meta values
+ * are only copied over when they are new to the hidden payload or when the
+ * batch updater explicitly changed them.
+ *
+ * @param array $product_meta     Raw public product meta collected for reassignment.
+ * @param array $new_product_meta Validated meta array after reassignment filters.
+ * @return array
+ */
+function ic_update_product_data_hidden_meta_to_save( $product_meta, $new_product_meta ) {
+	$hidden_product_meta = array();
+	$restricted_meta     = array(
+		'_wp_old_slug',
+		'_edit_lock',
+		'_edit_last',
+	);
+	if ( ! empty( $product_meta['_ic_hidden_product_data'] ) && is_array( $product_meta['_ic_hidden_product_data'] ) ) {
+		$hidden_product_meta = $product_meta['_ic_hidden_product_data'];
+	}
+	foreach ( $restricted_meta as $restricted_key ) {
+		if ( isset( $hidden_product_meta[ $restricted_key ] ) ) {
+			unset( $hidden_product_meta[ $restricted_key ] );
+		}
+	}
+
+	foreach ( $new_product_meta as $key => $value ) {
+		if ( '_ic_hidden_product_data' === $key || in_array( $key, $restricted_meta, true ) ) {
+			continue;
+		}
+		if ( '_sku' === $key ) {
+			$hidden_product_meta['_sku'] = $value;
+			continue;
+		}
+		if ( ! isset( $product_meta[ $key ] ) || $value !== $product_meta[ $key ] || ! array_key_exists( $key, $hidden_product_meta ) ) {
+			$hidden_product_meta[ $key ] = $value;
+		}
+	}
+
+	return $hidden_product_meta;
+}
+
+/**
+ * Ensures the public SKU row matches the reassigned private product SKU.
+ *
+ * @param int    $post_id           Product ID.
+ * @param array  $current_post_keys Raw post meta keys stored for the product.
+ * @param string $sku               SKU value that should remain public.
+ * @return void
+ */
+function ic_update_product_data_save_public_sku( $post_id, $current_post_keys, $sku ) {
+	if ( '' === $sku || null === $sku ) {
+		return;
+	}
+
+	if ( is_array( $current_post_keys ) && in_array( '_sku', $current_post_keys, true ) ) {
+		$current_sku = get_post_meta( $post_id, '_sku', true );
+		if ( $current_sku !== $sku ) {
+			update_post_meta( $post_id, '_sku', $sku );
+		}
+
+		return;
+	}
+
+	add_post_meta( $post_id, '_sku', $sku, true );
+}
+
+/**
+ * Returns the product register instance used for compression-aware saves.
+ *
+ * @return IC_Register_Product|null
+ */
+function ic_update_product_data_register_product() {
+	global $ic_register_product;
+
+	if ( is_object( $ic_register_product ) && method_exists( $ic_register_product, 'save_meta' ) ) {
+		return $ic_register_product;
+	}
+
+	if ( class_exists( 'IC_Register_Product' ) ) {
+		$reflection = new ReflectionClass( 'IC_Register_Product' );
+
+		return $reflection->newInstanceWithoutConstructor();
+	}
+
+	return null;
+}
+
+/**
+ * Removes restricted keys from the hidden product data payload.
+ *
+ * @param int $post_id Product ID.
+ * @return void
+ */
+function ic_update_product_data_cleanup_hidden_meta( $post_id ) {
+	$hidden_product_meta = get_post_meta( $post_id, '_ic_hidden_product_data', true );
+	if ( ! is_array( $hidden_product_meta ) ) {
+		return;
+	}
+
+	$restricted_meta = array(
+		'_wp_old_slug',
+		'_edit_lock',
+		'_edit_last',
+	);
+	$changed         = false;
+	foreach ( $restricted_meta as $restricted_key ) {
+		if ( isset( $hidden_product_meta[ $restricted_key ] ) ) {
+			unset( $hidden_product_meta[ $restricted_key ] );
+			$changed = true;
+		}
+	}
+
+	if ( $changed ) {
+		update_post_meta( $post_id, '_ic_hidden_product_data', $hidden_product_meta );
+	}
+}
+
+/**
  * Normalizes stored product meta for a single post.
  *
  * @param WP_Post $post Product post object.
@@ -620,7 +1193,8 @@ function ic_update_product_data_post( $post ) {
 	foreach ( $current_post_keys as $meta_key ) {
 		$product_meta[ $meta_key ] = get_post_meta( $post->ID, $meta_key, true );
 	}
-	$new_product_meta = apply_filters( 'ic_product_meta_save_update_data', $product_meta );
+	$restored_hidden_sku = ic_update_product_data_restore_hidden_sku( $product_meta, $post->ID );
+	$new_product_meta    = apply_filters( 'ic_product_meta_save_update_data', $product_meta );
 	if ( ! is_array( $new_product_meta ) ) {
 		$new_product_meta = $product_meta;
 	}
@@ -628,12 +1202,24 @@ function ic_update_product_data_post( $post ) {
 	// Allow maintenance tasks to rewrite product meta during the batch updater only.
 	$filtered_product_meta = apply_filters( 'ic_update_product_data_post_meta', $new_product_meta, $post, $product_meta );
 	$new_product_meta      = ic_update_product_data_validate_filtered_meta( $filtered_product_meta, $new_product_meta, $allowed_meta_keys );
-	if ( $product_meta !== $new_product_meta ) {
+	$register_product      = ic_update_product_data_register_product();
+	if ( ic_data_should_be_hidden( $post->post_status ) && is_object( $register_product ) && method_exists( $register_product, 'save_meta' ) ) {
+		$hidden_product_meta = ic_update_product_data_hidden_meta_to_save( $product_meta, $new_product_meta );
+		$register_product->save_meta( $post, $hidden_product_meta );
+		ic_update_product_data_cleanup_hidden_meta( $post->ID );
+		$new_product_meta = $hidden_product_meta;
+	} elseif ( $product_meta !== $new_product_meta ) {
 		foreach ( $new_product_meta as $key => $value ) {
 			if ( ! isset( $product_meta[ $key ] ) || $value !== $product_meta[ $key ] ) {
 				update_post_meta( $post->ID, $key, $value );
 			}
 		}
+	}
+	if ( ic_data_should_be_hidden( $post->post_status ) ) {
+		$public_sku = ! empty( $new_product_meta['_sku'] ) ? $new_product_meta['_sku'] : $restored_hidden_sku;
+		ic_update_product_data_save_public_sku( $post->ID, $current_post_keys, $public_sku );
+	} elseif ( ! empty( $restored_hidden_sku ) ) {
+		add_post_meta( $post->ID, '_sku', $restored_hidden_sku, true );
 	}
 	do_action( 'product_meta_save_update', $new_product_meta, $post );
 }

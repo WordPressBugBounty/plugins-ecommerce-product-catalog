@@ -147,24 +147,50 @@ function ic_system_status() {
 						<td><?php esc_html_e( 'Reassign product data', 'ecommerce-product-catalog' ); ?>:</td>
 					<?php
 					$info = '';
+					if ( ! empty( $_GET['stop_reassign_product_data'] ) && check_admin_referer( 'ic_stop_reassign_product_data' ) ) {
+						$info = ic_stop_update_product_data();
+					}
 					if ( ! empty( $_GET['reassign_product_data'] ) && check_admin_referer( 'ic_reassign_product_data' ) ) {
 						$info = ic_update_product_data();
 					}
-						$button_label = esc_html__( 'Reassign data', 'ecommerce-product-catalog' );
+					$button_label     = esc_html__( 'Reassign data', 'ecommerce-product-catalog' );
 					$done             = get_option( 'ic_update_product_data_done', 0 );
+					$scope            = ic_update_product_data_scope();
+					$scope_options    = ic_update_product_data_status_options();
+					$scope_disabled   = ! empty( $done ) ? ' disabled="disabled"' : '';
 					if ( ! empty( $done ) ) {
-							$button_label = esc_html__( 'Speed up', 'ecommerce-product-catalog' );
+						$button_label = esc_html__( 'Speed up', 'ecommerce-product-catalog' );
 					}
-					$reassign_data_url = wp_nonce_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reassign_product_data=1' ), 'ic_reassign_product_data' );
-					$reassign_data     = '<a class="button" href="' . esc_url( $reassign_data_url ) . '">' . $button_label . '</a>';
+						$reassign_data  = '<form method="get" action="' . esc_url( admin_url( 'edit.php' ) ) . '" style="display:inline-block; margin-right:8px;">';
+					$reassign_data .= '<input type="hidden" name="post_type" value="al_product" />';
+					$reassign_data .= '<input type="hidden" name="page" value="system.php" />';
+					$reassign_data .= '<input type="hidden" name="reassign_product_data" value="1" />';
+					$reassign_data .= wp_nonce_field( 'ic_reassign_product_data', '_wpnonce', true, false );
+					$reassign_data .= '<select name="reassign_product_data_status"' . $scope_disabled . '>';
+					foreach ( $scope_options as $scope_key => $scope_label ) {
+						$reassign_data .= '<option value="' . esc_attr( $scope_key ) . '"' . selected( $scope, $scope_key, false ) . '>' . esc_html( $scope_label ) . '</option>';
+					}
+					$reassign_data .= '</select> ';
+					$reassign_data .= '<button type="submit" class="button">' . $button_label . '</button>';
+					$reassign_data .= '</form>';
+					if ( ! empty( $done ) ) {
+							$reassign_data .= '<form method="get" action="' . esc_url( admin_url( 'edit.php' ) ) . '" style="display:inline-block;vertical-align:top;">';
+						$reassign_data .= '<input type="hidden" name="post_type" value="al_product" />';
+						$reassign_data .= '<input type="hidden" name="page" value="system.php" />';
+						$reassign_data .= '<input type="hidden" name="stop_reassign_product_data" value="1" />';
+						$reassign_data .= wp_nonce_field( 'ic_stop_reassign_product_data', '_wpnonce', true, false );
+						$reassign_data .= '<button type="submit" class="button">' . esc_html__( 'Stop', 'ecommerce-product-catalog' ) . '</button>';
+						$reassign_data .= '</form>';
+					}
+					$reassign_data .= '<p>' . esc_html__( 'Status scope:', 'ecommerce-product-catalog' ) . ' ' . esc_html( ic_update_product_data_scope_label( $scope ) ) . '</p>';
 					if ( ! empty( $done ) ) {
 						if ( $done < 0 ) {
 							$done = 0;
 						}
-							$reassign_data .= '<p>' . absint( $done ) . ' ' . esc_html__( 'Items Done! Still processing.', 'ecommerce-product-catalog' ) . '</p>';
+						$reassign_data .= '<p>' . absint( $done ) . ' ' . esc_html__( 'Items Done! Still processing.', 'ecommerce-product-catalog' ) . '</p>';
 					}
 					if ( ! empty( $info ) ) {
-							$reassign_data .= '<p>' . esc_html( $info ) . '</p>';
+						$reassign_data .= '<p>' . esc_html( $info ) . '</p>';
 					}
 					?>
 						<td>
