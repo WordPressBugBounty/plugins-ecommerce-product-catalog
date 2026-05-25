@@ -181,7 +181,7 @@ class ic_orders {
 						?>
 						<tr>
 							<td>
-								<?php echo __( 'Transaction ID', 'ecommerce-product-catalog' ) . ': ' . $order_id[0]; ?>
+								<?php echo __( 'Transaction ID', 'ecommerce-product-catalog' ) . ': ' . esc_html( $order_id[0] ); ?>
 							</td>
 						</tr>
 						<tr>

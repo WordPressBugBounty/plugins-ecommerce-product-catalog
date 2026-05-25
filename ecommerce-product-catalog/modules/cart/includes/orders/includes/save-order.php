@@ -71,7 +71,7 @@ class ic_orders_save {
 				'handling'  => $order['handling'],
 				'email'     => $customer_email,
 			);
-			$trans_id      = isset( $_POST['trans_id'] ) ? strval( $_POST['trans_id'] ) : '';
+			$trans_id		 = isset( $_POST[ 'trans_id' ] ) && is_scalar( $_POST[ 'trans_id' ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'trans_id' ] ) ) : '';
 			$order_id      = ic_update_digital_order_status( $payment_details, $order_products, $order_summary, $trans_id );
 			ic_save_global( 'ic_save_order_id', $order_id );
 			if ( function_exists( 'ic_count_shipping_cost_payment' ) ) {

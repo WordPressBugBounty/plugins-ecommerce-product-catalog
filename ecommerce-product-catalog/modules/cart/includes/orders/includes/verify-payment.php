@@ -93,6 +93,10 @@ function ic_create_digital_order() {
 }
 
 function ic_order_exists( $trans_id ) {
+	if ( !is_scalar( $trans_id ) || '' === $trans_id ) {
+		return;
+	}
+	$trans_id = sanitize_text_field( (string) $trans_id );
 	if ( empty( $trans_id ) ) {
 		return;
 	}
@@ -127,6 +131,11 @@ function ic_update_digital_order_status(
 	$trans_id,
 	$just_status = false
 ) {
+	if ( !is_scalar( $trans_id ) ) {
+		$trans_id = '';
+	} else {
+		$trans_id = sanitize_text_field( (string) $trans_id );
+	}
 	$order_id     = ic_order_exists( $trans_id );
 	$just_created = false;
 	if ( empty( $order_id ) && ! empty( $order_products ) ) {

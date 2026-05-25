@@ -186,6 +186,10 @@ function ic_epc_update_product_attributes_number( $value ) {
  * @return int
  */
 function ic_epc_sanitize_product_attributes_number( $value ) {
+	if ( null === $value ) {
+		return max( 0, intval( get_option( 'product_attributes_number', 3 ) ) );
+	}
+
 	return max( 0, intval( $value ) );
 }
 
@@ -448,6 +452,9 @@ function ic_epc_attributes_settings_page_sections() {
 			'settings'      => ic_epc_attributes_settings_table_settings( $attributes_count ),
 			'after_actions' => array(
 				array(
+					'action' => 'epc_product_attributes_hidden_count',
+				),
+				array(
 					'action' => 'epc_attributes_defaults_table_after',
 					'args'   => array( $attributes_mode, 'ic-epc-attributes-defaults-sync-form' ),
 				),
@@ -522,6 +529,14 @@ function ic_epc_attributes_settings_section_after_action( $action, $settings, $s
 	if ( 'epc_attributes_settings_after' === $action_id ) {
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Legacy public EPC hook.
 		do_action( 'attributes-settings' );
+
+		return;
+	}
+
+	if ( 'epc_product_attributes_hidden_count' === $action_id ) {
+		?>
+		<input type="hidden" name="product_attributes_number" value="<?php echo esc_attr( product_attributes_number() ); ?>" />
+		<?php
 
 		return;
 	}
