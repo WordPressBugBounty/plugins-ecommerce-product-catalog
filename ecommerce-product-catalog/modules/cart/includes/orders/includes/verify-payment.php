@@ -93,11 +93,11 @@ function ic_create_digital_order() {
 }
 
 function ic_order_exists( $trans_id ) {
-	if ( !is_scalar( $trans_id ) || '' === $trans_id ) {
+	if ( ! is_scalar( $trans_id ) || '' === $trans_id ) {
 		return;
 	}
 	$trans_id = sanitize_text_field( (string) $trans_id );
-	if ( empty( $trans_id ) ) {
+	if ( '' === $trans_id ) {
 		return;
 	}
 	$order_id = ic_get_global( 'trans_id_to_order_id_' . $trans_id );
@@ -105,21 +105,30 @@ function ic_order_exists( $trans_id ) {
 		return $order_id;
 	}
 	global $wpdb;
-	$querystr = 'SELECT wposts.*
-FROM ' . $wpdb->posts . ' AS wposts
-INNER JOIN ' . $wpdb->postmeta . " AS wpostmeta
+	$querystr = $wpdb->prepare(
+		"SELECT wposts.ID
+FROM {$wpdb->posts} AS wposts
+INNER JOIN {$wpdb->postmeta} AS wpostmeta
 ON wpostmeta.post_id = wposts.ID
-AND wpostmeta.meta_key = '_order_id'
-AND wpostmeta.meta_value = '$trans_id'
-AND wposts.post_type = 'al_digital_orders'
-AND wposts.post_status = 'publish'";
-	$order    = $wpdb->get_results( $querystr, OBJECT );
-	if ( ! empty( $order ) ) {
-		$r = $order[0];
-		if ( ! empty( $r->ID ) ) {
-			ic_save_global( 'trans_id_to_order_id_' . $trans_id, $r->ID );
+AND wpostmeta.meta_key = %s
+AND wpostmeta.meta_value = %s
+AND wposts.post_type = %s
+AND wposts.post_status = %s",
+		'_order_id',
+		$trans_id,
+		'al_digital_orders',
+		'publish'
+	);
+	$order_id = (int) $wpdb->get_var( $querystr );
+	if ( ! empty( $order_id ) ) {
+		ic_save_global( 'trans_id_to_order_id_' . $trans_id, $order_id );
 
-			return $r->ID;
+		return $order_id;
+	}
+	if ( is_numeric( $trans_id ) ) {
+		$check_trans_id = get_post_meta( $trans_id, '_order_id', true );
+		if ( ! empty( $check_trans_id ) ) {
+			return $trans_id;
 		}
 	}
 }
