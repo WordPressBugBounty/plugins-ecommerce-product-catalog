@@ -522,7 +522,7 @@ function ic_process_current_products(
 	$current_query = apply_filters( 'ic_catalog_current_products', '', $args );
 	if ( empty( $current_query ) ) {
 		$query_cache_key = 'ic_current_products_query_' . md5( wp_json_encode( $args ) );
-		$cached_query    = ic_transient_cache()->get( $query_cache_key, false );
+		$cached_query    = ic_get_global( $query_cache_key );
 		if ( false !== $cached_query ) {
 			return $cached_query;
 		}
@@ -536,7 +536,7 @@ function ic_process_current_products(
 		}
 		$args['ic_current_products'] = 1;
 		$current_query               = ic_wp_query( $args );
-		ic_transient_cache()->set( $query_cache_key, $current_query->posts, 5 * MINUTE_IN_SECONDS );
+		ic_save_global( $query_cache_key, $current_query->posts );
 	}
 	$product_ids = $current_query->posts;
 

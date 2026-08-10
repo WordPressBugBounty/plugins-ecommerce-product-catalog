@@ -769,7 +769,7 @@ class IC_Shortcode_Catalog {
 
 	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
 	public function default_message() {
-		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Legacy custom capability is retained for compatibility.
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
 		if ( ! current_user_can( 'manage_product_settings' ) || ic_is_rendering_catalog_block() ) {
 			return;
 		}
@@ -807,6 +807,7 @@ class IC_Shortcode_Catalog {
 		return "var data = {
         'action': 'ic_assign_listing',
 		'page_id': '" . $page_id . "',
+		'nonce': product_object.nonce
     };
 	jQuery('.ic_spinner').css('display', 'inline-block');
 	jQuery('.assign-listing-button').prop('disabled', true);
@@ -815,9 +816,15 @@ class IC_Shortcode_Catalog {
 });";
 	}
 
-	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
+	/**
+	 * Handles the assign listing AJAX request.
+	 */
 	public function assign_listing() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Existing AJAX flow does not include a nonce in this legacy handler.
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) || ! current_user_can( 'manage_product_settings' ) ) {
+			wp_die( '', '', array( 'response' => 403 ) );
+		}
 		$page_id = ! empty( $_POST['page_id'] ) ? absint( wp_unslash( $_POST['page_id'] ) ) : 0;
 		if ( ! empty( $page_id ) && is_ic_shortcode_integration( $page_id ) ) {
 			update_option( 'product_archive_page_id', $page_id );

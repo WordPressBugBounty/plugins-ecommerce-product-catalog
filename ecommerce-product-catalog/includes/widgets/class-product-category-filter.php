@@ -60,39 +60,39 @@ class Product_Category_Filter extends WP_Widget {
 				if ( ! empty( $shortcode_query ) && ! empty( $instance['shortcode_support'] ) && has_show_products_shortcode() ) {
 						$excluded_terms = array();
 						$shortcode_tax  = array();
-						if ( is_product_filter_active( 'product_category' ) ) {
-							$shortcode_terms = array();
-							if ( ! empty( $shortcode_query->query['tax_query'] ) ) {
-								foreach ( $shortcode_query->query['tax_query'] as $shortcode_tax_query ) {
-									if ( isset( $shortcode_tax_query['terms'] ) && is_array( $shortcode_tax_query['terms'] ) ) {
-										$shortcode_terms = array_merge( $shortcode_terms, $shortcode_tax_query['terms'] );
-										if ( ! empty( $shortcode_tax_query['taxonomy'] ) && ! in_array( $shortcode_tax_query['taxonomy'], $shortcode_tax, true ) ) {
-											$shortcode_tax[] = $shortcode_tax_query['taxonomy'];
-										}
-									}
-								}
-							}
-							$current_filter_value = get_product_filter_value( 'product_category' );
-							if ( ! empty( $current_filter_value ) ) {
-								if ( is_array( $current_filter_value ) ) {
-									$excluded_terms = array_merge( $excluded_terms, $current_filter_value );
-								} else {
-									$excluded_terms[] = $current_filter_value;
-								}
-							}
-
-							if ( ! empty( $shortcode_terms ) ) {
-								$excluded_terms = array_diff( $excluded_terms, $shortcode_terms );
-							}
-							if ( ! empty( $excluded_terms ) && is_array( $excluded_terms ) ) {
-								foreach ( $excluded_terms as $excluded_term ) {
-									$this_term = get_term( $excluded_term );
-									if ( ! empty( $this_term->taxonomy ) && ! in_array( $this_term->taxonomy, $shortcode_tax, true ) ) {
-										$shortcode_tax[] = $this_term->taxonomy;
+					if ( is_product_filter_active( 'product_category' ) ) {
+						$shortcode_terms = array();
+						if ( ! empty( $shortcode_query->query['tax_query'] ) ) {
+							foreach ( $shortcode_query->query['tax_query'] as $shortcode_tax_query ) {
+								if ( isset( $shortcode_tax_query['terms'] ) && is_array( $shortcode_tax_query['terms'] ) ) {
+									$shortcode_terms = array_merge( $shortcode_terms, $shortcode_tax_query['terms'] );
+									if ( ! empty( $shortcode_tax_query['taxonomy'] ) && ! in_array( $shortcode_tax_query['taxonomy'], $shortcode_tax, true ) ) {
+										$shortcode_tax[] = $shortcode_tax_query['taxonomy'];
 									}
 								}
 							}
 						}
+						$current_filter_value = get_product_filter_value( 'product_category' );
+						if ( ! empty( $current_filter_value ) ) {
+							if ( is_array( $current_filter_value ) ) {
+								$excluded_terms = array_merge( $excluded_terms, $current_filter_value );
+							} else {
+								$excluded_terms[] = $current_filter_value;
+							}
+						}
+
+						if ( ! empty( $shortcode_terms ) ) {
+							$excluded_terms = array_diff( $excluded_terms, $shortcode_terms );
+						}
+						if ( ! empty( $excluded_terms ) && is_array( $excluded_terms ) ) {
+							foreach ( $excluded_terms as $excluded_term ) {
+								$this_term = get_term( $excluded_term );
+								if ( ! empty( $this_term->taxonomy ) && ! in_array( $this_term->taxonomy, $shortcode_tax, true ) ) {
+									$shortcode_tax[] = $this_term->taxonomy;
+								}
+							}
+						}
+					}
 					$post_ids             = ic_get_current_products( array(), $shortcode_tax, array(), $excluded_terms );
 					$category_args['all'] = 1;
 				} elseif ( null === $post_ids ) {
@@ -102,19 +102,19 @@ class Product_Category_Filter extends WP_Widget {
 					}
 					$post_ids = ic_get_current_products( array(), $exclude_tax );
 				}
-				$cache_key = 'ic_catalog_category_filter_' . md5(
-					wp_json_encode(
-						array(
-							'instance'  => $instance,
-							'taxonomy'  => $taxonomy,
-							'post_ids'  => $post_ids,
-							'active'    => get_product_filter_value( 'product_category' ),
-							'shortcode' => ! empty( $instance['shortcode_support'] ) ? 1 : 0,
+					$cache_key = 'ic_catalog_category_filter_' . md5(
+						wp_json_encode(
+							array(
+								'instance'  => $instance,
+								'taxonomy'  => $taxonomy,
+								'post_ids'  => $post_ids,
+								'active'    => get_product_filter_value( 'product_category' ),
+								'shortcode' => ! empty( $instance['shortcode_support'] ) ? 1 : 0,
+							)
 						)
-					)
-				);
+					);
 				if ( ! is_product_filter_active( 'product_category' ) ) {
-					$form = ic_transient_cache()->get( $cache_key, false );
+					$form = ic_get_global( $cache_key );
 				}
 				if ( false === $form || is_product_filter_active( 'product_category' ) ) {
 
@@ -180,7 +180,7 @@ class Product_Category_Filter extends WP_Widget {
 							}
 						}
 					} else {
-						ic_transient_cache()->set( $cache_key, $form, 5 * MINUTE_IN_SECONDS );
+						ic_save_global( $cache_key, $form );
 					}
 				}
 				if ( ! is_ic_ajax() && empty( $form ) && empty( $child_form ) ) {
@@ -220,7 +220,7 @@ class Product_Category_Filter extends WP_Widget {
 				}
 			}
 		}
-		}
+	}
 
 	/**
 	 * Outputs the widget admin form.
@@ -282,4 +282,3 @@ class Product_Category_Filter extends WP_Widget {
 		return apply_filters( 'ic_catalog_category_filter_settings_save', $instance, $new_instance );
 	}
 }
-

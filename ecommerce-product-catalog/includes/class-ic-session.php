@@ -122,10 +122,9 @@ class IC_Session {
 		add_filter( 'wp_die_ajax_handler', array( $this, 'save_data_filter' ) );
 		add_filter( 'wp_redirect', array( $this, 'save_data_filter' ) );
 		add_action( 'wp_logout', array( $this, 'destroy_session' ) );
+		add_action( 'ic_cleanup_sessions', array( $this, 'cleanup_sessions' ), 10, 0 );
 		if ( ! wp_next_scheduled( 'ic_cleanup_sessions' ) ) {
 			wp_schedule_event( time() + ( 6 * HOUR_IN_SECONDS ), 'twicedaily', 'ic_cleanup_sessions' );
-		} else {
-			add_action( 'ic_cleanup_sessions', array( $this, 'cleanup_sessions' ) );
 		}
 
 		return true;
@@ -149,13 +148,10 @@ class IC_Session {
 				$this->set_session_expiration();
 			}
 
-			// If the user logs in, update session.
+			// If the user logs in, merge the stale guest cookie into the user session.
+			// Alternate auth flows such as 2FA can delay the cookie refresh by one request.
 			if ( is_user_logged_in() && strval( get_current_user_id() ) !== $this->_customer_id ) {
-				$guest_session_id   = $this->_customer_id;
-				$this->_customer_id = strval( get_current_user_id() );
-				$this->_to_save     = true;
-				$this->save_data( $guest_session_id );
-				$this->set_customer_session_cookie();
+				$this->adopt_customer_id( get_current_user_id() );
 			}
 
 			// Update session if it's close to expiring.
@@ -344,18 +340,28 @@ class IC_Session {
 		// Dirty if something changed - prevents saving nothing new.
 		if ( $this->_to_save && $this->has_session() ) {
 			global $wpdb;
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Sessions are stored in a custom table and cached manually.
+			$session_value = maybe_serialize( $this->_data );
+			$existing      = $this->get_existing_session_row( $this->_customer_id );
+
+			if ( ! empty( $existing ) && $session_value === $existing['session_value'] ) {
+				if ( intval( $existing['session_expiry'] ) !== intval( $this->_session_expiration ) ) {
+					$this->update_session_timestamp( $this->_customer_id, $this->_session_expiration );
+					wp_cache_set( $this->get_cache_prefix() . $this->_customer_id, $this->_data, $this->_cache_group, $this->_session_expiration - time() );
+				}
+			} else {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Sessions are stored in a custom table and cached manually.
 				$wpdb->query(
 					$wpdb->prepare(
 						'INSERT INTO %i (`session_key`, `session_value`, `session_expiry`) VALUES (%s, %s, %d)
 						ON DUPLICATE KEY UPDATE `session_value` = VALUES(`session_value`), `session_expiry` = VALUES(`session_expiry`)',
 						$this->_table,
 						$this->_customer_id,
-						maybe_serialize( $this->_data ),
+						$session_value,
 						$this->_session_expiration
 					)
 				);
-			wp_cache_set( $this->get_cache_prefix() . $this->_customer_id, $this->_data, $this->_cache_group, $this->_session_expiration - time() );
+				wp_cache_set( $this->get_cache_prefix() . $this->_customer_id, $this->_data, $this->_cache_group, $this->_session_expiration - time() );
+			}
 			$this->_to_save = false;
 			if ( ! empty( $old_session_key ) && get_current_user_id() !== $old_session_key && ! is_object( get_user_by( 'id', $old_session_key ) ) ) {
 				$this->delete_session( $old_session_key );
@@ -374,6 +380,50 @@ class IC_Session {
 		$this->save_data();
 
 		return $value;
+	}
+
+	/**
+	 * Rebinds the active session to a logged-in customer.
+	 *
+	 * This is used by front-end auth flows that establish the WordPress user
+	 * mid-request and need the catalog session to persist under that user key
+	 * immediately, rather than waiting for the next request bootstrap.
+	 *
+	 * @param int|string $customer_id Target customer ID.
+	 *
+	 * @return bool
+	 */
+	public function adopt_customer_id( $customer_id ) {
+		$customer_id = strval( absint( $customer_id ) );
+		if ( empty( $customer_id ) ) {
+			return false;
+		}
+
+		if ( strval( $this->_customer_id ) === $customer_id ) {
+			$this->all_data = array();
+			$this->set_customer_session_cookie();
+
+			return true;
+		}
+
+		$old_customer_id = strval( $this->_customer_id );
+		$current_data    = $this->get();
+		$target_data     = (array) $this->get_session( $customer_id, array() );
+		$merged_data     = array_merge( $target_data, $current_data );
+
+		$this->_customer_id = $customer_id;
+		$this->_data        = array();
+		$this->all_data     = array();
+		$this->_to_save     = false;
+
+		foreach ( $merged_data as $key => $value ) {
+			$this->set( $key, $value );
+		}
+
+		$this->save_data( $old_customer_id );
+		$this->set_customer_session_cookie();
+
+		return true;
 	}
 
 	/**
@@ -401,9 +451,41 @@ class IC_Session {
 	public function cleanup_sessions() {
 		global $wpdb;
 
-		$wpdb->query( $wpdb->prepare( "DELETE FROM $this->_table WHERE session_expiry < %d", time() ) ); // @codingStandardsIgnoreLine.
+		$batch_size = absint( apply_filters( 'ic_session_cleanup_batch_size', 500 ) );
+		if ( 0 === $batch_size ) {
+			$batch_size = 500;
+		}
 
-		wp_cache_set( $this->_cache_prefix . '_cache_prefix', microtime(), $this->_cache_group );
+		$deleted = $wpdb->query( $wpdb->prepare( "DELETE FROM $this->_table WHERE session_expiry < %d ORDER BY session_id ASC LIMIT %d", time(), $batch_size ) ); // @codingStandardsIgnoreLine.
+
+		if ( ! empty( $deleted ) ) {
+			wp_cache_set( $this->_cache_prefix . '_cache_prefix', microtime(), $this->_cache_group );
+		}
+
+		if ( intval( $deleted ) >= $batch_size && ! wp_next_scheduled( 'ic_cleanup_sessions', array( 'batch' ) ) ) {
+			wp_schedule_single_event( time() + MINUTE_IN_SECONDS, 'ic_cleanup_sessions', array( 'batch' ) );
+		}
+	}
+
+	/**
+	 * Gets an existing stored session row.
+	 *
+	 * @param string|int $customer_id Customer ID.
+	 *
+	 * @return array|null
+	 */
+	private function get_existing_session_row( $customer_id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Used to skip expensive unchanged custom-table session writes.
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT `session_value`, `session_expiry` FROM %i WHERE `session_key` = %s',
+				$this->_table,
+				$customer_id
+			),
+			ARRAY_A
+		);
 	}
 
 	/**

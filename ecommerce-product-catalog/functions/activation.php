@@ -279,6 +279,8 @@ add_action( 'admin_init', 'ecommerce_product_catalog_upgrade' );
  */
 function ecommerce_product_catalog_upgrade() {
 	if ( is_admin() ) {
+		ic_epc_schedule_catalog_transient_cleanup();
+
 		$plugin_version          = IC_EPC_VERSION;
 		$database_plugin_version = get_option( 'ecommerce_product_catalog_ver', $plugin_version );
 		if ( $database_plugin_version !== $plugin_version ) {
@@ -381,6 +383,199 @@ function ecommerce_product_catalog_upgrade() {
 			update_option( 'ecommerce_product_catalog_ver', $plugin_version, false );
 		}
 	}
+}
+
+add_action( 'ic_epc_cleanup_catalog_transient_options', 'ic_epc_cleanup_catalog_transient_options' );
+
+/**
+ * Schedules obsolete catalog transient cleanup outside the admin request.
+ *
+ * @param int $delay Delay in seconds before the cleanup worker should run.
+ * @return void
+ */
+function ic_epc_schedule_catalog_transient_cleanup( $delay = MINUTE_IN_SECONDS ) {
+	if ( get_option( 'ic_epc_catalog_transient_cleanup_20260618' ) ) {
+		return;
+	}
+
+	if ( wp_next_scheduled( 'ic_epc_cleanup_catalog_transient_options' ) ) {
+		return;
+	}
+
+	wp_schedule_single_event( time() + absint( $delay ), 'ic_epc_cleanup_catalog_transient_options' );
+}
+
+/**
+ * Removes high-cardinality catalog transients replaced by request-local caches.
+ *
+ * @return void
+ */
+function ic_epc_cleanup_catalog_transient_options() {
+	$cleanup_option = 'ic_epc_catalog_transient_cleanup_20260618';
+	if ( get_option( $cleanup_option ) ) {
+		return;
+	}
+
+	if ( ! ic_epc_catalog_transient_cleanup_acquire_lock() ) {
+		return;
+	}
+
+	$option_rows = ic_epc_catalog_transient_cleanup_get_batch();
+	if ( empty( $option_rows ) ) {
+		update_option( $cleanup_option, 1, false );
+		ic_epc_catalog_transient_cleanup_release_lock();
+
+		return;
+	}
+
+	ic_epc_catalog_transient_cleanup_delete_batch( $option_rows );
+
+	if ( ic_epc_catalog_transient_cleanup_has_rows() ) {
+		ic_epc_schedule_catalog_transient_cleanup(
+			(int) apply_filters( 'ic_epc_catalog_transient_cleanup_delay', MINUTE_IN_SECONDS )
+		);
+	} else {
+		update_option( $cleanup_option, 1, false );
+	}
+
+	ic_epc_catalog_transient_cleanup_release_lock();
+}
+
+/**
+ * Returns obsolete catalog transient option prefixes.
+ *
+ * @return array
+ */
+function ic_epc_catalog_transient_cleanup_prefixes() {
+	return array(
+		'_transient_ic_current_products_query_',
+		'_transient_timeout_ic_current_products_query_',
+		'_transient_ic_catalog_category_filter_',
+		'_transient_timeout_ic_catalog_category_filter_',
+	);
+}
+
+/**
+ * Acquires the catalog transient cleanup lock.
+ *
+ * @return bool
+ */
+function ic_epc_catalog_transient_cleanup_acquire_lock() {
+	$lock_option = 'ic_epc_catalog_transient_cleanup_lock';
+	$now         = time();
+	$locked_at   = absint( get_option( $lock_option, 0 ) );
+
+	if ( ! empty( $locked_at ) && ( $now - $locked_at ) < ( 10 * MINUTE_IN_SECONDS ) ) {
+		return false;
+	}
+
+	if ( ! empty( $locked_at ) ) {
+		update_option( $lock_option, $now, false );
+
+		return true;
+	}
+
+	return add_option( $lock_option, $now, '', false );
+}
+
+/**
+ * Releases the catalog transient cleanup lock.
+ *
+ * @return void
+ */
+function ic_epc_catalog_transient_cleanup_release_lock() {
+	delete_option( 'ic_epc_catalog_transient_cleanup_lock' );
+}
+
+/**
+ * Gets one cleanup batch.
+ *
+ * @return array
+ */
+function ic_epc_catalog_transient_cleanup_get_batch() {
+	global $wpdb;
+
+	$limit = absint( apply_filters( 'ic_epc_catalog_transient_cleanup_batch_size', 500 ) );
+	if ( $limit < 1 ) {
+		$limit = 1;
+	}
+
+	$where  = array();
+	$values = array();
+	foreach ( ic_epc_catalog_transient_cleanup_prefixes() as $prefix ) {
+		$where[]  = 'option_name LIKE %s';
+		$values[] = $wpdb->esc_like( $prefix ) . '%';
+	}
+	$values[] = $limit;
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded one-time cleanup for obsolete transient rows.
+	return $wpdb->get_results(
+		$wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- LIKE clauses are generated from fixed prefixes and still use prepared values.
+			"SELECT option_id, option_name FROM {$wpdb->options} WHERE " . implode( ' OR ', $where ) . ' ORDER BY option_id ASC LIMIT %d',
+			$values
+		)
+	);
+}
+
+/**
+ * Deletes one cleanup batch.
+ *
+ * @param array $option_rows Option rows with option_id and option_name.
+ * @return void
+ */
+function ic_epc_catalog_transient_cleanup_delete_batch( $option_rows ) {
+	global $wpdb;
+
+	$option_ids = array_map( 'absint', wp_list_pluck( $option_rows, 'option_id' ) );
+	$option_ids = array_filter( $option_ids );
+	if ( empty( $option_ids ) ) {
+		return;
+	}
+
+	$placeholders = implode( ', ', array_fill( 0, count( $option_ids ), '%d' ) );
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded one-time cleanup for selected obsolete transient rows.
+	$wpdb->query(
+		$wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- IN placeholders are generated for absint option IDs.
+			"DELETE FROM {$wpdb->options} WHERE option_id IN ($placeholders)",
+			$option_ids
+		)
+	);
+
+	foreach ( $option_rows as $option_row ) {
+		if ( ! empty( $option_row->option_name ) ) {
+			wp_cache_delete( $option_row->option_name, 'options' );
+		}
+	}
+}
+
+/**
+ * Checks whether cleanup rows remain.
+ *
+ * @return bool
+ */
+function ic_epc_catalog_transient_cleanup_has_rows() {
+	global $wpdb;
+
+	$where  = array();
+	$values = array();
+	foreach ( ic_epc_catalog_transient_cleanup_prefixes() as $prefix ) {
+		$where[]  = 'option_name LIKE %s';
+		$values[] = $wpdb->esc_like( $prefix ) . '%';
+	}
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded existence check for one-time cleanup.
+	$option_id = $wpdb->get_var(
+		$wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- LIKE clauses are generated from fixed prefixes and still use prepared values.
+			"SELECT option_id FROM {$wpdb->options} WHERE " . implode( ' OR ', $where ) . ' LIMIT 1',
+			$values
+		)
+	);
+
+	return ! empty( $option_id );
 }
 
 add_action( 'ic_update_product_data', 'ic_update_product_data' );
