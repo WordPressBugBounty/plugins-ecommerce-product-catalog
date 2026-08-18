@@ -60,8 +60,8 @@ class Product_Cat_Widget extends WP_Widget {
 			echo $args['before_widget'];
 
 			if ( $title ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-				echo $args['before_title'] . $title . $args['after_title'];
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+				echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 			}
 
 			$taxonomy = get_current_screen_tax();
@@ -102,7 +102,7 @@ class Product_Cat_Widget extends WP_Widget {
 					'taxonomy'         => $taxonomy,
 					'walker'           => new IC_Cat_Walker_CategoryDropdown(),
 					'show_option_none' => $label,
-					'pad_counts'       => true,
+					'pad_counts'       => (bool) $c,
 					'class'            => 'ic-category-select',
 				);
 
@@ -113,7 +113,9 @@ class Product_Cat_Widget extends WP_Widget {
 					$cat_args['show_option_none']  = ' ';
 				}
 
-				wp_dropdown_categories( apply_filters( 'widget_product_categories_dropdown_args', $cat_args ) );
+				$cat_args = apply_filters( 'widget_product_categories_dropdown_args', $cat_args );
+				$cat_args = $this->sync_pad_counts( $cat_args, (bool) $c );
+				wp_dropdown_categories( $cat_args );
 			} else {
 				$class = 'ic-cat-categories-list';
 				?>
@@ -129,8 +131,9 @@ class Product_Cat_Widget extends WP_Widget {
 						}
 					}
 
-					$cat_args['pad_counts'] = true;
+					$cat_args['pad_counts'] = (bool) $c;
 					$cat_args               = apply_filters( 'widget_product_categories_args', $cat_args, $instance );
+					$cat_args               = $this->sync_pad_counts( $cat_args, (bool) $c );
 
 					add_filter( 'category_css_class', array( $this, 'add_category_parent_css' ), 10, 4 );
 					wp_list_categories( $cat_args );
@@ -236,5 +239,22 @@ class Product_Cat_Widget extends WP_Widget {
 
 		return apply_filters( 'ic_catalog_cat_widget_el_classes', $css_classes, $category, $depth, $args );
 	}
-}
 
+	/**
+	 * Synchronizes padded counts with the filtered count-display setting.
+	 *
+	 * An explicit padding value that differs from the widget default is treated
+	 * as an intentional filter override.
+	 *
+	 * @param array $args               Filtered category arguments.
+	 * @param bool  $default_pad_counts Widget padding default.
+	 * @return array
+	 */
+	private function sync_pad_counts( $args, $default_pad_counts ) {
+		if ( ! array_key_exists( 'pad_counts', $args ) || (bool) $args['pad_counts'] === $default_pad_counts ) {
+			$args['pad_counts'] = ! empty( $args['show_count'] );
+		}
+
+		return $args;
+	}
+}

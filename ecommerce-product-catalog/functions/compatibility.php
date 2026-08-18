@@ -237,11 +237,12 @@ function ic_product_search_fix( $query ) {
 /**
  * Gets product terms with catalog-specific compatibility handling.
  *
- * @param array $def_params Default term query parameters.
+ * @param array $def_params      Default term query parameters.
+ * @param bool  $exact_taxonomy Whether to prevent EPC taxonomy widening.
  *
  * @return array|int[]|string[]|WP_Error|WP_Term[]
  */
-function ic_get_terms( $def_params = array() ) {
+function ic_get_terms( $def_params = array(), $exact_taxonomy = false ) {
 	if ( is_ic_admin() ) {
 
 		return ic_get_terms_simple( $def_params );
@@ -256,7 +257,7 @@ function ic_get_terms( $def_params = array() ) {
 	} else {
 		$fields = 'all';
 	}
-	if ( ! empty( $params['taxonomy'] ) && ! is_array( $params['taxonomy'] ) && ! empty( $params['object_ids'] ) ) {
+	if ( ! $exact_taxonomy && ! empty( $params['taxonomy'] ) && ! is_array( $params['taxonomy'] ) && ! empty( $params['object_ids'] ) ) {
 		$filter_taxonomies = ic_filter_taxonomies( true );
 		if ( count( $filter_taxonomies ) > 1 && in_array( $params['taxonomy'], $filter_taxonomies, true ) ) {
 			$return_taxonomy = $params['taxonomy'];
@@ -292,7 +293,14 @@ function ic_get_terms( $def_params = array() ) {
 	if ( isset( $params['ic_post_type'] ) && ! empty( $params['object_ids'] ) ) {
 		unset( $params['ic_post_type'] );
 	}
-	$cache_key = 'ic_get_terms_' . md5( wp_json_encode( $params ) );
+	$cache_key = 'ic_get_terms_' . md5(
+		wp_json_encode(
+			array(
+				'params'         => $params,
+				'exact_taxonomy' => $exact_taxonomy,
+			)
+		)
+	);
 	$terms     = ic_get_global( $cache_key );
 	if ( false === $terms ) {
 		$terms = ic_get_terms_simple( $params );
@@ -423,11 +431,14 @@ function ic_esc_html( $safe_text, $text ) {
  */
 function ic_http_get() {
 	$self_submit_data = filter_input( INPUT_POST, 'self_submit_data', FILTER_UNSAFE_RAW );
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only compatibility shim used by sibling plugins to recover catalog query args from a self-submitted Ajax post.
 	if ( empty( $_GET ) && null !== $self_submit_data ) {
 		$params = array();
+		// parse_str() must run before sanitizing: sanitize_text_field() strips the %xx octets the encoded payload depends on.
 		parse_str( $self_submit_data, $params );
-		$_GET = $params;
+		$_GET = ic_sanitize( $params );
 	}
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Returning the current query args; each caller sanitizes what it consumes.
 	return $_GET;
 }

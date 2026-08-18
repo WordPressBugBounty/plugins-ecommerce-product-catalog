@@ -100,7 +100,21 @@ class IC_Global_Cache {
 			return;
 		}
 
-		wp_cache_flush_group( 'implecode' );
+		$supports_group_flush = function_exists( 'wp_cache_flush_group' )
+			// plugin-check:ignore wp_function_not_compatible_with_requires_wp -- The call is guarded by function_exists(), and older WordPress versions use the ic_delete_global_cache fallback below.
+			&& ( ! function_exists( 'wp_cache_supports' ) || wp_cache_supports( 'flush_group' ) );
+		if ( $supports_group_flush ) {
+			// plugin-check:ignore wp_function_not_compatible_with_requires_wp -- The call is guarded by function_exists() through $supports_group_flush, and older WordPress versions use the ic_delete_global_cache fallback below.
+			wp_cache_flush_group( 'implecode' );
+		} else {
+			/**
+			 * Fires when all impleCode persistent cache storage must be cleared.
+			 *
+			 * This is distinct from the per-key `ic_delete_global` action so its
+			 * established non-empty string argument contract remains unchanged.
+			 */
+			do_action( 'ic_delete_global_cache' );
+		}
 		unset( $implecode );
 	}
 }

@@ -31,6 +31,13 @@ if ( ! function_exists( 'ic_error_log' ) ) {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			return;
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug helper only reads presence of query flags.
+		$global_debug_enabled = defined( 'IC_FORCE_DEBUG_LOG' ) && IC_FORCE_DEBUG_LOG;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug helper only reads presence of query flags.
+		$request_debug_enabled = isset( $_GET['ic_debug_log'] ) || isset( $_GET['ic-error-log'] );
+		if ( ! $global_debug_enabled && ! $request_debug_enabled && ! $param ) {
+			return;
+		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug logging is opt-in and read-only.
 		if ( $param && ! isset( $_GET[ $param ] ) && ! is_ic_front_ajax() ) {
 			return;

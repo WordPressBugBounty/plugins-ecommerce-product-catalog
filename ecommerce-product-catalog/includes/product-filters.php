@@ -24,8 +24,8 @@ if ( ! function_exists( 'get_product_catalog_session' ) ) {
 	 */
 	function get_product_catalog_session() {
 		if ( ! is_admin() || is_ic_front_ajax() ) {
-			global $IC_Session; // phpcs:ignore -- Legacy global name retained for backward compatibility.
-			$ic_session = &$IC_Session; // phpcs:ignore -- Alias references the legacy global name for compatibility.
+			global $IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Legacy global name retained for backward compatibility.
+			$ic_session = &$IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Alias references the legacy global name for compatibility.
 			$prefix     = ic_get_session_prefix();
 			if ( ic_use_php_session() ) {
 				if ( ! ic_is_session_started() && ! headers_sent() && ic_ic_cookie_enabled() && ( ! is_admin() || is_ic_front_ajax() ) ) {
@@ -92,8 +92,8 @@ if ( ! function_exists( 'set_product_catalog_session' ) ) {
 			return;
 		}
 		if ( ! is_admin() || is_ic_front_ajax() ) {
-			global $IC_Session; // phpcs:ignore -- Legacy global name retained for backward compatibility.
-			$ic_session = &$IC_Session; // phpcs:ignore -- Alias references the legacy global name for compatibility.
+			global $IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Legacy global name retained for backward compatibility.
+			$ic_session = &$IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Alias references the legacy global name for compatibility.
 			$prefix     = ic_get_session_prefix();
 			if ( ic_use_php_session() ) {
 				if ( ! headers_sent() && ic_ic_cookie_enabled() && ( ! is_admin() || is_ic_front_ajax() ) ) {
@@ -181,8 +181,8 @@ function ic_php_session_start() {
  * @return void
  */
 function ic_session_save() {
-	global $IC_Session; // phpcs:ignore -- Legacy global name retained for backward compatibility.
-	$ic_session = &$IC_Session; // phpcs:ignore -- Alias references the legacy global name for compatibility.
+	global $IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Legacy global name retained for backward compatibility.
+	$ic_session = &$IC_Session; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase -- Alias references the legacy global name for compatibility.
 	$prefix     = ic_get_session_prefix();
 	if ( ic_is_session_started() && isset( $ic_session[ $prefix ] ) ) {
 		if ( empty( $_SESSION[ $prefix ] ) ) {
@@ -282,12 +282,11 @@ function set_product_filter() {
 	}
 	$session = get_product_catalog_session();
 	$save    = false;
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 	if ( isset( $_GET['product_category'] ) ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The raw request value is sanitized immediately below.
-			$product_category = wp_unslash( $_GET['product_category'] ); // phpcs:ignore -- Frontend filter parameters are intentionally readable from the request.
-		$filter_value         = apply_filters( 'ic_catalog_save_product_filter_value', intval( $product_category ), $product_category );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public catalog filter parameter affecting only the current visitor's session; the raw value is intval()'d on the next line.
+		$product_category = wp_unslash( $_GET['product_category'] );
+		$filter_value     = apply_filters( 'ic_catalog_save_product_filter_value', intval( $product_category ), $product_category );
 		if ( ! empty( $filter_value ) ) {
 			if ( ! isset( $session['filters'] ) ) {
 				$session['filters'] = array();
@@ -308,17 +307,17 @@ function set_product_filter() {
 	do_action( 'ic_set_product_filters', $session );
 	$session = get_product_catalog_session();
 	if ( ! empty( $session['filters'] ) && empty( $session['filters']['filtered-url'] ) ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- AJAX requests pass the current frontend URL in the request body.
-		if ( isset( $_POST['request_url'] ) && is_ic_ajax() ) { // phpcs:ignore -- AJAX requests pass the current frontend URL in the request body.
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- AJAX requests pass the current frontend URL in the request body.
-			$session['filters']['filtered-url'] = esc_url_raw( wp_unslash( $_POST['request_url'] ) ); // phpcs:ignore -- AJAX requests pass the current frontend URL in the request body.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public catalog Ajax passes the current frontend URL; it is only stored in the caller's own catalog session.
+		if ( isset( $_POST['request_url'] ) && is_ic_ajax() ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public catalog Ajax passes the current frontend URL; esc_url_raw() sanitizes it and it is only stored in the caller's own catalog session.
+			$session['filters']['filtered-url'] = esc_url_raw( wp_unslash( $_POST['request_url'] ) );
 		} else {
 			$active_filters                     = get_active_product_filters();
 			$session['filters']['filtered-url'] = remove_query_arg( $active_filters, get_pagenum_link( 1, false ) );
 		}
 		if ( ic_string_contains( $session['filters']['filtered-url'], '&s=' ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- AJAX search state is read from the current request.
-			if ( is_ic_ajax() && empty( $_POST['is_search'] ) ) { // phpcs:ignore -- AJAX search state is read from the current request.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Presence-only read of a public catalog Ajax flag that only shapes the caller's own session URL.
+			if ( is_ic_ajax() && empty( $_POST['is_search'] ) ) {
 				$session['filters']['filtered-url'] = remove_query_arg(
 					array(
 						's',
@@ -357,11 +356,11 @@ function delete_product_filters() {
 		$keep_filters              = false;
 		$force_remove_filtered_url = true;
 		// The session is cleared below after permanent filters are preserved.
-	} elseif ( ! is_search() || isset( $_GET['reset_filters'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+	} elseif ( ! is_search() || isset( $_GET['reset_filters'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 		$active_filters = get_active_product_filters();
 		$keep_filters   = false;
 		foreach ( $active_filters as $filter ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 			if ( isset( $_GET[ $filter ] ) ) {
 				$keep_filters = true;
 				break;
@@ -370,7 +369,7 @@ function delete_product_filters() {
 	}
 	if ( ! $keep_filters ) {
 		$session = get_product_catalog_session();
-		if ( ! isset( $session['permanent-filters'] ) ) {
+		if ( ! isset( $session['permanent-filters'] ) || ! is_array( $session['permanent-filters'] ) ) {
 			$session['permanent-filters'] = array();
 		}
 		if ( ! empty( $session['filters'] ) ) {
@@ -578,8 +577,9 @@ add_action( 'wp_ajax_hide_empty_bar_message', 'hide_empty_bar_message' );
  * Ajax receiver to hide the filters bar empty message
  */
 function hide_empty_bar_message() {
-	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The request is validated by the nonce check below.
-	if ( ! empty( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'ic-ajax-nonce' ) ) {
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+	if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 		update_option( 'hide_empty_bar_message', 1, false );
 	}
 	wp_die();
@@ -762,7 +762,7 @@ function ic_get_active_filter_html( $filter_name, $filter_value = null, $new_val
 			} elseif ( ic_string_contains( $friendly_filter_value, '(0)' ) ) {
 				$out = str_replace( 'class="ic-active-filter"', 'class="ic-active-filter ic-active-filter-zero-count-visible"', $out );
 			}
-			$out .= '<span class="ic-active-filter-value">: ' . $friendly_filter_value . '</span>';
+			$out .= '<span class="ic-active-filter-value">: ' . esc_html( $friendly_filter_value ) . '</span>';
 		}
 		if ( ! empty( $new_value ) && is_array( $new_value ) ) {
 			foreach ( $new_value as $new_value_key => $new_value_val ) {
@@ -772,7 +772,7 @@ function ic_get_active_filter_html( $filter_name, $filter_value = null, $new_val
 				}
 			}
 		}
-		$out .= '<a class="ic-remove-active-filter" href="' . ic_filter_url( $filter_name, $new_value ) . '"><span class="dashicons dashicons-no-alt"></span></a>';
+		$out .= '<a class="ic-remove-active-filter" href="' . esc_url( ic_filter_url( $filter_name, $new_value ) ) . '"><span class="dashicons dashicons-no-alt"></span></a>';
 		$out .= '</div>';
 	}
 

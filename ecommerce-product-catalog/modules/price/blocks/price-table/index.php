@@ -40,9 +40,11 @@ function ic_block_price_table_localize( $localize ) {
 
 
 // Register the block by passing the path to it's block.json file.
+global $wp_version;
 register_block_type(
 	__DIR__,
 	array(
+		'api_version'     => version_compare( $wp_version, '6.3', '>=' ) ? 3 : 2,
 		'title'           => __( 'Price Table', 'ecommerce-product-catalog' ),
 		'render_callback' => 'ic_block_price_table_render',
 	)

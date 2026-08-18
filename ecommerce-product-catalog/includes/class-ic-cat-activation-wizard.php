@@ -361,7 +361,7 @@ class IC_Cat_Activation_Wizard extends IC_Activation_Wizard {
 	 */
 	public function activation_notices() {
 		if ( ! empty( $this->notices ) ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $this->notices;
 
 			return;

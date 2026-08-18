@@ -36,7 +36,7 @@ if ( 0 === (int) $product_cat->parent ) {
 		<div class="classic-list-image-wrapper">
 			<div class="pseudo"></div>
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_get_category_listing_image_html().
 			echo ic_get_category_listing_image_html( $product_cat->term_id );
 			?>
 			</div>
@@ -44,7 +44,7 @@ if ( 0 === (int) $product_cat->parent ) {
 		<div class="product-short-descr">
 			<p>
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by c_list_desc().
 			echo c_list_desc( null, $product_cat->description );
 			?>
 			</p>

@@ -15,17 +15,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 function shopping_cart_menu() {
 	?>
 	<a id="shopping-cart-settings" class="element"
-		href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=shopping-cart' ); ?>"><?php echo apply_filters( 'ic_simple_cart_settings_menu_name', __( 'Shopping Cart', 'ecommerce-product-catalog' ) ); ?> </a>
+		href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=shopping-cart' ) ); ?>"><?php echo esc_html( apply_filters( 'ic_simple_cart_settings_menu_name', __( 'Shopping Cart', 'ecommerce-product-catalog' ) ) ); ?> </a>
 		<?php
 }
 
 add_action( 'general_submenu', 'shopping_cart_menu' );
 
 function shopping_cart_settings() {
-	register_setting( 'shopping_cart', 'shopping_cart_settings' );
-	register_setting( 'checkout_form', 'shopping_checkout_form' );
-	register_setting( 'checkout_form', 'cart_form_editor_settings' );
+	register_setting( 'shopping_cart', 'shopping_cart_settings', array( 'sanitize_callback' => 'ic_sanitize_shopping_cart_settings' ) );
+	register_setting( 'checkout_form', 'shopping_checkout_form', array( 'sanitize_callback' => 'ic_sanitize_shopping_checkout_form' ) );
+	register_setting( 'checkout_form', 'cart_form_editor_settings', array( 'sanitize_callback' => 'ic_sanitize_cart_form_editor_settings' ) );
 	do_action( 'shopping_cart_settings' );
+}
+
+/** Recursively sanitize extension settings while applying cart field rules. */
+function ic_sanitize_shopping_cart_settings( $settings ) {
+	if ( ! is_array( $settings ) ) {
+		return array();
+	}
+	$clean = array();
+	foreach ( $settings as $key => $value ) {
+		$clean[ $key ] = is_array( $value ) ? ic_sanitize_shopping_cart_settings( $value ) : sanitize_textarea_field( (string) $value );
+	}
+	foreach ( array( 'shopping_cart_page', 'cart_submit_page', 'thank_you_page' ) as $page_key ) {
+		if ( isset( $clean[ $page_key ] ) ) {
+			$clean[ $page_key ] = absint( $clean[ $page_key ] );
+		}
+	}
+	foreach ( array( 'url_button', 'cart_redirect' ) as $url_key ) {
+		if ( isset( $settings[ $url_key ] ) ) {
+			$clean[ $url_key ] = esc_url_raw( wp_unslash( (string) $settings[ $url_key ] ) );
+		}
+	}
+	return $clean;
+}
+
+function ic_sanitize_shopping_checkout_form( $settings ) {
+	$settings = is_string( $settings ) ? json_decode( wp_unslash( $settings ), true ) : $settings;
+	if ( ! is_array( $settings ) ) {
+		return is_string( $settings ) ? wp_json_encode( array() ) : array();
+	}
+	return wp_json_encode( ic_sanitize_shopping_cart_settings( $settings ) );
+}
+
+function ic_sanitize_cart_form_editor_settings( $settings ) {
+	return is_array( $settings ) ? ic_sanitize_shopping_cart_settings( $settings ) : array();
 }
 
 add_action( 'product-settings-list', 'shopping_cart_settings' );
@@ -70,9 +104,21 @@ function get_shopping_cart_settings() {
 	} else {
 		$site_name = get_bloginfo( 'name' );
 	}
-	$shopping_cart_settings['admin_email_subject']        = isset( $shopping_cart_settings['admin_email_subject'] ) ? $shopping_cart_settings['admin_email_subject'] : sprintf( __( 'Order from %s', 'ecommerce-product-catalog' ), $site_name );
-	$shopping_cart_settings['user_email_subject']         = isset( $shopping_cart_settings['user_email_subject'] ) ? $shopping_cart_settings['user_email_subject'] : sprintf( __( 'New Order on %s', 'ecommerce-product-catalog' ), $site_name );
-	$shopping_cart_settings['packing_email_subject']      = isset( $shopping_cart_settings['packing_email_subject'] ) ? $shopping_cart_settings['packing_email_subject'] : sprintf( __( 'New Packing List on %s', 'ecommerce-product-catalog' ), $site_name );
+	$shopping_cart_settings['admin_email_subject'] = isset( $shopping_cart_settings['admin_email_subject'] ) ? $shopping_cart_settings['admin_email_subject'] : sprintf(
+		/* translators: %s: Site name. */
+		__( 'Order from %s', 'ecommerce-product-catalog' ),
+		$site_name
+	);
+	$shopping_cart_settings['user_email_subject'] = isset( $shopping_cart_settings['user_email_subject'] ) ? $shopping_cart_settings['user_email_subject'] : sprintf(
+		/* translators: %s: Site name. */
+		__( 'New Order on %s', 'ecommerce-product-catalog' ),
+		$site_name
+	);
+	$shopping_cart_settings['packing_email_subject'] = isset( $shopping_cart_settings['packing_email_subject'] ) ? $shopping_cart_settings['packing_email_subject'] : sprintf(
+		/* translators: %s: Site name. */
+		__( 'New Packing List on %s', 'ecommerce-product-catalog' ),
+		$site_name
+	);
 	$shopping_cart_settings['order_registration_disable'] = isset( $shopping_cart_settings['order_registration_disable'] ) ? $shopping_cart_settings['order_registration_disable'] : '';
 	$shopping_cart_settings['disable_payment']            = isset( $shopping_cart_settings['disable_payment'] ) ? $shopping_cart_settings['disable_payment'] : '';
 	$shopping_cart_settings['enable_recommendations']     = isset( $shopping_cart_settings['enable_recommendations'] ) ? $shopping_cart_settings['enable_recommendations'] : '';
@@ -82,7 +128,8 @@ function get_shopping_cart_settings() {
 }
 
 function shopping_cart_settings_content() {
-	$submenu = isset( $_GET['submenu'] ) ? $_GET['submenu'] : '';
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings submenu routing parameter; sanitized on this line.
+	$submenu = isset( $_GET['submenu'] ) ? sanitize_key( wp_unslash( $_GET['submenu'] ) ) : '';
 	if ( $submenu == 'shopping-cart' ) {
 		?>
 		<script>
@@ -91,7 +138,7 @@ function shopping_cart_settings_content() {
 		</script>
 		<div class="shopping-cart-settings setting-content submenu">
 			<form method="post" action="options.php">
-				<h2><?php _e( 'Cart Settings', 'ecommerce-product-catalog' ); ?></h2>
+				<h2><?php esc_html_e( 'Cart Settings', 'ecommerce-product-catalog' ); ?></h2>
 				<?php
 				settings_fields( 'shopping_cart' );
 				$shopping_cart_settings = get_shopping_cart_settings();
@@ -101,7 +148,7 @@ function shopping_cart_settings_content() {
 				<table>
 					<tr>
 						<td>
-							<?php _e( 'Choose Cart Page', 'ecommerce-product-catalog' ); ?>:
+							<?php esc_html_e( 'Choose Cart Page', 'ecommerce-product-catalog' ); ?>:
 						</td>
 						<td>
 							<?php
@@ -127,7 +174,7 @@ function shopping_cart_settings_content() {
 					</tr>
 					<tr>
 						<td>
-							<?php _e( 'Choose Cart Submit Page', 'ecommerce-product-catalog' ); ?>:
+							<?php esc_html_e( 'Choose Cart Submit Page', 'ecommerce-product-catalog' ); ?>:
 						</td>
 						<td>
 							<?php
@@ -153,7 +200,7 @@ function shopping_cart_settings_content() {
 					</tr>
 					<tr>
 						<td>
-							<?php _e( 'Choose Thank You Page', 'ecommerce-product-catalog' ); ?>:
+							<?php esc_html_e( 'Choose Thank You Page', 'ecommerce-product-catalog' ); ?>:
 						</td>
 						<td>
 							<?php
@@ -176,9 +223,9 @@ function shopping_cart_settings_content() {
 							);
 							?>
 						</td>
-					</tr>
-				</table><?php implecode_al_box( sprintf( __( 'Remember to use the %1$sShopping Cart widget%2$s to show the cart in the sidebar.', 'ecommerce-product-catalog' ), '<a href="' . admin_url( 'widgets.php' ) . '">', '</a>' ) ); ?>
-				<h3><?php _e( 'Email settings', 'ecommerce-product-catalog' ); ?></h3>
+				</tr>
+			</table><?php /* translators: 1: opening widget link, 2: closing widget link. */ implecode_al_box( sprintf( __( 'Remember to use the %1$sShopping Cart widget%2$s to show the cart in the sidebar.', 'ecommerce-product-catalog' ), '<a href="' . admin_url( 'widgets.php' ) . '">', '</a>' ) ); ?>
+				<h3><?php esc_html_e( 'Email settings', 'ecommerce-product-catalog' ); ?></h3>
 				<style>
 					textarea[name="shopping_cart_settings[admin_email]"], textarea[name="shopping_cart_settings[user_email]"], textarea[name="shopping_cart_settings[packing_email]"] {
 						width: 450px;
@@ -191,6 +238,7 @@ function shopping_cart_settings_content() {
 
 				</style>
 				<?php
+				/* translators: Placeholders are substituted with runtime values. */
 				$smtp_spam_message  = sprintf( __( 'Free %1$sSMTP plugin%2$s is recommended to make sure that your notifications are not treated as SPAM.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . admin_url( 'plugin-install.php?s=smtp&tab=search&type=term' ) . '">', '</a>' );
 				$smtp_spam_message .= ' ' . __( 'Alternately, try using the Email to send confirmations that matches your website domain.', 'ecommerce-product-catalog' );
 				implecode_info( $smtp_spam_message );
@@ -206,7 +254,7 @@ function shopping_cart_settings_content() {
 					implecode_settings_textarea( __( 'User Email template', 'ecommerce-product-catalog' ), 'shopping_cart_settings[user_email]', $shopping_cart_settings['user_email'] );
 					?>
 				</table>
-				<h3><?php _e( 'Form Settings', 'ecommerce-product-catalog' ); ?></h3>
+				<h3><?php esc_html_e( 'Form Settings', 'ecommerce-product-catalog' ); ?></h3>
 				<table>
 				<?php
 					implecode_settings_radio(
@@ -224,22 +272,23 @@ function shopping_cart_settings_content() {
 						implecode_settings_checkbox( __( 'Disable State Field', 'ecommerce-product-catalog' ), 'shopping_cart_settings[disable_state]', $shopping_cart_settings['disable_state'], 1, __( 'Check this checbox if you are not selling to USA.', 'ecommerce-product-catalog' ) );
 				?>
 				</table>
-				<h3><?php _e( 'Orders', 'ecommerce-product-catalog' ); ?></h3>
+				<h3><?php esc_html_e( 'Orders', 'ecommerce-product-catalog' ); ?></h3>
 				<table>
 					<?php
 					implecode_settings_checkbox( __( 'Disable Order Registration', 'ecommerce-product-catalog' ), 'shopping_cart_settings[order_registration_disable]', $shopping_cart_settings['order_registration_disable'], 1, __( 'If you check this the orders will not be saved into database. Only the notification email will be sent.', 'ecommerce-product-catalog' ) );
 					?>
 				</table>
-				<h3><?php _e( 'Cart Widget', 'ecommerce-product-catalog' ); ?></h3>
+				<h3><?php esc_html_e( 'Cart Widget', 'ecommerce-product-catalog' ); ?></h3>
 				<table><?php implecode_settings_checkbox( __( 'Stick cart on top on scroll', 'ecommerce-product-catalog' ), 'shopping_cart_settings[stick_cart]', $shopping_cart_settings['stick_cart'] ); ?>
 				</table>
 				<?php
 				do_action( 'shopping-cart-settings', $shopping_cart_settings );
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_cart_settings_html' filter, which extensions and themes legitimately use to inject their own HTML.
 				echo apply_filters( 'ic_cart_settings_html', ob_get_clean() );
 				?>
 				<p class="submit">
 					<input type="submit" class="button-primary"
-							value="<?php _e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
+							value="<?php esc_html_e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
 				</p>
 
 			</form>
@@ -252,17 +301,17 @@ add_action( 'product-settings', 'shopping_cart_settings_content' );
 
 function default_shopping_checkout_settings() {
 	$shopping_cart_settings = get_shopping_cart_settings();
-	$default  = '{"fields":[';
-	$default .= '{"label":"' . __( '<b>BILLING ADDRESS</b>', 'ecommerce-product-catalog' ) . '","field_type":"section_break","required":false,"cid":"inside_header_1"},{"label":"' . __( 'Company', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium","paypal":"customer_name"},"cid":"company"},{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_surname"},"cid":"name"},{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_address"},"cid":"address"},{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_postcode"},"cid":"postal"},{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_city"},"cid":"city"}';
-	$default .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":true,"field_options":{"size":"medium","paypal":"customer_country"';
-	$default .= '},"cid":"country"}';
+	$default                = '{"fields":[';
+	$default               .= '{"label":"' . '<b>' . esc_html__( 'BILLING ADDRESS', 'ecommerce-product-catalog' ) . '</b>' . '","field_type":"section_break","required":false,"cid":"inside_header_1"},{"label":"' . __( 'Company', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium","paypal":"customer_name"},"cid":"company"},{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_surname"},"cid":"name"},{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_address"},"cid":"address"},{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_postcode"},"cid":"postal"},{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_city"},"cid":"city"}';
+	$default               .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":true,"field_options":{"size":"medium","paypal":"customer_country"';
+	$default               .= '},"cid":"country"}';
 	if ( empty( $shopping_cart_settings['disable_state'] ) ) {
 		$default .= ',{"label":"' . __( 'State', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_state","required":true,"field_options":{"size":"medium","paypal":"customer_state"';
 		$default .= '},"cid":"state"}';
 	}
 	$default .= ',{"label":"' . __( 'Phone', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_phone"},"cid":"phone"},{"label":"' . __( 'Email', 'ecommerce-product-catalog' ) . ':","field_type":"email","required":true,"field_options":{"size":"medium","paypal":"1"},"cid":"email"},{"label":"' . __( 'Comment', 'ecommerce-product-catalog' ) . ':","field_type":"paragraph","required":false,"field_options":{"size":"medium"},"cid":"comment"}';
 	/*
-    $default .= ',{"label":"' . __( '<b>DELIVERY ADDRESS</b> (FILL ONLY IF DIFFERENT FROM THE BILLING ADDRESS)', 'ecommerce-product-catalog' ) . '","field_type":"section_break","required":false,"cid":"inside_header_2"},';
+	$default .= ',{"label":"' . __( '<b>DELIVERY ADDRESS</b> (FILL ONLY IF DIFFERENT FROM THE BILLING ADDRESS)', 'ecommerce-product-catalog' ) . '","field_type":"section_break","required":false,"cid":"inside_header_2"},';
 	$default .= '{"label":"' . __( 'Company', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"s_company"},{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"s_name"},{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"s_address"},{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"s_postal"},{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"s_city"}';
 	$default .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":false,"field_options":{"include_blank_option": "1","size":"medium"';
 	$default .= '},"cid":"s_country"}';
@@ -276,6 +325,7 @@ function default_shopping_checkout_settings() {
 		$privacy_url = get_privacy_policy_url();
 	}
 	if ( ! empty( $privacy_url ) ) {
+		/* translators: Placeholders are substituted with runtime values. */
 		$message  = sprintf( __( 'I agree to let %1$s process my personal data to process my order and for other purposes described in %1$s %2$sPrivacy Notice%3$s.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ), "<a href='" . $privacy_url . "'>", '</a>' );
 		$default .= ',{"label":"' . __( 'Privacy Notice', 'ecommerce-product-catalog' ) . ':","field_type":"checkboxes","required":true,"field_options":{"size":"medium","options":[{"label":"' . $message . '", "checked":false}]},"cid":"privacy_notice"}';
 	}
@@ -396,5 +446,3 @@ function ic_add_shopping_cart_page_shortcode( $page_id, $shortcode = '' ) {
 		wp_update_post( $post );
 	}
 }
-
-

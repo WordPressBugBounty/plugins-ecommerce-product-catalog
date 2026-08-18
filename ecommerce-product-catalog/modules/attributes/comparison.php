@@ -4,6 +4,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Recursively sanitize comparison settings.
+ *
+ * @param mixed $settings Submitted settings.
+ * @return array
+ */
+function ic_sanitize_attributes_compare( $settings ) {
+	if ( ! is_array( $settings ) ) {
+		return array();
+	}
+	$clean = array();
+	foreach ( $settings as $key => $value ) {
+		$clean[ $key ] = is_array( $value ) ? ic_sanitize_attributes_compare( $value ) : sanitize_text_field( (string) $value );
+	}
+	if ( isset( $clean['url'] ) ) {
+		$clean['url'] = absint( $clean['url'] );
+	}
+	return $clean;
+}
+
+/**
  * Manages product attributes
  *
  * Here all product attributes are defined and managed.
@@ -93,14 +113,18 @@ class ic_attribute_comparison {
 		if ( ! isset( $session['comparison'] ) || ! is_array( $session['comparison'] ) ) {
 			$session['comparison'] = array();
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable product comparison parameter that only affects the current visitor's own catalog session; every value is cast with intval().
 		if ( ! empty( $_GET['compare'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable product comparison parameter; the value is cast with intval() on this line.
 			if ( ! is_array( $_GET['compare'] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable product comparison parameter; the value is cast with intval() on this line.
 				$new_compare = intval( $_GET['compare'] );
 				if ( ! empty( $new_compare ) && ! in_array( $new_compare, $session['comparison'] ) ) {
 					$session['comparison'][] = $new_compare;
 				}
 			} else {
-				$session['comparison'] = array_map( 'intval', array_filter( $_GET['compare'] ) );
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable product comparison parameter; the value is cast with intval() on this line.
+				$session['comparison'] = array_filter( array_map( 'intval', wp_unslash( $_GET['compare'] ) ) );
 			}
 			set_product_catalog_session( $session );
 		}
@@ -122,6 +146,7 @@ class ic_attribute_comparison {
 
 	function choose( $i = 0, $exclude = null ) {
 		$names               = get_catalog_names( 'singular' );
+		/* translators: Placeholders are substituted with runtime values. */
 		$label               = sprintf( __( 'Select %s to compare', 'ecommerce-product-catalog' ), $names );
 		$selected_product_id = $this->products( $i );
 		if ( ! empty( $selected_product_id ) && ( $key = array_search( $selected_product_id, $exclude ) ) !== false ) {
@@ -161,7 +186,22 @@ class ic_attribute_comparison {
 	 * Registers advanced attributes settings
 	 */
 	function register_setting() {
-		register_setting( 'product_attributes', 'ic_attributes_compare' );
+		register_setting( 'product_attributes', 'ic_attributes_compare', array( 'sanitize_callback' => 'ic_sanitize_attributes_compare' ) );
+	}
+
+	/** Sanitize comparison settings without dropping extension keys. */
+	function ic_sanitize_attributes_compare( $settings ) {
+		if ( ! is_array( $settings ) ) {
+			return array();
+		}
+		$clean = array();
+		foreach ( $settings as $key => $value ) {
+			$clean[ $key ] = is_array( $value ) ? ic_sanitize_attributes_compare( $value ) : sanitize_text_field( (string) $value );
+		}
+		if ( isset( $clean['url'] ) ) {
+			$clean['url'] = absint( $clean['url'] );
+		}
+		return $clean;
 	}
 
 	function button() {
@@ -172,8 +212,8 @@ class ic_attribute_comparison {
 		}
 		?>
 		<div class="ic-compare-container">
-			<a class="button ic-compare-product" href="<?php echo $url; ?>">
-				<span><?php echo $this->label(); ?></span>
+			<a class="button ic-compare-product" href="<?php echo esc_url( $url ); ?>">
+				<span><?php echo esc_html( $this->label() ); ?></span>
 			</a>
 		</div>
 		<?php
@@ -181,6 +221,7 @@ class ic_attribute_comparison {
 
 	function label() {
 		$names   = get_catalog_names( 'singular' );
+		/* translators: Placeholders are substituted with runtime values. */
 		$default = sprintf( __( 'Compare %s', 'ecommerce-product-catalog' ), $names );
 
 		return $default;
@@ -206,10 +247,10 @@ class ic_attribute_comparison {
 	function settings_page() {
 		$settings = $this->settings();
 		?>
-		<h3><?php _e( 'Comparison', 'ecommerce-product-catalog' ); ?></h3>
+		<h3><?php esc_html_e( 'Comparison', 'ecommerce-product-catalog' ); ?></h3>
 		<table>
 			<tr>
-				<td><?php _e( 'Comparison Page', 'ecommerce-product-catalog' ); ?>:</td>
+				<td><?php esc_html_e( 'Comparison Page', 'ecommerce-product-catalog' ); ?>:</td>
 				<td>
 					<?php
 					ic_select_page( 'ic_attributes_compare[url]', __( 'Comparison Disabled', 'ecommerce-product-catalog' ), $settings['url'] );

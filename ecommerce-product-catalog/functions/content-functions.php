@@ -67,7 +67,7 @@ add_action( 'single_product_end', 'add_back_to_products_url', 99, 2 );
 function add_back_to_products_url( $post, $single_names ) {
 	$force_back_url = apply_filters( 'force_back_to_products_url', false );
 	if ( is_ic_product_listing_enabled() || $force_back_url ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by get_back_to_products_url().
 		echo get_back_to_products_url( $single_names );
 	}
 }
@@ -147,8 +147,16 @@ function ic_localize_main_catalog_js() {
 			'loading'             => get_site_url() . '/wp-includes/js/thickbox/loadingAnimation.gif',
 		)
 	);
-	// Keep the popup nonce available for frontend AJAX requests.
-	$localize['nonce'] = wp_create_nonce( 'ic-ajax-nonce' );
+	$nonces       = array(
+		'nonce' => wp_create_nonce( 'ic-ajax-nonce' ),
+	);
+	/**
+	 * Filters feature-owned nonces exposed through the frontend product object.
+	 *
+	 * @param array<string,string> $nonces Nonce key and generated nonce value pairs.
+	 */
+	$nonces   = apply_filters( 'ic_catalog_product_object_nonces', $nonces );
+	$localize = array_merge( $localize, $nonces );
 	wp_localize_script( 'al_product_scripts', 'product_object', $localize );
 }
 
@@ -178,7 +186,7 @@ if ( ! function_exists( 'ic_popup' ) ) {
 				$ok_label = __( 'OK', 'ecommerce-product-catalog' );
 			}
 			if ( empty( $cancel_label ) ) {
-				$cancel_label = __( 'Cancel', 'implecode-quote-cart' );
+				$cancel_label = __( 'Cancel', 'ecommerce-product-catalog' );
 			}
 			$buttons   = array_merge(
 				array(
@@ -196,7 +204,7 @@ if ( ! function_exists( 'ic_popup' ) ) {
 			);
 			if ( $show_by_default && is_user_logged_in() ) {
 				$buttons[] = array(
-					'label' => __( 'Never show again', 'implecode-quote-cart' ),
+					'label' => __( 'Never show again', 'ecommerce-product-catalog' ),
 					'class' => 'ic-secondary-button ic-popup-never-show',
 				);
 			}
@@ -205,7 +213,7 @@ if ( ! function_exists( 'ic_popup' ) ) {
 		} else {
 			$buttons = '';
 		}
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by the framework popup() builder.
 		echo $html->popup( $content, $buttons, $class );
 	}
 }

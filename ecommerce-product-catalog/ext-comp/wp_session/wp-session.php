@@ -1,5 +1,14 @@
 <?php
 /**
+ * WP Session bootstrap compatibility layer.
+ *
+ * @package Ecommerce_Product_Catalog
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+/**
  * WordPress session managment.
  *
  * Standardizes WordPress session data and uses either database transients or in-memory caching

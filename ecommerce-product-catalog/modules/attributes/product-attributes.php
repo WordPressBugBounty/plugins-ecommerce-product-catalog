@@ -115,7 +115,11 @@ function ic_assign_product_attributes( $product_meta, $post, $clear_empty = true
 		}
 		$attr_ids             = array();
 		$process_product_meta = $product_meta;
-		if ( function_exists( 'ic_visible_product_status' ) && in_array( $post->post_status, ic_visible_product_status() ) ) {
+		$can_process_attributes = function_exists( 'ic_visible_product_status' ) && in_array( $post->post_status, ic_visible_product_status(), true );
+		if ( ! $can_process_attributes && function_exists( 'ic_update_product_data_is_active' ) && ic_update_product_data_is_active() && function_exists( 'ic_update_product_data_scope_includes_status' ) ) {
+			$can_process_attributes = ic_update_product_data_scope_includes_status( $post->post_status );
+		}
+		if ( $can_process_attributes ) {
 			for ( $i = 1; $i <= $max_attr; $i++ ) {
 				$attr_ids   = apply_filters( 'ic_assign_product_attribute', $attr_ids, $process_product_meta, $i );
 				$value_meta = ic_attr_value_field_name( $i );
@@ -335,7 +339,7 @@ function ic_system_tools_attributes_upgrade() {
 		}
 		echo '<tr>';
 		echo '<td>Database Upgrade</td>';
-		echo '<td><a class="button" href="' . admin_url( 'edit.php?post_type=al_product&page=system.php&reassign_all_products_attributes=1' ) . '">Speed UP Pending Database Upgrade</a>';
+		echo '<td><a class="button" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reassign_all_products_attributes=1' ) ) . '">Speed UP Pending Database Upgrade</a>';
 		if ( isset( $_GET['reassign_all_products_attributes'] ) ) {
 			if ( is_numeric( $done ) ) {
 				if ( $done < 0 ) {
@@ -346,7 +350,7 @@ function ic_system_tools_attributes_upgrade() {
 			if ( is_numeric( $done ) ) {
 				$message .= ' Items Done! Another round needed.';
 			}
-			echo '<p>' . $message . '</p>';
+			echo '<p>' . esc_html( $message ) . '</p>';
 
 		}
 		echo '</td></tr>';
@@ -354,7 +358,7 @@ function ic_system_tools_attributes_upgrade() {
 		echo '<tr>';
 		echo '<td>Reassign Attributes</td>';
 		$reassign_attributes_url = wp_nonce_url( admin_url( 'edit.php?post_type=al_product&page=system.php&reassign_all_products_attributes=1' ), 'ic_reassign_all_products_attributes' );
-		echo '<td><a class="button" href="' . $reassign_attributes_url . '">Reassign attributes</a>';
+		echo '<td><a class="button" href="' . esc_url( $reassign_attributes_url ) . '">Reassign attributes</a>';
 		echo '</td></tr>';
 	}
 	if ( wp_get_schedule( 'ic_scheduled_attributes_clear' ) ) {
@@ -365,7 +369,7 @@ function ic_system_tools_attributes_upgrade() {
 	if ( wp_get_schedule( 'ic_scheduled_attributes_clear' ) ) {
 		echo '<tr>';
 		echo '<td>Clear Attributes</td>';
-		echo '<td><a class="button" href="' . admin_url( 'edit.php?post_type=al_product&page=system.php&clear_products_attributes=1' ) . '">Speed UP Clearing Empty Attributes</a></td>';
+		echo '<td><a class="button" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=system.php&clear_products_attributes=1' ) ) . '">Speed UP Clearing Empty Attributes</a></td>';
 		echo '</tr>';
 	}
 }
@@ -425,6 +429,13 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 
 		return false;
 	}
+	$single_product_id = null;
+	if ( false === $current && is_array( $product_ids ) && 1 === count( $product_ids ) ) {
+		$requested_product_id = intval( reset( $product_ids ) );
+		if ( $requested_product_id > 0 ) {
+			$single_product_id = $requested_product_id;
+		}
+	}
 	$cache_key = 'attribute_values' . $label . $format;
 	if ( ! empty( $product_ids ) ) {
 		$cache_key .= md5( serialize( $product_ids ) );
@@ -468,7 +479,20 @@ function ic_get_attribute_values( $label, $format = 'names', $current = false, $
 				}
 		*/
 		if ( $attributes === false ) {
-			$values = ic_get_terms( $args );
+			if ( null !== $single_product_id ) {
+				$terms = get_the_terms( $single_product_id, 'al_product-attributes' );
+				if ( false === $terms || is_wp_error( $terms ) || empty( $terms ) ) {
+					return false;
+				}
+				$values = array();
+				foreach ( $terms as $term ) {
+					if ( (int) $term->parent === (int) $attribute_id ) {
+						$values[ $term->term_id ] = $term->name;
+					}
+				}
+			} else {
+				$values = ic_get_terms( $args );
+			}
 			if ( empty( $values ) || is_wp_error( $values ) || ! is_array( $values ) ) {
 				return false;
 			}
@@ -538,16 +562,18 @@ function ic_sanitize_product_attribute( $attribute, $label = null ) {
 }
 
 function ic_delete_all_attribute_terms() {
-	global $wpdb;
 	$taxonomy = 'al_product-attributes';
-	$terms    = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN ('%s') ORDER BY t.name ASC", $taxonomy ) );
+	$terms    = get_terms(
+		array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+		)
+	);
 
 	// Delete Terms
-	if ( $terms ) {
+	if ( ! is_wp_error( $terms ) ) {
 		foreach ( $terms as $term ) {
-			$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-			$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-			$wpdb->delete( $wpdb->terms, array( 'term_id' => $term->term_id ) );
+			wp_delete_term( (int) $term->term_id, $taxonomy );
 		}
 	}
 }
@@ -600,19 +626,32 @@ if ( ! function_exists( 'get_all_attribute_values' ) ) {
 		$cache_key         = 'all_attribute_values_' . $post_type . $product_id;
 		$attributes_values = ic_get_global( $cache_key );
 		if ( false === $attributes_values ) {
-			$args = array(
-				'taxonomy'   => 'al_product-attributes',
-				'fields'     => 'names',
-				'hide_empty' => true,
-				'childless'  => true,
-			);
 			if ( ! empty( $product_id ) ) {
-				$args['object_ids'] = intval( $product_id );
+				$terms = get_the_terms( intval( $product_id ), 'al_product-attributes' );
+				if ( false === $terms || is_wp_error( $terms ) ) {
+					$attributes_values = array();
+				} else {
+					$term_hierarchy    = _get_term_hierarchy( 'al_product-attributes' );
+					$childless_terms   = array_filter(
+						$terms,
+						static function ( $term ) use ( $term_hierarchy ) {
+							return ! isset( $term_hierarchy[ $term->term_id ] );
+						}
+					);
+					$attributes_values = wp_list_pluck( array_values( $childless_terms ), 'name' );
+				}
 			} else {
-				$args['ic_post_type'] = array( $post_type );
+				$attributes_values = ic_get_terms(
+					array(
+						'taxonomy'     => 'al_product-attributes',
+						'fields'       => 'names',
+						'hide_empty'   => true,
+						'childless'    => true,
+						'ic_post_type' => array( $post_type ),
+					)
+				);
 			}
 
-			$attributes_values = ic_get_terms( $args );
 			if ( ! empty( $cache_key ) ) {
 				ic_save_global( $cache_key, $attributes_values );
 			}
@@ -633,11 +672,13 @@ function ic_wp_unique_slug_bug_fix( $slug, $term ) {
 		$query = $wpdb->prepare( "SELECT slug FROM $wpdb->terms WHERE slug = %s", $slug );
 	}
 
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- WordPress exposes no taxonomy-independent API for this core slug uniqueness check; $query is prepared directly above.
 	if ( $wpdb->get_var( $query ) ) {
 		$num = 2;
 		do {
 			$alt_slug = $slug . "-$num";
 			++$num;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- WordPress exposes no taxonomy-independent API for this core slug uniqueness check.
 			$slug_check = $wpdb->get_var( $wpdb->prepare( "SELECT slug FROM $wpdb->terms WHERE slug = %s", $alt_slug ) );
 		} while ( $slug_check );
 		$slug = $alt_slug;

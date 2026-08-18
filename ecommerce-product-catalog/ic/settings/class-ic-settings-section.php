@@ -173,7 +173,7 @@ class IC_Settings_Section {
 		}
 
 		/* translators: %s: section title. */
-		$label = sprintf( __( 'Open documentation for %s', 'implecode' ), $this->args['title'] );
+		$label = sprintf( __( 'Open documentation for %s', 'ecommerce-product-catalog' ), $this->args['title'] );
 		?>
 		<a class="ic-settings-section-doc-link" href="<?php echo esc_url( $this->args['documentation_url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( $label ); ?>" title="<?php echo esc_attr( $label ); ?>">?</a>
 		<?php

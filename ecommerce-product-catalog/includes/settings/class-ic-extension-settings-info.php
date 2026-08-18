@@ -50,7 +50,7 @@ class IC_Extension_Settings_Info {
 		} else {
 			/* translators: 1: opening Product CSV link, 2: closing Product CSV link. */
 			$info = sprintf( __( 'With %1$sProduct CSV%2$s you can import, export and update an unlimited number of products at once even on a very limited server. It also supports all product fields and will import external images to the WordPress media library. You can also enjoy scheduled sync and many more features that come with the premium support service!', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/plugins/product-csv/#cam=extension-info&key=product-csv">', '</a>' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by info_box().
 			echo $this->info_box( $info );
 		}
 	}
@@ -80,7 +80,7 @@ class IC_Extension_Settings_Info {
 			$extensions_url = admin_url( 'edit.php?post_type=al_product&page=extensions.php' );
 			/* translators: 1: opening extensions page link, 2: closing extensions page link. */
 			$message = sprintf( __( 'More free & premium features %1$shere%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( $extensions_url ) . '">', '</a>' );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo '<span class="extensions-promo-box">' . $message . '</span>';
 		}
 	}

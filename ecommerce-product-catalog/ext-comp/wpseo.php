@@ -96,8 +96,10 @@ function ic_remove_seo_archives( $title ) {
 	return str_replace(
 		array(
 			/* translators: Archive title suffix used by Yoast SEO. */
+			// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- This label belongs to Yoast SEO and must use Yoast's translation catalogue.
 			' ' . __( 'Archives', 'wordpress-seo' ),
 			/* translators: Archive title suffix used by Yoast SEO. */
+			// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- This label belongs to Yoast SEO and must use Yoast's translation catalogue.
 			' ' . __( 'Archive', 'wordpress-seo' ),
 		),
 		'',

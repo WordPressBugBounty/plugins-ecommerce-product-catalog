@@ -88,10 +88,20 @@ class IC_Settings_Page {
 			'screen_submenu_priority'          => 10,
 			'container_class'                  => 'setting-content submenu',
 			'submenu_item_id'                  => '',
-			'submit_label'                     => __( 'Save changes', 'implecode' ),
+			'submit_label'                     => __( 'Save changes', 'ecommerce-product-catalog' ),
+			'submit_name'                      => '',
+			'submit_class'                     => 'button-primary',
 			'show_submit'                      => true,
 			'show_title'                       => true,
 			'show_form'                        => true,
+			'form_action'                      => 'options.php',
+			'form_method'                      => 'post',
+			'form_attributes'                  => array(),
+			'hidden_fields'                    => array(),
+			'show_settings_fields'             => true,
+			'nonce_action'                     => '',
+			'nonce_name'                       => '_wpnonce',
+			'nonce_referer'                    => true,
 		);
 		$this->args = wp_parse_args( is_array( $args ) ? $args : array(), $defaults );
 		$this->register_screen_tabs_filter();
@@ -273,14 +283,16 @@ class IC_Settings_Page {
 			<?php endif; ?>
 			<?php if ( ! empty( $this->args['show_form'] ) ) : ?>
 				<?php do_action( 'ic_settings_page_before_form', $this->args['option_group'], $this->settings(), $this ); ?>
-				<form method="post" action="<?php echo esc_url( 'options.php' ); ?>">
-					<?php if ( ! empty( $this->args['option_group'] ) ) : ?>
+				<form method="<?php echo esc_attr( $this->form_method() ); ?>" action="<?php echo esc_url( $this->form_action() ); ?>"<?php echo $this->form_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form attributes are escaped by form_attributes(). ?>>
+					<?php if ( ! empty( $this->args['option_group'] ) && ! empty( $this->args['show_settings_fields'] ) ) : ?>
 						<?php settings_fields( $this->args['option_group'] ); ?>
 					<?php endif; ?>
+					<?php $this->render_form_nonce(); ?>
+					<?php $this->render_hidden_fields(); ?>
 					<?php $this->render_body(); ?>
 					<?php if ( ! empty( $this->args['show_submit'] ) ) : ?>
 						<p class="submit">
-							<input type="submit" class="button-primary" value="<?php echo esc_attr( $this->args['submit_label'] ); ?>"/>
+							<input type="submit"<?php $this->render_submit_name(); ?> class="<?php echo esc_attr( $this->args['submit_class'] ); ?>" value="<?php echo esc_attr( $this->args['submit_label'] ); ?>"/>
 						</p>
 					<?php endif; ?>
 				</form>
@@ -318,6 +330,26 @@ class IC_Settings_Page {
 	 */
 	public function helpers() {
 		return is_array( $this->args['helpers'] ) ? $this->args['helpers'] : array();
+	}
+
+	/**
+	 * Returns the configured form action URL.
+	 *
+	 * @return string
+	 */
+	public function form_action() {
+		return (string) $this->args['form_action'];
+	}
+
+	/**
+	 * Returns the configured form method.
+	 *
+	 * @return string
+	 */
+	public function form_method() {
+		$method = strtolower( (string) $this->args['form_method'] );
+
+		return 'get' === $method ? 'get' : 'post';
 	}
 
 	/**
@@ -760,5 +792,84 @@ class IC_Settings_Page {
 		$submenus = is_array( $this->args['submenu'] ) ? $this->args['submenu'] : array( $this->args['submenu'] );
 
 		return array_map( 'sanitize_key', $submenus );
+	}
+
+	/**
+	 * Returns normalized form attributes.
+	 *
+	 * @return string
+	 */
+	private function form_attributes() {
+		if ( empty( $this->args['form_attributes'] ) || ! is_array( $this->args['form_attributes'] ) ) {
+			return '';
+		}
+
+		$attributes = '';
+		foreach ( $this->args['form_attributes'] as $attribute => $value ) {
+			$attribute = sanitize_key( (string) $attribute );
+			if ( '' === $attribute || null === $value || false === $value ) {
+				continue;
+			}
+			if ( true === $value ) {
+				$attributes .= ' ' . $attribute;
+				continue;
+			}
+
+			$attributes .= sprintf( ' %1$s="%2$s"', $attribute, esc_attr( (string) $value ) );
+		}
+
+		return $attributes;
+	}
+
+	/**
+	 * Renders a nonce field for custom form handlers when configured.
+	 *
+	 * @return void
+	 */
+	private function render_form_nonce() {
+		if ( empty( $this->args['nonce_action'] ) ) {
+			return;
+		}
+
+		wp_nonce_field(
+			(string) $this->args['nonce_action'],
+			(string) $this->args['nonce_name'],
+			! empty( $this->args['nonce_referer'] )
+		);
+	}
+
+	/**
+	 * Renders configured hidden fields.
+	 *
+	 * @return void
+	 */
+	private function render_hidden_fields() {
+		if ( empty( $this->args['hidden_fields'] ) || ! is_array( $this->args['hidden_fields'] ) ) {
+			return;
+		}
+
+		foreach ( $this->args['hidden_fields'] as $name => $value ) {
+			$name = is_scalar( $name ) ? (string) $name : '';
+			if ( '' === $name ) {
+				continue;
+			}
+			?>
+			<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( is_scalar( $value ) ? (string) $value : '' ); ?>" />
+			<?php
+		}
+	}
+
+	/**
+	 * Renders the optional submit name attribute.
+	 *
+	 * @return void
+	 */
+	private function render_submit_name() {
+		if ( empty( $this->args['submit_name'] ) ) {
+			return;
+		}
+		?>
+name="<?php echo esc_attr( (string) $this->args['submit_name'] ); ?>"
+		<?php
 	}
 }

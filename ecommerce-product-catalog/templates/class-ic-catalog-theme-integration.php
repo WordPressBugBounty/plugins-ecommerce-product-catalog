@@ -44,16 +44,45 @@ class IC_Catalog_Theme_Integration {
 	}
 
 	/**
+	 * Returns the `test_advanced` wizard steps that write the integration mode option.
+	 *
+	 * Every step listed here must be triggered from a nonced link.
+	 *
+	 * @return string[]
+	 */
+	public static function mode_switching_wizard_steps() {
+		return array( 'ok', 'bad', 'simple' );
+	}
+
+	/**
+	 * Returns a nonced wizard step URL.
+	 *
+	 * @param string $step Wizard step passed as the `test_advanced` query arg.
+	 * @return string Escaped URL.
+	 */
+	public static function wizard_step_url( $step ) {
+		$url = add_query_arg( 'test_advanced', $step );
+		if ( in_array( (string) $step, self::mode_switching_wizard_steps(), true ) ) {
+			$url = wp_nonce_url( $url, 'ic_test_advanced' );
+		}
+
+		return esc_url( $url );
+	}
+
+	/**
 	 * Shows the theme integration wizard.
 	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return void
 	 */
 	public static function theme_integration_wizard( $atts ) {
-		$current_mode = self::get_real_integration_mode();
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only wizard state from the current request.
+		$current_mode  = self::get_real_integration_mode();
 		$test_advanced = isset( $_GET['test_advanced'] ) ? sanitize_text_field( wp_unslash( $_GET['test_advanced'] ) ) : '';
 		if ( is_ic_integration_wizard_page() ) {
+			if ( in_array( $test_advanced, self::mode_switching_wizard_steps(), true ) ) {
+				// These steps write the integration mode option, so they require a valid nonce.
+				check_admin_referer( 'ic_test_advanced' );
+			}
 			$args            = shortcode_atts(
 				array(
 					'class' => 'fixed-box',
@@ -79,14 +108,14 @@ class IC_Catalog_Theme_Integration {
 
 				$box_content .= '<p>' . __( 'Please use the button below to check out how the product page looks in Automatic Advanced Mode.', 'ecommerce-product-catalog' ) . '</p>';
 				$box_content .= '<p>' . __( 'The layout might look like broken at first; however, you will be able to adjust it.', 'ecommerce-product-catalog' ) . '</p>';
-				$box_content .= '<p class="wp-core-ui"><a href="' . esc_url( add_query_arg( 'test_advanced', '1' ) ) . '" class="button-primary">' . __( 'Start Advanced Mode Test', 'ecommerce-product-catalog' ) . '</a>';
+				$box_content .= '<p class="wp-core-ui"><a href="' . self::wizard_step_url( '1' ) . '" class="button-primary">' . __( 'Start Advanced Mode Test', 'ecommerce-product-catalog' ) . '</a>';
 				if ( is_ic_shortcode_integration( null, false ) ) {
-					$box_content .= '<a href="' . esc_url( add_query_arg( 'test_advanced', 'simple' ) ) . '" class="button-secondary">' . __( 'Use Shortcode Mode', 'ecommerce-product-catalog' ) . '</a></p>';
+					$box_content .= '<a href="' . self::wizard_step_url( 'simple' ) . '" class="button-secondary">' . __( 'Use Shortcode Mode', 'ecommerce-product-catalog' ) . '</a></p>';
 				} elseif ( is_ic_simple_mode() ) {
-					$box_content .= '<a href="' . esc_url( add_query_arg( 'test_advanced', 'simple' ) ) . '" class="button-secondary">' . __( 'Use Simple Mode', 'ecommerce-product-catalog' ) . '</a></p>';
+					$box_content .= '<a href="' . self::wizard_step_url( 'simple' ) . '" class="button-secondary">' . __( 'Use Simple Mode', 'ecommerce-product-catalog' ) . '</a></p>';
 				}
 				if ( 'simple' === $current_mode ) {
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by implecode_info(), a framework notice box.
 					echo '<div id="integration_wizard" class="' . $class . '">' . implecode_info( $box_content, 0 ) . '</div>';
 				}
 			} elseif ( '1' === $test_advanced ) {
@@ -94,7 +123,7 @@ class IC_Catalog_Theme_Integration {
 				if ( is_ic_shortcode_integration( null, false ) ) {
 					/* translators: %s: shortcode tag used to restore the catalog listing. */
 					$box_content .= '<p class="initial-description">' . __( 'Would you like to remove the shortcode integration and try the configuration wizard?', 'ecommerce-product-catalog' ) . '</p><p><strong>' . sprintf( __( 'If something goes wrong you will have to add %s to the product listing again.', 'ecommerce-product-catalog' ), '[' . ic_catalog_shortcode_name() . ']' ) . '</strong></p><p><strong>' . __( 'Do it only if the catalog layout doesn\'t match your theme or if some unwanted elements from the theme are displayed on catalog pages.', 'ecommerce-product-catalog' ) . '</strong></p>';
-					$box_content .= '<p class="wp-core-ui" style="margin-top: 20px;"><a href="' . esc_url( add_query_arg( 'remove_shortcode_integration', '1' ) ) . '" class="button-primary">' . __( 'Remove the Shortcode and Start the Wizard', 'ecommerce-product-catalog' ) . '</a></p>';
+					$box_content .= '<p class="wp-core-ui" style="margin-top: 20px;"><a href="' . esc_url( wp_nonce_url( add_query_arg( 'remove_shortcode_integration', '1' ), 'ic_remove_shortcode_integration' ) ) . '" class="button-primary">' . __( 'Remove the Shortcode and Start the Wizard', 'ecommerce-product-catalog' ) . '</a></p>';
 				} else {
 					$box_content .= '<p class="initial-description">' . __( 'Advanced Mode is temporary enabled for this page now.', 'ecommerce-product-catalog' ) . ' <strong>' . __( "Don't worry if it looks messy.", 'ecommerce-product-catalog' ) . '</strong> ' . __( 'Make some adjustments if necessary (you can change it at any time later).', 'ecommerce-product-catalog' ) . '</p>';
 					$box_content .= '<p class="initial-description"><strong>' . __( 'Click start to proceed with layout adjustment.', 'ecommerce-product-catalog' ) . '</strong></p>';
@@ -167,15 +196,15 @@ class IC_Catalog_Theme_Integration {
     display: none;
 	margin-right:3px;
 	margin-left: -23px;}</style>';
-					$box_content .= '<p class="wp-core-ui"><span class="ic_spinner"></span><a href="' . esc_url( add_query_arg( 'test_advanced', 'ok' ) ) . '" class="button-primary integration-ok">' . __( 'It\'s Fine', 'ecommerce-product-catalog' ) . '</a>';
+					$box_content .= '<p class="wp-core-ui"><span class="ic_spinner"></span><a href="' . self::wizard_step_url( 'ok' ) . '" class="button-primary integration-ok">' . __( 'It\'s Fine', 'ecommerce-product-catalog' ) . '</a>';
 					if ( is_ic_simple_mode() ) {
-						$box_content .= '<a href="' . esc_url( add_query_arg( 'test_advanced', 'bad' ) ) . '" class="button-secondary">' . __( 'It\'s Broken', 'ecommerce-product-catalog' ) . '</a>';
+						$box_content .= '<a href="' . self::wizard_step_url( 'bad' ) . '" class="button-secondary">' . __( 'It\'s Broken', 'ecommerce-product-catalog' ) . '</a>';
 					}
 					$box_content .= '<button class="button-secondary show_third switch_section">' . __( 'Go Back', 'ecommerce-product-catalog' ) . '</button></p>';
 					$box_content .= '</div>';
 					$box_content .= '<p class="wp-core-ui" style="margin-top: 20px;"><button class="button-secondary show_prev_section switch_section" style="display: none">' . __( 'Go Back', 'ecommerce-product-catalog' ) . '</button><button class="button-primary show_next_section switch_section" style="display: none">' . __( 'Next', 'ecommerce-product-catalog' ) . '</button></p>';
 				}
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by implecode_info(), a framework notice box.
 				echo '<div id="integration_wizard" class="integration_start ' . $class . '">' . implecode_info( $box_content, 0 ) . '</div>';
 			} elseif ( 'bad' === $test_advanced ) {
 				$box_content .= '<p>' . __( 'It seems that Manual Theme Integration is needed in order to use Advanced Mode with your current theme.', 'ecommerce-product-catalog' ) . '</p>';
@@ -188,9 +217,9 @@ class IC_Catalog_Theme_Integration {
 				$box_content .= '<li>' . __( 'Switch the theme.', 'ecommerce-product-catalog' ) . '</li>';
 				$box_content .= '</ol>';
 				$box_content .= '<p>' . __( 'Please make your choice below or switch the theme.', 'ecommerce-product-catalog' ) . '</p>';
-				$box_content .= '<p class="wp-core-ui"><a target="_blank" href="https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=integration-advanced-fail" class="button-primary">' . __( 'Free Theme Integration Guide', 'ecommerce-product-catalog' ) . '</a><a href="' . esc_url( add_query_arg( 'test_advanced', 'simple' ) ) . '" class="button-secondary">' . __( 'Use Simple Mode', 'ecommerce-product-catalog' ) . '</a></p>';
+				$box_content .= '<p class="wp-core-ui"><a target="_blank" href="https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=simple-mode&key=integration-advanced-fail" class="button-primary">' . __( 'Free Theme Integration Guide', 'ecommerce-product-catalog' ) . '</a><a href="' . self::wizard_step_url( 'simple' ) . '" class="button-secondary">' . __( 'Use Simple Mode', 'ecommerce-product-catalog' ) . '</a></p>';
 				self::enable_simple_mode();
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by implecode_warning(), a framework notice box.
 				echo '<div id="integration_wizard" class="' . $class . '">' . implecode_warning( $box_content, 0 ) . '</div>';
 			} elseif ( 'ok' === $test_advanced ) {
 				/* translators: %s: catalog plugin name. */
@@ -202,7 +231,7 @@ class IC_Catalog_Theme_Integration {
 				// The optional guide link remains disabled here.
 				$box_content .= '</p>';
 				self::enable_advanced_mode();
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by implecode_success(), a framework notice box.
 				echo '<div id="integration_wizard" class="' . $class . '">' . implecode_success( $box_content, 0 ) . '</div>';
 			} elseif ( 'simple' === $test_advanced ) {
 				if ( is_ic_shortcode_integration() ) {
@@ -212,9 +241,9 @@ class IC_Catalog_Theme_Integration {
 				}
 				$box_content .= '<p>' . __( 'You can switch between modes at any time in Product Settings.', 'ecommerce-product-catalog' ) . '</p>';
 				$box_content .= '<p>' . __( 'Use the buttons below to try the advanced integration again or go to admin and start adding your products.', 'ecommerce-product-catalog' ) . '</p>';
-				$box_content .= '<p class="wp-core-ui"><a href="' . admin_url( 'edit.php?post_type=al_product' ) . '" class="button-primary">' . __( 'Go to Admin', 'ecommerce-product-catalog' ) . '</a><a href="' . esc_url( add_query_arg( 'test_advanced', '1' ) ) . '" class="button-secondary">' . __( 'Restart Advanced Mode Test', 'ecommerce-product-catalog' ) . '</a></p>';
+				$box_content .= '<p class="wp-core-ui"><a href="' . admin_url( 'edit.php?post_type=al_product' ) . '" class="button-primary">' . __( 'Go to Admin', 'ecommerce-product-catalog' ) . '</a><a href="' . self::wizard_step_url( '1' ) . '" class="button-secondary">' . __( 'Restart Advanced Mode Test', 'ecommerce-product-catalog' ) . '</a></p>';
 				self::enable_simple_mode();
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by implecode_success(), a framework notice box.
 				echo '<div id="integration_wizard" class="' . $class . '">' . implecode_success( $box_content, 0 ) . '</div>';
 			}
 		}
@@ -348,10 +377,10 @@ class IC_Catalog_Theme_Integration {
 				}
 					wp_enqueue_script( 'wp-color-picker', admin_url( 'js/color-picker.min.js' ), $picker_deps, IC_EPC_VERSION, true );
 					$colorpicker_l10n = array(
-						'clear'         => __( 'Clear' ),
-						'defaultString' => __( 'Default' ),
-						'pick'          => __( 'Select Color' ),
-						'current'       => __( 'Current Color' ),
+						'clear'         => __( 'Clear', 'ecommerce-product-catalog' ),
+						'defaultString' => __( 'Default', 'ecommerce-product-catalog' ),
+						'pick'          => __( 'Select Color', 'ecommerce-product-catalog' ),
+						'current'       => __( 'Current Color', 'ecommerce-product-catalog' ),
 					);
 					wp_localize_script( 'wp-color-picker', 'wpColorPickerL10n', $colorpicker_l10n );
 					wp_enqueue_style( 'wp-color-picker' );
@@ -431,14 +460,16 @@ class IC_Catalog_Theme_Integration {
 	 * Creates the sample product and redirects to the wizard.
 	 */
 	public static function create_sample_product_with_redirect() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Existing sample-product bootstrap is driven by this query arg.
-		if ( isset( $_GET['create_sample_product_page'] ) ) {
-			$sample_product_id = create_sample_product();
-			$url               = get_permalink( $sample_product_id );
-			$url               = esc_url_raw( add_query_arg( 'test_advanced', 1, $url ) );
-			wp_safe_redirect( $url );
-			exit();
+		// Plain flag read; the nonce it carries is verified by check_admin_referer() below.
+		if ( ! isset( $_GET['create_sample_product_page'] ) ) {
+			return;
 		}
+		check_admin_referer( 'ic_create_sample_product_page' );
+		$sample_product_id = create_sample_product();
+		$url               = get_permalink( $sample_product_id );
+		$url               = esc_url_raw( add_query_arg( 'test_advanced', 1, $url ) );
+		wp_safe_redirect( $url );
+		exit();
 	}
 }
 

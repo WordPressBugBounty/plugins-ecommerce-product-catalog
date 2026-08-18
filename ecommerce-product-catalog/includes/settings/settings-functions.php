@@ -503,7 +503,7 @@ if ( ! function_exists( 'echo_ic_setting' ) ) {
 	 */
 	function echo_ic_setting( $content, $should_echo = 1 ) {
 		if ( 1 === (int) $should_echo ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $content;
 		} else {
 			return $content;
@@ -662,9 +662,14 @@ if ( ! function_exists( 'ic_ajax_hide_message' ) ) {
 				}
 				if ( ! in_array( $hash, $hidden, true ) ) {
 					$hidden[] = $hash;
+					// Only the last branch writes the site-wide option, so only it requires the
+					// settings capability. Dismissing your own admin message stays available to
+					// any logged-in user through the self-scoped user-meta branch above.
+					// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+					$can_hide_site_wide = current_user_can( 'manage_product_settings' );
 					if ( get_current_user_id() ) {
 						update_user_meta( get_current_user_id(), '_ic_hidden_boxes', $hidden );
-					} else {
+					} elseif ( $can_hide_site_wide ) {
 						update_option( 'ic_hidden_boxes', $hidden, false );
 					}
 				}
@@ -797,18 +802,21 @@ if ( ! function_exists( 'ic_select_page' ) ) {
 		$multiple = false,
 		$select_class = ''
 	) {
-		$create_page_request = filter_input( INPUT_GET, 'ic_create_new_page_for_settings', FILTER_DEFAULT );
-		if ( is_string( $create_page_request ) ) {
-			$create_page_request = urldecode( sanitize_text_field( $create_page_request ) );
-		} else {
-			$create_page_request = '';
-		}
+		$create_page_request = isset( $_GET['ic_create_new_page_for_settings'] ) && is_scalar( $_GET['ic_create_new_page_for_settings'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['ic_create_new_page_for_settings'] ) ) : '';
+		$create_page_nonce   = isset( $_GET['ic_create_page_nonce'] ) && is_scalar( $_GET['ic_create_page_nonce'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['ic_create_page_nonce'] ) ) : '';
+		$create_page_action  = 'ic_create_page_for_settings_' . $option_name;
 		if ( ( empty( $selected_value ) || 'noid' === $selected_value ) && ! empty( $create_new_button ) && is_array( $create_new_button ) ) {
-			if ( ! empty( $create_page_request ) && $create_page_request === $option_name ) {
+			if ( $create_page_request === $option_name && wp_verify_nonce( $create_page_nonce, $create_page_action ) ) {
 				$selected_value = ic_create_page_for_settings( $create_new_button['title'], $create_new_button['content'], $create_new_button['option'], $create_new_button['option_sub'] );
 			}
-			if ( ( empty( $create_page_request ) || $create_page_request !== $option_name ) && ( empty( $selected_value ) || 'noid' === $selected_value ) ) {
-				$custom_content .= ' <a class="button button-small" style="vertical-align: middle;" href="' . esc_url( add_query_arg( 'ic_create_new_page_for_settings', $option_name ) ) . '">' . __( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
+			if ( empty( $selected_value ) || 'noid' === $selected_value ) {
+				$create_page_url = add_query_arg(
+					array(
+						'ic_create_new_page_for_settings' => $option_name,
+						'ic_create_page_nonce'            => wp_create_nonce( $create_page_action ),
+					)
+				);
+				$custom_content .= ' <a class="button button-small" style="vertical-align: middle;" href="' . esc_url( $create_page_url ) . '">' . __( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
 			}
 		}
 		$args  = array(
@@ -843,10 +851,10 @@ if ( ! function_exists( 'ic_select_page' ) ) {
 			$edit_link  = get_edit_post_link( $selected_value );
 			$front_link = $custom_view_url ? $custom_view_url : get_permalink( $selected_value );
 			if ( ! empty( $edit_link ) ) {
-				$select_box .= ' <a class="button button-small" style="vertical-align: middle;" href="' . $edit_link . '">' . __( 'Edit' ) . '</a>';
+				$select_box .= ' <a class="button button-small" style="vertical-align: middle;" href="' . $edit_link . '">' . __( 'Edit', 'ecommerce-product-catalog' ) . '</a>';
 			}
 			if ( ! empty( $front_link ) ) {
-				$select_box .= ' <a class="button button-small" style="vertical-align: middle;" href="' . $front_link . '">' . __( 'View Page' ) . '</a>';
+				$select_box .= ' <a class="button button-small" style="vertical-align: middle;" href="' . $front_link . '">' . __( 'View Page', 'ecommerce-product-catalog' ) . '</a>';
 			}
 		}
 		$select_box .= $custom_content;

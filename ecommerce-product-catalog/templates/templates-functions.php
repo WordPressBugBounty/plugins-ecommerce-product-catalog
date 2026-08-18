@@ -66,7 +66,7 @@ function content_product_adder_archive() {
 		ob_start();
 		include apply_filters( 'content_product_adder_archive_path', $path );
 		$product_listing = ob_get_clean();
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 		echo do_shortcode( $product_listing );
 	} else {
 		include apply_filters( 'content_product_adder_archive_path', AL_BASE_TEMPLATES_PATH . '/templates/full/product-listing.php' );
@@ -83,7 +83,7 @@ function content_product_adder_single() {
 		ob_start();
 		include apply_filters( 'content_product_adder_path', $path );
 		$product_page = ob_get_clean();
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 		echo do_shortcode( $product_page );
 	} else {
 		include apply_filters( 'content_product_adder_path', AL_BASE_TEMPLATES_PATH . '/templates/full/product-page.php' );
@@ -99,7 +99,7 @@ function content_product_adder_single_content() {
 		ob_start();
 		include $path;
 		$product_page = ob_get_clean();
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 		echo do_shortcode( $product_page );
 	} else {
 		include AL_BASE_TEMPLATES_PATH . '/templates/full/product-page-inside.php';
@@ -171,6 +171,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 			'post_type'        => 'al_product',
 			'category'         => '',
 			'product'          => '',
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- The related-products template contract supports explicit caller exclusions.
 			'exclude'          => '',
 			'products_limit'   => 100,
 			'archive_template' => get_product_listing_template(),
@@ -214,6 +215,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 		}
 		$query_param = array(
 			'post_type'      => $post_type,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Related products are selected by shared catalog taxonomy terms.
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'al_product-cat',
@@ -229,6 +231,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 			'posts_per_page' => $products_limit,
 		);
 		if ( ! empty( $exclude ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- The caller-provided related-product exclusion is required to avoid rendering the current/explicit products.
 			$query_param['post__not_in'] = explode( ',', $exclude );
 		}
 	}
@@ -262,7 +265,7 @@ function show_products_outside_loop( $atts, $content = '' ) {
 	ob_start();
 	do_action( 'before_product_list', $archive_template );
 	do_action( 'before_shortcode_product_list', $shortcode_query, $args, $archive_template );
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 	echo do_shortcode( $content );
 	$before = ob_get_contents();
 	ob_end_clean();
@@ -401,7 +404,7 @@ function product_archive_pagination( $wp_query = null ) {
 	if ( get_previous_posts_link( $names['previous_products'] ) ) {
 		$previous      = $current_page - 1;
 		$previous_link = get_previous_posts_link( '<span>' . esc_html( $names['previous_products'] ) . '</span>' );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_product_archive_nav_buttons' filter, which extensions and themes legitimately use to inject their own HTML.
 		printf( '<li class="previous-page" data-page="%1$s">%2$s</li> ' . "\n", esc_attr( (string) $previous ), $previous_link );
 	}
 	$pre_page_buttons = apply_filters( 'ic_product_archive_nav_buttons', '', $links, $max, $current_page );
@@ -426,13 +429,13 @@ function product_archive_pagination( $wp_query = null ) {
 			printf( '<li class="%1$s" data-page="%2$s"><a href="%3$s">%4$s</a></li> ' . "\n", esc_attr( $class_name ), esc_attr( (string) $max ), esc_url( get_pagenum_link( $max ) ), esc_html( (string) $max ) );
 		}
 	} else {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $pre_page_buttons;
 	}
 	if ( get_next_posts_link( $names['next_products'], $max ) ) {
 		$next      = $current_page + 1;
 		$next_link = get_next_posts_link( '<span>' . esc_html( $names['next_products'] ) . '</span>', $max );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
 		printf( '<li class="next-page" data-page="%1$s">%2$s</li> ' . "\n", esc_attr( (string) $next ), $next_link );
 	}
 	echo '</ul></div>' . "\n";
@@ -464,8 +467,19 @@ function get_catalog_template( $archive_template, $post, $i = null, $design_sche
 	);
 	$themes_array[ $archive_template ] = isset( $themes_array[ $archive_template ] ) ? $themes_array[ $archive_template ] : $themes_array['default'];
 	$themes_array[ $archive_template ] = empty( $themes_array[ $archive_template ] ) ? get_default_archive_theme( $post, 'default' ) : $themes_array[ $archive_template ];
+	$markup                            = $themes_array[ $archive_template ];
+	$product_id                        = is_object( $post ) && isset( $post->ID ) ? absint( $post->ID ) : 0;
+	if ( ! empty( $markup ) && $product_id > 0 && is_ic_product( $product_id ) ) {
+		do_action(
+			'ic_epc_listing_impression',
+			array(
+				'product_id' => $product_id,
+				'page_type'  => 'listing',
+			)
+		);
+	}
 
-	return $themes_array[ $archive_template ];
+	return $markup;
 }
 
 /**
@@ -1020,7 +1034,7 @@ function product_list_categories_header() {
 	if ( ! empty( $archive_names['all_main_categories'] ) && ! isset( $shortcode_query ) ) {
 		$title = do_shortcode( $archive_names['all_main_categories'] );
 		if ( get_product_listing_title() !== $title ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 			echo '<h2 class="catalog-header">' . do_shortcode( $archive_names['all_main_categories'] ) . '</h2>';
 		}
 	}
@@ -1035,7 +1049,7 @@ function category_list_subcategories_header() {
 	if ( is_ic_taxonomy_page() ) {
 		$archive_names = get_archive_names();
 		if ( ! empty( $archive_names['all_subcategories'] ) && ! is_ic_shortcode_query() ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 			echo '<h2 class="catalog-header">' . do_shortcode( $archive_names['all_subcategories'] ) . '</h2>';
 		}
 	}
@@ -1052,11 +1066,11 @@ function product_list_header() {
 		if ( is_ic_product_listing() && ! empty( $archive_names['all_products'] ) ) {
 			$title = do_shortcode( $archive_names['all_products'] );
 			if ( get_product_listing_title() !== $title ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 				echo '<h2 class="catalog-header">' . $title . '</h2>';
 			}
 		} elseif ( is_ic_taxonomy_page() && ! empty( $archive_names['category_products'] ) && is_ic_product_listing_showing_cats() ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: do_shortcode() output. Escaping it would print the tags instead of rendering them.
 			echo '<h2 class="catalog-header">' . do_shortcode( $archive_names['category_products'] ) . '</h2>';
 		}
 	}
@@ -1113,21 +1127,26 @@ add_action( 'advanced_mode_layout_start', 'advanced_mode_styling' );
  */
 function advanced_mode_styling() {
 	$settings = IC_Catalog_Theme_Integration::settings();
-	$styling  = '<style>';
-	if ( 100 !== $settings['container_width'] ) {
-		$styling .= '#container.content-area.product-catalog {width: ' . $settings['container_width'] . '%; margin: 0 auto; overflow: hidden; box-sizing: border-box; float: none;}';
+	// Stored option values are normalized before they are concatenated into the style block.
+	$container_width   = absint( $settings['container_width'] );
+	$container_padding = absint( $settings['container_padding'] );
+	$container_bg      = sanitize_hex_color( $settings['container_bg'] );
+	$container_text    = sanitize_hex_color( $settings['container_text'] );
+	$styling           = '<style>';
+	if ( 100 !== $container_width ) {
+		$styling .= '#container.content-area.product-catalog {width: ' . $container_width . '%; margin: 0 auto; overflow: hidden; box-sizing: border-box; float: none;}';
 	}
-	if ( '' !== $settings['container_bg'] && ic_string_contains( $settings['container_bg'], '#' ) ) {
-		$styling .= '#container.content-area.product-catalog {background: ' . $settings['container_bg'] . ';}';
+	if ( ! empty( $container_bg ) ) {
+		$styling .= '#container.content-area.product-catalog {background: ' . $container_bg . ';}';
 	}
-	if ( 0 !== $settings['container_padding'] ) {
-		$styling .= '.content-area.product-catalog #content {padding: ' . $settings['container_padding'] . 'px; box-sizing: border-box; float: none; }';
+	if ( 0 !== $container_padding ) {
+		$styling .= '.content-area.product-catalog #content {padding: ' . $container_padding . 'px; box-sizing: border-box; float: none; }';
 		if ( is_ic_default_theme_sided_sidebar_active() ) {
-			$styling .= '.content-area.product-catalog #catalog_sidebar {padding: ' . $settings['container_padding'] . 'px; box-sizing: border-box;}';
+			$styling .= '.content-area.product-catalog #catalog_sidebar {padding: ' . $container_padding . 'px; box-sizing: border-box;}';
 		}
 	}
-	if ( '' !== $settings['container_text'] && ic_string_contains( $settings['container_text'], '#' ) ) {
-		$styling .= '#container.content-area.product-catalog * {color: ' . $settings['container_text'] . ';}';
+	if ( ! empty( $container_text ) ) {
+		$styling .= '#container.content-area.product-catalog * {color: ' . $container_text . ';}';
 	}
 	if ( 'left' === $settings['default_sidebar'] ) {
 		$styling .= '.content-area.product-catalog #catalog_sidebar {float: left;}';
@@ -1144,7 +1163,7 @@ function advanced_mode_styling() {
 	$styling .= apply_filters( 'advanced_mode_styling_rules', '' );
 	$styling .= '</style>';
 	if ( '<style></style>' !== $styling ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS block built from hardcoded selectors plus absint()/sanitize_hex_color() values and the advanced_mode_styling_rules filter.
 		echo $styling;
 	}
 }
@@ -1236,6 +1255,7 @@ function get_related_products( $products_limit = null, $markup = false, $product
 			$query_param = array(
 				'post_type'      => $post_type,
 				'orderby'        => 'rand',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Random related products require the current product's taxonomy term constraint.
 				'tax_query'      => array(
 					array(
 						'taxonomy' => $taxonomy,
@@ -1345,7 +1365,7 @@ function ic_product_listing_categories( $archive_template, $multiple_settings ) 
 	if ( ! is_tax() && ! is_search() ) {
 		$before_archive = content_product_adder_archive_before();
 		if ( '<div class="entry-summary"></div>' !== $before_archive ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $before_archive;
 		}
 		if ( 'on' === $multiple_settings['product_listing_cats'] || 'cats_only' === $multiple_settings['product_listing_cats'] || 'forced_cats_only' === $multiple_settings['product_listing_cats'] ) {
@@ -1362,7 +1382,7 @@ function ic_product_listing_categories( $archive_template, $multiple_settings ) 
 				$show_categories = do_shortcode( '[show_categories parent="0" shortcode_query="no"]' );
 				if ( ! empty( $show_categories ) ) {
 					do_action( 'before_product_listing_category_list' );
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $show_categories;
 					if ( 'list' !== $archive_template && more_products() && 'forced_cats_only' !== $multiple_settings['product_listing_cats'] ) {
 						echo '<hr>';
@@ -1400,7 +1420,7 @@ function ic_product_listing_categories( $archive_template, $multiple_settings ) 
 				$show_categories = do_shortcode( '[show_categories parent=' . get_queried_object_id() . ' shortcode_query=no]' );
 				if ( ! empty( $show_categories ) ) {
 					do_action( 'before_category_subcategories' );
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $show_categories;
 					if ( 'list' !== $archive_template && more_products() ) {
 						echo '<hr>';
@@ -1451,7 +1471,7 @@ function ic_product_listing_products( $archive_template, $multiple_settings ) {
 			ic_reset_product_id();
 		endwhile;
 		$product_list = apply_filters( 'product_list_ready', $product_list, $archive_template, 'auto_listing' );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo '<div class="product-list ' . $archive_template . ' ' . product_list_class( $archive_template ) . '" ' . product_list_attr() . '>' . $product_list . '</div>';
 		do_action( 'after_product_list', $archive_template, $multiple_settings );
 		add_action( 'product_listing_end', 'ic_product_clear_span', 99 );
@@ -1459,19 +1479,19 @@ function ic_product_listing_products( $archive_template, $multiple_settings ) {
 		do_action( 'ic_before_empty_search', $archive_template, $multiple_settings );
 		ob_start();
 		$notfound_text = __( 'Sorry, but nothing matched your search terms. Please try again with some different keywords.', 'ecommerce-product-catalog' );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_catalog_not_found_message' filter, which extensions and themes legitimately use to inject their own HTML.
 		echo '<div class="product-list ' . product_list_class( $archive_template ) . '"><p>' . apply_filters( 'ic_catalog_not_found_message', $notfound_text ) . '</p></div>';
 		product_search_form();
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_catalog_not_found_content' filter, which extensions and themes legitimately use to inject their own HTML.
 		echo apply_filters( 'ic_catalog_not_found_content', ob_get_clean() );
 	} elseif ( is_product_filters_active() && ! more_products() ) {
 		show_product_sort_bar();
 		/* translators: 1: opening reset filters link, 2: closing reset filters link */
 		$notfound_filters_text = sprintf( __( 'Sorry, but nothing matched your search terms. Please try again with some different options or %1$sreset filters%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( get_filters_bar_reset_url() ) . '">', '</a>' );
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_catalog_not_found_filters_message' filter, which extensions and themes legitimately use to inject their own HTML.
 		echo '<div class="product-list ' . product_list_class( $archive_template ) . '"><p>' . apply_filters( 'ic_catalog_not_found_filters_message', $notfound_filters_text ) . '</p></div>';
 	} elseif ( ! more_products() && ! ic_is_rendering_catalog_block() && ! is_ic_admin() && ( ! is_ic_only_main_cats() || ( is_ic_taxonomy_page() && ! has_category_children() ) ) ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_empty_list_text().
 		echo ic_empty_list_text();
 	}
 }

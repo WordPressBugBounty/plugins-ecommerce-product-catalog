@@ -22,9 +22,11 @@ if ( ! function_exists( 'ic_framework_require_once' ) ) {
 
 		$real_file = realpath( $file );
 		if ( false === $real_file ) {
-			_doing_it_wrong( __FUNCTION__,
+			_doing_it_wrong(
+				__FUNCTION__,
 				sprintf( 'IC Framework file is missing: %s', esc_html( $file ) ),
-				'1.0' );
+				'1.0'
+			);
 
 			return false;
 		}
@@ -173,6 +175,13 @@ if ( ! function_exists( 'ic_error_log' ) ) {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			return;
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug helper only reads presence of query flags.
+		$global_debug_enabled = defined( 'IC_FORCE_DEBUG_LOG' ) && IC_FORCE_DEBUG_LOG;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug helper only reads presence of query flags.
+		$request_debug_enabled = isset( $_GET['ic_debug_log'] ) || isset( $_GET['ic-error-log'] );
+		if ( ! $global_debug_enabled && ! $request_debug_enabled && ! $param ) {
+			return;
+		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Debug helper only reads presence of a query flag.
 		if ( $param && ! isset( $_GET[ $param ] ) && ! is_ic_front_ajax() ) {
 			return;
@@ -196,8 +205,11 @@ if ( ! function_exists( 'ic_filemtime' ) ) {
 	 *
 	 * @return string|null
 	 */
-	function ic_filemtime( $path ) {
+	function ic_filemtime( $path, $time_only = false ) {
 		if ( file_exists( $path ) ) {
+			if ( $time_only ) {
+				return filemtime( $path );
+			}
 			return '?timestamp=' . filemtime( $path );
 		}
 
@@ -482,6 +494,50 @@ if ( ! function_exists( 'ic_url_to_array' ) ) {
 	}
 }
 
+if ( ! function_exists( 'ic_sanitize_decoded_payload' ) ) {
+	/**
+	 * Decodes a URL payload before recursively sanitizing its scalar fields.
+	 *
+	 * @param mixed $payload URL-encoded JSON or legacy serialized payload.
+	 * @return array Sanitized decoded structure, or an empty array.
+	 */
+	function ic_sanitize_decoded_payload( $payload ) {
+
+		if ( ! is_scalar( $payload ) ) {
+				return array();
+		}
+
+		$data    = urldecode( wp_unslash( (string) $payload ) );
+		$decoded = json_decode( trim( $data ), true );
+		if ( JSON_ERROR_NONE !== json_last_error() && is_serialized( $data ) ) {
+			  // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize -- Required for validated legacy handoff payload compatibility; object creation is disabled.
+				$decoded = unserialize( trim( $data ), array( 'allowed_classes' => false ) );
+		}
+		if ( is_array( $decoded ) ) {
+			return ic_sanitize_decoded_payload_values( $decoded );
+		}
+
+		return array();
+	}
+}
+
+if ( ! function_exists( 'ic_sanitize_decoded_payload_values' ) ) {
+	/**
+	 * Recursively sanitizes values from an already decoded payload.
+	 *
+	 * @param array $values Decoded values.
+	 * @return array
+	 */
+	function ic_sanitize_decoded_payload_values( $values ) {
+
+		$clean = array();
+		foreach ( $values as $key => $value ) {
+			$clean[ $key ] = is_array( $value ) ? ic_sanitize_decoded_payload_values( $value ) : sanitize_text_field( (string) $value );
+		}
+
+		return $clean;
+	}
+}
 if ( ! function_exists( 'ic_get_site_name' ) ) {
 	/**
 	 * Gets the current site name.

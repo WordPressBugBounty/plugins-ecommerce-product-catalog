@@ -15,6 +15,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 class IC_EPC_Import_Post_Type {
 
 	/**
+	 * Nonce action guarding the post type import.
+	 */
+	const IMPORT_NONCE_ACTION = 'ic_import_post_type';
+
+	/**
+	 * Nonce field name used by the post type import form.
+	 *
+	 * A dedicated name is required because this form is rendered on the same
+	 * screen as the CSV upload form, and `wp_nonce_field()` derives the field
+	 * `id` from the field name. Sharing the default `_wpnonce` name would emit
+	 * a duplicate `id="_wpnonce"` on that screen.
+	 */
+	const IMPORT_NONCE_FIELD = 'ic_import_post_type_nonce';
+
+	/**
 	 * Hooks the import UI into the settings screen.
 	 *
 	 * @return void
@@ -32,7 +47,7 @@ class IC_EPC_Import_Post_Type {
 	public function post_types_dropdown() {
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		$options    = '';
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading import target from admin UI state.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only read used to preselect the dropdown option.
 		$selected = isset( $_GET['import_post_type'] ) ? sanitize_key( wp_unslash( $_GET['import_post_type'] ) ) : '';
 		foreach ( $post_types as $post_type ) {
 			if ( ! ic_string_contains( $post_type->name, 'al_product' ) && 'attachment' !== $post_type->name ) {
@@ -55,8 +70,9 @@ class IC_EPC_Import_Post_Type {
 	 */
 	public function import_output() {
 		$this->import_initial_html();
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading import target from admin UI state.
 		if ( ! empty( $_GET['import_post_type'] ) ) {
+			// The import bulk-inserts posts, so the request must come from the nonced import form.
+			check_admin_referer( self::IMPORT_NONCE_ACTION, self::IMPORT_NONCE_FIELD );
 			$this->process_import_post_type();
 		}
 	}
@@ -71,11 +87,16 @@ class IC_EPC_Import_Post_Type {
 		if ( ! empty( $post_types_dropdown ) ) {
 			echo '<h3>' . esc_html__( 'Import from other content', 'ecommerce-product-catalog' ) . '</h3>';
 			echo '<form>';
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Preserving current admin query args in the form.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Current admin query args are only mirrored back into the form; the submission itself is nonced below.
 			foreach ( $_GET as $key => $value ) {
+				if ( ! is_scalar( $value ) || in_array( $key, array( '_wpnonce', '_wp_http_referer', self::IMPORT_NONCE_FIELD ), true ) ) {
+					continue;
+				}
 				echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">';
 			}
-			echo wp_kses_post( $post_types_dropdown ) . ' <button type="submit" class="button-secondary">' . esc_html__( 'Import', 'ecommerce-product-catalog' ) . '</button>';
+			wp_nonce_field( self::IMPORT_NONCE_ACTION, self::IMPORT_NONCE_FIELD );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- post_types_dropdown() builds a select from escaped post-type labels/values; post KSES would remove the control.
+			echo $post_types_dropdown . ' <button type="submit" class="button-secondary">' . esc_html__( 'Import', 'ecommerce-product-catalog' ) . '</button>';
 			echo '</form>';
 		}
 	}
@@ -86,7 +107,7 @@ class IC_EPC_Import_Post_Type {
 	 * @return void
 	 */
 	public function process_import_post_type() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading import target from admin UI state.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- import_output() runs check_admin_referer() before calling this method.
 		$post_type = isset( $_GET['import_post_type'] ) ? sanitize_key( wp_unslash( $_GET['import_post_type'] ) ) : '';
 		if ( ! empty( $post_type ) ) {
 			$posts   = get_posts(

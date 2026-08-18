@@ -25,7 +25,7 @@ if ( ! empty( $term_description ) ) {
 
 	<div class="taxonomy-description">
 	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_product_cat_desc' filter, which extensions and themes legitimately use to inject their own HTML.
 	echo apply_filters( 'ic_product_cat_desc', $term_description );
 	?>
 	</div>

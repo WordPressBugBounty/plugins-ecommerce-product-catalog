@@ -92,12 +92,14 @@ class ic_cart_payments {
 	function email_payment_details( $message, $pre_name ) {
 		if ( ic_string_contains( $message, '[payment_details]' ) ) {
 			$payment_details = '';
-			if ( $pre_name == 'cart_' && isset( $_POST['gateway'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public checkout submission; the posted gateway is only used as a key into the ic_get_order_payments() allow-list and is normalized with sanitize_title() (not sanitize_text_field(), which would strip the %xx octets that sanitize_title() produces for non-ASCII gateway names).
+			$posted_gateway = isset( $_POST['gateway'] ) ? sanitize_title( wp_unslash( $_POST['gateway'] ) ) : '';
+			if ( $pre_name == 'cart_' && '' !== $posted_gateway ) {
 				$normal_payemts = ic_get_order_payments();
-				if ( ! empty( $normal_payemts[ $_POST['gateway'] ] ) ) {
+				if ( ! empty( $normal_payemts[ $posted_gateway ] ) ) {
 					$p               = ic_email_paragraph();
 					$ep              = ic_email_paragraph_end();
-					$payment_details = $p . __( 'Payment Method', 'ecommerce-product-catalog' ) . ': ' . $normal_payemts[ $_POST['gateway'] ] . $ep;
+					$payment_details = $p . __( 'Payment Method', 'ecommerce-product-catalog' ) . ': ' . $normal_payemts[ $posted_gateway ] . $ep;
 				}
 			}
 			$message = str_replace( '[payment_details]', $payment_details, $message );
@@ -115,10 +117,12 @@ class ic_cart_payments {
 
 	function current_payment_label() {
 		$payment_label = '';
-		if ( isset( $_POST['gateway'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public checkout submission; the posted gateway is only used as a key into the ic_get_order_payments() allow-list and is normalized with sanitize_title() (not sanitize_text_field(), which would strip the %xx octets that sanitize_title() produces for non-ASCII gateway names).
+		$posted_gateway = isset( $_POST['gateway'] ) ? sanitize_title( wp_unslash( $_POST['gateway'] ) ) : '';
+		if ( '' !== $posted_gateway ) {
 			$normal_payments = ic_get_order_payments();
-			if ( ! empty( $normal_payments[ $_POST['gateway'] ] ) ) {
-				$payment_label = $normal_payments[ $_POST['gateway'] ];
+			if ( ! empty( $normal_payments[ $posted_gateway ] ) ) {
+				$payment_label = $normal_payments[ $posted_gateway ];
 			}
 		}
 
@@ -127,8 +131,16 @@ class ic_cart_payments {
 
 	function current_payment_name() {
 		$payment_name = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public checkout submission; the posted gateway is only used as a key into the ic_get_order_payments() allow-list and is normalized with sanitize_title() (not sanitize_text_field(), which would strip the %xx octets that sanitize_title() produces for non-ASCII gateway names).
 		if ( isset( $_POST['gateway'] ) ) {
-			$payment_name = sanitize_text_field( $_POST['gateway'] );
+			// Normalize with sanitize_title(), NOT sanitize_text_field(). The gateway radio posts a
+			// sanitize_title() slug of the custom payment name, and sanitize_title() PERCENT-ENCODES
+			// non-ASCII names while sanitize_text_field() strips every %xx octet. The destroyed value is
+			// persisted by order_save_payment_label() into _payment_details['payment_name'] and later read
+			// by IC_Payment_Stats_Normalizer, which bucketed every such order as "unknown".
+			// sanitize_title() is idempotent on an already-slugged value.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public checkout submission; the posted gateway is only used as a key into the ic_get_order_payments() allow-list and is normalized with sanitize_title() (not sanitize_text_field(), which would strip the %xx octets that sanitize_title() produces for non-ASCII gateway names).
+			$payment_name = sanitize_title( wp_unslash( $_POST['gateway'] ) );
 		}
 
 		return $payment_name;
@@ -136,6 +148,10 @@ class ic_cart_payments {
 
 	function add_payment_status( $statuses ) {
 		if ( is_ic_any_payment_gateway_active() ) {
+			if ( ! empty( $statuses['shipped'] ) ) {
+				$old_status['shipped'] = $statuses['shipped'];
+				unset( $statuses['shipped'] );
+			}
 			if ( ! empty( $statuses['completed'] ) ) {
 				$old_status['completed'] = $statuses['completed'];
 				unset( $statuses['completed'] );

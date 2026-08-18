@@ -30,7 +30,7 @@ if ( class_exists( 'WP_Customize_Control' ) ) {
 					<?php
 					/* translators: 1: opening catalog settings link, 2: closing catalog settings link. */
 					$message = sprintf( __( 'Check the %1$scatalog settings%2$s for more advanced configuration options.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) ) . '">', '</a>' );
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $message;
 					?>
 				</p>
@@ -38,7 +38,7 @@ if ( class_exists( 'WP_Customize_Control' ) ) {
 					<?php
 					/* translators: 1: opening extensions page link, 2: closing extensions page link. */
 					$message = sprintf( __( 'There\'s also a range of %1$sCatalog add-ons%2$s available to put additional power in your hands. Check out the %1$sextensions page%2$s in your dashboard for more information.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=extensions.php' ) ) . '">', '</a>' );
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $message;
 					?>
 				</p>

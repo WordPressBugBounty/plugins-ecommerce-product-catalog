@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+
 /**
  * Registers and renders EPC widget blocks.
  */
@@ -129,23 +130,29 @@ class IC_EPC_Widget_Blocks {
 	 * Registers widget block types.
 	 */
 	public function register() {
-		$blocks = apply_filters(
+		$epc_blocks = array(
+			__DIR__ . '/search/',
+			__DIR__ . '/category-links/',
+			__DIR__ . '/sort/',
+			__DIR__ . '/category-filter/',
+			__DIR__ . '/related/',
+		);
+		$blocks     = apply_filters(
 			'ic_product_widget_blocks',
-			array(
-				__DIR__ . '/search/',
-				__DIR__ . '/category-links/',
-				__DIR__ . '/sort/',
-				__DIR__ . '/category-filter/',
-				__DIR__ . '/related/',
-			)
+			$epc_blocks
 		);
 		if ( function_exists( 'ic_size_field_names' ) ) {
 			$blocks[] = __DIR__ . '/size-filter/';
+			$epc_blocks[] = __DIR__ . '/size-filter/';
 		}
 		foreach ( $blocks as $block_dir ) {
 			$args = array(
 				'render_callback' => array( $this, 'render' ),
 			);
+			if ( in_array( $block_dir, $epc_blocks, true ) ) {
+				global $wp_version;
+				$args['api_version'] = version_compare( $wp_version, '6.3', '>=' ) ? 3 : 2;
+			}
 			if ( ! empty( $block_dir ) && file_exists( $block_dir . 'block.json' ) ) {
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading trusted local block metadata.
 				$block_metadata = json_decode( file_get_contents( $block_dir . 'block.json' ), true );
@@ -201,4 +208,3 @@ class IC_EPC_Widget_Blocks {
 		return $localize;
 	}
 }
-

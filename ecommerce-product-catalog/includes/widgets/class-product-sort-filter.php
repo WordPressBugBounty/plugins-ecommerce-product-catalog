@@ -54,8 +54,8 @@ class Product_Sort_Filter extends WP_Widget {
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
 				echo $args['before_widget'];
 				if ( $title ) {
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-					echo $args['before_title'] . $title . $args['after_title'];
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+					echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 				}
 
 				// Use current theme search form if it exists.

@@ -30,13 +30,13 @@ if ( ! empty( $product_image ) ) {
 			?>
 			<a class="a-product-image nofancybox nolightbox no-ajaxy" href="<?php echo esc_url( get_product_image_url( $product_id ) ); ?>">
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $product_image;
 			?>
 			</a>
 			<?php
 		} else {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $product_image;
 		}
 		do_action( 'below_product_image', $product_id );

@@ -131,7 +131,7 @@ class IC_Register_Product {
 				$dependence[] = 'colorbox';
 			}
 		}
-		wp_register_script( 'al_product_scripts', AL_PLUGIN_BASE_PATH . 'js/product.min.js', apply_filters( 'al_product_scripts_dependence', $dependence ), ic_filemtime( AL_BASE_PATH . '/js/product.min.js' ), true );
+		wp_register_script( 'al_product_scripts', AL_PLUGIN_BASE_PATH . 'js/product.min.js', apply_filters( 'al_product_scripts_dependence', $dependence ), ic_filemtime( AL_BASE_PATH . '/js/product.min.js', true ), true );
 	}
 
 	/**
@@ -373,7 +373,7 @@ class IC_Register_Product {
 		echo '<input type="hidden" name="pricemeta_noncename" id="pricemeta_noncename" value="' .
 			esc_attr( wp_create_nonce( plugin_basename( __FILE__ ) ) ) . '" />';
 		$product_details = '';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'admin_product_details' filter, which extensions and themes legitimately use to inject their own HTML.
 		echo apply_filters( 'admin_product_details', $product_details, $post->ID );
 	}
 
@@ -403,7 +403,7 @@ class IC_Register_Product {
 			}
 			wp_editor( $shortdesc, 'excerpt', $short_desc_settings );
 		} else {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $override_excerpt;
 		}
 	}
@@ -464,7 +464,6 @@ class IC_Register_Product {
 				return $post->ID;
 			}
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Action is read after the product save nonce has already been verified.
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Action is read after the product save nonce has already been verified.
 			$action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
 			if ( empty( $action ) ) {
 				return $post->ID;
@@ -523,7 +522,7 @@ class IC_Register_Product {
 		$hook_existed = remove_filter( 'get_post_metadata', array( $this, 'hidden_product_data' ) );
 		$product_meta = apply_filters( 'product_meta_save_anywhere', $product_meta, $post );
 		if ( ! ic_data_should_be_hidden( $post->post_status ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Action is read after the product save nonce has already been verified.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Branch-selection read only: it decides whether hidden product meta is merged back and writes nothing. Reachable from status_change() (transition_post_status) where no nonce exists, so it must not carry write authority.
 			$action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
 			if ( empty( $action ) || 'editpost' !== $action ) {
 				$this->hidden_to_public( $post->ID );
@@ -555,7 +554,16 @@ class IC_Register_Product {
 		if ( $check_status ) {
 			$post = get_post( $product_id );
 			if ( ic_data_should_be_hidden( $post->post_status ) ) {
-				return $this->save_single_hidden_meta( $product_id, $key, $value );
+				$hidden_result = $this->save_single_hidden_meta( $product_id, $key, $value );
+				// Restore the reader before returning. Without this, the early return leaves
+				// get_post_metadata unhooked for the REST of the request, so every later get_post_meta()
+				// call on a compressed product misses _ic_hidden_product_data and the product renders with
+				// no image, no price and zero inventory until the next page load.
+				if ( $hook_existed ) {
+					add_filter( 'get_post_metadata', array( $this, 'hidden_product_data' ), 10, 4 );
+				}
+
+				return $hidden_result;
 			}
 		}
 		$current_post_keys = get_post_custom_keys( $product_id );
@@ -670,7 +678,7 @@ class IC_Register_Product {
 				}
 			}
 		}
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Action is read after the product save nonce has already been verified.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- Branch-selection read only: it decides whether hidden product meta is merged back and writes nothing. Reachable from status_change() (transition_post_status) where no nonce exists, so it must not carry write authority.
 			$action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
 		if ( empty( $action ) || 'editpost' !== $action ) {
 			$current_hidden = get_post_meta( $product_id, '_ic_hidden_product_data', true );
@@ -684,7 +692,12 @@ class IC_Register_Product {
 		}
 		update_post_meta( $product_id, '_ic_hidden_product_data', $product_meta );
 		foreach ( $product_meta as $key => $val ) {
-			if ( '_sku' === $key ) {
+			// _sku stays public so SKU lookups keep working on a hidden product. _ic_hidden_product_data is
+			// the store this loop is filling -- deleting it here wipes every field of the product. It cannot
+			// reach $product_meta through data_keys() any more (see restricted_meta()), but callers such as
+			// save_meta() pass their own array through the product_meta_save_anywhere filter, so the guard
+			// stays.
+			if ( '_sku' === $key || '_ic_hidden_product_data' === $key ) {
 				continue;
 			}
 			delete_post_meta( $product_id, $key );
@@ -806,6 +819,15 @@ class IC_Register_Product {
 			'_wp_old_slug',
 			'_edit_lock',
 			'_edit_last',
+			// The compressed store itself. data_keys() feeds public_to_hidden(), which deletes every key it
+			// returns; leaving this one in made a second compression pass delete the blob it had just
+			// written, and nest the blob inside itself. See public_to_hidden().
+			'_ic_hidden_product_data',
+			// WordPress trash bookkeeping. wp_untrash_post() READS _wp_trash_meta_status to pick the restore
+			// status and then deletes both keys; once they are swallowed into the blob those deletes hit
+			// nothing, the keys survive the restore and reappear as public rows on a published product.
+			'_wp_trash_meta_status',
+			'_wp_trash_meta_time',
 		);
 	}
 
@@ -878,11 +900,11 @@ class IC_Register_Product {
 				5  => $revision ? sprintf( __( '%1$s restored to revision from %2$s', 'ecommerce-product-catalog' ), $singular, wp_post_revision_title( $revision, false ) ) : false,
 				// translators: 1: product label, 2: product permalink.
 				6  => sprintf( __( '%1$s published. <a href="%2$s">View %1$s</a>', 'ecommerce-product-catalog' ), $singular, esc_url( get_permalink( $post_ID ) ) ),
-				7  => __( 'Page saved.' ),
+				7  => __( 'Page saved.', 'ecommerce-product-catalog' ),
 				// translators: 1: product label, 2: preview URL.
 				8  => sprintf( __( '%1$s submitted. <a target="_blank" href="%2$s">Preview %1$s</a>', 'ecommerce-product-catalog' ), $singular, esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ), strtolower( $singular ) ),
 				// translators: 1: scheduled date, 2: preview URL, 3: product label.
-				9  => sprintf( __( '%3$s scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview %3$s</a>', 'ecommerce-product-catalog' ), date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ), $singular ),
+				9  => sprintf( __( '%3$s scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview %3$s</a>', 'ecommerce-product-catalog' ), date_i18n( __( 'M j, Y @ G:i', 'ecommerce-product-catalog' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ), $singular ),
 				// translators: 1: product label, 2: preview URL.
 				10 => sprintf( __( '%1$s draft updated. <a target="_blank" href="%2$s">Preview %1$s</a>', 'ecommerce-product-catalog' ), $singular, esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
 			);

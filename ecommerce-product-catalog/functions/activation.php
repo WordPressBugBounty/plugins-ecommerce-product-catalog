@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function epc_activation_function() {
 	if ( is_ic_activation_hook() && current_user_can( 'activate_plugins' ) ) {
 		$first_activation = get_option( 'ic_epc_first_activation' );
-		// phpcs:ignore -- Legacy local timestamp storage is preserved for backward compatibility.
+		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested, Generic.Formatting.MultipleStatementAlignment.IncorrectWarning -- Legacy local timestamp storage is preserved for backward compatibility.
 		$current_time     = current_time( 'timestamp' );
 		if ( empty( $first_activation ) || $current_time - $first_activation < MONTH_IN_SECONDS ) {
 			if ( ! function_exists( 'start_ic_woocat' ) ) {
@@ -48,13 +48,13 @@ function epc_activation_function() {
 			ic_set_filter_bar_default_widgets();
 			if ( empty( $first_activation ) ) {
 				update_option( 'ic_epc_first_activation', $current_time, false );
-				// phpcs:ignore -- Legacy hook name kept for backward compatibility.
+				// phpcs:ignore WordPress.NamingConventions.ValidHookName.NotLowercase -- Legacy hook name kept for backward compatibility.
 				do_action( 'ic_EPC_first_activation' );
 			}
 		}
 		add_product_caps();
 		permalink_options_update();
-		// phpcs:ignore -- Legacy hook name kept for backward compatibility.
+		// phpcs:ignore WordPress.NamingConventions.ValidHookName.NotLowercase -- Legacy hook name kept for backward compatibility.
 		do_action( 'ic_EPC_activation' );
 		delete_option( 'IC_EPC_install' );
 	}
@@ -139,8 +139,14 @@ function create_products_page( $status = 'publish' ) {
  */
 function create_sample_product() {
 	$sample_id = sample_product_id();
-	// phpcs:ignore -- Preserves the legacy capability/role gate and GET trigger used by the activation flow.
-	if ( ( current_user_can( 'publish_products' ) || current_user_can( 'administrator' ) ) && ( ( ( ! is_advanced_mode_forced() || is_ic_shortcode_integration() ) && empty( $sample_id ) ) || isset( $_GET['create_sample_product_page'] ) ) ) {
+
+	/*
+	 * `activate_plugins` replaces the former `current_user_can( 'administrator' )` role-name check.
+	 * It must not be a plugin capability here: on first activation this runs before
+	 * add_product_caps(), so `publish_products` is not registered yet.
+	 */
+	// phpcs:ignore WordPress.WP.Capabilities.Unknown, WordPress.Security.NonceVerification.Recommended -- publish_products is registered by the plugin; the GET trigger is nonce-verified by IC_Catalog_Theme_Integration::create_sample_product_with_redirect() before this runs.
+	if ( ( current_user_can( 'publish_products' ) || current_user_can( 'activate_plugins' ) ) && ( ( ( ! is_advanced_mode_forced() || is_ic_shortcode_integration() ) && empty( $sample_id ) ) || isset( $_GET['create_sample_product_page'] ) ) ) {
 		$short_desc                         = '<p>' . __( 'Welcome on a product test page. This is a short description. It should show up on the left side of the product image and below the product name.', 'ecommerce-product-catalog' ) . '</p>';
 		$short_desc                        .= '<p>' . __( 'You can change the product page template in catalog settings.', 'ecommerce-product-catalog' ) . '</p>';
 		$short_desc                        .= '<p><strong>' . __( 'Please read this page carefully to fully understand all product page elements.', 'ecommerce-product-catalog' ) . '</strong></p>';
@@ -244,7 +250,7 @@ function sample_product_url() {
 		$sample_product_url = esc_url( add_query_arg( 'test_advanced', 1, $sample_product_url ) );
 	}
 	if ( empty( $sample_product_url ) || ( ! empty( $product_id ) && 'publish' !== get_post_status( $product_id ) ) ) {
-		$sample_product_url = esc_url( add_query_arg( 'create_sample_product_page', 'true' ) );
+		$sample_product_url = esc_url( wp_nonce_url( add_query_arg( 'create_sample_product_page', 'true' ), 'ic_create_sample_product_page' ) );
 	}
 
 	return $sample_product_url;
@@ -508,7 +514,7 @@ function ic_epc_catalog_transient_cleanup_get_batch() {
 	}
 	$values[] = $limit;
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded one-time cleanup for obsolete transient rows.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Bounded cleanup uses fixed LIKE fragments and prepares every value below.
 	return $wpdb->get_results(
 		$wpdb->prepare(
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- LIKE clauses are generated from fixed prefixes and still use prepared values.
@@ -566,7 +572,7 @@ function ic_epc_catalog_transient_cleanup_has_rows() {
 		$values[] = $wpdb->esc_like( $prefix ) . '%';
 	}
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded existence check for one-time cleanup.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Bounded existence check uses fixed LIKE fragments and prepares every value below.
 	$option_id = $wpdb->get_var(
 		$wpdb->prepare(
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- LIKE clauses are generated from fixed prefixes and still use prepared values.
@@ -581,6 +587,58 @@ function ic_epc_catalog_transient_cleanup_has_rows() {
 add_action( 'ic_update_product_data', 'ic_update_product_data' );
 add_action( 'ic_update_product_data_frozen', 'ic_update_product_data_watchdog' );
 add_action( 'ic_product_data_reassignment_done', 'ic_update_product_data_clear_scope' );
+add_action( 'ic_product_data_reassignment_done', 'ic_update_product_data_flush_object_cache', 999 );
+
+/**
+ * Flushes the WordPress object cache after product data reassignment terminates.
+ *
+ * @return void
+ */
+function ic_update_product_data_flush_object_cache() {
+	$completion_cooldown = get_transient( 'ic_update_product_data_done' );
+	wp_cache_flush();
+	if ( false !== $completion_cooldown ) {
+		set_transient( 'ic_update_product_data_done', $completion_cooldown, MINUTE_IN_SECONDS * 10 );
+	}
+}
+
+/**
+ * Starts or resumes the product data reassignment worker.
+ *
+ * @param string $scope Reassignment status scope.
+ * @return string
+ */
+function ic_update_product_data_start( $scope = 'publish' ) {
+	$option_name  = 'ic_update_product_data_done';
+	$hook_name    = 'ic_update_product_data';
+	$scope_option = ic_update_product_data_scope_option_name();
+	$done         = get_option( $option_name, false );
+
+	ic_update_product_data_clear_stale_lock();
+	if ( false === $done ) {
+		if ( get_transient( $option_name ) ) {
+			return __( 'Just Finished! Wait 10 minutes before restarting.', 'ecommerce-product-catalog' );
+		}
+		update_option( $option_name, - 1 );
+		ic_update_product_data_save_scope( $scope );
+		ic_update_product_data_schedule();
+
+		return '';
+	}
+
+	if ( false === get_option( $scope_option, false ) ) {
+		ic_update_product_data_save_scope( $scope );
+	}
+	if ( ic_update_product_data_has_lock() ) {
+		return __( 'Product data reassignment is already running.', 'ecommerce-product-catalog' );
+	}
+	if ( wp_next_scheduled( $hook_name ) ) {
+		return __( 'Product data reassignment is already scheduled.', 'ecommerce-product-catalog' );
+	}
+	ic_update_product_data_schedule();
+
+	return '';
+}
 
 /**
  * Schedules or runs the product meta update process.
@@ -588,6 +646,10 @@ add_action( 'ic_product_data_reassignment_done', 'ic_update_product_data_clear_s
  * @return string|void
  */
 function ic_update_product_data() {
+	if ( ! wp_doing_cron() ) {
+		return ic_update_product_data_start( ic_update_product_data_requested_scope() );
+	}
+
 	$start_time       = microtime( true );
 	$option_name      = 'ic_update_product_data_done';
 	$hook_name        = 'ic_update_product_data';
@@ -595,32 +657,6 @@ function ic_update_product_data() {
 	$done             = get_option( $option_name, 0 );
 	$scope_option     = ic_update_product_data_scope_option_name();
 
-	if ( ! wp_doing_cron() ) {
-		ic_update_product_data_clear_stale_lock();
-		if ( empty( $done ) ) {
-			if ( get_transient( $option_name ) ) {
-				return __( 'Just Finished! Wait 10 minutes before restarting.', 'ecommerce-product-catalog' );
-			}
-			update_option( $option_name, - 1 );
-			ic_update_product_data_save_scope( ic_update_product_data_requested_scope() );
-			ic_update_product_data_schedule();
-
-			return '';
-		}
-
-		if ( false === get_option( $scope_option, false ) ) {
-			ic_update_product_data_save_scope( ic_update_product_data_requested_scope() );
-		}
-		if ( ic_update_product_data_has_lock() ) {
-			return __( 'Product data reassignment is already running.', 'ecommerce-product-catalog' );
-		}
-		if ( wp_next_scheduled( $hook_name ) ) {
-			return __( 'Product data reassignment is already scheduled.', 'ecommerce-product-catalog' );
-		}
-		ic_update_product_data_schedule();
-
-		return '';
-	}
 	if ( empty( $done ) ) {
 		if ( ! get_transient( $option_name ) ) {
 			return __( 'Just Finished! Wait 10 minutes before restarting.', 'ecommerce-product-catalog' );
@@ -673,17 +709,15 @@ function ic_update_product_data() {
 			ic_update_product_data_schedule();
 		}
 		ic_update_product_data_release_lock( $lock_token );
+	} elseif ( ic_update_product_data_is_lock_owner( $lock_token ) ) {
+		delete_option( $option_name );
+		wp_clear_scheduled_hook( $hook_name );
+		wp_clear_scheduled_hook( $frozen_hook_name );
+		set_transient( $option_name, 1, MINUTE_IN_SECONDS * 10 );
+		ic_update_product_data_release_lock( $lock_token );
+		do_action( 'ic_product_data_reassignment_done' );
 	} else {
-		if ( ic_update_product_data_is_lock_owner( $lock_token ) ) {
-			delete_option( $option_name );
-			wp_clear_scheduled_hook( $hook_name );
-			wp_clear_scheduled_hook( $frozen_hook_name );
-			set_transient( $option_name, 1, MINUTE_IN_SECONDS * 10 );
-			ic_update_product_data_release_lock( $lock_token );
-			do_action( 'ic_product_data_reassignment_done' );
-		} else {
-			ic_update_product_data_release_lock( $lock_token );
-		}
+		ic_update_product_data_release_lock( $lock_token );
 	}
 }
 
@@ -991,7 +1025,9 @@ function ic_update_product_data_normalize_scope( $scope ) {
  * @return string
  */
 function ic_update_product_data_requested_scope() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only scope selector; no state changes occur here.
 	if ( isset( $_GET['reassign_product_data_status'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Scope is sanitized and allow-listed by ic_update_product_data_normalize_scope().
 		return ic_update_product_data_normalize_scope( wp_unslash( $_GET['reassign_product_data_status'] ) );
 	}
 

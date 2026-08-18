@@ -144,6 +144,7 @@ class IC_EPC_Extension_Compatibility {
 			<p>
 				<?php
 				printf(
+				/* translators: Placeholders are substituted with runtime values. */
 					esc_html__( 'eCommerce Product Catalog keeps incompatible extensions inactive until they are updated to avoid compatibility errors for EPC %s.', 'ecommerce-product-catalog' ),
 					esc_html( IC_EPC_VERSION )
 				);

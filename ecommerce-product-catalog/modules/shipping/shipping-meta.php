@@ -64,7 +64,9 @@ function ic_render_product_shipping_table( $args = array() ) {
 		if ( ! empty( $args['show_dragger'] ) ) {
 			echo '<td class="dragger"></td>';
 		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: widget chrome supplied by the theme through register_sidebar(); the title itself is escaped on this line.
 		echo '<td' . $label_cell . '><input class="' . esc_attr( $args['label_input_class'] ) . '" type="text" name="' . esc_attr( ic_get_shipping_table_field_name( $args['label_name_pattern'], $i ) ) . '" value="' . esc_attr( $label ) . '"' . $label_disabled . ' /></td>';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: widget chrome supplied by the theme through register_sidebar(); the title itself is escaped on this line.
 		echo '<td' . $price_cell . '><input' . $price_input_id . ' class="' . esc_attr( $args['price_input_class'] ) . '" type="number" min="0" step="0.01" name="' . esc_attr( ic_get_shipping_table_field_name( $args['cost_name_pattern'], $i ) ) . '" value="' . esc_attr( $cost ) . '"' . $placeholder_attr . $price_disabled . ' />';
 		if ( ! empty( $args['separate_currency_cell'] ) ) {
 			echo '</td><td>' . esc_html( $args['currency'] ) . '</td>';
@@ -84,6 +86,7 @@ function ic_render_product_shipping_table( $args = array() ) {
 function ic_shipping_metabox( $names ) {
 	$names['singular'] = ic_ucfirst( $names['singular'] );
 	if ( is_plural_form_active() ) {
+		/* translators: Placeholders are substituted with runtime values. */
 		$labels['shipping'] = sprintf( __( '%s Shipping', 'ecommerce-product-catalog' ), $names['singular'] );
 	} else {
 		$labels['shipping'] = __( 'Shipping', 'ecommerce-product-catalog' );
@@ -102,7 +105,7 @@ function ic_shipping_metabox( $names ) {
 function al_product_shipping() {
 	global $post;
 	echo '<input type="hidden" name="shippingmeta_noncename" id="shippingmeta_noncename" value="' .
-		wp_create_nonce( AL_BASE_PATH . 'shipping_meta' ) . '" />';
+		esc_attr( wp_create_nonce( AL_BASE_PATH . 'shipping_meta' ) ) . '" />';
 	$currency      = '';
 	$shipping_mode = get_shipping_source_mode();
 	if ( function_exists( 'product_currency' ) ) {
@@ -171,11 +174,15 @@ add_filter( 'product_meta_save', 'ic_save_product_shipping', 1, 2 );
 function ic_save_product_shipping( $product_meta, $post ) {
 	$max_shipping = get_shipping_options_number();
 	for ( $i = 1; $i <= $max_shipping; $i++ ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized on this line and left slashed on purpose because update_post_meta() unslashes it downstream.
 		if ( isset( $_POST[ '_shipping' . $i ] ) ) {
-			$product_meta[ '_shipping' . $i ] = $_POST[ '_shipping' . $i ];
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized on this line and left slashed on purpose because update_post_meta() unslashes it downstream.
+			$product_meta[ '_shipping' . $i ] = sanitize_text_field( $_POST[ '_shipping' . $i ] );
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized on this line and left slashed on purpose because update_post_meta() unslashes it downstream.
 		if ( isset( $_POST[ '_shipping-label' . $i ] ) ) {
-			$product_meta[ '_shipping-label' . $i ] = ! empty( $_POST[ '_shipping-label' . $i ] ) ? $_POST[ '_shipping-label' . $i ] : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized on this line and left slashed on purpose because update_post_meta() unslashes it downstream.
+			$product_meta[ '_shipping-label' . $i ] = ! empty( $_POST[ '_shipping-label' . $i ] ) ? ic_sanitize( $_POST[ '_shipping-label' . $i ] ) : '';
 		}
 	}
 

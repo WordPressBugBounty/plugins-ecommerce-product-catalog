@@ -169,8 +169,9 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 			if ( ! is_advanced_mode_forced() || ic_get_product_listing_status() ) {
 				$template      = get_option( 'template' );
 				$current_check = $this->theme_support_check();
-				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Legacy admin notice dismissal uses an admin-only query flag.
 				if ( ! empty( $_GET['hide_al_product_adder_support_check'] ) ) {
+					// The dismissal writes a site option, so the request must come from the nonced link.
+					check_admin_referer( 'ic_hide_theme_support_check' );
 					$current_check[ $template ] = $template;
 					update_option( 'product_adder_theme_support_check', $current_check );
 
@@ -217,7 +218,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 					<h4><?php printf( esc_html__( 'To switch to Advanced Mode, please add %s to your product listing page.', 'ecommerce-product-catalog' ), esc_html( ic_catalog_shortcode_name() ) ); ?></h4>
 					<h4>
 					<?php
-                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $catalog_me_theme_notice;
 					?>
 					</h4>
@@ -226,7 +227,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 						<a class="skip button"
 							href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=support' ) ); ?>"><?php esc_html_e( 'Plugin Support', 'ecommerce-product-catalog' ); ?></a>
 						<a class="skip button"
-							href="<?php echo esc_url( add_query_arg( 'hide_al_product_adder_support_check', 'true' ) ); ?>"><?php esc_html_e( 'I know, don\'t bug me', 'ecommerce-product-catalog' ); ?></a>
+							href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'hide_al_product_adder_support_check', 'true' ), 'ic_hide_theme_support_check' ) ); ?>"><?php esc_html_e( 'I know, don\'t bug me', 'ecommerce-product-catalog' ); ?></a>
 					</p>
 				</div>
 			</div>
@@ -271,7 +272,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 						<li><?php printf( esc_html__( '%1$s as an alternative to %2$s', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ), 'WooCommerce' ); ?>
 							- 
 							<?php
-                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 							echo $woocommerce_import_notice;
 							?>
 							</li>
@@ -279,7 +280,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 						<li><?php printf( esc_html__( '%1$s with %2$s design', 'ecommerce-product-catalog' ), 'WooCommerce', esc_html( IC_CATALOG_PLUGIN_NAME ) ); ?>
 							- 
 							<?php
-                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 							echo $woocommerce_design_notice;
 							?>
 							</li>
@@ -418,7 +419,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 		<div class="notice notice-warning implecode-review ic-notice is-dismissible"
 			data-ic_dismissible="ic-catalog-review"
 			data-ic_dismissible_type="temp">
-			<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point. ?>
+			<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags. ?>
 			<p><?php echo $text . ' ' . __( 'A <strong>huge thank you</strong> from impleCode and WordPress community in advance!', 'ecommerce-product-catalog' ); ?></p>
 			<p><a target="_blank"
 					href="https://wordpress.org/support/view/plugin-reviews/ecommerce-product-catalog#new-post"
@@ -427,7 +428,7 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 		<div class="update-nag notice notice-warning inline implecode-review-thanks"
 			style="display: none">
 			<?php
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $review_thanks_text;
 			?>
 		<span class="dashicons dashicons-yes"></span></div>
@@ -442,8 +443,8 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 	public function translation_notice() {
 		?>
 		<div class="update-nag notice notice-warning inline implecode-translate"><?php /* translators: 1: Plugin name. 2: Translation project URL. */ ?>
-		<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point. ?>
-		<?php printf( __( "<strong>Psst, it's less than 1 minute</strong> to add some translations to %1\$s collaborative <a target='_blank' href='%2\$s'>translation project</a>.", 'ecommerce-product-catalog' ), IC_CATALOG_PLUGIN_NAME, 'https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog' ); ?>
+		<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line. ?>
+		<?php /* translators: 1: plugin name, 2: translation project URL. */ printf( __( "<strong>Psst, it's less than 1 minute</strong> to add some translations to %1\$s collaborative <a target='_blank' href='%2\$s'>translation project</a>.", 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ), esc_url( 'https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog' ) ); ?>
 		<span class="dashicons dashicons-no"></span></div>
 		<?php
 	}
@@ -474,7 +475,8 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 	 */
 	public function ajax_hide_review_notice() {
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 			$forever = isset( $_POST['forever'] );
 			$this->review_notice_hide( $forever );
 		}
@@ -497,7 +499,8 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 	 */
 	public function ajax_hide_translation_notice() {
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 			$this->translation_notice_hide();
 		}
 		wp_die();
@@ -526,7 +529,8 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 	 */
 	public function add_catalog_shortcode() {
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 			$page_id = get_product_listing_id();
 			if ( empty( $page_id ) || 'noid' === $page_id ) {
 				$page_id = create_products_page();
@@ -551,8 +555,13 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 	 * @return void
 	 */
 	public function remove_catalog_shortcode() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.WP.Capabilities.Unknown -- Legacy admin action uses a query flag plus the plugin's custom capability.
-		if ( ! empty( $_GET['remove_shortcode_integration'] ) && current_user_can( 'manage_product_settings' ) ) {
+		// Plain flag read; the nonce it carries is verified by wp_verify_nonce() below.
+		if ( empty( $_GET['remove_shortcode_integration'] ) ) {
+			return;
+		}
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic_remove_shortcode_integration' ) && current_user_can( 'manage_product_settings' ) ) {
 			$page_id = get_product_listing_id();
 			if ( ! empty( $page_id ) && is_ic_shortcode_integration( $page_id ) ) {
 				$post               = get_post( $page_id );
@@ -566,8 +575,8 @@ class IC_Catalog_Notices extends IC_Activation_Wizard {
 				);
 				wp_update_post( $post );
 				permalink_options_update();
-				// phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Legacy redirect stays on the current admin request URL.
-				wp_redirect( remove_query_arg( 'remove_shortcode_integration' ) );
+				wp_safe_redirect( remove_query_arg( array( 'remove_shortcode_integration', '_wpnonce' ) ) );
+				exit;
 			}
 		}
 	}

@@ -207,8 +207,8 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 				'order'            => 'ASC',
 				'post_type'        => $catalogs,
 				'post_status'      => ic_visible_product_status(),
-				'suppress_filters' => true,
 				'fields'           => 'ids',
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- The public helper contract explicitly supports excluding requested category IDs.
 				'exclude'          => $exclude,
 			);
 			if ( ! empty( $orderby ) ) {
@@ -242,7 +242,7 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 			if ( is_array( $selected_value ) ) {
 				$selected_value = implode( ',', $selected_value );
 			}
-			$select_box = '<input type="text" name="' . esc_attr( $select_name ) . '" placeholder="' . esc_attr__( 'Set Product ID', 'al-implecode-product-sidebar' ) . '" value="' . esc_attr( $selected_value ) . '"/>';
+			$select_box = '<input type="text" name="' . esc_attr( $select_name ) . '" placeholder="' . esc_attr__( 'Set Product ID', 'ecommerce-product-catalog' ) . '" value="' . esc_attr( $selected_value ) . '"/>';
 		}
 
 		return echo_ic_setting( $select_box, $should_echo );
@@ -1341,6 +1341,35 @@ function ic_pre_get_products( $query ) {
 	}
 }
 
+add_action( 'pre_get_posts', 'ic_forced_categories_only_query_fast_path', 100 );
+
+/**
+ * Reduces the discarded product query on forced category-only listings.
+ *
+ * One product is retained so WordPress and theme archive state remains valid.
+ * Secondary queries, including product shortcodes and blocks, are not changed.
+ *
+ * @param WP_Query $query Current query object.
+ *
+ * @return void
+ */
+function ic_forced_categories_only_query_fast_path( $query ) {
+	if ( is_admin() || is_ic_ajax() || ! is_object( $query ) || ! $query->is_main_query() || ! is_ic_product_listing( $query ) ) {
+		return;
+	}
+	$archive_multiple_settings = get_multiple_settings();
+	if ( 'forced_cats_only' !== $archive_multiple_settings['product_listing_cats'] ) {
+		return;
+	}
+	$query->set( 'ic_forced_categories_only_fast_path', 1 );
+	$query->set( 'posts_per_page', 1 );
+	$query->set( 'no_found_rows', true );
+	$query->set( 'orderby', 'none' );
+	$query->set( 'update_post_meta_cache', false );
+	$query->set( 'update_post_term_cache', false );
+	$query->set( 'lazy_load_term_meta', false );
+}
+
 add_filter( 'shortcode_query', 'ic_pre_get_products_shortcode' );
 
 /**
@@ -1366,7 +1395,7 @@ add_action( 'ic_pre_get_products_only', 'set_product_order', 30 );
  * @return void
  */
 function set_product_order( $query ) {
-	if ( ! ic_is_main_query( $query ) ) {
+	if ( $query->get( 'ic_forced_categories_only_fast_path' ) || ! ic_is_main_query( $query ) ) {
 		return;
 	}
 	$archive_multiple_settings = get_multiple_settings();
@@ -1945,22 +1974,23 @@ function ic_override_product_post_thumbnail( $metadata, $object_id, $meta_key = 
 }
 
 if ( ! function_exists( 'ic_filemtime' ) ) {
+    /**
+     * Gets a cache-busting timestamp query string for a file.
+     *
+     * @param string $path File path.
+     *
+     * @return string|null
+     */
+    function ic_filemtime( $path, $time_only = false ) {
+        if ( file_exists( $path ) ) {
+            if ( $time_only ) {
+                return filemtime( $path );
+            }
+            return '?timestamp=' . filemtime( $path );
+        }
 
-	/**
-	 * Returns a file modification query suffix.
-	 *
-	 * @param string $path File path.
-	 *
-	 * @return string
-	 */
-	function ic_filemtime( $path ) {
-		if ( file_exists( $path ) ) {
-			return '?timestamp=' . filemtime( $path );
-		}
-
-		return '';
-	}
-
+        return null;
+    }
 }
 
 /**
@@ -2174,6 +2204,7 @@ if ( ! function_exists( 'ic_set_time_limit' ) ) {
 			return;
 		}
 		if ( function_exists( 'set_time_limit' ) && ! ic_is_function_disabled( 'set_time_limit' ) ) {
+			// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- This guarded helper is explicitly invoked for bounded maintenance work that can exceed the host default.
 			set_time_limit( $limit );
 		}
 	}
@@ -2246,6 +2277,72 @@ function ic_sanitize( $data, $strict = true ) {
 	}
 
 	return addslashes( wp_kses( stripslashes( $data ), 'implecode' ) );
+}
+
+/**
+ * Restricts client-supplied widget wrapper arguments to post-safe HTML.
+ *
+ * @param array $args Unslashed widget wrapper arguments.
+ *
+ * @return array
+ */
+function ic_sanitize_widget_ajax_args( $args ) {
+	$sanitized = array();
+	if ( ! is_array( $args ) ) {
+		return $sanitized;
+	}
+	foreach ( $args as $key => $value ) {
+		$key = sanitize_key( $key );
+		if ( '' === $key ) {
+			continue;
+		}
+		if ( is_array( $value ) ) {
+			$sanitized[ $key ] = ic_sanitize_widget_ajax_args( $value );
+		} elseif ( is_scalar( $value ) ) {
+			$sanitized[ $key ] = wp_kses_post( (string) $value );
+		}
+	}
+
+	return $sanitized;
+}
+
+/**
+ * Normalizes client-supplied widget refresh settings coming from a catalog Ajax request.
+ *
+ * The `args` entry is echoed as the widget wrapper markup and the `instance` entry drives widget
+ * rendering, so both are treated as untrusted here: wrapper markup is limited to post-safe HTML and
+ * instance values are reduced to plain text. The trusted `dynamic_sidebar()` path never goes
+ * through this function.
+ *
+ * @param mixed $settings Raw widget settings from the request. Must already be unslashed.
+ *
+ * @return array {
+ *     @type array $instance Sanitized widget instance settings.
+ *     @type array $args     Sanitized widget wrapper arguments.
+ * }
+ */
+function ic_sanitize_widget_ajax_settings( $settings ) {
+	$sanitized = array(
+		'instance' => array(),
+		'args'     => array(),
+	);
+	if ( is_string( $settings ) ) {
+		$decoded = json_decode( $settings, true );
+		if ( is_array( $decoded ) ) {
+			$settings = $decoded;
+		}
+	}
+	if ( ! is_array( $settings ) ) {
+		return $sanitized;
+	}
+	if ( isset( $settings['instance'] ) && is_array( $settings['instance'] ) ) {
+		$sanitized['instance'] = ic_sanitize( $settings['instance'] );
+	}
+	if ( isset( $settings['args'] ) ) {
+		$sanitized['args'] = ic_sanitize_widget_ajax_args( $settings['args'] );
+	}
+
+	return $sanitized;
 }
 
 add_filter( 'wp_kses_allowed_html', 'ic_wp_kses_allowed_html', 10, 2 );

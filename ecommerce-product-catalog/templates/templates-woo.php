@@ -17,6 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class IC_Woo_Templates {
 
 	/**
+	 * Nonce action guarding the template availability AJAX probe.
+	 */
+	const AJAX_NONCE_ACTION = 'ic_is_woo_template_available';
+
+	/**
 	 * Active theme slug.
 	 *
 	 * @var string
@@ -80,8 +85,16 @@ class IC_Woo_Templates {
 
 	/**
 	 * AJAX endpoint for template availability checks.
+	 *
+	 * The probe writes the `ic_allow_woo_template_file` / `ic_block_woo_template_file` options and
+	 * may generate a theme template file, so it requires both a nonce and the settings capability.
 	 */
 	public function ajax() {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, self::AJAX_NONCE_ACTION ) || ! current_user_can( 'manage_product_settings' ) ) {
+			wp_die( '', '', array( 'response' => 403 ) );
+		}
 		$this->is_woo_template_available();
 		wp_die();
 	}
@@ -90,14 +103,16 @@ class IC_Woo_Templates {
 	 * Prints the admin-side AJAX probe.
 	 */
 	public function ajax_script() {
-		if ( $this->processed || ! $this->let_template_error_check() ) {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( $this->processed || ! current_user_can( 'manage_product_settings' ) || ! $this->let_template_error_check() ) {
 			return;
 		}
 		?>
 		<script>
 			jQuery(document).ready(function () {
 				var data = {
-					'action': 'ic_is_woo_template_available'
+					'action': 'ic_is_woo_template_available',
+					'nonce': '<?php echo esc_js( wp_create_nonce( self::AJAX_NONCE_ACTION ) ); ?>'
 				};
 				jQuery.post(ajaxurl, data);
 			});
@@ -144,7 +159,7 @@ class IC_Woo_Templates {
 	 */
 	public function let_template_error_check() {
 		// Legacy PHP-version gating is intentionally disabled here.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only compatibility flag check.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence-only read that can only make this check return false; the state-changing entry point is nonce- and capability-gated in ajax().
 		if ( is_integration_mode_selected() || is_theme_implecode_supported() || is_ic_shortcode_integration( null, false ) || isset( $_GET['test_advanced'] ) ) {
 			return false;
 		}

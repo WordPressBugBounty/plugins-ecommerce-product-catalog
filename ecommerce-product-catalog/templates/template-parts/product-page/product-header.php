@@ -27,7 +27,7 @@ if ( ! empty( $header_content ) ) {
 	?>
 	<header class="entry-header product-page-header">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $header_content;
 		?>
 	</header>

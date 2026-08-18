@@ -62,11 +62,11 @@ function manage_product_columns( $column_name, $product_id ) {
 			echo esc_html( '[show_products product="' . (int) $product_id . '"]' );
 			break;
 		case 'image':
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by get_the_post_thumbnail(), WordPress core markup.
 			echo get_the_post_thumbnail( $product_id, array( 40, 40 ) );
 			break;
 		case 'product_cat':
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by get_the_term_list(), WordPress core markup.
 			echo get_the_term_list( $product_id, 'al_product-cat', '', ', ', '' );
 			break;
 

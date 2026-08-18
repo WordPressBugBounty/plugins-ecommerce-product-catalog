@@ -189,8 +189,8 @@ if ( file_exists( AL_BASE_PATH . '/modules/cart/index.php' ) ) {
 			<h3><?php esc_html_e( 'Check the documentation for more!', 'ecommerce-product-catalog' ); ?></h3>
 			<p>
 				<?php
-					/* Translators: 1: Current EPC version number. 2: Opening documentation link. 3: Closing link. */
-					printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION ), '<a href="' . esc_url( 'https://implecode.com/docs/#cam=welcome&key=docs' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+					printf( /* translators: 1: Current EPC version number. 2: Opening documentation link. 3: Closing link. */ __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION ), '<a href="' . esc_url( 'https://implecode.com/docs/#cam=welcome&key=docs' ) . '">', '</a>' );
 				?>
 			</p>
 		</div>

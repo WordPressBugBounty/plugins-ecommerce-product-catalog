@@ -433,6 +433,19 @@ input[name="_price"], input[name="_sku"], input[name="_mpn"], #al_product_price.
 	text-align: center;
 }
 
+#al_product_details.postbox table {
+	max-width: 100%;
+}
+
+#al_product_details.postbox table td:first-child {
+	width: 104px;
+}
+
+#al_product_details.postbox input[type="text"] {
+	width: 120px;
+	box-sizing: border-box;
+}
+
 .product-settings-table {
 	width: auto;
 }

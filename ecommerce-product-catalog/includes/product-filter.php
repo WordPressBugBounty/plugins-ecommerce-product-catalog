@@ -1,4 +1,4 @@
-<?php // phpcs:ignore -- Legacy filename retained for backward compatibility.
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName, Squiz.Commenting.FileComment.WrongStyle -- Legacy filename retained for backward compatibility.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @version 1.0.0
  * @author  impleCode
  */
-// phpcs:ignore -- Legacy class name retained for backward compatibility.
+// phpcs:ignore PEAR.NamingConventions.ValidClassName.StartWithCapital, PEAR.NamingConventions.ValidClassName.Invalid, Squiz.Commenting.ClassComment.WrongStyle, Squiz.Commenting.ClassComment.Missing -- Legacy class name retained for backward compatibility; the class docblock is directly above.
 class ic_catalog_filter {
 	/**
 	 * Filter name.
@@ -479,13 +479,12 @@ class ic_catalog_filter {
 		$session        = get_product_catalog_session();
 		$check_if_empty = false;
 		$permanent      = $this->permanent;
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 		if ( isset( $_GET[ $this->name ] ) || ( $this->enable_by_default && ! isset( $session['filters'][ $this->name ] ) ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 			if ( isset( $_GET[ $this->name ] ) ) {
-				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
-				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Dynamic filter values are sanitized by the configured callback below.
-				$raw_filter_value = wp_unslash( $_GET[ $this->name ] ); // phpcs:ignore -- Frontend filter parameters are intentionally readable from the request.
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public, bookmarkable catalog filter parameter affecting only the current visitor's session; the raw value is sanitized by the configured callback on the next line.
+				$raw_filter_value = wp_unslash( $_GET[ $this->name ] );
 				$filter_value     = is_array( $raw_filter_value ) ? array_map( $this->sanitization, $raw_filter_value ) : call_user_func( $this->sanitization, $raw_filter_value );
 			} elseif ( $this->enable_by_default ) {
 				$filter_value   = 1;
@@ -509,7 +508,7 @@ class ic_catalog_filter {
 			} elseif ( isset( $session['filters'][ $this->name ] ) ) {
 				unset( $session['filters'][ $this->name ] );
 			}
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Frontend filter parameters are intentionally readable from the request.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session.
 		} elseif ( ! isset( $_GET[ $this->name ] ) ) {
 			if ( ! $this->enable_by_default && isset( $session['filters'][ $this->name ] ) ) {
 				unset( $session['filters'][ $this->name ] );

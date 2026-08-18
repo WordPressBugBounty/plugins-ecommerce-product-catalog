@@ -69,6 +69,6 @@ function ic_mpn_structured_data( $product_id ) {
 		}
 	}
 	?>
-	"mpn": "<?php echo $mpn; ?>",
+	"mpn": <?php echo wp_json_encode( $mpn ); ?>,
 	<?php
 }

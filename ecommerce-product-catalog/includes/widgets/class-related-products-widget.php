@@ -61,8 +61,8 @@ class Related_Products_Widget extends WP_Widget {
 			echo $args['before_widget'];
 
 			if ( $title ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-				echo $args['before_title'] . $title . $args['after_title'];
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+				echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 			}
 
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Related products HTML is generated upstream.

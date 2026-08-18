@@ -40,7 +40,7 @@ class IC_Settings_Design_Table {
 				'setting_label'             => '',
 				'table_class'               => 'design-table',
 				'designs'                   => array(),
-				'additional_settings_label' => __( 'Additional Settings', 'implecode' ),
+				'additional_settings_label' => __( 'Additional Settings', 'ecommerce-product-catalog' ),
 				'rows_after_callback'       => null,
 				'after_table_callback'      => null,
 			)

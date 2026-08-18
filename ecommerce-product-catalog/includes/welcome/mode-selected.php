@@ -45,11 +45,11 @@ $additional_content = ob_get_clean();
 		<?php
 		if ( empty( $activation_choice ) ) {
 			/* translators: %s: selected catalog mode label. */
-			echo '<h1>' . sprintf( esc_html__( '%s mode is active now!', 'ecommmerce-product-catalog' ), esc_html( ic_ucfirst( $selected_mode ) ) ) . '</h1>';
+			echo '<h1>' . sprintf( esc_html__( '%s mode is active now!', 'ecommerce-product-catalog' ), esc_html( ic_ucfirst( $selected_mode ) ) ) . '</h1>';
 		}
 		?>
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $additional_content;
 		?>
 		<div class="column">
@@ -170,7 +170,7 @@ $additional_content = ob_get_clean();
 					'<a href="' . esc_url( 'https://implecode.com/docs/#cam=welcome&key=docs' ) . '">',
 					'</a>'
 				);
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 				echo $documentation_text;
 				?>
 			</p>

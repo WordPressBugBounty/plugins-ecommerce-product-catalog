@@ -259,15 +259,15 @@ function ic_shipping_collect_address( $i ) {
  */
 function ic_default_shipping_address_form_fields() {
 	$default  = '{"fields":[';
-	$default .= '{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"name"}';
+	$default .= '{"label":"' . __( 'Full Name', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_name"},"cid":"name"}';
 	$default .= ',{"label":"' . __( 'Company', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"company"}';
-	$default .= ',{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"address"}';
-	$default .= ',{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"postal"}';
-	$default .= ',{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium"},"cid":"city"}';
-	$default .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":true,"field_options":{"size":"medium"},"cid":"country"}';
-	$default .= ',{"label":"' . __( 'State', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_state","required":false,"field_options":{"size":"medium"},"cid":"state"}';
-	$default .= ',{"label":"' . __( 'Phone', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium"},"cid":"phone"}';
-	$default .= ',{"label":"' . __( 'Email', 'ecommerce-product-catalog' ) . ':","field_type":"email","required":false,"field_options":{"size":"medium"},"cid":"email"}';
+	$default .= ',{"label":"' . __( 'Address', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_address"},"cid":"address"}';
+	$default .= ',{"label":"' . __( 'Postal Code', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_postcode"},"cid":"postal"}';
+	$default .= ',{"label":"' . __( 'City', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":true,"field_options":{"size":"medium","paypal":"customer_city"},"cid":"city"}';
+	$default .= ',{"label":"' . __( 'Country', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_country","required":true,"field_options":{"size":"medium","paypal":"customer_country"},"cid":"country"}';
+	$default .= ',{"label":"' . __( 'State', 'ecommerce-product-catalog' ) . ':","field_type":"dropdown_state","required":false,"field_options":{"size":"medium","paypal":"customer_state"},"cid":"state"}';
+	$default .= ',{"label":"' . __( 'Phone', 'ecommerce-product-catalog' ) . ':","field_type":"text","required":false,"field_options":{"size":"medium","paypal":"customer_phone"},"cid":"phone"}';
+	$default .= ',{"label":"' . __( 'Email', 'ecommerce-product-catalog' ) . ':","field_type":"email","required":false,"field_options":{"size":"medium","paypal":"1"},"cid":"email"}';
 	$default .= ',{"label":"' . __( 'Comment', 'ecommerce-product-catalog' ) . ':","field_type":"paragraph","required":false,"field_options":{"size":"medium"},"cid":"comment"}';
 	$default .= ']}';
 
@@ -349,6 +349,9 @@ function get_shipping_options( $product_id ) {
 	$shipping_values    = array();
 	$any_shipping_value = false;
 	for ( $i = 1; $i <= $shipping_options; $i++ ) {
+		if ( ! apply_filters( 'ic_shipping_option_enabled', true, $i, $product_id ) ) {
+			continue;
+		}
 		$sh_val   = get_shipping_option( $i, $product_id );
 		$test_val = '';
 		if ( ! empty( $sh_val ) || is_numeric( $sh_val ) ) {
@@ -408,7 +411,6 @@ function get_shipping_option( $i = 1, $product_id = null ) {
 	if ( $mode === 'global' || ( $mode === 'price_per_product' && ! ic_has_shipping_value( $option ) ) ) {
 		$option = ic_get_default_shipping_cost( $i );
 	}
-
 	return apply_filters( 'product_shipping_option_price', $option, $product_id, $i );
 }
 
@@ -491,5 +493,17 @@ function ic_shipping_price_format( $price, $clear = 0, $format = 1, $raw = 0, $f
 		return $single_names['free_shipping'];
 	}
 
-	return function_exists( 'price_format' ) ? price_format( $price, $clear, $format, $raw, $free_label ) : number_format( $price, 2 );
+	if ( ! function_exists( 'price_format' ) ) {
+		return number_format( $price, 2 );
+	}
+
+	$disable_bulk_unit = static function() {
+		return false;
+	};
+
+	add_filter( 'ic_bulk_pricing_should_append_unit', $disable_bulk_unit, PHP_INT_MAX );
+	$formatted = price_format( $price, $clear, $format, $raw, $free_label );
+	remove_filter( 'ic_bulk_pricing_should_append_unit', $disable_bulk_unit, PHP_INT_MAX );
+
+	return $formatted;
 }

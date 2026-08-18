@@ -450,7 +450,10 @@ jQuery(this).parent("p").next("p").find("textarea").show();
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 		$reason = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
 
-		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && ! empty( $reason ) ) {
+		// The 'ic-ajax-nonce' is minted for every front-end visitor, so it cannot act as an
+		// authorization control. Deactivating a plugin is an 'activate_plugins' action, so the
+		// deactivation survey must not be submittable by lower roles.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && ! empty( $reason ) && current_user_can( 'activate_plugins' ) ) {
 			$this->setup_data();
 			$data                        = $this->data;
 			$data['deactivation_reason'] = $reason;

@@ -446,7 +446,7 @@ class IC_Catalog_Customizer {
 					$wp_customize,
 					'implecode_more',
 					array(
-						'label'    => __( 'Looking for more options?', 'catalog-me' ),
+						'label'    => __( 'Looking for more options?', 'ecommerce-product-catalog' ),
 						'section'  => 'ic_product_catalog_integration',
 						'settings' => 'implecode_more',
 					)
@@ -458,7 +458,7 @@ class IC_Catalog_Customizer {
 					$wp_customize,
 					'implecode_more2',
 					array(
-						'label'    => __( 'Looking for more options?', 'catalog-me' ),
+						'label'    => __( 'Looking for more options?', 'ecommerce-product-catalog' ),
 						'section'  => 'ic_product_catalog_listing',
 						'settings' => 'implecode_more',
 					)
@@ -470,7 +470,7 @@ class IC_Catalog_Customizer {
 					$wp_customize,
 					'implecode_more3',
 					array(
-						'label'    => __( 'Looking for more options?', 'catalog-me' ),
+						'label'    => __( 'Looking for more options?', 'ecommerce-product-catalog' ),
 						'section'  => 'ic_product_catalog_icons',
 						'settings' => 'implecode_more',
 					)

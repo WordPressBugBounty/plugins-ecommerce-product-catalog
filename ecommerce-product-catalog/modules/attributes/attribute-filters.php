@@ -25,6 +25,7 @@ class ic_attribute_default_filters {
 	}
 
 	function show_filters() {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by get_size_filters().
 		echo $this->get_size_filters();
 	}
 
@@ -57,6 +58,7 @@ class ic_attribute_default_filters {
 		}
 
 		if ( empty( $shortcode_query['meta_query'] ) ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The shortcode query creates this structure only when an attribute filter is active.
 			$shortcode_query['meta_query'] = array();
 		}
 		if ( ! $this->has_query( $shortcode_query['meta_query'] ) ) {
@@ -122,11 +124,14 @@ class ic_attribute_default_filters {
 		$size_fields = ic_size_field_names();
 		$save        = false;
 		foreach ( $size_fields as $field_name => $label ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog size filter that only affects the current visitor's own catalog session; the raw value is sanitized on the next lines.
 			if ( isset( $_GET[ $field_name ] ) ) {
-				if ( ! is_array( $_GET[ $field_name ] ) ) {
-					$filter_value = strval( $_GET[ $field_name ] );
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Public, bookmarkable catalog size filter; the unslashed value is sanitized with sanitize_text_field() on the next lines, which must run after wp_unslash() and the array check.
+				$raw_filter_value = wp_unslash( $_GET[ $field_name ] );
+				if ( ! is_array( $raw_filter_value ) ) {
+					$filter_value = sanitize_text_field( strval( $raw_filter_value ) );
 				} else {
-					$filter_value = array_map( 'strval', $_GET[ $field_name ] );
+					$filter_value = array_map( 'sanitize_text_field', array_map( 'strval', $raw_filter_value ) );
 				}
 				if ( ! empty( $filter_value ) && ( is_array( $filter_value ) || ic_string_contains( $filter_value, ';' ) ) ) {
 					if ( ! is_array( $filter_value ) ) {
@@ -162,7 +167,7 @@ class ic_attribute_default_filters {
 			$current_min = $this->get_current_min( $field_name );
 			$current_max = $this->get_current_max( $field_name );
 			if ( ! empty( $max ) && ( $min !== $max || ( is_product_filter_active( $field_name ) && $current_max <= $max && $current_min >= $min ) ) ) {
-				$filter_fields .= '<div class="size-filter-row"><label for="' . $field_name . '">' . $label . '</label><div class="size-field-container"><input id="' . $field_name . '" data-unit="' . $unit . '" data-current-min="' . $current_min . '" data-current-max="' . $current_max . '" data-min="' . $min . '" data-max="' . $max . '" class="ic-range-slider" type="text" name="' . $field_name . '" value=""></div></div>';
+				$filter_fields .= '<div class="size-filter-row"><label for="' . esc_attr( $field_name ) . '">' . esc_html( $label ) . '</label><div class="size-field-container"><input id="' . esc_attr( $field_name ) . '" data-unit="' . esc_attr( $unit ) . '" data-current-min="' . esc_attr( $current_min ) . '" data-current-max="' . esc_attr( $current_max ) . '" data-min="' . esc_attr( $min ) . '" data-max="' . esc_attr( $max ) . '" class="ic-range-slider" type="text" name="' . esc_attr( $field_name ) . '" value=""></div></div>';
 			}
 		}
 		if ( empty( $filter_fields ) ) {
@@ -257,41 +262,30 @@ class ic_attribute_default_filters {
 				// $product_ids = $this->get_current_products( $key );
 				$product_ids = ic_get_current_products( array(), array(), $this->query_meta_keys() );
 				if ( ! empty( $product_ids ) && is_array( $product_ids ) ) {
-					$product_ids_string = implode( ',', $product_ids );
-					$r                  = $wpdb->get_results(
-						stripslashes(
-							$wpdb->prepare(
-								"
-        SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm
-        LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-        WHERE
-		pm.meta_key IN (%s)
-        AND p.post_status = '%s'
-        AND p.post_type = '%s'
-		AND p.ID IN ($product_ids_string)
-    ",
-								implode( "','", $this->query_meta_keys() ),
-								$status,
-								$type
-							)
+					$meta_keys        = $this->query_meta_keys();
+					$product_ids      = array_map( 'absint', $product_ids );
+					$key_placeholders = implode( ', ', array_fill( 0, count( $meta_keys ), '%s' ) );
+					$id_placeholders  = implode( ', ', array_fill( 0, count( $product_ids ), '%d' ) );
+					$query_values     = array_merge( $meta_keys, array( $status, $type ), $product_ids );
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Results are request-cached in the shared catalog global immediately below.
+					$r                = $wpdb->get_results(
+						// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The generated key and ID placeholder lists are supplied by the flattened query-values array to this variadic prepare call.
+						$wpdb->prepare(
+							"SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id WHERE pm.meta_key IN ($key_placeholders) AND p.post_status = %s AND p.post_type = %s AND p.ID IN ($id_placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Core table identifiers and generated placeholder lists are paired with prepared values.
+							$query_values
 						)
 					);
 				}
 			} else {
-				$r = $wpdb->get_results(
-					stripslashes(
-						$wpdb->prepare(
-							"
-        SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm
-        LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-        WHERE pm.meta_key IN (%s)
-        AND p.post_status = '%s'
-        AND p.post_type = '%s'
-    ",
-							implode( "','", $this->query_meta_keys() ),
-							$status,
-							$type
-						)
+				$meta_keys        = $this->query_meta_keys();
+				$key_placeholders = implode( ', ', array_fill( 0, count( $meta_keys ), '%s' ) );
+				$query_values     = array_merge( $meta_keys, array( $status, $type ) );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Results are request-cached in the shared catalog global immediately below.
+				$r                = $wpdb->get_results(
+					// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- The generated key placeholder list is supplied by the flattened query-values array to this variadic prepare call.
+					$wpdb->prepare(
+						"SELECT pm.meta_key,pm.meta_value FROM {$wpdb->postmeta} pm LEFT JOIN {$wpdb->posts} p ON p.ID = pm.post_id WHERE pm.meta_key IN ($key_placeholders) AND p.post_status = %s AND p.post_type = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Core table identifiers and the generated placeholder list are paired with prepared values.
+						$query_values
 					)
 				);
 			}

@@ -72,6 +72,6 @@ function ic_sku_structured_data( $product_id ) {
 		}
 	}
 	?>
-	"sku": "<?php echo $sku; ?>",
+	"sku": <?php echo wp_json_encode( $sku ); ?>,
 	<?php
 }

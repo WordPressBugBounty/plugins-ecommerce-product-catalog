@@ -234,12 +234,12 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 		);
 		?>
 		<div class="form-field term-description-wrap">
-				<label for="tag-description"><?php esc_html_e( 'Description' ); ?></label>
+				<label for="tag-description"><?php esc_html_e( 'Description', 'ecommerce-product-catalog' ); ?></label>
 		<?php
 		wp_editor( '', 'html-tag-description', $settings );
 		ic_category_editor_word_count();
 		?>
-				<p><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
+				<p><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.', 'ecommerce-product-catalog' ); ?></p>
 
 			<script type="text/javascript">
 				// Remove the non-html field
@@ -287,13 +287,13 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 		);
 		?>
 			<tr class="form-field term-description-wrap">
-				<th scope="row"><label for="description"><?php esc_html_e( 'Description' ); ?></label></th>
+				<th scope="row"><label for="description"><?php esc_html_e( 'Description', 'ecommerce-product-catalog' ); ?></label></th>
 			<td>
 			<?php
 			wp_editor( htmlspecialchars_decode( $tag->description ), 'html-tag-description', $settings );
 			ic_category_editor_word_count();
 			?>
-					<p class="description"><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.' ); ?></p>
+					<p class="description"><?php esc_html_e( 'The description is not prominent by default; however, some themes may show it.', 'ecommerce-product-catalog' ); ?></p>
 			</td>
 			<script type="text/javascript">
 				// Remove the non-html field
@@ -339,7 +339,7 @@ if ( ! function_exists( 'vtde_php_upgrade_notice' ) ) {
 					$taxonomy = $term->taxonomy;
 				}
 			} else {
-				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core taxonomy requests supply this admin state.
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- WordPress core taxonomy requests supply this admin state.
 				$get_taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_key( wp_unslash( $_GET['taxonomy'] ) ) : '';
 				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- WordPress core taxonomy requests supply this admin state.
 				$post_action = isset( $_POST['action'] ) ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '';

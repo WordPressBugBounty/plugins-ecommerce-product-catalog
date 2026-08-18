@@ -42,7 +42,7 @@ class ic_catalog_button {
 		if ( ! empty( $url ) ) {
 			?>
 			<div class="ic-affiliate-button-container"><a href="<?php echo esc_url( $url ); ?>"
-															class="button"><?php echo $this->settings['label']; ?></a>
+															class="button"><?php echo esc_html( $this->settings['label'] ); ?></a>
 			</div>
 			<?php
 		}
@@ -91,13 +91,15 @@ class ic_catalog_button {
 	}
 
 	function save( $product_meta ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with esc_url() and left slashed on purpose because update_post_meta() unslashes it downstream.
 		$product_meta[ $this->meta_name ] = isset( $_POST[ $this->meta_name ] ) ? esc_url( $_POST[ $this->meta_name ] ) : '';
 
 		return $product_meta;
 	}
 
 	function settings_html() {
-		$submenu = isset( $_GET['submenu'] ) ? $_GET['submenu'] : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings submenu routing parameter; sanitized on this line.
+		$submenu = isset( $_GET['submenu'] ) ? sanitize_key( wp_unslash( $_GET['submenu'] ) ) : '';
 		if ( $submenu == $this->menu_element ) {
 			?>
 			<script>
@@ -107,7 +109,7 @@ class ic_catalog_button {
 			<div class="affiliate-button-settings setting-content submenu">
 				<form method="post" action="options.php">
 					<?php settings_fields( $this->option_name ); ?>
-					<h2><?php _e( 'Product Button Options', 'ecommerce-product-catalog' ); ?></h2>
+					<h2><?php esc_html_e( 'Product Button Options', 'ecommerce-product-catalog' ); ?></h2>
 					<?php
 					echo '<table>';
 					implecode_settings_text( __( 'Button Label', 'ecommerce-product-catalog' ), $this->option_name . '[label]', $this->settings['label'] );
@@ -119,7 +121,7 @@ class ic_catalog_button {
 					?>
 					<p class="submit">
 						<input type="submit" class="button-primary"
-								value="<?php _e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
+								value="<?php esc_attr_e( 'Save changes', 'ecommerce-product-catalog' ); ?>"/>
 					</p>
 				</form>
 			</div>
@@ -130,12 +132,32 @@ class ic_catalog_button {
 	function settings_menu() {
 		?>
 		<a id="affiliate-button-settings" class="element"
-			href="<?php echo admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=' . $this->menu_element ); ?>"><?php _e( 'Affiliate Button', 'ecommerce-product-catalog' ); ?> </a>
+			href="<?php echo esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=' . $this->menu_element ) ); ?>"><?php esc_html_e( 'Affiliate Button', 'ecommerce-product-catalog' ); ?> </a>
 			<?php
 	}
 
 	function register_settings() {
-		register_setting( $this->option_name, $this->option_name );
+		register_setting( $this->option_name, $this->option_name, array( 'sanitize_callback' => array( $this, 'sanitize_settings' ) ) );
+	}
+
+	/** Sanitize affiliate button settings while retaining extension keys. */
+	function sanitize_settings( $settings ) {
+		if ( ! is_array( $settings ) ) {
+			return array();
+		}
+		$clean = array();
+		foreach ( $settings as $key => $value ) {
+			$clean[ $key ] = is_array( $value ) ? $this->sanitize_settings( $value ) : sanitize_text_field( (string) $value );
+		}
+		if ( isset( $settings['url'] ) ) {
+			$clean['url'] = esc_url_raw( wp_unslash( (string) $settings['url'] ) );
+		}
+		foreach ( array( 'individual', 'use_default' ) as $flag ) {
+			if ( isset( $clean[ $flag ] ) ) {
+				$clean[ $flag ] = empty( $clean[ $flag ] ) ? '' : '1';
+			}
+		}
+		return $clean;
 	}
 
 	function settings() {

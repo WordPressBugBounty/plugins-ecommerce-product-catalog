@@ -1,5 +1,14 @@
 <?php
 /**
+ * WP-CLI commands for the bundled WP Session compatibility layer.
+ *
+ * @package Ecommerce_Product_Catalog
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+/**
  * WP-CLI loader for WP session commands.
  *
  * @package ecommerce-product-catalog

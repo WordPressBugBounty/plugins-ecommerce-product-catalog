@@ -324,6 +324,7 @@ function default_quote_checkout_settings() {
 		$privacy_url = get_privacy_policy_url();
 	}
 	if ( ! empty( $privacy_url ) ) {
+		/* translators: Placeholders are substituted with runtime values. */
 		$message  = sprintf( __( 'I agree to let %1$s process my personal data to process my inquiry and for other purposes described in %1$s %2$sPrivacy Notice%3$s.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ), "<a href='" . $privacy_url . "'>", '</a>' );
 		$default .= ',{"label":"' . __( 'Privacy Notice', 'ecommerce-product-catalog' ) . ':","field_type":"checkboxes","required":true,"field_options":{"size":"medium","options":[{"label":"' . $message . '", "checked":false}]},"cid":"privacy_notice"}';
 	}

@@ -1,11 +1,11 @@
-=== eCommerce Product Catalog Plugin for WordPress ===
+=== eCommerce Product Catalog ===
 Contributors: impleCode, ndre
 Donate link: https://implecode.com/wordpress/plugins/premium-support/#cam=wordpress-org-catalog-page&key=donate-link
 Tags: ecommerce, shopping cart, catalog, quote, request a quote
-Requires at least: 3.7
+Requires at least: 5.9
 Tested up to: 7.0
-Requires PHP: 5.6
-Stable tag: 3.5.8
+Requires PHP: 7.4
+Stable tag: 3.5.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -298,8 +298,8 @@ eCommerce Product Catalog doesn't use cookies or local storage in the default co
 
 = Minimum Requirements =
 
-* WordPress 3.5 or greater (The latest version is always recommended)
-* PHP version 5.6 or greater (PHP 8.2 or greater is recommended)
+* WordPress 5.9 or greater (The latest version is always recommended)
+* PHP version 7.4 or greater (PHP 8.4 or greater is recommended)
 
 = Automatic installation =
 
@@ -389,6 +389,10 @@ This can be a store but it is not limited to it. It's main purpose is to present
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
 
+= 3.5.9 - 17/08/2026 =
+
+* Code refactoring and preparation for v3.6
+
 = 3.5.8 - 10/08/2026 =
 
 * Security fix - added nonce checks in the listing assignment
@@ -424,7 +428,7 @@ Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/
 = 3.5.0 - 23/04/2026 =
 
 * Added new shipping options modes
-* Added new attribute options modes 
+* Added new attribute options modes
 * Added shipping and attributes bulk override tool
 * Added shipping note feature
 * Added an option to collect shipping address only for selected shipping options
@@ -459,7 +463,7 @@ Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/
 
 = 3.4.7 - 10/09/2025 =
 
-* Inquiry and order notification email deliverability improvement 
+* Inquiry and order notification email deliverability improvement
 
 = 3.4.6 - 05/08/2025 =
 

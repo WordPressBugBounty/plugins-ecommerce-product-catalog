@@ -59,7 +59,7 @@ class Elementor_IC_Show_Catalog_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			array(
-				'label' => __( 'Info', 'plugin-name' ),
+				'label' => __( 'Info', 'ecommerce-product-catalog' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -70,7 +70,7 @@ class Elementor_IC_Show_Catalog_Widget extends \Elementor\Widget_Base {
 				'label' => __( 'Catalog Markup Element', 'ecommerce-product-catalog' ),
 				'type'  => \Elementor\Controls_Manager::RAW_HTML,
 				/* translators: 1: opening catalog settings link, 2: closing catalog settings link, 3: opening archive names link, 4: closing archive names link. */
-				'raw'   => '<br>' . __( 'Use this to position your catalog container. The catalog container will show different content for product listing, category page, single product page and search results.', 'plugin-name' ) . '<br><br>' . __( 'By default it shows the main catalog page content.', 'ecommerce-product-catalog' ) . '<br><br>' . sprintf( __( 'Go to %1$scatalog settings%2$s to adjust what is visible here.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) ) . '">', '</a>' ) . '<br><br>' . sprintf( __( '%1$sHere%2$s you can edit all text that is displayed inside the catalog container.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=names-settings&submenu=archive-names' ) ) . '">', '</a>' ),
+				'raw'   => '<br>' . __( 'Use this to position your catalog container. The catalog container will show different content for product listing, category page, single product page and search results.', 'ecommerce-product-catalog' ) . '<br><br>' . __( 'By default it shows the main catalog page content.', 'ecommerce-product-catalog' ) . '<br><br>' . sprintf( __( 'Go to %1$scatalog settings%2$s to adjust what is visible here.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) ) . '">', '</a>' ) . '<br><br>' . sprintf( __( '%1$sHere%2$s you can edit all text that is displayed inside the catalog container.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=names-settings&submenu=archive-names' ) ) . '">', '</a>' ),
 			)
 		);
 

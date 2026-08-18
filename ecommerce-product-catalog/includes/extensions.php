@@ -158,7 +158,7 @@ function ic_epc_render_extensions_screen_top() {
 	<hr class="wp-header-end">
 	<h3>
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Trusted translated admin HTML with a single line break.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated literal that deliberately contains HTML, with no dynamic values.
 		echo __( 'All premium extensions come with premium support provided by the dev team.<br>Feel free to contact impleCode for configuration help, troubleshooting, installation assistance and any other plugin support at any time!', 'ecommerce-product-catalog' );
 		?>
 	</h3>

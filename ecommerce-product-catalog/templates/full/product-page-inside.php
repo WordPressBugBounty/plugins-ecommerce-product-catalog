@@ -55,7 +55,7 @@ if ( ! empty( $after_product_details ) ) {
 	?>
 	<div id="after-product-details" class="after-product-details">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $after_product_details;
 		?>
 	</div>

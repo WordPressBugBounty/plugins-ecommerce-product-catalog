@@ -63,21 +63,27 @@ function ic_duplicate_product() {
 				}
 				if ( is_array( $value ) && count( $value ) > 0 ) {
 					foreach ( $value as $i => $v ) {
+						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Product duplication intentionally copies each allowlisted source meta row into the new product through wpdb::insert().
 						$wpdb->insert(
 							$wpdb->prefix . 'postmeta',
 							array(
 								'post_id'    => $duplicate_id,
+								// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Duplicate creation must copy the exact source product meta key.
 								'meta_key'   => $key,
+								// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Duplicate creation must copy the exact source product meta value.
 								'meta_value' => $v,
 							)
 						);
 					}
 				} elseif ( ! empty( $value ) && ! is_array( $value ) ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Product duplication intentionally copies the selected source meta row into the new product through wpdb::insert().
 					$wpdb->insert(
 						$wpdb->prefix . 'postmeta',
 						array(
 							'post_id'    => $duplicate_id,
+							// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Duplicate creation must copy the exact source product meta key.
 							'meta_key'   => $key,
+							// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Duplicate creation must copy the exact source product meta value.
 							'meta_value' => $value,
 						)
 					);
@@ -147,7 +153,7 @@ function ic_post_duplicator_notice() {
 		$names = get_catalog_names();
 		$link  = '<a href="' . esc_url( get_edit_post_link( $ic_duplicated_id ) ) . '">' . esc_html__( 'here', 'ecommerce-product-catalog' ) . '</a>';
 		/* translators: 1: singular catalog item label, 2: singular catalog item label in lowercase, 3: edit link HTML. */
-		$label = sprintf( __( '%1$s successfully duplicated! You can edit your new %2$s %3$s.', 'ecommerce-product-catalog' ), ic_ucfirst( $names['singular'] ), ic_lcfirst( $names['singular'] ), $link );
+		$label = sprintf( __( '%1$s successfully duplicated! You can edit your new %2$s %3$s.', 'ecommerce-product-catalog' ), esc_html( ic_ucfirst( $names['singular'] ) ), esc_html( ic_lcfirst( $names['singular'] ) ), $link );
 		?>
 		<div class="updated">
 			<p>

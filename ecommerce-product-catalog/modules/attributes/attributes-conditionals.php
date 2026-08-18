@@ -37,8 +37,8 @@ function is_ic_attributes_enabled() {
 function has_product_any_attributes( $product_id ) {
 	$has_attr = false;
 	if ( is_ic_attributes_enabled() ) {
-		$any_attr = ic_wp_get_object_terms( $product_id, 'al_product-attributes', array( 'number' => 1 ) );
-		if ( ! empty( $any_attr ) ) {
+		$any_attr = get_the_terms( $product_id, 'al_product-attributes' );
+		if ( false !== $any_attr && ! is_wp_error( $any_attr ) && ! empty( $any_attr ) ) {
 			$has_attr = true;
 		}
 	}

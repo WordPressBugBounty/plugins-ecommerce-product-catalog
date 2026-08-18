@@ -51,7 +51,7 @@ if ( has_product_any_attributes( $product_id ) && function_exists( 'is_ic_attrib
 						<td class="attribute-value-unit-single"><span
 									class="attribute-value-single <?php echo esc_attr( sanitize_title( $label . '-value' ) ); ?> <?php echo esc_attr( sanitize_title( $display_value ) ); ?>">
 									<?php
-									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 									echo $display_value;
 									?>
 									</span>

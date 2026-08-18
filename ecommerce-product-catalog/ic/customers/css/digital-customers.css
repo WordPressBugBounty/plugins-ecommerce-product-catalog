@@ -1,0 +1,529 @@
+/*!
+ * Customers Styling
+ * https://implecode.com/wordpress/plugins/quote-cart/
+ *
+ * Copyright 2022 impleCode
+ * Free to use under the GPLv3 license.
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * Contributing author: Norbert Dreszer
+ */
+.customer_panel_actions {
+    clear: both;
+}
+
+#customer_email {
+    font-size: 20px;
+    float: left;
+}
+
+#customer_logout {
+    float: right;
+}
+
+#customer_panel_tabs {
+    margin-top: 20px;
+    clear: both;
+}
+
+#customer_products_table {
+    margin-top: 20px;
+}
+
+#customer_products_table .table-cell {
+    min-width: 80px;
+}
+
+.dialog .order_form_row, .renewal-dialog .order_form_row {
+    display: table;
+}
+
+.dialog .order_form_row .label, .dialog .order_form_row .field, .renewal-dialog .order_form_row .label, .renewal-dialog .order_form_row .field {
+    display: table-cell;
+    vertical-align: top;
+    padding: 5px;
+}
+
+.dialog .order_form_row .field span, .renewal-dialog .order_form_row .field span {
+    vertical-align: top;
+    margin-right: 5px;
+}
+
+.dialog .order_form_row .label, .renewal-dialog .order_form_row .label {
+    padding: 0px;
+}
+
+.edit-websites, .no-edit-websites {
+    font-size: 14px;
+}
+
+.edit-websites .al-box {
+    font-size: 13px;
+}
+
+.edit-websites input {
+    border: none;
+    padding-left: 0;
+}
+
+
+.edit-websites span.delete:before, .edit-websites span.delete {
+    cursor: pointer;
+    color: red;
+    content: "\f158";
+    font-family: dashicons;
+    font-size: 18px;
+}
+
+.edit-websites table, .edit-websites table tr, .edit-websites table td {
+    border: none;
+}
+
+.edit-websites table td.lp-td, .edit-websites table td.delete-td {
+    max-width: 25px;
+    width: 25px;
+    vertical-align: middle;
+}
+
+#customer_panel_tabs span.active, #customer_panel_tabs span.expired {
+    padding: 2px 4px;
+    border-radius: 5px;
+    color: #fff;
+    max-width: 67px;
+    text-align: center;
+}
+
+#customer_panel_tabs span.active {
+    border: 1px solid green;
+    background: green;
+}
+
+#customer_panel_tabs span.expired {
+    border: 1px solid red;
+    background: red;
+}
+
+.spinner_gif {
+    margin-right: 3px;
+    position: relative;
+    top: 5px;
+}
+
+/* Reset Password */
+#customer_panel_tabs-password input {
+    max-width: 300px;
+    width: 50%;
+}
+
+#customer_panel_tabs-password label {
+    min-width: 220px;
+    display: inline-block;
+}
+
+#customer_panel_tabs-password .new-password-button {
+    display: table;
+}
+
+#customer_panel_tabs-password .new-password, #customer_panel_tabs-password .repeat-new-password {
+    margin-bottom: 10px;
+}
+
+#customer_panel_tabs-password .spinner {
+    opacity: .7;
+    filter: alpha(opacity=70);
+    padding-left: 5px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#customer_panel_tabs-password .spinner img {
+    display: none;
+}
+
+/* Login normal */
+
+.login_form.panel_login {
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 3px;
+    padding: 10px 20px;
+}
+
+.login_form.panel_login h2 {
+    margin-top: 0;
+}
+
+/* Menu Login */
+.menu li.menu-item-type-custom.show-popup ul.sub-menu:before,
+.menu-item-type-custom.show-popup .menu_arrow,
+.menu-item-type-custom.show-popup .ic-login-form-options,
+.menu-item-type-custom.show-popup .ic-fake-login-submenu-bg,
+.menu-item-type-custom.show-popup .login_button.logged,
+.menu-item-type-custom.show-popup .ic-saved-guest-container {
+    display: none !important;
+}
+
+body:not(.logged-in,.ic-logged-in) .menu li.menu-item-type-custom.show-popup-for-logged-1 ul.sub-menu:before,
+body:not(.logged-in,.ic-logged-in) .menu-item-type-custom.show-popup-for-logged-1 .menu_arrow,
+body:not(.logged-in,.ic-logged-in) .menu-item-type-custom.show-popup-for-logged-1 .ic-login-form-options,
+body:not(.logged-in,.ic-logged-in) .menu-item-type-custom.show-popup-for-logged-1 .ic-fake-login-submenu-bg,
+body:not(.logged-in,.ic-logged-in) .menu-item-type-custom.show-popup-for-logged-1 .login_button.logged,
+body:not(.logged-in,.ic-logged-in) .menu-item-type-custom.show-popup-for-logged-1 .ic-saved-guest-container {
+    display: none !important;
+}
+
+.menu-item-type-custom.show-popup .ic-customer-menu-login-container,
+body:not(.logged-in) .menu-item-type-custom.show-popup-for-logged-1 .ic-customer-menu-login-container {
+    padding: 0;
+}
+
+/* Login Popup */
+.popup_login_form, .popup_login .ic-guest-register, .popup_login .ic-user-register {
+    position: fixed;
+    top: 5%;
+    left: 30%;
+    background: #fff;
+    box-shadow: 0 0 1px #000;
+    max-width: 360px;
+    z-index: 1000;
+    border-radius: 4px;
+    width: 25%;
+    min-width: 280px;
+    white-space: initial;
+}
+
+.popup_login_form #login_form, .popup_login .ic-guest-register, .popup_login .ic-user-register {
+    padding: 30px 20px;
+}
+
+.popup_login_form .closer {
+    top: 0;
+    right: 0;
+    left: auto;
+}
+
+.popup_login_form form {
+    width: 100%;
+}
+
+.popup_login_form label, .login_form label {
+    min-width: 90px;
+    display: block;
+    line-height: 1.5;
+}
+
+.popup_login_form #user_login, .popup_login_form #user_pass, #activation_form form input[type="text"], #activation_form form input[type="email"] {
+    padding: 10px;
+    font-size: 1.1em;
+    width: 100%;
+}
+
+.popup_login_form .inside_login {
+    max-width: 360px;
+}
+
+.popup_login_form .inside_login .ui-tabs-nav a {
+    font-size: 1.2em;
+}
+
+.popup_login_form .button-primary, .popup_login_form .button {
+    padding: 10px;
+    font-size: 1.2em;
+    font-weight: normal;
+}
+
+#ic_overlay, .ic-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.popup_login_form .closer {
+    top: 7px;
+    right: 7px;
+    left: auto;
+}
+
+.closer {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    z-index: 99;
+    cursor: pointer;
+}
+
+.closer:before {
+    font-family: dashicons;
+    content: "\f158";
+    font-size: 25px;
+    color: #000;
+}
+
+/* Upgrade License Dialog */
+.upgrade-dialog h3, .renewal-dialog h3 {
+    margin: 15px 0;
+}
+
+.upgrade-dialog .upgrade_types, .upgrade-dialog .payment-options, .renewal-dialog .payment-options {
+    margin: 10px;
+}
+
+.ui-dialog.edit-websites .ui-dialog-titlebar-close span, .ui-dialog.upgrade-dialog .ui-dialog-titlebar-close span, .ui-dialog.renew-license .ui-dialog-titlebar-close span {
+    margin: 0;
+    left: 0;
+    top: 0;
+}
+
+.upgrade-dialog #license_upgrade_price {
+    display: inline-block;
+}
+
+/* License Renewal */
+#customer_products_table .expiry-date {
+    font-size: 0.9em;
+}
+
+.ui-dialog.renew-license .renew-normal-price div, .ui-dialog.renew-license .renew-renewal-price div {
+    display: inline-block;
+}
+
+.ui-dialog.renew-license .renew-normal-price div {
+    text-decoration: line-through;
+}
+
+.ui-dialog.renew-license .renew-renewal-price {
+    color: #027E02;
+}
+
+.ui-dialog.renew-license .renew-normal-price, .ui-dialog.renew-license .renew-normal-price div, .ui-dialog.renew-license .renew-renewal-price, .ui-dialog.renew-license .renew-renewal-price div, .ui-dialog.renew-license .renewed-valid-until {
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.renewal-dialog .order_form_row .label {
+    padding-top: 6px;
+}
+
+#customer_panel .add-to-shopping-cart button.button {
+    padding: 12px;
+    min-width: 185px;
+}
+
+#customer_orders_table .table-row .table-cell .dashicons {
+    cursor: pointer;
+    vertical-align: bottom;
+    font-size: 1em;
+}
+
+#customer_orders_table .order-name-edit {
+    padding: 0;
+}
+
+.ic-login-form-container {
+    width: auto;
+    max-width: 700px;
+}
+
+.user_registration-1 .login-username input, .user_registration-1 .login-password input, .user_registration-1 .ic-user-register-name input,
+.ic-login-form-container .ic-guest-register-email input, .ic-login-form-container .ic-guest-register-phone input, .ic-login-form-container .ic-guest-register-name input,
+.ic-login-form-container .ic-user-register-email input, .ic-login-form-container .ic-user-register-phone input, .ic-login-form-container .ic-user-register-name input {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+
+.ic-top-registration-link {
+    line-height: 1.5;
+    text-align: right;
+    margin-bottom: -1.5em;
+}
+
+.ic-design.button.ic-cancel-login, .ic-design.button.ic-guest-cancel, .ic-design.button.ic-user-register-cancel {
+    margin-left: 7px;
+}
+
+.login_form {
+    width: 550px;
+    max-width: 100%;
+}
+
+.login_form.guest_checkout-1, .login_form.user_registration-1, .ic-guest-register, .ic-top-registration-link, .ic-user-register {
+    display: none;
+}
+
+.ic-login-form-options.user_registration-1.guest_checkout .ic-buttons {
+    display: inline;
+}
+
+.ic-login-form-options.user_registration-1.guest_checkout .ic-create-account {
+    padding-left: 5px;
+}
+
+.ic-guest-register, .ic-user-register {
+    max-width: 100%;
+}
+
+span.ic-input-comment {
+    font-size: 0.7em;
+    line-height: 0.8;
+}
+
+div.quote-cart-login form.ic-guest-register > p, form.ic-guest-register > p,
+div.quote-cart-login form.ic-user-register > p, form.ic-user-register > p {
+    margin-bottom: 20px;
+}
+
+.ic-form-title {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.ic-guest-register .ic-registration-notice {
+    float: right;
+}
+
+.ic-hidden-submit {
+    display: none !important;
+}
+
+.ic-hidden {
+    display: none;
+}
+
+.ic-design.button.ic-edit-guest {
+    margin-left: 10px;
+}
+
+.ic-lost-password-link {
+    font-size: 0.8em;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.ic-design.button.guest-sign-in, .guest-sign-in {
+    margin-left: 7px;
+}
+
+.ic-login-form-options .ic-create-account {
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.ic-customer-menu-login-container {
+    /*
+    position: absolute;
+    top: 100%;
+    left: 0px;
+    background: #fff;
+    border: 1px solid #ededed;
+
+     */
+    padding: 10px;
+    z-index: 2;
+    position: relative;
+}
+
+.ic-customer-menu-login-container a.button.ic-design {
+    margin-left: 5px;
+}
+
+.ic-trigger-menu-login {
+    display: inline;
+}
+
+.ic-trigger-menu-login .dashicons {
+    vertical-align: middle;
+}
+
+.ic-customer-menu-login-container a.ic-create-account, .ic-customer-menu-login-container a.ic-create-account:hover, .ic-customer-menu-login-container a.ic-create-account:focus, .ic-customer-menu-login-container a.ic-create-account:active,
+#site-navigation .ic-customer-menu-login-container a.ic-create-account, #site-navigation .ic-customer-menu-login-container a.ic-create-account:hover, #site-navigation .ic-customer-menu-login-container a.ic-create-account:focus, #site-navigation .ic-customer-menu-login-container a.ic-create-account:active {
+    color: inherit;
+}
+
+.ic-customer-menu-login-container .widget {
+    margin: 0;
+}
+
+.ic-customer-menu-login-container .ic-buttons, .ic-customer-menu-login-container span.login_button, .ic-customer-menu-login-container .ic-saved-guest-container, .ic-customer-menu-login-container div.popup_login {
+    white-space: nowrap;
+}
+
+.ic-menu-login-label {
+    padding-right: 5px;
+}
+
+.ic-permanent-show {
+    display: block !important;
+}
+
+.menu-item-customer-login_submenu {
+    position: relative;
+}
+
+.ic-fake-login-submenu-bg {
+    width: 160%;
+    height: 160%;
+    position: absolute;
+    top: -30%;
+    left: -30%;
+    z-index: 1;
+}
+
+.ic-always-hidden {
+    display: none !important;
+}
+
+.ic-bar-text-login {
+    padding: 0 10px;
+}
+
+body .ic-existing-account-notification .ic-design.button {
+    display: block;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.ic-existing-account-notification .ic-modal-container-buttons div.ic-design.button.ic-secondary-button {
+    margin-left: 0px;
+}
+
+@media (min-width: 1200px) {
+    .popup_login_form .inside_login, .popup_login_form, .login_form.panel_login, .login_form.panel_login .inside_login {
+        max-width: 600px;
+    }
+
+    .popup_login_form {
+        width: 35%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .popup_login_form, .popup_login .ic-guest-register, .popup_login .ic-user-register {
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-width: 500px;
+        min-width: 280px;
+    }
+
+    .ic-top-registration-link {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 550px) {
+    .ic-design.button.ic-cancel-login, .ic-design.button.ic-guest-cancel, .ic-design.button.ic-user-register-cancel {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 300px) {
+    .guest-sign-in, .ic-design.button.guest-sign-in {
+        margin: 10px 0 0;
+    }
+}

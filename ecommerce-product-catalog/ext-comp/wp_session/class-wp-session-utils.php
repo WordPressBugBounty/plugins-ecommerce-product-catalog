@@ -32,7 +32,7 @@ class WP_Session_Utils {
 		 */
 		$query = apply_filters( 'wp_session_count_query', $query );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The filtered query is prepared with the pattern placeholder immediately here.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- The filtered query contract retains a value placeholder and is prepared immediately here; this bounded count is intentionally direct.
 		$sessions = $wpdb->get_var( $wpdb->prepare( $query, '_wp_session_expires_%' ) );
 
 		return absint( $sessions );
@@ -85,6 +85,7 @@ class WP_Session_Utils {
 		global $wpdb;
 
 		$limit = absint( $limit );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bounded session cleanup reads WordPress options and deletes the selected rows immediately.
 		$keys  = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE %s ORDER BY option_value ASC LIMIT 0, %d",
@@ -119,7 +120,7 @@ class WP_Session_Utils {
 
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The dynamic placeholder list is prepared immediately before execution.
 			$prepared = $wpdb->prepare( $query, $expired );
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The statement above is already prepared before execution.
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- The statement above is prepared and performs bounded session cleanup.
 			$wpdb->query( $prepared );
 		}
 
@@ -136,6 +137,7 @@ class WP_Session_Utils {
 	public static function delete_all_sessions() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Explicit session cleanup must remove all matching option pairs immediately.
 		$count = $wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM $wpdb->options WHERE option_name LIKE %s",

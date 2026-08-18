@@ -30,8 +30,8 @@ if ( false !== $instance ) {
 	<form role="search" class="<?php echo esc_attr( apply_filters( 'ic_search_box_class', '', $instance ) ); ?>" method="get"
 			id="product_search_form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
-		echo apply_filters( 'ic_product_search_form_post_type', '<input type="hidden" name="post_type" value="' . $search_post_type . '" />', $instance );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The post type is esc_attr'd above; the markup is a documented filter hook so third parties can replace the whole field.
+		echo apply_filters( 'ic_product_search_form_post_type', '<input type="hidden" name="post_type" value="' . esc_attr( $search_post_type ) . '" />', $instance );
 		?>
 		<div class="ic-search-container">
 			<?php

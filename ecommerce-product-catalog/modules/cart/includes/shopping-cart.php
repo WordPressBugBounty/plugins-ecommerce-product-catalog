@@ -5,6 +5,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Adds EPC-owned shopping cart AJAX nonces to the catalog product object.
+ *
+ * @param array $nonces Existing nonce map.
+ * @return array
+ */
+function ic_epc_shopping_cart_product_object_nonces( $nonces ) {
+	$nonces['shopping_cart_products_nonce'] = wp_create_nonce( 'shopping_cart_products' );
+	$nonces['cart_price_nonce']             = wp_create_nonce( 'ic_price_format' );
+
+	return $nonces;
+}
+add_filter( 'ic_catalog_product_object_nonces', 'ic_epc_shopping_cart_product_object_nonces' );
+
+/**
  * Manages shopping cart
  *
  * Here shopping cart functions are defined and managed.
@@ -49,7 +63,7 @@ function shopping_cart_products_total() {
 			$product_id = cart_id_to_product_id( $cart_id );
 			// $product_price     = apply_filters( 'shopping_cart_product_price', product_price( $product_id, 1 ), $cart_id, $p_quantity );
 			$product_price = get_shopping_cart_product_price( $product_id, $cart_id, $p_quantity );
-			$product_total = $product_price * $p_quantity;
+			$product_total = floatval( $product_price ) * $p_quantity;
 			$total_net    += $product_total;
 		}
 
@@ -65,10 +79,17 @@ if ( ! function_exists( 'ic_ajax_price_format' ) ) {
 	 * Manages ajax price format
 	 */
 	function ic_ajax_price_format() {
-		$price = '';
-		if ( isset( $_POST['price'] ) ) {
-			$price = price_format( raw_price_format( $_POST['price'] ) );
+		$nonce = isset( $_REQUEST['ic_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['ic_nonce'] ) ) : '';
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ic_price_format' ) || ( is_user_logged_in() && ! current_user_can( 'read' ) ) ) {
+			wp_die( '', '', array( 'response' => 403 ) );
 		}
+		$price = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public nopriv AJAX formatting endpoint: it echoes a formatted number for the visitor's own cart and writes nothing; the value is sanitized on this line.
+		if ( isset( $_POST['price'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public nopriv AJAX formatting endpoint: it echoes a formatted number for the visitor's own cart and writes nothing; the value is sanitized on this line.
+			$price = price_format( raw_price_format( sanitize_text_field( wp_unslash( $_POST['price'] ) ) ) );
+		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: price_format() output, which emits the currency markup. The underlying value came from $_POST but was already run through sanitize_text_field( wp_unslash() ) and raw_price_format() above; it is the formatter's tags that must survive here.
 		echo $price;
 		wp_die();
 	}
@@ -82,7 +103,10 @@ add_action( 'wp_ajax_nopriv_shopping_cart_products', 'ic_ajax_shopping_cart_prod
  * Handles ajax shopping cart products table
  */
 function ic_ajax_shopping_cart_products() {
-	$raw = isset( $_POST['raw'] ) ? $_POST['raw'] : 1;
+	ic_verify_public_cart_nonce( 'shopping_cart_products' );
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public nopriv AJAX endpoint that renders the visitor's own cart table and writes nothing; the flag is cast with intval() on this line.
+	$raw = isset( $_POST['raw'] ) ? intval( $_POST['raw'] ) : 1;
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by shopping_cart_products().
 	echo shopping_cart_products( $raw );
 	wp_die();
 }

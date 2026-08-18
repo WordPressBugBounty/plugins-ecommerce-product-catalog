@@ -213,7 +213,7 @@ class IC_Catalog_Menu_Element {
 			<p class="button-controls wp-clearfix">
 			<span class="add-to-menu">
 				<input type="submit" <?php disabled( $nav_menu_selected_id, 0 ); ?> class="button-secondary submit-add-to-menu right"
-						value="<?php esc_attr_e( 'Add to Menu', 'implecode-quote-cart' ); ?>"
+						value="<?php esc_attr_e( 'Add to Menu', 'ecommerce-product-catalog' ); ?>"
 						name="add-post-type-menu-item" id="submit-<?php echo esc_attr( $section_name ); ?>">
 
 				<span class="spinner"></span>
@@ -251,12 +251,12 @@ class IC_Catalog_Menu_Element {
 
 		if ( ic_string_contains( $current, $settings_start ) ) {
 			$current_modified = substr( $current, 0, strpos( $current, $settings_start ) );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $current_modified;
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $settings_start;
 		} else {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $current;
 		}
 

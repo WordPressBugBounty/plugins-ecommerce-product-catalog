@@ -126,17 +126,16 @@ abstract class IC_Catalog_Widget extends WP_Widget {
 	 * @return array
 	 */
 	public function ajax( $response ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent Ajax handler verifies the request nonce before this callback runs.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IC_Catalog_Ajax::ajax_self_submit() verifies the ic_ajax nonce before this filter callback runs.
 		if ( ! empty( $_POST['ajax_elements'][ $this->widget_filter_name ] ) ) {
-			ob_start();
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The parent Ajax handler verifies the request nonce before this callback runs, and the widget settings array is normalized before use.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified by the parent Ajax handler; the payload is sanitized by ic_sanitize_widget_ajax_settings() on the next line.
 			$ajax_element = wp_unslash( $_POST['ajax_elements'][ $this->widget_filter_name ] );
 			if ( ! is_array( $ajax_element ) ) {
 				return $response;
 			}
-			$instance = isset( $ajax_element['instance'] ) && is_array( $ajax_element['instance'] ) ? $ajax_element['instance'] : array();
-			$args     = isset( $ajax_element['args'] ) && is_array( $ajax_element['args'] ) ? $ajax_element['args'] : array();
-			the_widget( $this->ic_name, $instance, $args );
+			$ajax_element = ic_sanitize_widget_ajax_settings( $ajax_element );
+			ob_start();
+			the_widget( $this->ic_name, $ajax_element['instance'], $ajax_element['args'] );
 			$response[ $this->widget_filter_name ] = ob_get_clean();
 		}
 

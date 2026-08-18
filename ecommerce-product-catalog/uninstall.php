@@ -12,7 +12,24 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'ic_ai_manager' ) ) {
+	$framework_index = __DIR__ . '/ic/index.php';
+	if ( file_exists( $framework_index ) ) {
+		require_once $framework_index;
+	}
+}
+
+if ( function_exists( 'ic_ai_manager' ) ) {
+	ic_ai_manager()->revoke_site_key( 'plugin_uninstall' );
+}
+
 if ( ! defined( 'AL_BASE_PATH' ) ) {
+	if ( ! taxonomy_exists( 'al_product-cat' ) ) {
+		register_taxonomy( 'al_product-cat', 'al_product', array( 'public' => false ) );
+	}
+	if ( ! taxonomy_exists( 'al_product-attributes' ) ) {
+		register_taxonomy( 'al_product-attributes', 'al_product', array( 'public' => false ) );
+	}
 	$uninstall_products = get_option( 'ic_delete_products_uninstall', 0 );
 
 	if ( 1 === (int) $uninstall_products ) {
@@ -25,47 +42,91 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 			 * @global type $wpdb
 			 */
 			function ic_delete_all_attribute_terms() {
-				global $wpdb;
 				$taxonomy  = 'al_product-attributes';
-					$terms = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN (%s) ORDER BY t.name ASC", $taxonomy ) );
+					$terms = get_terms(
+						array(
+							'taxonomy'   => $taxonomy,
+							'hide_empty' => false,
+						)
+					);
 
 					// Delete terms.
-				if ( $terms ) {
+				if ( ! is_wp_error( $terms ) ) {
 					foreach ( $terms as $attribute_term ) {
-						$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $attribute_term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $attribute_term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->terms, array( 'term_id' => $attribute_term->term_id ) );
+						wp_delete_term( (int) $attribute_term->term_id, $taxonomy );
 					}
 				}
 			}
 
 		}
 
-		global $wpdb;
-		$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE post_type IN ( 'al_product' );" );
-		$wpdb->query( "DELETE meta FROM {$wpdb->postmeta} meta LEFT JOIN {$wpdb->posts} posts ON posts.ID = meta.post_id WHERE posts.ID IS NULL;" );
+		$product_ids = get_posts(
+			array(
+				'post_type'      => 'al_product',
+				'post_status'    => get_post_stati( array(), 'names' ),
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+		foreach ( $product_ids as $product_id ) {
+			wp_delete_post( (int) $product_id, true );
+		}
 
 			$product_category_taxonomy = 'al_product-cat';
-			$terms                     = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN (%s) ORDER BY t.name ASC", $product_category_taxonomy ) );
+				$terms                 = get_terms(
+					array(
+						'taxonomy'   => $product_category_taxonomy,
+						'hide_empty' => false,
+					)
+				);
 
 			// Delete terms.
-		if ( $terms ) {
+		if ( ! is_wp_error( $terms ) ) {
 			foreach ( $terms as $catalog_term ) {
-				$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $catalog_term->term_taxonomy_id ) );
-				$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $catalog_term->term_taxonomy_id ) );
-				$wpdb->delete( $wpdb->terms, array( 'term_id' => $catalog_term->term_id ) );
+				wp_delete_term( (int) $catalog_term->term_id, $product_category_taxonomy );
 				delete_option( 'al_product_cat_image_' . $catalog_term->term_id );
 			}
 		}
 
-			// Delete taxonomy.
-			$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => $product_category_taxonomy ), array( '%s' ) );
-
 		ic_delete_all_attribute_terms();
-		$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => 'al_product-attributes' ), array( '%s' ) );
 
 		remove_role( 'catalog_manager' );
 		remove_role( 'ic_order_manager' );
+
+		global $wpdb;
+		/*
+		 * Statistics data is business history (orders, revenue, payments,
+		 * telemetry), so it is removed ONLY under this explicit opt-in, exactly
+		 * like the products it describes - and only when no other active plugin
+		 * ships the shared statistics framework, because the five `ic_stats_*`
+		 * tables are shared by every IC integration on the site. With the opt-in
+		 * off, or with a sibling integration still active, nothing statistics
+		 * related is touched. Decision recorded in `plugin-architecture.md`.
+		 */
+		$ic_stats_siblings = 0;
+		$ic_active_plugins = array_merge( (array) get_option( 'active_plugins', array() ), array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
+		foreach ( array_unique( $ic_active_plugins ) as $ic_active_plugin ) {
+			$ic_plugin_directory = WP_PLUGIN_DIR . '/' . dirname( (string) $ic_active_plugin );
+			if ( __DIR__ === $ic_plugin_directory ) {
+				continue;
+			}
+			if ( file_exists( $ic_plugin_directory . '/ic/stats/class-ic-stats-manager.php' ) ) {
+				++$ic_stats_siblings;
+			}
+		}
+		if ( 0 === $ic_stats_siblings ) {
+			foreach ( array( 'ic_stats_event_metrics', 'ic_stats_events', 'ic_stats_aggregates', 'ic_stats_lifecycle_metrics', 'ic_stats_lifecycles' ) as $ic_stats_table ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Uninstall drops only fixed allowlisted framework table suffixes joined to the trusted WordPress prefix.
+				$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . $ic_stats_table );
+			}
+			$ic_stats_like = $wpdb->esc_like( 'ic_stats_' ) . '%';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall enumerates its own options with prepared values.
+			$ic_stats_options = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s", $ic_stats_like, '_transient_' . $ic_stats_like, '_transient_timeout_' . $ic_stats_like ) );
+			foreach ( (array) $ic_stats_options as $ic_stats_option ) {
+				delete_option( $ic_stats_option );
+			}
+		}
 	}
 
 
@@ -146,7 +207,16 @@ if ( ! defined( 'AL_BASE_PATH' ) ) {
 	}
 
 	delete_user_meta( get_current_user_id(), 'ic_review_hidden' );
-	global $wpdb;
-	$wpdb->delete( $wpdb->usermeta, array( 'meta_key' => '_ic_hidden_notices' ) );
-
+	$hidden_notice_users = get_users(
+		array(
+			'fields'      => 'ids',
+			'number'      => -1,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Uninstall must find users holding the plugin's exact notice meta key for cleanup.
+			'meta_key'    => '_ic_hidden_notices',
+			'count_total' => false,
+		)
+	);
+	foreach ( $hidden_notice_users as $hidden_notice_user_id ) {
+		delete_user_meta( (int) $hidden_notice_user_id, '_ic_hidden_notices' );
+	}
 }

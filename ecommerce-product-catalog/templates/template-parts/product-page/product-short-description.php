@@ -25,7 +25,7 @@ if ( ! empty( $shortdesc ) ) {
 
 	<div class="shortdesc">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $shortdesc;
 		?>
 	</div>

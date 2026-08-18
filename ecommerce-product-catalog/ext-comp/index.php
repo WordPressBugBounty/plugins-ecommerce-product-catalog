@@ -57,6 +57,42 @@ function run_ext_comp_files() {
 	}
 }
 
+if ( ! function_exists( 'ic_is_xml_sitemap_request' ) ) {
+	/**
+	 * Detects public XML sitemap requests by their request path.
+	 *
+	 * Supports provider sitemap files used by common SEO plugins, their sitemap
+	 * index, and WordPress core sitemap files. Query strings do not participate
+	 * in matching.
+	 *
+	 * @return bool
+	 */
+	function ic_is_xml_sitemap_request() {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The request URI is parsed as a path and matched against fixed filename patterns only.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
+		if ( ! is_string( $path ) || '' === $path ) {
+			return false;
+		}
+
+		$filename = strtolower( wp_basename( $path ) );
+
+		if ( empty($filename) || ! ic_string_contains($filename, '.xml' ) ) {
+			return false;
+		}
+
+		if ( 'sitemap_index.xml' === $filename ) {
+			return true;
+		}
+
+		if ( preg_match( '/^wp-sitemap(?:-[a-z0-9_-]+)*\.xml$/i', $filename ) ) {
+			return true;
+		}
+
+		return 1 === preg_match( '/^[a-z0-9_-]+-sitemap[0-9]*\.xml$/i', $filename );
+	}
+}
+
 if ( ! function_exists( 'run_ic_session' ) ) {
 	add_action( 'ic_epc_included', 'run_ic_session', - 1 );
 	add_filter( 'wp_session_expiration_variant', 'ic_wp_session_expiration_variant', 999999 );
@@ -66,6 +102,10 @@ if ( ! function_exists( 'run_ic_session' ) ) {
 	 * Boots the session layer used by the catalog.
 	 */
 	function run_ic_session() {
+		if ( ic_is_xml_sitemap_request() ) {
+			return;
+		}
+
 		if ( is_admin() && ! is_ic_ajax() ) {
 
 			return;

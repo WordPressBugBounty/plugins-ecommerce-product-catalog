@@ -62,8 +62,8 @@ class Product_Widget_Search extends WP_Widget {
 			}
 
 			if ( $title ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-				echo $args['before_title'] . $title . $args['after_title'];
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+				echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 			}
 
 			ic_save_global( 'search_widget_instance', $instance );

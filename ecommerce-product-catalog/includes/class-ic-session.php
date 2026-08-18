@@ -24,75 +24,75 @@ class IC_Session {
 	 *
 	 * @var string $_cache_prefix Cache prefix.
 	 */
-	protected $_cache_prefix = 'ic_cache';
+	protected $_cache_prefix = 'ic_cache'; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 	/**
 	 * Cache group.
 	 *
 	 * @var string $cache_group Cache group.
 	 */
-	protected $_cache_group = 'implecode';
+	protected $_cache_group = 'implecode'; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 	/**
 	 * Customer ID.
 	 *
 	 * @var int $_customer_id Customer ID.
 	 */
-	protected $_customer_id;
+	protected $_customer_id; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Guest customer ID prefix.
 	 *
 	 * @var string $_random_customer_id_prefix Prefix.
 	 */
-	protected $_random_customer_id_prefix = 'ic_';
+	protected $_random_customer_id_prefix = 'ic_'; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Session Data.
 	 *
 	 * @var array $_data Data array.
 	 */
-	protected $_data = array();
+	protected $_data = array(); // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * To save when the session needs saving.
 	 *
 	 * @var bool $_to_save When something changes
 	 */
-	protected $_to_save = false;
+	protected $_to_save = false; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Cookie name used for the session.
 	 *
 	 * @var string cookie name
 	 */
-	protected $_cookie;
+	protected $_cookie; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Stores session expiry.
 	 *
 	 * @var string session due to expire timestamp
 	 */
-	protected $_session_expiring;
+	protected $_session_expiring; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Stores session due to expire timestamp.
 	 *
 	 * @var string session expiration timestamp
 	 */
-	protected $_session_expiration;
+	protected $_session_expiration; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * True when the cookie exists.
 	 *
 	 * @var bool Based on whether a cookie exists.
 	 */
-	protected $_has_cookie = false;
+	protected $_has_cookie = false; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Table name for session data.
 	 *
 	 * @var string Custom session table name
 	 */
-	protected $_table;
+	protected $_table; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Legacy session property is part of the compatibility API.
 
 	/**
 	 * Array containing all data including to save
@@ -349,12 +349,12 @@ class IC_Session {
 					wp_cache_set( $this->get_cache_prefix() . $this->_customer_id, $this->_data, $this->_cache_group, $this->_session_expiration - time() );
 				}
 			} else {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Sessions are stored in a custom table and cached manually.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- The identifier is the fixed prefixed session table; values are prepared and rows are cached manually.
 				$wpdb->query(
 					$wpdb->prepare(
-						'INSERT INTO %i (`session_key`, `session_value`, `session_expiry`) VALUES (%s, %s, %d)
-						ON DUPLICATE KEY UPDATE `session_value` = VALUES(`session_value`), `session_expiry` = VALUES(`session_expiry`)',
-						$this->_table,
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- The identifier is the fixed prefixed session table and all values use placeholders.
+						"INSERT INTO {$this->_table} (`session_key`, `session_value`, `session_expiry`) VALUES (%s, %s, %d)
+						ON DUPLICATE KEY UPDATE `session_value` = VALUES(`session_value`), `session_expiry` = VALUES(`session_expiry`)",
 						$this->_customer_id,
 						$session_value,
 						$this->_session_expiration
@@ -422,6 +422,7 @@ class IC_Session {
 
 		$this->save_data( $old_customer_id );
 		$this->set_customer_session_cookie();
+		do_action( 'ic_session_customer_id_adopted', $old_customer_id, $customer_id, $this );
 
 		return true;
 	}
@@ -477,11 +478,10 @@ class IC_Session {
 	private function get_existing_session_row( $customer_id ) {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Used to skip expensive unchanged custom-table session writes.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- The identifier is the fixed prefixed session table; the value is prepared and the row is cached manually.
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT `session_value`, `session_expiry` FROM %i WHERE `session_key` = %s',
-				$this->_table,
+				"SELECT `session_value`, `session_expiry` FROM {$this->_table} WHERE `session_key` = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- The identifier is the fixed prefixed session table and the key uses a placeholder.
 				$customer_id
 			),
 			ARRAY_A
@@ -496,15 +496,17 @@ class IC_Session {
 	 *
 	 * @return string|array
 	 */
-	public function get_session( $customer_id, $default = false ) {
+	public function get_session( $customer_id, $default = false ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- Legacy method parameter is part of the compatibility API.
 		global $wpdb;
 
 		if ( defined( 'WP_SETUP_CONFIG' ) ) {
 			return false;
 		}
 
-		$value = wp_cache_get( $this->get_cache_prefix() . $customer_id, $this->_cache_group );
+		$value        = wp_cache_get( $this->get_cache_prefix() . $customer_id, $this->_cache_group );
+		$value_source = 'cache';
 		if ( false === $value ) {
+			$value_source = 'db';
 			$value = $wpdb->get_var( $wpdb->prepare( "SELECT session_value FROM $this->_table WHERE session_key = %s", $customer_id ) ); // @codingStandardsIgnoreLine.
 
 			if ( is_null( $value ) ) {
@@ -517,7 +519,14 @@ class IC_Session {
 			}
 		}
 
-		return maybe_unserialize( $value );
+		$decoded = $this->decode_session_value( $value, $default );
+		if ( ! $decoded['valid'] ) {
+			$this->delete_session( $customer_id );
+
+			return $default;
+		}
+
+		return $decoded['value'];
 	}
 
 	/**
@@ -529,6 +538,7 @@ class IC_Session {
 		global $wpdb;
 
 		wp_cache_delete( $this->get_cache_prefix() . $customer_id, $this->_cache_group );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Legacy session persistence uses the established wpdb API.
 		$wpdb->delete(
 			$this->_table,
 			array(
@@ -546,6 +556,7 @@ class IC_Session {
 	public function update_session_timestamp( $customer_id, $timestamp ) {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Legacy session persistence uses the established wpdb API.
 		$wpdb->update(
 			$this->_table,
 			array(
@@ -612,7 +623,7 @@ class IC_Session {
 	 *
 	 * @return array|string value of session variable
 	 */
-	public function get( $key = '', $default = null ) {
+	public function get( $key = '', $default = null ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- Legacy method parameter is part of the compatibility API.
 		if ( empty( $key ) ) {
 
 			if ( ! empty( $this->all_data ) ) {
@@ -634,7 +645,134 @@ class IC_Session {
 		}
 		$key = sanitize_key( $key );
 
-		return isset( $this->_data[ $key ] ) ? maybe_unserialize( $this->_data[ $key ] ) : $default;
+		if ( ! isset( $this->_data[ $key ] ) ) {
+			return $default;
+		}
+
+		$decoded = $this->decode_session_value( $this->_data[ $key ], $default );
+		if ( ! $decoded['valid'] ) {
+			unset( $this->_data[ $key ] );
+			unset( $this->all_data[ $key ] );
+			$this->_to_save = true;
+
+			return $default;
+		}
+
+		return $decoded['value'];
+	}
+
+	/**
+	 * Decodes one stored session value when it is safe to unserialize.
+	 *
+	 * @param mixed $value   Raw stored value.
+	 * @param mixed $default Default value returned for invalid payloads.
+	 *
+	 * @return array{valid:bool,value:mixed,reason:string}
+	 */
+	private function decode_session_value( $value, $default = null ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- Legacy method parameter is part of the compatibility API.
+		if ( ! is_string( $value ) ) {
+			return array(
+				'valid'  => true,
+				'value'  => $value,
+				'reason' => 'not_string',
+			);
+		}
+
+		$value = trim( $value );
+		if ( ! is_serialized( $value ) ) {
+			return array(
+				'valid'  => true,
+				'value'  => $value,
+				'reason' => 'not_serialized',
+			);
+		}
+
+		$safety = $this->session_payload_safety( $value );
+		if ( ! $safety['valid'] ) {
+			return array(
+				'valid'  => false,
+				'value'  => $default,
+				'reason' => $safety['reason'],
+			);
+		}
+
+		return array(
+			'valid'  => true,
+			'value'  => maybe_unserialize( $value ),
+			'reason' => 'decoded',
+		);
+	}
+
+	/**
+	 * Returns whether a serialized session payload is safe to unserialize.
+	 *
+	 * @param string $value Serialized value.
+	 *
+	 * @return bool
+	 */
+	private function is_session_payload_safe_to_unserialize( $value ) {
+		$safety = $this->session_payload_safety( $value );
+
+		return $safety['valid'];
+	}
+
+	/**
+	 * Returns the validation result for one serialized session payload.
+	 *
+	 * @param string $value Serialized value.
+	 *
+	 * @return array{valid:bool,reason:string}
+	 */
+	private function session_payload_safety( $value ) {
+		$max_length = absint( apply_filters( 'ic_session_serialized_payload_max_length', MB_IN_BYTES ) );
+		if ( empty( $max_length ) ) {
+			$max_length = MB_IN_BYTES;
+		}
+		if ( strlen( $value ) > $max_length ) {
+			return array(
+				'valid'  => false,
+				'reason' => 'payload_too_large',
+			);
+		}
+
+		if ( preg_match( '/(^|;|{|})(O|C):\d+:"/m', $value ) ) {
+			return array(
+				'valid'  => false,
+				'reason' => 'serialized_object_not_allowed',
+			);
+		}
+
+		$max_collection_size = absint( apply_filters( 'ic_session_serialized_collection_max_items', 5000 ) );
+		if ( empty( $max_collection_size ) ) {
+			$max_collection_size = 5000;
+		}
+		if ( preg_match_all( '/(^|;|{|})a:(\d+):\{/m', $value, $array_matches ) ) {
+			foreach ( $array_matches[2] as $collection_size ) {
+				if ( absint( $collection_size ) > $max_collection_size ) {
+					return array(
+						'valid'  => false,
+						'reason' => 'collection_too_large',
+					);
+				}
+			}
+		}
+
+		if ( preg_match_all( '/(^|;|{|})s:(\d+):"/m', $value, $string_matches ) ) {
+			foreach ( $string_matches[2] as $string_length ) {
+				$string_length = absint( $string_length );
+				if ( $string_length > $max_length || $string_length > strlen( $value ) ) {
+					return array(
+						'valid'  => false,
+						'reason' => 'declared_string_length_invalid',
+					);
+				}
+			}
+		}
+
+		return array(
+			'valid'  => true,
+			'reason' => 'safe',
+		);
 	}
 
 	/**
@@ -692,14 +830,18 @@ class IC_Session {
 	/**
 	 * Check whether the session table exists.
 	 *
+	 * @param bool $use_cache Whether to use the request-local existence cache.
+	 *
 	 * @return bool
 	 */
-	private function table_exists() {
-		$return = ic_get_global( 'session_table_exists' );
-		if ( 1 === $return ) {
-			return true;
-		} elseif ( 2 === $return ) {
-			return false;
+	private function table_exists( $use_cache = true ) {
+		if ( $use_cache ) {
+			$return = ic_get_global( 'session_table_exists' );
+			if ( 1 === $return ) {
+				return true;
+			} elseif ( 2 === $return ) {
+				return false;
+			}
 		}
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- This checks the custom session table directly during bootstrap.
@@ -730,7 +872,7 @@ class IC_Session {
 		if ( $wpdb->has_cap( 'collation' ) ) {
 			$collate = $wpdb->get_charset_collate();
 		}
-		$create = "CREATE TABLE $this->_table (
+		$create = "CREATE TABLE IF NOT EXISTS $this->_table (
   session_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   session_key char(32) NOT NULL,
   session_value longtext NOT NULL,
@@ -738,12 +880,12 @@ class IC_Session {
   PRIMARY KEY  (session_id),
   UNIQUE KEY session_key (session_key)
 ) $collate;";
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $create );
-		if ( $this->table_exists() ) {
-			return true;
-		} else {
+		// Do not use dbDelta() here: its CREATE parser treats IF as the table name.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- The complete schema statement uses the fixed prefixed session table and trusted collation clause.
+		if ( false === $wpdb->query( $create ) ) {
 			return false;
 		}
+
+		return $this->table_exists( false );
 	}
 }

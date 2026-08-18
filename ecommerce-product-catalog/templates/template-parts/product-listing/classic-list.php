@@ -26,14 +26,14 @@ $product = ic_get_product_object();
 		<div class="classic-list-image-wrapper">
 			<div class="pseudo"></div>
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by listing_image_html().
 			echo $product->listing_image_html();
 			?>
 			</div>
 		<div class="product-name"><?php echo esc_html( $product->name() ); ?></div>
 		<div class="product-short-descr"><p>
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by c_list_desc().
 		echo c_list_desc( $product->ID );
 		?>
 		</p></div>

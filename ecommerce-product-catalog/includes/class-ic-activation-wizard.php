@@ -50,12 +50,12 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 				?>
 				<div class="<?php echo esc_attr( $class ); ?>"
 				<?php
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 				echo $attr;
 				?>
 				>
 					<?php
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 					echo $content;
 					do_action( 'ic_cat_activation_wizard_bottom' );
 					?>
@@ -330,13 +330,13 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 					$this->box_paragraph( sprintf( __( 'Recommended extensions on the list below are highlighted with %s and red border.', 'ecommerce-product-catalog' ), '<span class="dashicons dashicons-thumbs-up"></span>' ) );
 					?>
 					<style>
-						<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point. ?>
+						<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS selector list built from hardcoded strings plus sanitize_html_class() extension slugs. ?>
 						<?php echo $styling; ?>
 						{
 							border-color: red
 						;
 						}
-						<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point. ?>
+						<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS selector list built from hardcoded strings plus sanitize_html_class() extension slugs. ?>
 						<?php echo $styling_name; ?>
 						{
 							content: "\f529"
@@ -489,6 +489,12 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 					if ( is_array( $status ) && empty( $status[ $element ] ) ) {
 						$status[ $element ] = 1;
 					}
+					// Only the last branch writes the site-wide option, so only it requires the
+					// settings capability. The self-scoped 'user' and 'temp' branches stay
+					// available to any logged-in user; a non-privileged user simply gets no
+					// site-wide write.
+					// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+					$can_hide_site_wide = current_user_can( 'manage_product_settings' );
 					if ( 'user' === $type && get_current_user_id() ) {
 						update_user_meta( get_current_user_id(), '_ic_hidden_notices', $status );
 					} elseif ( 'temp' === $type ) {
@@ -497,7 +503,7 @@ if ( ! class_exists( 'IC_Activation_Wizard', false ) ) {
 							$transient_name .= '_' . get_current_user_id();
 						}
 						set_transient( $transient_name, 1, MONTH_IN_SECONDS );
-					} else {
+					} elseif ( $can_hide_site_wide ) {
 						update_option( 'ic_hidden_notices', $status );
 					}
 				}

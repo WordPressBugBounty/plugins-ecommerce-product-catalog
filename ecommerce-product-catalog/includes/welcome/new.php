@@ -37,8 +37,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p><?php esc_html_e( 'Until now there are 3 CTAs available: Shopping Cart add to cart, Quote Cart add to cart and an affiliate button.', 'ecommerce-product-catalog' ); ?></p>
 			<p>
 				<?php
-				/* Translators: 1: Opening contact link. 2: Closing contact link. */
-				printf( __( 'If you have an idea of a great CTA that could be included, please %1$scontact the developers%2$s!', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( 'https://implecode.com/support/?support_type=different&cam=welcome&key=idea' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening contact link. 2: Closing contact link. */ __( 'If you have an idea of a great CTA that could be included, please %1$scontact the developers%2$s!', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( 'https://implecode.com/support/?support_type=different&cam=welcome&key=idea' ) . '">', '</a>' );
 				?>
 			</p>
 		</div>
@@ -54,8 +54,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p><?php esc_html_e( 'In the current release, the theme integration goal is almost 100% complete.', 'ecommerce-product-catalog' ); ?></p>
 			<p>
 				<?php
-				/* Translators: 1: Opening support forum link. 2: Closing support forum link. */
-				printf( __( 'If you still face any theme or page builder integration issues, please report them on the %1$ssupport forum%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening support forum link. 2: Closing support forum link. */ __( 'If you still face any theme or page builder integration issues, please report them on the %1$ssupport forum%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '</a>' );
 				?>
 			</p>
 			<p><?php esc_html_e( 'Thank you for all your feedback regarding theme integration issues!', 'ecommerce-product-catalog' ); ?></p>
@@ -94,8 +94,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p><?php esc_html_e( 'Most changes were added in the admin side to make the configuration easier for new users.', 'ecommerce-product-catalog' ); ?></p>
 			<p>
 				<?php
-				/* Translators: 1: Opening support forum link. 2: Closing support forum link. */
-				printf( __( 'If you face any configuration issues, please report it on the %1$ssupport forum%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening support forum link. 2: Closing support forum link. */ __( 'If you face any configuration issues, please report it on the %1$ssupport forum%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '</a>' );
 				?>
 			</p>
 			<p><?php esc_html_e( 'Thanks to your feedback, we can make things easier together!', 'ecommerce-product-catalog' ); ?></p>
@@ -112,14 +112,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 			<p>
 				<?php
-				/* Translators: 1: Opening support forum link. 2: Opening plugin website link. 3: Closing link tag. */
-				printf( __( 'You can report any bugs or feedback on the %1$ssupport forum%3$s or on the %2$splugin website%3$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '<a href="' . esc_url( 'https://implecode.com/support/?support_type=bug_report&cam=welcome&key=bug' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening support forum link. 2: Opening plugin website link. 3: Closing link tag. */ __( 'You can report any bugs or feedback on the %1$ssupport forum%3$s or on the %2$splugin website%3$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/ecommerce-product-catalog/' ) . '">', '<a href="' . esc_url( 'https://implecode.com/support/?support_type=bug_report&cam=welcome&key=bug' ) . '">', '</a>' );
 				?>
 			</p>
 			<p>
 				<?php
-				/* Translators: 1: Opening security report link. 2: Closing link. */
-				printf( __( 'If you find any security issue, please report it %1$shere%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://implecode.com/support/?support_type=bug_report&cam=welcome&key=security' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening security report link. 2: Closing link. */ __( 'If you find any security issue, please report it %1$shere%2$s.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://implecode.com/support/?support_type=bug_report&cam=welcome&key=security' ) . '">', '</a>' );
 				?>
 			</p>
 			<p>
@@ -170,8 +170,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p><?php esc_html_e( 'Now you can search through the catalog settings and docs from your admin dashboard!', 'ecommerce-product-catalog' ); ?></p>
 			<p>
 				<?php
-				/* Translators: 1: Opening catalog settings link. 2: Opening help tab link. 3: Closing link. */
-				printf( __( 'You can find the search box in the %1$scatalog settings%3$s or %2$shelp tab%3$s.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) ) . '">', '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=extensions.php&tab=help' ) ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Opening catalog settings link. 2: Opening help tab link. 3: Closing link. */ __( 'You can find the search box in the %1$scatalog settings%3$s or %2$shelp tab%3$s.', 'ecommerce-product-catalog' ), '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) ) . '">', '<a target="_blank" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=extensions.php&tab=help' ) ) . '">', '</a>' );
 				?>
 			</p>
 		</div>
@@ -249,8 +249,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Check the documentation for more!', 'ecommerce-product-catalog' ); ?></h3>
 			<p>
 				<?php
-				/* Translators: 1: Current EPC version number. 2: Opening documentation link. 3: Closing link. */
-				printf( __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION ), '<a href="' . esc_url( 'https://implecode.com/docs/#cam=welcome&key=docs' ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: a translated string that deliberately contains HTML, so it cannot be escaped wholesale; the values interpolated into it are escaped individually on this line.
+				printf( /* translators: 1: Current EPC version number. 2: Opening documentation link. 3: Closing link. */ __( 'There’s a lot more for developers to love in %1$s. To discover more and learn how to make the catalog shine on your sites, themes, plugins and more, check the %2$sdocumentation.%3$s', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME . ' ' . IC_CATALOG_VERSION ), '<a href="' . esc_url( 'https://implecode.com/docs/#cam=welcome&key=docs' ) . '">', '</a>' );
 				?>
 			</p>
 		</div>

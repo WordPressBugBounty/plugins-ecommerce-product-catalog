@@ -74,16 +74,16 @@ jQuery( document ).ready(
 					function () {
 						var column = jQuery( this );
 						var toggle = column.find( '.ic-shipping-address-toggle' );
-						var button = column.find( '.shipping-address-editor-button' );
+						var dependents = column.find( '.ic-shipping-address-toggle-dependent' );
 
-						if ( ! toggle.length || ! button.length ) {
+						if ( ! toggle.length || ! dependents.length ) {
 							return;
 						}
 
 						if (toggle.is( ':checked' )) {
-							button.show();
+							dependents.show();
 						} else {
-							button.hide();
+							dependents.hide();
 						}
 					}
 				);

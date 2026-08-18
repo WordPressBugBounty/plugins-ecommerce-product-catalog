@@ -80,6 +80,10 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 			}
 			$button_tags = '';
 			foreach ( $buttons as $button ) {
+				if ( is_string( $button ) ) {
+					$button_tags .= $button;
+					continue;
+				}
 				if ( ! empty( $button['for'] ) ) {
 					$class          = 'button ' . design_schemes( 'box', 0 ) . ' ' . $button['class'];
 					$restore_fix_id = false;
@@ -286,6 +290,9 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 				),
 				$default_attr
 			);
+
+			$preserve_empty_checkbox_value = ! empty( $attr['_ic_preserve_empty_value'] );
+			unset( $attr['_ic_preserve_empty_value'] );
 			if ( ! empty( $required ) ) {
 				$attr['required'] = 'required';
 			}
@@ -309,6 +316,9 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 							if ( ! empty( $placeholder ) && empty( $attr['data-placeholder'] ) ) {
 								$attr['data-placeholder'] = $placeholder;
 							}
+							if ( ! empty( $placeholder ) && empty( $attr['title'] ) ) {
+								$attr['title'] = $placeholder;
+							}
 						}
 						$return .= $this->tag( 'select', $dropdown_options, $attr );
 					}
@@ -321,7 +331,7 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 					if ( ! isset( $attr['checked'] ) && $attr['value'] === '1' ) {
 						$attr['checked'] = 'checked';
 					}
-					if ( empty( $attr['value'] ) ) {
+					if ( empty( $attr['value'] ) && ! $preserve_empty_checkbox_value ) {
 						$attr['value'] = '1';
 					}
 				}
@@ -479,13 +489,17 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 		 * @param $selected
 		 * @param $id
 		 * @param $required
+		 * @param bool $preserve_empty_value Whether an explicitly empty option value must remain empty.
 		 *
 		 * @return void
 		 */
-		function checkbox( $name, $value, $label, $selected = false, $id = '', $required = 0, $class = '' ) {
+		function checkbox( $name, $value, $label, $selected = false, $id = '', $required = 0, $class = '', $preserve_empty_value = false ) {
 			$attr = array( 'checked' => $selected );
 			if ( ! empty( $class ) ) {
 				$attr['class'] = $class;
+			}
+			if ( $preserve_empty_value ) {
+				$attr['_ic_preserve_empty_value'] = true;
 			}
 
 			return $this->input( 'checkbox', $name, $value, $id, $required, $label, null, true, array(), $attr );
@@ -525,7 +539,7 @@ if ( ! class_exists( 'IC_Html_Util' ) ) {
 							$selected = true;
 						}
 					}
-					$radio_checkbox_options .= $this->checkbox( $name, $option_value, $option_label, $selected, $option_id, $required, $class );
+					$radio_checkbox_options .= $this->checkbox( $name, $option_value, $option_label, $selected, $option_id, $required, $class, '' === $option_value );
 				}
 			}
 

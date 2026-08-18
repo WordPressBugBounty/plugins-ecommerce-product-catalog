@@ -37,11 +37,11 @@ function ic_catalog_image_sizes_settings() {
 			<td>
 				<fieldset>
 					<legend class="screen-reader-text"><span>Large size</span></legend>
-					<label for="product_page_image_w"><?php esc_html_e( 'Max Width' ); ?></label>
+					<label for="product_page_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[product_page_image_w]" type="number" step="1" min="0"
 							id="product_page_image_w" value="<?php echo esc_attr( $images['product_page_image_w'] ); ?>"
 							class="small-text">
-					<label for="product_page_image_h"><?php esc_html_e( 'Max Height' ); ?></label>
+					<label for="product_page_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[product_page_image_h]" type="number" step="1" min="0"
 							id="product_page_image_h" value="<?php echo esc_attr( $images['product_page_image_h'] ); ?>"
 							class="small-text">
@@ -53,11 +53,11 @@ function ic_catalog_image_sizes_settings() {
 			<td>
 				<fieldset>
 					<legend class="screen-reader-text"><span>Large size</span></legend>
-					<label for="product_category_page_image_w"><?php esc_html_e( 'Max Width' ); ?></label>
+					<label for="product_category_page_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[product_category_page_image_w]" type="number" step="1" min="0"
 							id="product_category_page_image_w"
 							value="<?php echo esc_attr( $images['product_category_page_image_w'] ); ?>" class="small-text">
-					<label for="product_category_page_image_h"><?php esc_html_e( 'Max Height' ); ?></label>
+					<label for="product_category_page_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[product_category_page_image_h]" type="number" step="1" min="0"
 							id="product_category_page_image_h"
 							value="<?php echo esc_attr( $images['product_category_page_image_h'] ); ?>" class="small-text">
@@ -69,11 +69,11 @@ function ic_catalog_image_sizes_settings() {
 			<td>
 				<fieldset>
 					<legend class="screen-reader-text"><span>Large size</span></legend>
-					<label for="modern_grid_image_w"><?php esc_html_e( 'Max Width' ); ?></label>
+					<label for="modern_grid_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[modern_grid_image_w]" type="number" step="1" min="0"
 							id="product_page_image_w" value="<?php echo esc_attr( $images['modern_grid_image_w'] ); ?>"
 							class="small-text">
-					<label for="modern_grid_image_h"><?php esc_html_e( 'Max Height' ); ?></label>
+					<label for="modern_grid_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[modern_grid_image_h]" type="number" step="1" min="0"
 							id="product_page_image_h" value="<?php echo esc_attr( $images['modern_grid_image_h'] ); ?>"
 							class="small-text"><br>
@@ -86,11 +86,11 @@ function ic_catalog_image_sizes_settings() {
 				<fieldset>
 					<legend class="screen-reader-text">
 						<span><?php esc_html_e( 'Classic Grid Image', 'ecommerce-product-catalog' ); ?></span></legend>
-					<label for="classic_grid_image_w"><?php esc_html_e( 'Max Width' ); ?></label>
+					<label for="classic_grid_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[classic_grid_image_w]" type="number" step="1" min="0"
 							id="product_page_image_w" value="<?php echo esc_attr( $images['classic_grid_image_w'] ); ?>"
 							class="small-text">
-					<label for="classic_grid_image_h"><?php esc_html_e( 'Max Height' ); ?></label>
+					<label for="classic_grid_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[classic_grid_image_h]" type="number" step="1" min="0"
 							id="product_page_image_h" value="<?php echo esc_attr( $images['classic_grid_image_h'] ); ?>"
 							class="small-text">
@@ -103,11 +103,11 @@ function ic_catalog_image_sizes_settings() {
 				<fieldset>
 					<legend class="screen-reader-text">
 						<span><?php esc_html_e( 'Classic List Image', 'ecommerce-product-catalog' ); ?></span></legend>
-					<label for="classic_list_image_w"><?php esc_html_e( 'Max Width' ); ?></label>
+					<label for="classic_list_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[classic_list_image_w]" type="number" step="1" min="0"
 							id="product_page_image_w" value="<?php echo esc_attr( $images['classic_list_image_w'] ); ?>"
 							class="small-text">
-					<label for="classic_list_image_h"><?php esc_html_e( 'Max Height' ); ?></label>
+					<label for="classic_list_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[classic_list_image_h]" type="number" step="1" min="0"
 							id="product_page_image_h" value="<?php echo esc_attr( $images['classic_list_image_h'] ); ?>"
 							class="small-text">
@@ -162,7 +162,27 @@ add_action( 'product-settings-list', 'ic_register_image_setting' );
  * Registers catalog image sizes
  */
 function ic_register_image_setting() {
-	register_setting( 'media', 'catalog_image_sizes' );
+	register_setting( 'media', 'catalog_image_sizes', array( 'sanitize_callback' => 'ic_sanitize_catalog_image_sizes' ) );
+}
+
+/**
+ * Sanitizes image dimensions while preserving extension-added size keys.
+ *
+ * @param mixed $settings Submitted image settings.
+ * @return array
+ */
+function ic_sanitize_catalog_image_sizes( $settings ) {
+	if ( ! is_array( $settings ) ) {
+		return array();
+	}
+	$clean = array();
+	foreach ( $settings as $key => $value ) {
+		$clean[ $key ] = is_array( $value ) ? ic_sanitize_catalog_image_sizes( $value ) : sanitize_text_field( (string) $value );
+		if ( preg_match( '/_(w|h)$/', (string) $key ) ) {
+			$clean[ $key ] = max( 0, intval( $value ) );
+		}
+	}
+	return $clean;
 }
 
 add_action( 'ic_epc_loaded', 'ic_add_catalog_image_sizes' );
@@ -196,10 +216,10 @@ function ic_image_sizes_settings_tr( $label, $name ) {
 	<td>
 		<fieldset>
 			<legend class="screen-reader-text"><span><?php echo esc_html( $label ); ?></span></legend>
-			<label for="<?php echo esc_attr( $name . '_w' ); ?>"><?php esc_html_e( 'Max Width' ); ?></label>
+			<label for="<?php echo esc_attr( $name . '_w' ); ?>"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 			<input name="catalog_image_sizes[<?php echo esc_attr( $name ); ?>_w]" type="number" step="1" min="0"
 					id="<?php echo esc_attr( $name . '_w' ); ?>" value="<?php echo esc_attr( $images[ $name . '_w' ] ); ?>" class="small-text">
-			<label for="<?php echo esc_attr( $name . '_h' ); ?>"><?php esc_html_e( 'Max Height' ); ?></label>
+			<label for="<?php echo esc_attr( $name . '_h' ); ?>"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 			<input name="catalog_image_sizes[<?php echo esc_attr( $name ); ?>_h]" type="number" step="1" min="0"
 					id="<?php echo esc_attr( $name . '_h' ); ?>" value="<?php echo esc_attr( $images[ $name . '_h' ] ); ?>" class="small-text">
 		</fieldset>
@@ -209,7 +229,7 @@ function ic_image_sizes_settings_tr( $label, $name ) {
 			<input name="catalog_image_sizes[<?php echo esc_attr( $name ); ?>_crop]" type="hidden" value="0">
 			<input name="catalog_image_sizes[<?php echo esc_attr( $name ); ?>_crop]" type="checkbox"
 					id="<?php echo esc_attr( $name ); ?>_crop" value="1" <?php checked( '1', $images[ $name . '_crop' ] ); ?>>
-			<label for="<?php echo esc_attr( $name ); ?>_crop"><?php esc_html_e( 'Crop thumbnail to exact dimensions (normally thumbnails are proportional)', 'ic-pdf-catalog' ); ?></label>
+			<label for="<?php echo esc_attr( $name ); ?>_crop"><?php esc_html_e( 'Crop thumbnail to exact dimensions (normally thumbnails are proportional)', 'ecommerce-product-catalog' ); ?></label>
 			<?php
 		}
 		?>

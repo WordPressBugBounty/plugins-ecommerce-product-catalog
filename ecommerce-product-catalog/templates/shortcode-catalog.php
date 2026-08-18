@@ -715,7 +715,7 @@ class IC_Shortcode_Catalog {
 
 	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
 	public function show_catalog_shortcode() {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by catalog_shortcode().
 		echo $this->catalog_shortcode();
 	}
 
@@ -769,7 +769,7 @@ class IC_Shortcode_Catalog {
 
 	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
 	public function default_message() {
-		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Legacy custom capability is retained for compatibility.
 		if ( ! current_user_can( 'manage_product_settings' ) || ic_is_rendering_catalog_block() ) {
 			return;
 		}

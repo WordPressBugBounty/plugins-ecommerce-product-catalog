@@ -50,13 +50,23 @@ class IC_Catalog_Ajax {
 	/**
 	 * Maps serialized admin self-submit data onto the request query vars.
 	 *
+	 * This replaces the whole `$_GET` superglobal for the rest of the request, so it is limited to
+	 * logged-in users presenting a valid `ic_ajax` nonce, exactly like `ajax_self_submit()`.
+	 * `is_admin()` alone is not a guard: it is true on `admin-ajax.php` for `nopriv` actions too.
+	 *
 	 * @return void
 	 */
 	public function ajax_get() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Admin helper reads serialized self-submit data only.
-		if ( is_admin() && ! empty( $_POST['self_submit_data'] ) ) {
+		if ( ! is_admin() || ! is_user_logged_in() ) {
+			return;
+		}
+		$security = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
+		if ( empty( $security ) || ! wp_verify_nonce( $security, 'ic_ajax' ) ) {
+			return;
+		}
+		if ( ! empty( $_POST['self_submit_data'] ) ) {
 			$params = array();
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The serialized payload is sanitized after parsing for the admin helper.
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The serialized payload is sanitized with ic_sanitize() after parse_str() below.
 			$this->self_submit_data = wp_unslash( $_POST['self_submit_data'] );
 			parse_str( $this->self_submit_data, $params );
 			$_GET = array_map( 'ic_sanitize', $params );
@@ -69,6 +79,13 @@ class IC_Catalog_Ajax {
 	 * @return void
 	 */
 	public function ajax_self_submit() {
+		$ic_nonce = isset( $_POST['ic_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ic_nonce'] ) ) : '';
+		if ( empty( $ic_nonce ) || ! wp_verify_nonce( $ic_nonce, 'ic_catalog_self_submit' ) ) {
+			wp_die( -1, 403 );
+		}
+		if ( is_user_logged_in() && ! current_user_can( 'read' ) ) {
+			wp_die( -1, 403 );
+		}
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The serialized payload is sanitized after parsing.
 		$this->self_submit_data = isset( $_POST['self_submit_data'] ) ? wp_unslash( $_POST['self_submit_data'] ) : '';
 		$security               = isset( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
@@ -301,30 +318,15 @@ class IC_Catalog_Ajax {
 	 * @return array
 	 */
 	public function get_ajax_widget_settings( $element_name ) {
-		$empty_settings = array(
-			'instance' => array(),
-			'args'     => array(),
-		);
 		if ( empty( $this->ajax_elements[ $element_name ] ) ) {
-			return $empty_settings;
+			return array(
+				'instance' => array(),
+				'args'     => array(),
+			);
 		}
 
-		$settings = $this->ajax_elements[ $element_name ];
-		if ( is_string( $settings ) ) {
-			$decoded_settings = json_decode( $settings, true );
-			if ( is_array( $decoded_settings ) ) {
-				$settings = $decoded_settings;
-			}
-		}
-
-		if ( ! is_array( $settings ) ) {
-			return $empty_settings;
-		}
-
-		$settings['instance'] = isset( $settings['instance'] ) && is_array( $settings['instance'] ) ? $settings['instance'] : array();
-		$settings['args']     = isset( $settings['args'] ) && is_array( $settings['args'] ) ? $settings['args'] : array();
-
-		return $settings;
+		// The payload is client supplied, so wrapper markup and instance values are sanitized here.
+		return ic_sanitize_widget_ajax_settings( $this->ajax_elements[ $element_name ] );
 	}
 
 	/**
@@ -358,7 +360,7 @@ class IC_Catalog_Ajax {
 			'ic_product_ajax',
 			AL_PLUGIN_BASE_PATH . 'js/product-ajax.min.js',
 			array( 'al_product_scripts' ),
-			ic_filemtime( AL_BASE_PATH . '/js/product-ajax.min.js' ),
+			ic_filemtime( AL_BASE_PATH . '/js/product-ajax.min.js', true ),
 			true
 		);
 	}
@@ -405,6 +407,7 @@ class IC_Catalog_Ajax {
 				'filters_reset_url' => get_filters_bar_reset_url(),
 				'is_search'         => is_search(),
 				'nonce'             => wp_create_nonce( 'ic_ajax' ),
+				'ic_nonce'          => wp_create_nonce( 'ic_catalog_self_submit' ),
 			)
 		);
 	}
@@ -508,4 +511,3 @@ class IC_Catalog_Ajax {
 		return $this->request_url;
 	}
 }
-

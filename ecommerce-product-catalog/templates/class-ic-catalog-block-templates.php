@@ -26,7 +26,12 @@ class IC_Catalog_Block_Templates {
 	 * Registers the plugin block templates.
 	 */
 	public function register_block_templates() {
+		static $registered = false;
+		if ( $registered ) {
+			return;
+		}
 		if ( function_exists( 'register_block_template' ) ) {
+			// plugin-check:ignore wp_function_not_compatible_with_requires_wp -- The function_exists() guard skips catalog template registration on WordPress before 6.7.
 			register_block_template(
 				'ecommerce-product-catalog//archive-al_product',
 				array(
@@ -36,6 +41,7 @@ class IC_Catalog_Block_Templates {
 					'post_types' => array( 'al_product' ),
 				)
 			);
+			// plugin-check:ignore wp_function_not_compatible_with_requires_wp -- The function_exists() guard skips product template registration on WordPress before 6.7.
 			register_block_template(
 				'ecommerce-product-catalog//single-al_product',
 				array(
@@ -45,6 +51,7 @@ class IC_Catalog_Block_Templates {
 					'post_types' => array( 'al_product' ),
 				)
 			);
+			// plugin-check:ignore wp_function_not_compatible_with_requires_wp -- The function_exists() guard skips category template registration on WordPress before 6.7.
 			register_block_template(
 				'ecommerce-product-catalog//taxonomy-al_product-cat',
 				array(
@@ -54,6 +61,7 @@ class IC_Catalog_Block_Templates {
 					'post_types' => array( 'al_product' ),
 				)
 			);
+			$registered = true;
 		}
 	}
 }

@@ -21,6 +21,7 @@ add_action( 'add_product_metaboxes', 'ic_attributes_metabox' );
 function ic_attributes_metabox( $names ) {
 	$names['singular'] = ic_ucfirst( $names['singular'] );
 	if ( is_plural_form_active() ) {
+		/* translators: Placeholders are substituted with runtime values. */
 		$labels['attributes'] = sprintf( __( '%s Attributes', 'ecommerce-product-catalog' ), $names['singular'] );
 	} else {
 		$labels['attributes'] = __( 'Attributes', 'ecommerce-product-catalog' );
@@ -38,9 +39,10 @@ function ic_attributes_metabox( $names ) {
  */
 function al_product_attributes( $post, $args = null ) {
 	echo '<input type="hidden" name="attributesmeta_noncename" id="attributesmeta_noncename" value="' .
-		wp_create_nonce( AL_BASE_PATH . 'attributes_meta' ) . '" />';
+		esc_attr( wp_create_nonce( AL_BASE_PATH . 'attributes_meta' ) ) . '" />';
 	// echo '<div class="al-box info">' . __( 'Only attributes with values set will be shown on product page.', 'ecommerce-product-catalog' ) . ' ' . sprintf( __( 'See <a target="_blank" href="%s">docs</a>.', 'ecommerce-product-catalog' ), 'https://implecode.com/docs/ecommerce-product-catalog/product-attributes/#cam=catalog-add-page-box&key=product-attributes' ) . '</div>';
 	if ( function_exists( 'implecode_info' ) ) {
+		/* translators: %s: product attributes documentation URL. */
 		implecode_info( __( 'Only attributes with values set will be shown on the product page.', 'ecommerce-product-catalog' ) . ' ' . sprintf( __( 'See <a target="_blank" href="%s">docs</a>.', 'ecommerce-product-catalog' ), 'https://implecode.com/docs/ecommerce-product-catalog/product-attributes/#cam=catalog-add-page-box&key=product-attributes' ) );
 	}
 	$attributes_mode = get_attributes_source_mode();
@@ -123,19 +125,19 @@ function al_product_attributes( $post, $args = null ) {
 		$value_disabled_attr   = ! ic_product_attribute_values_per_product() ? ' disabled="disabled"' : '';
 		$placeholder_attr      = $attribute_placeholder !== '' ? ' placeholder="' . esc_attr( $attribute_placeholder ) . '"' : '';
 		$field_value           = is_array( $attributes_option_field ) ? reset( $attributes_option_field ) : $attributes_option_field;
-		$attribute_value_field = '<input ' . $autocomplete . ' class="ic_autocomplete attribute-value" type="text" data-base_name="' . $names['value'] . '" name="' . esc_attr( $value_name ) . '" value="' . esc_html( $field_value ) . '"' . $placeholder_attr . $value_disabled_attr . ' />';
+		$attribute_value_field = '<input ' . $autocomplete . ' class="ic_autocomplete attribute-value" type="text" data-base_name="' . esc_attr( $names['value'] ) . '" name="' . esc_attr( $value_name ) . '" value="' . esc_html( $field_value ) . '"' . $placeholder_attr . $value_disabled_attr . ' />';
 		?>
 		<tr>
-			<td class="attributes-label-column"><input <?php echo $label_autocomplete; ?>
+			<td class="attributes-label-column"><?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags. ?><input <?php echo $label_autocomplete; ?>
 						class="ic_autocomplete attribute-label" type="text"
-						data-base_name="<?php echo $names['label']; ?>" name="<?php echo esc_attr( $label_name ); ?>"
-						value="<?php echo esc_html( $attributes_label_option_field ); ?>"<?php echo $label_disabled_attr; ?>/></td>
+						data-base_name="<?php echo esc_attr( $names['label'] ); ?>" name="<?php echo esc_attr( $label_name ); ?>"
+						value="<?php echo esc_html( $attributes_label_option_field ); ?>"<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'product_attribute_value_edit' filter, which extensions and themes legitimately use to inject their own HTML. ?><?php echo $label_disabled_attr; ?>/></td>
 			<td class="break-column">:</td>
-			<td class="value-column"><?php echo apply_filters( 'product_attribute_value_edit', $attribute_value_field, $i, $attributes_option_field, $attributes_label_option_field, $names['value'] ); ?></td>
+			<td class="value-column"><?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'product_attribute_value_edit' filter, which extensions and themes legitimately use to inject their own HTML. ?><?php echo apply_filters( 'product_attribute_value_edit', $attribute_value_field, $i, $attributes_option_field, $attributes_label_option_field, $names['value'] ); ?></td>
 			<td class="unit-column"><input class="attribute-unit admin-number-field" type="text"
-											data-base_name="<?php echo $names['unit']; ?>"
+											data-base_name="<?php echo esc_attr( $names['unit'] ); ?>"
 											name="<?php echo esc_attr( $unit_name ); ?>"
-											value="<?php echo esc_html( $attributes_unit_option_field ); ?>"<?php echo $unit_disabled_attr; ?>/></td>
+											value="<?php echo esc_html( $attributes_unit_option_field ); ?>"<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags. ?><?php echo $unit_disabled_attr; ?>/></td>
 			<td class="dragger"></td>
 		</tr>
 	<?php } ?>
@@ -146,6 +148,139 @@ function al_product_attributes( $post, $args = null ) {
 }
 
 add_filter( 'product_meta_save', 'ic_save_product_attributes', 1, 2 );
+add_filter( 'ic_epc_ai_product_fields', 'ic_attributes_ai_product_fields', 10, 3 );
+
+/**
+ * Adds AI size and weight fields when the attributes module enables them.
+ *
+ * @param array  $fields    AI field definitions.
+ * @param string $post_type Product post type.
+ * @param object $context   EPC AI integration context.
+ *
+ * @return array
+ */
+function ic_attributes_ai_product_fields( $fields, $post_type, $taxonomy ) {
+	if ( ! class_exists( 'IC_Product_Details' ) || ! IC_Product_Details::is_ai_product_post_type( $post_type ) ) {
+		return $fields;
+	}
+
+	if ( is_ic_attributes_weight_enabled() ) {
+		$fields['weight'] = array(
+			'type'            => 'meta',
+			'label'            => __( 'Weight', 'ecommerce-product-catalog' ),
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- This declaration binds the weight field to its established product meta key.
+			'meta_key'        => '_weight',
+			'form_field'      => '_weight',
+			'input_selector'  => '[name="_weight"]',
+			'enhancement_mode' => 'preserve',
+			'default_enabled' => true,
+		);
+	}
+
+	if ( is_ic_attributes_size_enabled() ) {
+		$fields['size'] = array(
+			'type'            => 'group',
+			'label'           => __( 'Size', 'ecommerce-product-catalog' ),
+			'enhancement_mode' => 'preserve',
+			'default_enabled' => true,
+			'group_fields'    => array(
+				'length' => array(
+					'type'           => 'meta',
+					'label'          => __( 'Length', 'ecommerce-product-catalog' ),
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- This declaration binds length to its established product meta key.
+					'meta_key'       => '_size_length',
+					'form_field'     => '_size_length',
+					'input_selector' => '[name="_size_length"]',
+					'enhancement_mode' => 'preserve',
+				),
+				'width'  => array(
+					'type'           => 'meta',
+					'label'          => __( 'Width', 'ecommerce-product-catalog' ),
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- This declaration binds width to its established product meta key.
+					'meta_key'       => '_size_width',
+					'form_field'     => '_size_width',
+					'input_selector' => '[name="_size_width"]',
+					'enhancement_mode' => 'preserve',
+				),
+				'height' => array(
+					'type'           => 'meta',
+					'label'          => __( 'Height', 'ecommerce-product-catalog' ),
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- This declaration binds height to its established product meta key.
+					'meta_key'       => '_size_height',
+					'form_field'     => '_size_height',
+					'input_selector' => '[name="_size_height"]',
+					'enhancement_mode' => 'preserve',
+				),
+			),
+		);
+	}
+
+	if ( ic_product_attribute_values_per_product() && product_attributes_number() > 0 ) {
+		$fields['attributes'] = array(
+			'type'             => 'group',
+			'label'            => __( 'Attributes', 'ecommerce-product-catalog' ),
+			'enhancement_mode' => 'preserve',
+			'default_enabled'  => true,
+			'group_fields'     => ic_attributes_ai_group_fields(),
+		);
+	}
+
+	return $fields;
+}
+
+/**
+ * Returns AI group-field definitions for dynamic product attributes.
+ *
+ * @return array
+ */
+function ic_attributes_ai_group_fields() {
+	$group_fields   = array();
+	$max_attributes = product_attributes_number();
+
+	for ( $i = 1; $i <= $max_attributes; $i++ ) {
+		$field_name = ic_attr_value_field_name( $i );
+		$label      = ic_attributes_ai_group_field_label( $i );
+
+		$group_fields[ 'attribute_' . $i ] = array(
+			'type'             => 'meta',
+			'label'            => $label,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Custom attribute declarations must retain their registered product meta key.
+			'meta_key'         => $field_name,
+			'form_field'       => $field_name,
+			'input_selector'   => '[name="' . $field_name . '"]',
+			'enhancement_mode' => 'preserve',
+		);
+	}
+
+	return $group_fields;
+}
+
+/**
+ * Returns the display label for one AI attribute slot.
+ *
+ * @param int $attribute_id Attribute slot number.
+ *
+ * @return string
+ */
+function ic_attributes_ai_group_field_label( $attribute_id ) {
+	$attribute_id = absint( $attribute_id );
+	$label        = get_default_product_attribute_label( $attribute_id );
+	$unit         = get_default_product_attribute_unit( $attribute_id );
+
+	if ( '' === (string) $label ) {
+		$label = sprintf(
+			/* translators: %d: attribute slot number. */
+			__( 'Attribute %d', 'ecommerce-product-catalog' ),
+			$attribute_id
+		);
+	}
+
+	if ( '' !== (string) $unit ) {
+		$label .= ' (' . $unit . ')';
+	}
+
+	return $label;
+}
 
 /**
  * Saves product attributes
@@ -161,8 +296,11 @@ function ic_save_product_attributes( $product_meta, $post ) {
 		$label         = $default_label;
 		if ( ic_product_attribute_labels_per_product() ) {
 			$label_default = false;
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 			if ( ! empty( $_POST[ '_attribute-label' . $i ] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 				if ( $default_label !== $_POST[ '_attribute-label' . $i ] ) {
+					// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 					$product_meta[ '_attribute-label' . $i ] = apply_filters( 'save_product_attribute_label', ic_sanitize( $_POST[ '_attribute-label' . $i ] ), $i, $post->ID );
 				} else {
 					$product_meta[ '_attribute-label' . $i ] = '';
@@ -176,9 +314,12 @@ function ic_save_product_attributes( $product_meta, $post ) {
 			} else {
 				$label = isset( $product_meta[ '_attribute-label' . $i ] ) ? $product_meta[ '_attribute-label' . $i ] : $default_label;
 			}
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 			if ( ! empty( $_POST[ '_attribute-unit' . $i ] ) ) {
 				$default_unit = get_default_product_attribute_unit( $i );
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 				if ( $default_unit !== $_POST[ '_attribute-unit' . $i ] ) {
+					// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 					$product_meta[ '_attribute-unit' . $i ] = apply_filters( 'save_product_attribute_unit', ic_sanitize( $_POST[ '_attribute-unit' . $i ] ), $i, $post->ID, $label );
 				} else {
 					$product_meta[ '_attribute-unit' . $i ] = '';
@@ -188,20 +329,29 @@ function ic_save_product_attributes( $product_meta, $post ) {
 			}
 		}
 		if ( ic_product_attribute_values_per_product() ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 			$product_meta[ ic_attr_value_field_name( $i ) ] = isset( $_POST[ '_attribute' . $i ] ) ? apply_filters( 'save_product_attribute_value', ic_sanitize( $_POST[ '_attribute' . $i ], false ), $i, $post->ID, $label ) : '';
 		}
 	}
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 	if ( ! empty( $_POST['_size_length'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 		$product_meta['_size_length'] = ic_sanitize( $_POST['_size_length'] );
 	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 	if ( ! empty( $_POST['_size_width'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 		$product_meta['_size_width'] = ic_sanitize( $_POST['_size_width'] );
 	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 	if ( ! empty( $_POST['_size_height'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 		$product_meta['_size_height'] = ic_sanitize( $_POST['_size_height'] );
 	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 	if ( ! empty( $_POST['_weight'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce, 'editpost' action and edit_post capability are verified by IC_Register_Product::implecode_save_products_meta() before the product_meta_save filter runs; the value is sanitized with ic_sanitize() and left slashed on purpose because update_post_meta() unslashes it downstream.
 		$product_meta['_weight'] = floatval( $_POST['_weight'] );
 	}
 

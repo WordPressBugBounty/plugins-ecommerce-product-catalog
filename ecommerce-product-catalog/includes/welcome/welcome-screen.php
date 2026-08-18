@@ -171,7 +171,7 @@ $selected_mode_param = isset( $_GET['selected_mode'] ) ? sanitize_text_field( wp
 		<?php } ?>
 
 			<nav class="about__header-navigation nav-tab-wrapper wp-clearfix"
-				aria-label="<?php esc_attr_e( 'Secondary menu' ); ?>">
+				aria-label="<?php esc_attr_e( 'Secondary menu', 'ecommerce-product-catalog' ); ?>">
 				<?php
 				$getting_started = '';
 				$whats_new       = '';

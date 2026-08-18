@@ -33,7 +33,7 @@ $classic_grid_settings = get_classic_grid_settings();
 				<div class="pseudo"></div>
 				<div class="image">
 				<?php
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_get_category_listing_image_html().
 				echo ic_get_category_listing_image_html( $product_cat->term_id );
 				?>
 				</div>

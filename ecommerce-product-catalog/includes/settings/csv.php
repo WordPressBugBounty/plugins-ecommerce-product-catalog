@@ -106,7 +106,16 @@ add_action( 'product-settings', 'implecode_custom_csv_settings_content' );
  */
 function simple_upload_csv_products_file() {
 	$upload_feedback = '';
-	// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- File upload form processing in admin settings; individual fields are validated below.
+	if ( isset( $_FILES['product_csv'] ) ) {
+		// The upload bulk-inserts products, so the request must come from the nonced upload form.
+		check_admin_referer( 'ic_simple_csv_upload' );
+		// The nonce alone only proves the form was rendered; the import must also be authorised.
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! current_user_can( 'manage_product_settings' ) ) {
+			wp_die( esc_html__( 'You are not allowed to import products.', 'ecommerce-product-catalog' ) );
+		}
+	}
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; the individual file fields are sanitized and validated below.
 	$product_csv = ( isset( $_FILES['product_csv'] ) && is_array( $_FILES['product_csv'] ) ) ? $_FILES['product_csv'] : array();
 	if ( ! empty( $product_csv['size'] ) ) {
 		$file_name          = isset( $product_csv['name'] ) ? sanitize_file_name( wp_unslash( $product_csv['name'] ) ) : '';
@@ -114,10 +123,30 @@ function simple_upload_csv_products_file() {
 		$uploaded_file_type = $arr_file_type['ext'];
 		$allowed_file_type  = 'csv';
 		if ( $uploaded_file_type === $allowed_file_type ) {
-			$filepath = ic_simple_import_file_name();
-			$tmp_name = isset( $product_csv['tmp_name'] ) ? wp_unslash( $product_csv['tmp_name'] ) : '';
-			if ( move_uploaded_file( $tmp_name, $filepath ) ) {
-				simple_import_product_from_csv();
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			$handled = wp_handle_upload(
+				$product_csv,
+				array(
+					'test_form' => false,
+					'mimes'     => array( 'csv' => 'text/csv' ),
+				)
+			);
+			if ( ! empty( $handled['file'] ) && empty( $handled['error'] ) ) {
+				$private_dir = trailingslashit( wp_upload_dir( null, false )['basedir'] ) . 'ic-simple-csv';
+				wp_mkdir_p( $private_dir );
+				if ( ! file_exists( $private_dir . '/.htaccess' ) ) {
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations -- The import directory must be web-inaccessible on hosts without Apache rules.
+					file_put_contents( $private_dir . '/.htaccess', "Deny from all\n" );
+				}
+				$private_file = trailingslashit( $private_dir ) . wp_unique_filename( $private_dir, basename( $handled['file'] ) );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- The upload is moved atomically between local paths before WP_Filesystem credentials can be requested.
+				if ( @rename( $handled['file'], $private_file ) ) {
+					simple_import_product_from_csv( $private_file );
+					wp_delete_file( $private_file );
+				} else {
+					wp_delete_file( $handled['file'] );
+					$upload_feedback = '<div class="al-box warning">' . __( 'There was a problem securing your upload.', 'ecommerce-product-catalog' ) . '</div>';
+				}
 			} else {
 				$upload_feedback = '<div class="al-box warning">' . __( 'There was a problem with your upload.', 'ecommerce-product-catalog' ) . '</div>';
 			}
@@ -134,7 +163,9 @@ function simple_upload_csv_products_file() {
 			}
 		}
 		$url = sample_import_file_url();
-		echo '<form method="POST" enctype="multipart/form-data"><input type="file" accept=".csv" name="product_csv" id="product_csv" /><input type="submit" class="button" value="' . esc_attr__( 'Import Now', 'ecommerce-product-catalog' ) . '" /></form>';
+		echo '<form method="POST" enctype="multipart/form-data">';
+		wp_nonce_field( 'ic_simple_csv_upload' );
+		echo '<input type="file" accept=".csv" name="product_csv" id="product_csv" /><input type="submit" class="button" value="' . esc_attr__( 'Import Now', 'ecommerce-product-catalog' ) . '" /></form>';
 		$sep = get_simple_separator();
 		if ( ';' === $sep ) {
 			$sep_label = __( 'Semicolon', 'ecommerce-product-catalog' );
@@ -149,8 +180,8 @@ function simple_upload_csv_products_file() {
 /**
  * Imports products from the uploaded CSV file.
  */
-function simple_import_product_from_csv() {
-	$file_path = ic_simple_import_file_name();
+function simple_import_product_from_csv( $file_path = '' ) {
+	$file_path = ! empty( $file_path ) ? $file_path : ic_simple_import_file_name();
 	$fp        = simple_prepare_csv_file( 'r', $file_path );
 	$product   = array();
 	if ( false !== $fp ) {
@@ -205,7 +236,7 @@ function simple_import_product_from_csv() {
 					'',
 					'<br>',
 				),
-				print_r( $csv_cols, true )
+				wp_json_encode( $csv_cols )
 			);
 			$export_array = prepare_sample_import_file();
 			$expected     = str_replace(
@@ -217,18 +248,19 @@ function simple_import_product_from_csv() {
 					'',
 					'<br>',
 				),
-				print_r( array_values( $export_array[1] ), true )
+				wp_json_encode( array_values( $export_array[1] ) )
 			);
 			echo '<div class = "al-box warning">';
 			echo '<p>' . esc_html__( 'Number of product fields and number of fields in CSV file do not match!', 'ecommerce-product-catalog' ) . '</p>';
 			/* translators: %s: Included CSV columns. */
-			echo '<p>' . esc_html( sprintf( __( 'Columns included in file: %s', 'al-product-csv' ), $included ) ) . '</p>';
+			echo '<p>' . esc_html( sprintf( __( 'Columns included in file: %s', 'ecommerce-product-catalog' ), $included ) ) . '</p>';
 			/* translators: %s: Expected CSV columns. */
-			echo '<p>' . esc_html( sprintf( __( 'Columns expected in file: %s', 'al-product-csv' ), $expected ) ) . '</p>';
+			echo '<p>' . esc_html( sprintf( __( 'Columns expected in file: %s', 'ecommerce-product-catalog' ), $expected ) ) . '</p>';
 			echo '<p>' . esc_html__( 'Please make sure that only the expected columns exist in the import file and the correct CSV separator is set.', 'ecommerce-product-catalog' ) . '</p>';
 			echo '</div>';
 		}
 	}
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- CSV export/import uses a bounded local stream to preserve large-file memory behavior.
 	fclose( $fp );
 }
 
@@ -242,8 +274,10 @@ function simple_import_product_from_csv() {
  */
 function simple_prepare_csv_file( $type = 'w', $file_path = '' ) {
 	if ( version_compare( PHP_VERSION, '8.1.0', '<' ) ) {
+		// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Required for legacy PHP CSV line-ending compatibility.
 		ini_set( 'auto_detect_line_endings', true );
 	}
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- CSV import/export requires a local streaming resource and does not use remote URLs.
 	$fp = fopen( $file_path, $type );
 	if ( false === $fp ) {
 		/* translators: %1$s: Opening permissions documentation link. %2$s: Closing link. */
@@ -352,7 +386,9 @@ function sample_import_file_url() {
  * @param resource $fp File pointer.
  */
 function simple_close_csv_file( $fp ) {
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- CSV import uses a bounded local stream to preserve large-file memory behavior.
 	fclose( $fp );
+	// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Restore the legacy CSV line-ending setting after the import stream closes.
 	ini_set( 'auto_detect_line_endings', false );
 }
 
@@ -368,6 +404,9 @@ function simple_get_all_exported_products() {
 		'order'            => 'ASC',
 		'post_type'        => 'al_product',
 		'post_status'      => ic_visible_product_status(),
+		// CSV export intentionally enumerates canonical catalog storage so an
+		// export remains complete even when multilingual filters hide products.
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- Export must bypass multilingual display filters to include the complete catalog.
 		'suppress_filters' => true,
 	);
 	$products = get_posts( $args );
@@ -476,6 +515,7 @@ function ic_simple_csv_provide_file( $file_path ) {
 		header( 'Cache-Control: must-revalidate' );
 		header( 'Pragma: public' );
 		header( 'Content-Length: ' . filesize( $file_path ) );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Authenticated CSV downloads stream the local export without loading it into memory.
 		readfile( $file_path );
 		exit;
 	}
@@ -532,12 +572,14 @@ function ic_simple_csv_temp_folder() {
 	$csv_temp   = wp_upload_dir( null, false );
 	$csv_folder = $csv_temp['basedir'] . '/ic-simple-csv';
 	if ( ! file_exists( $csv_folder ) && ! is_dir( $csv_folder ) ) {
-		mkdir( $csv_folder );
+		wp_mkdir_p( $csv_folder );
 		$htaccess_data = 'Order deny,allow
 Deny from all';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Creates the local CSV privacy guard alongside the bounded temporary export directory.
 		file_put_contents( $csv_folder . '/.htaccess', $htaccess_data );
 		$index_data = '<?php
 // Silence is golden.';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Creates the local CSV directory index guard; WP_Filesystem is unavailable during this request path.
 		file_put_contents( $csv_folder . '/index.php', $index_data );
 	}
 
@@ -576,7 +618,6 @@ if ( ! function_exists( 'get_product_image_id' ) ) {
 	 * @return int|false|null
 	 */
 	function get_product_image_id( $attachment_url = '' ) {
-		global $wpdb;
 		$attachment_id = false;
 		if ( '' === $attachment_url ) {
 			return;
@@ -592,7 +633,20 @@ if ( ! function_exists( 'get_product_image_id' ) ) {
 		if ( false !== strpos( $attachment_url, $upload_dir_paths['baseurl'] ) ) {
 			$attachment_url    = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment_url );
 			$attachment_url    = str_replace( $upload_dir_paths['baseurl'] . '/', '', $attachment_url );
-				$attachment_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = %s AND wposts.post_type = 'attachment'", $attachment_url ) ) );
+				$attachment    = get_posts(
+					array(
+						'post_type'      => 'attachment',
+						'post_status'    => 'inherit',
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Attachment lookup requires WordPress core's stored file meta key.
+						'meta_key'       => '_wp_attached_file',
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Attachment lookup requires matching the imported file path value.
+						'meta_value'     => $attachment_url,
+						'no_found_rows'  => true,
+					)
+				);
+				$attachment_id = ! empty( $attachment ) ? (int) $attachment[0] : 0;
 
 			$cache[ $oryginal_attachment_url ] = $attachment_id;
 			ic_save_global( 'ic_cat_db_image_id_from_url', $cache );

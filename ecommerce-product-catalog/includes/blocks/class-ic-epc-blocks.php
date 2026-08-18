@@ -128,7 +128,9 @@ class IC_EPC_Blocks {
 				'wp-server-side-render',
 				'wp-data',
 				'wp-compose',
-			)
+			),
+			IC_EPC_VERSION,
+			true
 		);
 	}
 
@@ -138,7 +140,7 @@ class IC_EPC_Blocks {
 	 * @return void
 	 */
 	public function register_css_framework() {
-		wp_register_style( 'ic_blocks', AL_PLUGIN_BASE_PATH . 'includes/blocks/ic-blocks.min.css' . ic_filemtime( AL_BASE_PATH . '/includes/blocks/ic-blocks.min.css' ) );
+		wp_register_style( 'ic_blocks', AL_PLUGIN_BASE_PATH . 'includes/blocks/ic-blocks.min.css' . ic_filemtime( AL_BASE_PATH . '/includes/blocks/ic-blocks.min.css' ), array(), IC_EPC_VERSION );
 	}
 
 	/**
@@ -236,46 +238,69 @@ class IC_EPC_Blocks {
 	 * @return void
 	 */
 	public function register() {
+		$block_args = array( 'api_version' => 2 );
+		global $wp_version;
+		if ( version_compare( $wp_version, '6.3', '>=' ) ) {
+			$block_args['api_version'] = 3;
+		}
 		register_block_type(
 			__DIR__ . '/show-catalog/',
-			array(
-				'title'           => __( 'Show Catalog', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_catalog' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Show Catalog', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_catalog' ),
+				)
 			)
 		);
 		register_block_type(
 			__DIR__ . '/show-products/',
-			array(
-				'title'           => __( 'Show Products', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_products' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Show Products', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_products' ),
+				)
 			)
 		);
 		register_block_type(
 			__DIR__ . '/show-categories/',
-			array(
-				'title'           => __( 'Show Categories', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_categories' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Show Categories', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_categories' ),
+				)
 			)
 		);
 		register_block_type(
 			__DIR__ . '/active-filters/',
-			array(
-				'title'           => __( 'Active Filters', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_active_filters' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Active Filters', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_active_filters' ),
+				)
 			)
 		);
 		register_block_type(
 			__DIR__ . '/product-page/',
-			array(
-				'title'           => __( 'Product Page', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_product_page' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Product Page', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_product_page' ),
+				)
 			)
 		);
 		register_block_type(
 			__DIR__ . '/product-category/',
-			array(
-				'title'           => __( 'Product Category', 'ecommerce-product-catalog' ),
-				'render_callback' => array( $this, 'render_product_category' ),
+			array_merge(
+				$block_args,
+				array(
+					'title'           => __( 'Product Category', 'ecommerce-product-catalog' ),
+					'render_callback' => array( $this, 'render_product_category' ),
+				)
 			)
 		);
 
@@ -300,8 +325,8 @@ class IC_EPC_Blocks {
 			if ( is_ic_product_listing_enabled() ) {
 				$rendered = '<hr>';
 				/* translators: 1: opening catalog settings link, 2: closing catalog settings link. */
-				$rendered .= sprintf( __( 'There is nothing to display yet. Please add your products or %1$sconfigure the catalog%2$s to display something.', 'ecommmerce-product-catalog' ), '<a href="' . admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) . '">', '</a>' );
-				$rendered .= '<hr>';
+				$rendered .= sprintf( __( 'There is nothing to display yet. Please add your products or %1$sconfigure the catalog%2$s to display something.', 'ecommerce-product-catalog' ), '<a href="' . admin_url( 'edit.php?post_type=al_product&page=product-settings.php' ) . '">', '</a>' );
+				$rendered     .= '<hr>';
 			} else {
 				$rendered  = '<hr>';
 				$rendered .= '<h3>' . __( 'Catalog Container', 'ecommerce-product-catalog' ) . '</h3>';
@@ -373,6 +398,7 @@ class IC_EPC_Blocks {
 				$wp_query = new WP_Query(
 					array(
 						'post_type' => 'al_product',
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Block preview must select products from the configured catalog taxonomy.
 						'tax_query' => array(
 							array(
 								'taxonomy' => 'al_product-cat',

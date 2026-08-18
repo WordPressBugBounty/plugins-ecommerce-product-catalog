@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers the system status submenu.
  */
 function register_product_system() {
-	add_submenu_page( 'edit.php?post_type=al_product', __( 'System Status', 'ecommerce-product-catalog' ), __( 'System Status', 'ecommerce-product-catalog' ), apply_filters( 'ic_system_status_cap', 'manage_product_settings' ), basename( __FILE__ ), 'ic_system_status' );
+	add_submenu_page( 'edit.php?post_type=al_product', __( 'System Status', 'ecommerce-product-catalog' ), __( 'System Status', 'ecommerce-product-catalog' ), apply_filters( 'ic_system_status_cap', 'manage_product_settings' ), 'system.php', 'ic_system_status' );
 }
 
 add_action( 'product_settings_menu', 'register_product_system' );
@@ -37,9 +37,18 @@ function ic_system_status() {
 			}
 		} elseif ( isset( $_GET['delete_all_products'] ) ) {
 			if ( isset( $_GET['delete_all_products_confirm'] ) && check_admin_referer( 'ic_delete_all_products_confirm' ) ) {
-				global $wpdb;
-				$wpdb->query( "DELETE FROM {$wpdb->posts} WHERE post_type IN ( 'al_product' );" );
-				$wpdb->query( "DELETE meta FROM {$wpdb->postmeta} meta LEFT JOIN {$wpdb->posts} posts ON posts.ID = meta.post_id WHERE posts.ID IS NULL;" );
+					$product_ids = get_posts(
+						array(
+							'post_type'      => 'al_product',
+							'post_status'    => get_post_stati( array(), 'names' ),
+							'posts_per_page' => -1,
+							'fields'         => 'ids',
+							'no_found_rows'  => true,
+						)
+					);
+				foreach ( $product_ids as $product_id ) {
+					wp_delete_post( (int) $product_id, true );
+				}
 				if ( function_exists( 'ic_delete_all_attribute_terms' ) ) {
 					ic_delete_all_attribute_terms();
 				}
@@ -54,25 +63,19 @@ function ic_system_status() {
 			}
 		} elseif ( isset( $_GET['delete_all_product_categories'] ) ) {
 			if ( isset( $_GET['delete_all_product_categories_confirm'] ) && check_admin_referer( 'ic_delete_all_product_categories_confirm' ) ) {
-				global $wpdb;
-				$taxonomy  = 'al_product-cat';
-					$terms = $wpdb->get_results( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy IN (%s) ORDER BY t.name ASC", $taxonomy ) );
-
-					// Delete terms.
-				if ( $terms ) {
+					$taxonomy = 'al_product-cat';
+					$terms    = get_terms(
+						array(
+							'taxonomy'   => $taxonomy,
+							'hide_empty' => false,
+						)
+					);
+				if ( ! is_wp_error( $terms ) ) {
 					foreach ( $terms as $term ) {
-						$wpdb->delete( $wpdb->term_taxonomy, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->term_relationships, array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-						$wpdb->delete( $wpdb->terms, array( 'term_id' => $term->term_id ) );
+						wp_delete_term( (int) $term->term_id, $taxonomy );
 						delete_option( 'al_product_cat_image_' . $term->term_id );
-						if ( function_exists( 'delete_term_meta' ) ) {
-							delete_term_meta( $term->term_id, 'thumbnail_id' );
-						}
 					}
 				}
-
-					// Delete taxonomy.
-					$wpdb->delete( $wpdb->term_taxonomy, array( 'taxonomy' => $taxonomy ), array( '%s' ) );
 					implecode_success( __( 'All Catalog Categories successfully deleted!', 'ecommerce-product-catalog' ) );
 			} else {
 				echo '<h3>' . esc_html__( 'All catalog categories will be permanently deleted. Would you like to proceed?', 'ecommerce-product-catalog' ) . '</h3>';
@@ -153,20 +156,20 @@ function ic_system_status() {
 					if ( ! empty( $_GET['reassign_product_data'] ) && check_admin_referer( 'ic_reassign_product_data' ) ) {
 						$info = ic_update_product_data();
 					}
-					$button_label     = esc_html__( 'Reassign data', 'ecommerce-product-catalog' );
-					$done             = get_option( 'ic_update_product_data_done', 0 );
-					$scope            = ic_update_product_data_scope();
-					$scope_options    = ic_update_product_data_status_options();
-					$scope_disabled   = ! empty( $done ) ? ' disabled="disabled"' : '';
+					$button_label   = esc_html__( 'Reassign data', 'ecommerce-product-catalog' );
+					$done           = get_option( 'ic_update_product_data_done', 0 );
+					$scope          = ic_update_product_data_scope();
+					$scope_options  = ic_update_product_data_status_options();
+					$scope_disabled = ! empty( $done ) ? ' disabled="disabled"' : '';
 					if ( ! empty( $done ) ) {
 						$button_label = esc_html__( 'Speed up', 'ecommerce-product-catalog' );
 					}
-						$reassign_data  = '<form method="get" action="' . esc_url( admin_url( 'edit.php' ) ) . '" style="display:inline-block; margin-right:8px;">';
-					$reassign_data .= '<input type="hidden" name="post_type" value="al_product" />';
-					$reassign_data .= '<input type="hidden" name="page" value="system.php" />';
-					$reassign_data .= '<input type="hidden" name="reassign_product_data" value="1" />';
-					$reassign_data .= wp_nonce_field( 'ic_reassign_product_data', '_wpnonce', true, false );
-					$reassign_data .= '<select name="reassign_product_data_status"' . $scope_disabled . '>';
+						$reassign_data = '<form method="get" action="' . esc_url( admin_url( 'edit.php' ) ) . '" style="display:inline-block; margin-right:8px;">';
+					$reassign_data    .= '<input type="hidden" name="post_type" value="al_product" />';
+					$reassign_data    .= '<input type="hidden" name="page" value="system.php" />';
+					$reassign_data    .= '<input type="hidden" name="reassign_product_data" value="1" />';
+					$reassign_data    .= wp_nonce_field( 'ic_reassign_product_data', '_wpnonce', true, false );
+					$reassign_data    .= '<select name="reassign_product_data_status"' . $scope_disabled . '>';
 					foreach ( $scope_options as $scope_key => $scope_label ) {
 						$reassign_data .= '<option value="' . esc_attr( $scope_key ) . '"' . selected( $scope, $scope_key, false ) . '>' . esc_html( $scope_label ) . '</option>';
 					}
@@ -175,12 +178,12 @@ function ic_system_status() {
 					$reassign_data .= '</form>';
 					if ( ! empty( $done ) ) {
 							$reassign_data .= '<form method="get" action="' . esc_url( admin_url( 'edit.php' ) ) . '" style="display:inline-block;vertical-align:top;">';
-						$reassign_data .= '<input type="hidden" name="post_type" value="al_product" />';
-						$reassign_data .= '<input type="hidden" name="page" value="system.php" />';
-						$reassign_data .= '<input type="hidden" name="stop_reassign_product_data" value="1" />';
-						$reassign_data .= wp_nonce_field( 'ic_stop_reassign_product_data', '_wpnonce', true, false );
-						$reassign_data .= '<button type="submit" class="button">' . esc_html__( 'Stop', 'ecommerce-product-catalog' ) . '</button>';
-						$reassign_data .= '</form>';
+						$reassign_data     .= '<input type="hidden" name="post_type" value="al_product" />';
+						$reassign_data     .= '<input type="hidden" name="page" value="system.php" />';
+						$reassign_data     .= '<input type="hidden" name="stop_reassign_product_data" value="1" />';
+						$reassign_data     .= wp_nonce_field( 'ic_stop_reassign_product_data', '_wpnonce', true, false );
+						$reassign_data     .= '<button type="submit" class="button">' . esc_html__( 'Stop', 'ecommerce-product-catalog' ) . '</button>';
+						$reassign_data     .= '</form>';
 					}
 					$reassign_data .= '<p>' . esc_html__( 'Status scope:', 'ecommerce-product-catalog' ) . ' ' . esc_html( ic_update_product_data_scope_label( $scope ) ) . '</p>';
 					if ( ! empty( $done ) ) {
@@ -195,7 +198,7 @@ function ic_system_status() {
 					?>
 						<td>
 							<?php
-							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 							echo $reassign_data;
 							?>
 						</td>
@@ -204,7 +207,7 @@ function ic_system_status() {
 				</tbody>
 			</table>
 			<p></p>
-			<table class="widefat" cellspacing="0" id="status">
+			<table class="widefat" cellspacing="0" id="ic-wordpress-environment-status">
 				<thead>
 				<tr>
 						<th colspan="2"><?php esc_html_e( 'WordPress Environment', 'ecommerce-product-catalog' ); ?></th>
@@ -289,7 +292,7 @@ function ic_system_status() {
 				</tbody>
 			</table>
 			<p></p>
-			<table class="widefat" cellspacing="0" id="status">
+			<table class="widefat" cellspacing="0" id="ic-server-environment-status">
 				<thead>
 				<tr>
 						<th colspan="2"><?php esc_html_e( 'Server Environment', 'ecommerce-product-catalog' ); ?></th>
@@ -359,7 +362,7 @@ function ic_system_status() {
 				</tbody>
 			</table>
 			<p></p>
-			<table class="widefat" cellspacing="0" id="status">
+			<table class="widefat" cellspacing="0" id="ic-server-locale-status">
 				<thead>
 				<tr>
 						<th colspan="2"><?php esc_html_e( 'Server Locale', 'ecommerce-product-catalog' ); ?></th>
@@ -386,7 +389,7 @@ function ic_system_status() {
 				</tbody>
 			</table>
 			<p></p>
-			<table class="widefat" cellspacing="0" id="status">
+			<table class="widefat" cellspacing="0" id="ic-active-plugins-status">
 				<thead>
 				<tr>
 						<th colspan="2"><?php esc_html_e( 'Active Plugins', 'ecommerce-product-catalog' ); ?>
@@ -421,7 +424,7 @@ function ic_system_status() {
 						<tr>
 								<td>
 									<?php
-									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 									echo $plugin_name;
 									?>
 								</td>

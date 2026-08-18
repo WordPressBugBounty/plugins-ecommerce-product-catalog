@@ -90,6 +90,42 @@ class IC_Catalog_Hooks {
 	 */
 	public function wp() {
 		$this->action_hook_template( 'wp' );
+		$this->emit_stats_view_context();
+	}
+
+	/** Emit stable owning-module view/search actions for analytics integrations. */
+	private function emit_stats_view_context() {
+		if ( ! is_ic_catalog_page() ) {
+			return;
+		}
+		// A 404 still resolves as a catalog page, so an unresolved URL used to be
+		// recorded as a real catalog view. A missing page is not a view.
+		if ( is_404() ) {
+			return;
+		}
+		$query = array();
+		foreach ( array( 's', 'post_type', 'product_cat', 'product_tag', 'orderby', 'order' ) as $key ) {
+			$value = get_query_var( $key, '' );
+			if ( is_scalar( $value ) && '' !== (string) $value ) {
+				$query[ $key ] = sanitize_text_field( (string) $value );
+			}
+		}
+		$context = array(
+			'query'       => $query,
+			'product_id'  => is_ic_product_page() ? absint( get_queried_object_id() ) : 0,
+			'category_id' => is_ic_taxonomy_page() ? absint( get_queried_object_id() ) : 0,
+			'page_type'   => is_ic_product_page() ? 'product' : ( is_ic_taxonomy_page() ? 'category' : ( is_ic_product_search() ? 'search' : 'catalog' ) ),
+			'zero_result' => is_ic_product_search() && isset( $GLOBALS['wp_query'] ) && 0 === (int) $GLOBALS['wp_query']->found_posts,
+		);
+		if ( is_ic_product_page() ) {
+			do_action( 'ic_epc_product_viewed', $context );
+		} elseif ( is_ic_taxonomy_page() ) {
+			do_action( 'ic_epc_category_viewed', $context );
+		} elseif ( is_ic_product_search() ) {
+			do_action( 'ic_epc_search_performed', $context );
+		} else {
+			do_action( 'ic_epc_catalog_viewed', $context );
+		}
 	}
 
 	/**

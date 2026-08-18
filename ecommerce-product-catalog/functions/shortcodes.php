@@ -27,7 +27,7 @@ add_shortcode( 'display_product_categories', 'parent_cat_list' );
  *
  * @return string
  */
-function parent_cat_list( $_atts ) {
+function parent_cat_list( $_atts ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Required by the WordPress shortcode callback signature.
 	$output = wp_list_categories( 'title_li=&orderby=name&depth=1&taxonomy=al_product-cat&echo=0' );
 
 	return $output;
@@ -51,6 +51,7 @@ function product_cat_shortcode( $atts ) {
 	$available_args                 = apply_filters(
 		'show_categories_shortcode_args',
 		array(
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- The shortcode contract accepts an explicit category exclusion list.
 			'exclude'          => array(),
 			'include'          => array(),
 			'archive_template' => get_product_listing_template(),
@@ -82,12 +83,35 @@ function product_cat_shortcode( $atts ) {
 	if ( ! empty( $per_row ) ) {
 		ic_save_global( 'shortcode_per_row', $per_row, true );
 	}
-	$cache_order   = 'ASC' === $args['order'] ? '' : $args['order'];
-	$cache_orderby = 'name' === $args['orderby'] ? '' : $args['orderby'];
-	if ( '' === $args['parent'] && empty( $args['include'] ) ) {
+	$term_query_args      = array_diff_key(
+		$args,
+		array_flip(
+			array(
+				'archive_template',
+				'sort',
+				'shortcode_query',
+				'per_row',
+				'parent',
+				'include',
+				'exclude',
+				'order',
+				'orderby',
+				'taxonomy',
+			)
+		)
+	);
+	$render_subcategories = '' === $args['parent'] && empty( $args['include'] );
+	if ( $render_subcategories ) {
+		$args['parent'] = 0;
+	} elseif ( is_numeric( $args['parent'] ) ) {
+		$args['parent'] = (int) $args['parent'];
+	}
+	if ( 'ASC' !== $args['order'] ) {
+		$term_query_args['order'] = $args['order'];
+	}
+	if ( $render_subcategories ) {
 
-		$args['parent'] = '0';
-			$cats       = apply_filters( 'ic_categories_ready_to_show', ic_catalog_get_categories( $args['parent'], $args['taxonomy'], '', $args['include'], $args['exclude'], $args['order'], $args['orderby'], $args ), $args );
+		$cats = apply_filters( 'ic_categories_ready_to_show', ic_catalog_get_categories( $args['parent'], $args['taxonomy'], '', $args['include'], $args['exclude'], $args['order'], $args['orderby'], $term_query_args ), $args );
 		if ( ! is_wp_error( $cats ) ) {
 			$cat_shortcode_query['count'] = count( $cats );
 			foreach ( $cats as $cat ) {
@@ -97,7 +121,7 @@ function product_cat_shortcode( $atts ) {
 			}
 		}
 	} else {
-		$cats = apply_filters( 'ic_categories_ready_to_show', ic_catalog_get_categories( $args['parent'], $args['taxonomy'], '', $args['include'], $args['exclude'], $args['order'], $args['orderby'], $args ), $args );
+		$cats = apply_filters( 'ic_categories_ready_to_show', ic_catalog_get_categories( $args['parent'], $args['taxonomy'], '', $args['include'], $args['exclude'], $args['order'], $args['orderby'], $term_query_args ), $args );
 		if ( ! is_wp_error( $cats ) ) {
 			$cat_shortcode_query['count'] = count( $cats );
 			foreach ( $cats as $cat ) {
@@ -313,7 +337,7 @@ add_shortcode( 'back_to_products_url', 'ic_back_to_prodcts_url' );
  *
  * @return string
  */
-function ic_back_to_prodcts_url( $_atts ) {
+function ic_back_to_prodcts_url( $_atts ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Required by the WordPress shortcode callback signature.
 	return get_back_to_products_url();
 }
 

@@ -794,11 +794,11 @@ function ic_epc_render_category_archive_url_row( $row ) {
 	?>
 	<tr>
 		<td>
-			<span title="<?php echo esc_attr( sprintf( __( 'By default, the category parent slug cannot be the same as for products. If you want them to be the same, please look for %s extension in the catalog extensions menu.', 'ecommerce-product-catalog' ), 'Smarter Product URLs' ) ); ?>" class="dashicons dashicons-editor-help ic_tip"></span>
+			<span title="<?php /* translators: %s: extension name. */ echo esc_attr( sprintf( __( 'By default, the category parent slug cannot be the same as for products. If you want them to be the same, please look for %s extension in the catalog extensions menu.', 'ecommerce-product-catalog' ), 'Smarter Product URLs' ) ); ?>" class="dashicons dashicons-editor-help ic_tip"></span>
 			<?php esc_html_e( 'Categories Parent URL', 'ecommerce-product-catalog' ); ?>:
 		</td>
 		<td class="longer">
-			<?php echo esc_html( $site_url ); ?>/<input type="text" name="archive_multiple_settings[category_archive_url]" title="<?php echo esc_attr( sprintf( __( 'Cannot be the same as product listing page slug (%s).', 'ecommerce-product-catalog' ), get_product_slug() ) ); ?>" id="category_archive_url" value="<?php echo esc_attr( urldecode( sanitize_title( $archive_multiple_settings['category_archive_url'] ) ) ); ?>"/>/<?php esc_html_e( 'category-name', 'ecommerce-product-catalog' ); ?>/
+			<?php echo esc_html( $site_url ); ?>/<input type="text" name="archive_multiple_settings[category_archive_url]" title="<?php /* translators: %s: product listing slug. */ echo esc_attr( sprintf( __( 'Cannot be the same as product listing page slug (%s).', 'ecommerce-product-catalog' ), get_product_slug() ) ); ?>" id="category_archive_url" value="<?php echo esc_attr( urldecode( sanitize_title( $archive_multiple_settings['category_archive_url'] ) ) ); ?>"/>/<?php esc_html_e( 'category-name', 'ecommerce-product-catalog' ); ?>/
 		</td>
 	</tr>
 	<?php
@@ -1232,13 +1232,14 @@ function ic_catalog_shortcode() {
  */
 function ic_create_new_listing_page() {
 	$button = '';
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Existing admin action toggle.
 	if ( ! empty( $_GET['create_new_listing_page'] ) ) {
+		// Creating the listing page inserts a post, so the request must come from the nonced button.
+		check_admin_referer( 'ic_create_new_listing_page' );
 		create_products_page();
 	}
 	$listing_id = get_product_listing_id();
 	if ( empty( $listing_id ) || 'noid' === $listing_id ) {
-		$button = ' <a class="button button-small" style="vertical-align: middle;" href="' . esc_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&create_new_listing_page=1' ) ) . '">' . esc_html__( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
+		$button = ' <a class="button button-small" style="vertical-align: middle;" href="' . esc_url( wp_nonce_url( admin_url( 'edit.php?post_type=al_product&page=product-settings.php&create_new_listing_page=1' ), 'ic_create_new_listing_page' ) ) . '">' . esc_html__( 'Create New', 'ecommerce-product-catalog' ) . '</a>';
 	}
 
 	return $button;

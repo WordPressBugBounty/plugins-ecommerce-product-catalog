@@ -120,7 +120,7 @@ class Product_Category_Filter extends WP_Widget {
 
 					// Get all terms and save them to cache.
 					ic_save_global( 'taxonomy_terms_' . $taxonomy, ic_get_terms( array( 'taxonomy' => $taxonomy ) ) );
-					$categories                = ic_catalog_get_current_categories( $taxonomy, apply_filters( 'ic_catalog_category_filter_cat_args', $category_args, $instance ) );
+					$categories                = ic_catalog_get_current_categories( $taxonomy, apply_filters( 'ic_catalog_category_filter_cat_args', $category_args, $instance ), array(), $post_ids );
 					$form                      = '';
 					$category_ids              = wp_list_pluck( $categories, 'term_id' );
 					$category_elements         = array();
@@ -193,8 +193,8 @@ class Product_Category_Filter extends WP_Widget {
 						echo $args['before_widget'];
 					}
 					if ( $title ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-						echo $args['before_title'] . $title . $args['after_title'];
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme (or is kses-filtered on the Ajax path); the title itself is escaped.
+						echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 					}
 					echo '<div class="' . esc_attr( $class ) . ' ic_ajax" data-ic_responsive_label="' . esc_attr__( 'Category', 'ecommerce-product-catalog' ) . '" data-ic_ajax="product-category-filter-container" data-ic_ajax_data="' . esc_attr(
 						wp_json_encode(

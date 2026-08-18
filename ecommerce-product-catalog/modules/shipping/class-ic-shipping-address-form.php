@@ -91,7 +91,7 @@ class IC_Shipping_Address_Form {
 	 * @return string
 	 */
 	protected static function inline_init_script() {
-		return "<script>(function($){function updateGroups(form){if(!form.length){return;}form.find('.ic-shipping-address-group').each(function(){var group=$(this),fieldName=group.data('ic-shipping-field'),selectedField,selectedValue='';if(!fieldName){return;}selectedField=form.find('input[type=\"radio\"][name=\"'+fieldName+'\"]:checked').first();if(!selectedField.length){selectedField=form.find('input[type=\"hidden\"][name=\"'+fieldName+'\"]').first();}selectedValue=selectedField.val()||'';group.find('.ic-shipping-address-option').each(function(){var option=$(this),isActive=option.data('ic-shipping-option-value')===selectedValue,fields=option.find('input, select, textarea, button');option.toggle(isActive);option.toggleClass('active',isActive);fields.prop('disabled',!isActive);fields.filter('select').trigger('chosen:updated');});});}$(function(){var script=$(document.currentScript),previous=script.prev(),group=previous.is('.ic-shipping-address-group')?previous:previous.find('.ic-shipping-address-group').first(),form=group.closest('form');updateGroups(form);if(form.length){form.off('change.icShippingAddressInline','input[type=\"radio\"][name=\"shipping\"], input[type=\"radio\"][name^=\"shipping_\"]').on('change.icShippingAddressInline','input[type=\"radio\"][name=\"shipping\"], input[type=\"radio\"][name^=\"shipping_\"]',function(){updateGroups(form);});}});})(jQuery);</script>";
+		return "<script>(function($){function markRequiredFields(fields){fields.each(function(){var field=$(this);if(field.is('[required]')||field.prop('required')){field.data('ic-shipping-address-required',true);}});}function updateRequiredFields(fields,required){fields.each(function(){var field=$(this);if(field.data('ic-shipping-address-required')){if(required){field.attr('required','required');field.prop('required',true);}else{field.removeAttr('required');field.prop('required',false);}}});}function updateSameAsBilling(option){var toggle=option.find('.ic-shipping-address-same-as-billing-toggle').first(),container=option.find('.shipping-address-form-fields-container').first();if(!toggle.length||!container.length){return;}var formFields=container.find('input, select, textarea'),fields=formFields.add(container.find('button')),same=toggle.is(':checked');markRequiredFields(formFields);container.toggle(!same);fields.prop('disabled',same);updateRequiredFields(formFields,!same);fields.filter('select').trigger('chosen:updated');}function updateGroups(form){if(!form.length){return;}form.find('.ic-shipping-address-group').each(function(){var group=$(this),fieldName=group.data('ic-shipping-field'),selectedField,selectedValue='';if(!fieldName){return;}selectedField=form.find('input[type=\"radio\"][name=\"'+fieldName+'\"]:checked').first();if(!selectedField.length){selectedField=form.find('input[type=\"hidden\"][name=\"'+fieldName+'\"]').first();}selectedValue=selectedField.val()||'';group.find('.ic-shipping-address-option').each(function(){var option=$(this),isActive=option.data('ic-shipping-option-value')===selectedValue,fields=option.find('input, select, textarea, button');option.toggle(isActive);option.toggleClass('active',isActive);fields.prop('disabled',!isActive);if(isActive){updateSameAsBilling(option);}else{option.find('.shipping-address-form-fields-container').show();}fields.filter('select').trigger('chosen:updated');});});}$(function(){var script=$(document.currentScript),previous=script.prev(),group=previous.is('.ic-shipping-address-group')?previous:previous.find('.ic-shipping-address-group').first(),form=group.closest('form');updateGroups(form);if(form.length){form.off('change.icShippingAddressInline','input[type=\"radio\"][name=\"shipping\"], input[type=\"radio\"][name^=\"shipping_\"]').on('change.icShippingAddressInline','input[type=\"radio\"][name=\"shipping\"], input[type=\"radio\"][name^=\"shipping_\"]',function(){updateGroups(form);});form.off('change.icShippingSameAsBillingInline','.ic-shipping-address-same-as-billing-toggle').on('change.icShippingSameAsBillingInline','.ic-shipping-address-same-as-billing-toggle',function(){updateSameAsBilling($(this).closest('.ic-shipping-address-option'));});}});})(jQuery);</script>";
 	}
 
 	/**
@@ -144,6 +144,10 @@ class IC_Shipping_Address_Form {
 			$is_active    = $option_slug === $selected_value;
 			$field_prefix = self::field_prefix( $pre_name, $group_index, $option_slug );
 			$field_values = self::field_values( $field_prefix );
+			$slot_field_id = self::shipping_slot_field_id( $field_prefix );
+			$same_as_billing_id = self::same_as_billing_field_id( $field_prefix );
+			$show_same_as_billing = self::same_as_billing_available( $field_slot, $pre_name );
+			$is_same_as_billing   = $show_same_as_billing && self::field_value_is_checked( isset( $field_values[ $same_as_billing_id ] ) ? $field_values[ $same_as_billing_id ] : null );
 			$fields_html  = formbuilder_raw_fields( $field_json, 2, $field_prefix, $field_values );
 			if ( ! $is_active ) {
 				$fields_html = str_replace(
@@ -166,8 +170,14 @@ class IC_Shipping_Address_Form {
 			$group_forms .= '<div class="ic-shipping-address-option' . ( $is_active ? ' active' : '' ) . '" data-ic-shipping-option-value="' . esc_attr( $option_slug ) . '"' . ( $is_active ? '' : ' style="display:none;"' ) . '>';
 			$group_forms .= '<div class="shipping-address-form-row">';
 			$group_forms .= '<div class="shipping-address-form-title"><strong>' . esc_html__( 'Shipping Address', 'ecommerce-product-catalog' ) . '</strong></div>';
+			$group_forms .= '<input class="ic-shipping-address-slot" type="hidden" name="' . esc_attr( $slot_field_id ) . '" value="' . intval( $field_slot ) . '"' . ( $is_active ? '' : ' disabled' ) . ' />';
+			if ( $show_same_as_billing ) {
+				$group_forms .= '<div class="ic-shipping-address-same-as-billing"><label><input class="ic-shipping-address-same-as-billing-toggle" type="checkbox" name="' . esc_attr( $same_as_billing_id ) . '" value="1" ' . checked( $is_same_as_billing, true, false ) . ( $is_active ? '' : ' disabled' ) . ' /> <span class="ic-shipping-address-same-as-billing-label">' . esc_html__( 'Shipping address is same as billing address', 'ecommerce-product-catalog' ) . '</span></label></div>';
+			}
+			$group_forms .= '<div class="shipping-address-form-fields-container"' . ( $is_same_as_billing ? ' style="display:none;"' : '' ) . '>';
 			$group_forms .= '<div class="shipping-address-form-fields table" data-pre_name="' . esc_attr( $field_prefix ) . '">';
 			$group_forms .= $fields_html;
+			$group_forms .= '</div>';
 			$group_forms .= '</div>';
 			$group_forms .= '</div>';
 			$group_forms .= '</div>';
@@ -331,8 +341,14 @@ class IC_Shipping_Address_Form {
 
 			$field_name = $shipping_num > 1 ? 'shipping_' . $group_index : 'shipping';
 			$selected   = '';
-			if ( null !== $this->posted_scalar_value( $field_name ) ) {
-				$selected = $this->posted_scalar_value( $field_name );
+			// Read the shipping radio through posted_shipping_option_slug(), never through a
+			// sanitize_text_field() based reader. $option_slug below and the rendered radio value are both
+			// sanitize_title() slugs, and sanitize_title() PERCENT-ENCODES non-ASCII option names, while
+			// sanitize_text_field() strips every %xx octet. That made the comparison at the bottom of this
+			// loop impossible to satisfy for any non-Latin option name, so no context was returned and
+			// validate_selected_forms() never validated the required shipping-address fields.
+			if ( null !== $this->posted_shipping_option_slug( $field_name ) ) {
+				$selected = $this->posted_shipping_option_slug( $field_name );
 			}
 			if ( '' === $selected ) {
 				$first_option = reset( $shipping_option['options'] );
@@ -352,6 +368,7 @@ class IC_Shipping_Address_Form {
 					'field_name'      => $field_name,
 					'selected'        => $selected,
 					'prefix'          => self::field_prefix( $pre_name, $group_index, $option_slug ),
+					'slot'            => self::option_slot( $option ),
 					'shipping_option' => $shipping_option,
 					'option'          => $option,
 					'fields'          => json_decode( ic_get_shipping_address_form_fields( self::option_slot( $option ), $pre_name ) ),
@@ -382,13 +399,39 @@ class IC_Shipping_Address_Form {
 		}
 
 		foreach ( $this->posted_shipping_address_contexts( $pre_name ) as $context ) {
-			if ( empty( $context['prefix'] ) || isset( $contexts[ $context['prefix'] ] ) ) {
+			if ( empty( $context['prefix'] ) ) {
 				continue;
 			}
 			$contexts[ $context['prefix'] ] = $context;
 		}
 
 		return array_values( $contexts );
+	}
+
+	/**
+	 * Returns true when one reconstructed prefix is a nested derivative of another.
+	 *
+	 * @param string $prefix Candidate shipping-address field prefix.
+	 * @param array  $contexts Existing contexts keyed by prefix.
+	 *
+	 * @return bool
+	 */
+	protected function context_prefix_is_nested( $prefix, $contexts ) {
+		if ( empty( $prefix ) || empty( $contexts ) || ! is_array( $contexts ) ) {
+			return false;
+		}
+
+		foreach ( array_keys( $contexts ) as $existing_prefix ) {
+			$existing_prefix = (string) $existing_prefix;
+			if ( '' === $existing_prefix || $existing_prefix === $prefix ) {
+				continue;
+			}
+			if ( 0 === strpos( $prefix, $existing_prefix ) || 0 === strpos( $existing_prefix, $prefix ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -429,6 +472,38 @@ class IC_Shipping_Address_Form {
 					continue;
 				}
 
+					if ( substr( $posted_field_name, -strlen( 'shipping_slot' ) ) === 'shipping_slot' ) {
+						$prefix = substr( $posted_field_name, 0, -strlen( 'shipping_slot' ) );
+						if ( ! $this->is_supported_shipping_address_prefix( $prefix ) ) {
+							continue;
+						}
+						if ( $this->context_prefix_is_nested( $prefix, $contexts ) ) {
+							continue;
+						}
+
+						$posted_slot = intval( $this->posted_field_value( $posted_field_name ) );
+						if ( $posted_slot < 1 ) {
+							continue;
+						}
+
+					$posted_slot_fields = $this->best_admin_shipping_address_fields_for_prefix( $prefix, $posted_slot, $pre_name, $posted );
+					if ( empty( $posted_slot_fields ) ) {
+						continue;
+					}
+
+					$contexts[ $prefix ] = array(
+						'group_index'     => 0,
+						'field_name'      => '',
+						'selected'        => '',
+						'prefix'          => $prefix,
+						'slot'            => $posted_slot,
+						'shipping_option' => array(),
+						'option'          => array(),
+						'fields'          => $posted_slot_fields,
+					);
+					continue;
+				}
+
 				foreach ( $field_definitions as $field ) {
 					if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
 						continue;
@@ -443,15 +518,27 @@ class IC_Shipping_Address_Form {
 					if ( ! $this->is_supported_shipping_address_prefix( $prefix ) ) {
 						continue;
 					}
+					if ( isset( $contexts[ $prefix ] ) ) {
+						break;
+					}
+					if ( $this->context_prefix_is_nested( $prefix, $contexts ) ) {
+						break;
+					}
+
+					$matched_fields = $this->best_admin_shipping_address_fields_for_prefix( $prefix, $slot, $pre_name, $posted );
+					if ( empty( $matched_fields ) ) {
+						break;
+					}
 
 					$contexts[ $prefix ] = array(
 						'group_index'     => 0,
 						'field_name'      => '',
 						'selected'        => '',
 						'prefix'          => $prefix,
+						'slot'            => $slot,
 						'shipping_option' => array(),
 						'option'          => array(),
-						'fields'          => $fields,
+						'fields'          => $matched_fields,
 					);
 					break;
 				}
@@ -472,6 +559,55 @@ class IC_Shipping_Address_Form {
 	 */
 	protected static function field_prefix( $pre_name, $group_index, $option_slug ) {
 		return $pre_name . 'shipping_address_' . intval( $group_index ) . '_' . sanitize_key( $option_slug ) . '_';
+	}
+
+	/**
+	 * Returns the same-as-billing field identifier for one shipping option form.
+	 *
+	 * @param string $prefix Shipping-address field prefix.
+	 *
+	 * @return string
+	 */
+	protected static function same_as_billing_field_id( $prefix ) {
+		return $prefix . 'same_as_billing';
+	}
+
+	/**
+	 * Returns the hidden shipping-slot field identifier for one shipping option form.
+	 *
+	 * @param string $prefix Shipping-address field prefix.
+	 *
+	 * @return string
+	 */
+	protected static function shipping_slot_field_id( $prefix ) {
+		return $prefix . 'shipping_slot';
+	}
+
+	/**
+	 * Returns true when the value represents a checked checkbox state.
+	 *
+	 * @param mixed $field_value Field value.
+	 *
+	 * @return bool
+	 */
+	protected static function field_value_is_checked( $field_value ) {
+		if ( is_array( $field_value ) ) {
+			return ! empty( array_filter( $field_value ) );
+		}
+
+		return ! empty( $field_value );
+	}
+
+	/**
+	 * Returns true when the same-as-billing checkbox should be shown.
+	 *
+	 * @param int    $field_slot Shipping slot number.
+	 * @param string $pre_name Checkout prefix.
+	 *
+	 * @return bool
+	 */
+	public static function same_as_billing_available( $field_slot, $pre_name = '' ) {
+		return (bool) apply_filters( 'ic_shipping_same_as_billing_available', true, intval( $field_slot ), $pre_name );
 	}
 
 	/**
@@ -520,14 +656,131 @@ class IC_Shipping_Address_Form {
 		}
 
 		$fields_json = ic_get_shipping_address_form_fields( $slot, $pre_name );
-		$fields      = json_decode( $fields_json );
+		return $this->decoded_shipping_address_fields( $fields_json );
+	}
+
+	/**
+	 * Returns decoded shipping-address fields for one JSON payload.
+	 *
+	 * @param string $fields_json Shipping-address formbuilder JSON.
+	 *
+	 * @return object|null
+	 */
+	protected function decoded_shipping_address_fields( $fields_json ) {
+		$fields = json_decode( $fields_json );
 		if ( empty( $fields->fields ) || ! is_array( $fields->fields ) ) {
 			return null;
 		}
 
-		$fields->ic_fields_json = $fields_json;
+		$fields->ic_fields_json = (string) $fields_json;
 
 		return $fields;
+	}
+
+	/**
+	 * Returns additional shipping-address field candidates for a slot.
+	 *
+	 * @param int    $slot Shipping option slot.
+	 * @param string $pre_name Checkout prefix.
+	 *
+	 * @return array
+	 */
+	protected function additional_admin_shipping_address_field_sets_for_slot( $slot, $pre_name ) {
+		if ( 'quote_cart_' !== $pre_name || ! function_exists( 'ic_get_quote_cart_shipping_address_forms' ) ) {
+			return array();
+		}
+
+		$field_sets = array();
+		$slot       = intval( $slot );
+		foreach ( ic_get_quote_cart_shipping_address_forms() as $key => $form ) {
+			if ( is_array( $form ) ) {
+				if ( empty( $form[ $slot ] ) ) {
+					continue;
+				}
+				$fields = $this->decoded_shipping_address_fields( $form[ $slot ] );
+				if ( empty( $fields ) ) {
+					continue;
+				}
+				$field_sets[ 'location_' . intval( $key ) . '_' . $slot ] = $fields;
+			} elseif ( intval( $key ) === $slot ) {
+				$fields = $this->decoded_shipping_address_fields( $form );
+				if ( empty( $fields ) ) {
+					continue;
+				}
+				$field_sets[ 'slot_' . $slot ] = $fields;
+			}
+		}
+
+		return $field_sets;
+	}
+
+	/**
+	 * Returns all candidate field sets for a slot.
+	 *
+	 * @param int    $slot Shipping option slot.
+	 * @param string $pre_name Checkout prefix.
+	 *
+	 * @return array
+	 */
+	protected function candidate_admin_shipping_address_field_sets_for_slot( $slot, $pre_name ) {
+		$field_sets = array();
+		$fields     = $this->admin_shipping_address_fields_for_slot( $slot, $pre_name );
+		if ( ! empty( $fields ) ) {
+			$field_sets[ 'runtime_' . intval( $slot ) ] = $fields;
+		}
+
+		foreach ( $this->additional_admin_shipping_address_field_sets_for_slot( $slot, $pre_name ) as $key => $additional_fields ) {
+			if ( empty( $additional_fields ) ) {
+				continue;
+			}
+			$field_sets[ $key ] = $additional_fields;
+		}
+
+		return $field_sets;
+	}
+
+	/**
+	 * Returns the best matching field set for one posted shipping-address prefix.
+	 *
+	 * @param string $prefix Shipping-address field prefix.
+	 * @param int    $slot Shipping option slot.
+	 * @param string $pre_name Checkout prefix.
+	 * @param array  $posted Posted request data.
+	 *
+	 * @return object|null
+	 */
+	protected function best_admin_shipping_address_fields_for_prefix( $prefix, $slot, $pre_name, $posted ) {
+		$candidates = $this->candidate_admin_shipping_address_field_sets_for_slot( $slot, $pre_name );
+		if ( empty( $candidates ) ) {
+			return null;
+		}
+
+		$best_candidate = null;
+		$best_score     = -1;
+		foreach ( $candidates as $candidate ) {
+			if ( empty( $candidate->fields ) || ! is_array( $candidate->fields ) ) {
+				continue;
+			}
+
+			$score = 0;
+			foreach ( $candidate->fields as $field ) {
+				if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
+					continue;
+				}
+
+				$field_id = ic_formbuilder_field_cid( $field, $prefix );
+				if ( array_key_exists( $field_id, $posted ) ) {
+					++$score;
+				}
+			}
+
+			if ( $score > $best_score ) {
+				$best_candidate = $candidate;
+				$best_score     = $score;
+			}
+		}
+
+		return $best_candidate;
 	}
 
 	/**
@@ -713,13 +966,13 @@ class IC_Shipping_Address_Form {
 	 * @return array
 	 */
 	protected function posted_admin_shipping_address_contexts() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		if ( empty( $_POST['ic_admin_shipping_address_slots'] ) || ! is_array( $_POST['ic_admin_shipping_address_slots'] ) ) {
 			return array();
 		}
 
 		$contexts = array();
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		$posted_slots = wp_unslash( $_POST['ic_admin_shipping_address_slots'] );
 		foreach ( $posted_slots as $prefix => $slot ) {
 			$prefix = sanitize_key( $prefix );
@@ -753,12 +1006,12 @@ class IC_Shipping_Address_Form {
 	 * @return mixed|null
 	 */
 	protected function posted_admin_field_value( $field_id ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		if ( ! isset( $_POST[ $field_id ] ) ) {
 			return null;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		$field_value = wp_unslash( $_POST[ $field_id ] );
 		if ( is_array( $field_value ) ) {
 			return array_map( 'sanitize_text_field', $field_value );
@@ -790,6 +1043,7 @@ class IC_Shipping_Address_Form {
 
 		$payment_details = ic_get_order_payment_details( $order_id );
 		$summary         = '';
+		$contexts_payload = array();
 		foreach ( $contexts as $context ) {
 			$rows = '';
 			foreach ( $context['fields']->fields as $field ) {
@@ -817,9 +1071,15 @@ class IC_Shipping_Address_Form {
 			}
 
 			$summary .= $rows . '<br>';
+			$contexts_payload[] = $this->build_admin_context_payload( $context );
 		}
 
 		$payment_details['shipping_address'] = preg_replace( '/(?:<br>)+$/', '', $summary );
+		if ( ! empty( $contexts_payload ) ) {
+			$payment_details[ self::payment_details_contexts_key() ] = $contexts_payload;
+		} else {
+			unset( $payment_details[ self::payment_details_contexts_key() ] );
+		}
 		update_post_meta( $order_id, '_payment_details', $payment_details );
 	}
 
@@ -831,16 +1091,17 @@ class IC_Shipping_Address_Form {
 	 * @return void
 	 */
 	protected function save_admin_shipping_address_summary( $order_id ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		if ( ! isset( $_POST['ic_admin_shipping_address_summary'] ) ) {
 			return;
 		}
 
 		$payment_details = ic_get_order_payment_details( $order_id );
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent order save handler verifies the order nonce before firing update_digital_order.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reached only via the update_digital_order hook, whose handler runs current_user_can( 'edit_digital_order' ) and an order-nonce check first. NOTE: that upstream nonce check only rejects a nonce that is present and invalid, so it is the capability check that is load-bearing here; every value read below is sanitized.
 		$summary = sanitize_textarea_field( wp_unslash( $_POST['ic_admin_shipping_address_summary'] ) );
 
 		$payment_details['shipping_address'] = nl2br( esc_html( $summary ) );
+		unset( $payment_details[ self::payment_details_contexts_key() ] );
 		update_post_meta( $order_id, '_payment_details', $payment_details );
 	}
 
@@ -874,20 +1135,28 @@ class IC_Shipping_Address_Form {
 	}
 
 	/**
-	 * Returns one posted scalar value.
+	 * Returns one posted shipping-option slug.
 	 *
-	 * @param string $field_id Field identifier.
+	 * Deliberately separate from the generic readers (posted_field_value() and posted_request_data()),
+	 * which serve the free-text address fields (names, streets, notes) where sanitize_text_field() is
+	 * correct and slugifying the value would mangle it. Only the shipping radios carry a
+	 * sanitize_title() slug, and sanitize_title() percent-encodes non-ASCII option names, so
+	 * sanitize_text_field() -- which strips every %xx octet -- destroys them. sanitize_title() is
+	 * idempotent on an already-slugged value, so it is the only normalizer that can agree with the
+	 * sanitize_title()-built option slugs this value is compared against.
+	 *
+	 * @param string $field_id Shipping radio field name (shipping or shipping_N).
 	 *
 	 * @return string|null
 	 */
-	protected function posted_scalar_value( $field_id ) {
+	protected function posted_shipping_option_slug( $field_id ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shipping address fields are processed during the parent checkout form submission.
 		if ( ! isset( $_POST[ $field_id ] ) ) {
 			return null;
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shipping address fields are processed during the parent checkout form submission.
-		return sanitize_text_field( wp_unslash( $_POST[ $field_id ] ) );
+		return sanitize_title( wp_unslash( $_POST[ $field_id ] ) );
 	}
 
 	/**
@@ -914,6 +1183,296 @@ class IC_Shipping_Address_Form {
 	}
 
 	/**
+	 * Returns true when the request selected "same as billing" for one context.
+	 *
+	 * @param array $context Shipping-address context.
+	 *
+	 * @return bool
+	 */
+	protected function is_same_as_billing_context( $context ) {
+		if ( empty( $context['prefix'] ) ) {
+			return false;
+		}
+
+		$field_id    = self::same_as_billing_field_id( $context['prefix'] );
+		$field_value = $this->posted_field_value( $field_id );
+		if ( null === $field_value ) {
+			$field_values = self::field_values( $context['prefix'] );
+			$field_value  = isset( $field_values[ $field_id ] ) ? $field_values[ $field_id ] : null;
+		}
+
+		return self::field_value_is_checked( $field_value );
+	}
+
+	/**
+	 * Returns the summary used when shipping matches billing.
+	 *
+	 * @return string
+	 */
+	protected static function same_as_billing_summary() {
+		return esc_html__( 'Shipping address is same as billing address', 'ecommerce-product-catalog' );
+	}
+
+	/**
+	 * Returns the payment-details key used for structured shipping contexts.
+	 *
+	 * @return string
+	 */
+	protected static function payment_details_contexts_key() {
+		return '_shipping_address_contexts';
+	}
+
+	/**
+	 * Returns structured shipping contexts saved in payment details.
+	 *
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return array
+	 */
+	public function payment_details_contexts( $payment_details ) {
+		if ( empty( $payment_details ) || ! is_array( $payment_details ) ) {
+			return array();
+		}
+
+		$contexts_key = self::payment_details_contexts_key();
+		if ( ! empty( $payment_details[ $contexts_key ] ) && is_array( $payment_details[ $contexts_key ] ) ) {
+			$contexts = $this->normalize_payment_details_contexts( $payment_details[ $contexts_key ] );
+			if ( ! empty( $contexts ) ) {
+				return $contexts;
+			}
+		}
+
+		$contexts = $this->build_saved_payment_details_contexts( $payment_details );
+		if ( ! empty( $contexts ) ) {
+			return $contexts;
+		}
+
+		if ( ! empty( $payment_details['shipping_address'] ) && trim( wp_strip_all_tags( $payment_details['shipping_address'] ) ) === self::same_as_billing_summary() ) {
+			return array(
+				array(
+					'slot'            => 0,
+					'pre_name'        => '',
+					'prefix'          => '',
+					'same_as_billing' => true,
+					'fields_json'     => '',
+					'values'          => array(),
+				),
+			);
+		}
+
+		return array();
+	}
+
+	/**
+	 * Normalizes structured shipping contexts loaded from saved payment details.
+	 *
+	 * @param array $contexts Raw contexts.
+	 *
+	 * @return array
+	 */
+	protected function normalize_payment_details_contexts( $contexts ) {
+		$normalized = array();
+		foreach ( $contexts as $context ) {
+			if ( ! is_array( $context ) ) {
+				continue;
+			}
+
+			$fields_json = '';
+			if ( isset( $context['fields_json'] ) && is_string( $context['fields_json'] ) ) {
+				$decoded_fields = json_decode( $context['fields_json'] );
+				$fields_json    = ! empty( $decoded_fields ) ? wp_json_encode( $decoded_fields ) : sanitize_text_field( $context['fields_json'] );
+			}
+
+			$normalized[] = array(
+				'slot'            => ! empty( $context['slot'] ) ? intval( $context['slot'] ) : 0,
+				'pre_name'        => ! empty( $context['pre_name'] ) ? sanitize_key( $context['pre_name'] ) : '',
+				'prefix'          => ! empty( $context['prefix'] ) ? sanitize_key( $context['prefix'] ) : '',
+				'same_as_billing' => ! empty( $context['same_as_billing'] ),
+				'fields_json'     => $fields_json,
+				'values'          => $this->sanitize_context_values( isset( $context['values'] ) ? $context['values'] : array() ),
+			);
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Sanitizes structured field values for one shipping context.
+	 *
+	 * @param array $values Raw field values.
+	 *
+	 * @return array
+	 */
+	protected function sanitize_context_values( $values ) {
+		if ( ! is_array( $values ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		foreach ( $values as $cid => $value ) {
+			$cid = sanitize_key( $cid );
+			if ( '' === $cid ) {
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$sanitized[ $cid ] = array_map( 'sanitize_text_field', $value );
+			} else {
+				$sanitized[ $cid ] = sanitize_text_field( $value );
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Builds structured contexts from saved legacy payment details.
+	 *
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return array
+	 */
+	protected function build_saved_payment_details_contexts( $payment_details ) {
+		$contexts = array();
+		foreach ( $this->saved_admin_shipping_address_contexts( $payment_details ) as $context ) {
+			$payload = $this->build_context_payload_from_saved_payment_details( $context, $payment_details );
+			if ( empty( $payload ) ) {
+				continue;
+			}
+
+			$contexts[] = $payload;
+		}
+
+		return $contexts;
+	}
+
+	/**
+	 * Builds a structured context payload from saved raw payment-detail fields.
+	 *
+	 * @param array $context         Shipping-address context.
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return array
+	 */
+	protected function build_context_payload_from_saved_payment_details( $context, $payment_details ) {
+		if ( empty( $context['prefix'] ) || empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
+			return array();
+		}
+
+		$payload = array(
+			'slot'            => ! empty( $context['slot'] ) ? intval( $context['slot'] ) : 0,
+			'pre_name'        => ! empty( $context['pre_name'] ) ? $context['pre_name'] : $this->pre_name_from_shipping_address_prefix( $context['prefix'] ),
+			'prefix'          => $context['prefix'],
+			'same_as_billing' => false,
+			'fields_json'     => ! empty( $context['fields_json'] ) ? (string) $context['fields_json'] : '',
+			'values'          => array(),
+		);
+
+		foreach ( $context['fields']->fields as $field ) {
+			if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
+				continue;
+			}
+
+			$field_id = ic_formbuilder_field_cid( $field, $context['prefix'] );
+			if ( ! array_key_exists( $field_id, $payment_details ) ) {
+				continue;
+			}
+
+			$payload['values'][ $field->cid ] = $payment_details[ $field_id ];
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Builds a structured context payload from the current checkout request.
+	 *
+	 * @param array $context Shipping-address context.
+	 *
+	 * @return array
+	 */
+	protected function build_request_context_payload( $context ) {
+		if ( empty( $context['prefix'] ) ) {
+			return array();
+		}
+
+		$payload = array(
+			'slot'            => ! empty( $context['slot'] ) ? intval( $context['slot'] ) : 0,
+			'pre_name'        => $this->pre_name_from_shipping_address_prefix( $context['prefix'] ),
+			'prefix'          => $context['prefix'],
+			'same_as_billing' => $this->is_same_as_billing_context( $context ),
+			'fields_json'     => ! empty( $context['fields']->ic_fields_json ) ? $context['fields']->ic_fields_json : '',
+			'values'          => array(),
+		);
+
+		if ( empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
+			return $payload;
+		}
+
+		foreach ( $context['fields']->fields as $field ) {
+			if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
+				continue;
+			}
+
+			$field_id    = ic_formbuilder_field_cid( $field, $context['prefix'] );
+			$field_value = $this->posted_field_value( $field_id );
+			if ( null === $field_value ) {
+				$field_values = self::field_values( $context['prefix'] );
+				$field_value  = isset( $field_values[ $field_id ] ) ? $field_values[ $field_id ] : null;
+			}
+			if ( null === $field_value ) {
+				continue;
+			}
+
+			$payload['values'][ $field->cid ] = $field_value;
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Builds a structured context payload from admin-posted shipping-address fields.
+	 *
+	 * @param array $context Shipping-address context.
+	 *
+	 * @return array
+	 */
+	protected function build_admin_context_payload( $context ) {
+		if ( empty( $context['prefix'] ) ) {
+			return array();
+		}
+
+		$payload = array(
+			'slot'            => ! empty( $context['slot'] ) ? intval( $context['slot'] ) : 0,
+			'pre_name'        => ! empty( $context['pre_name'] ) ? $context['pre_name'] : $this->pre_name_from_shipping_address_prefix( $context['prefix'] ),
+			'prefix'          => $context['prefix'],
+			'same_as_billing' => false,
+			'fields_json'     => ! empty( $context['fields']->ic_fields_json ) ? $context['fields']->ic_fields_json : '',
+			'values'          => array(),
+		);
+
+		if ( empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
+			return $payload;
+		}
+
+		foreach ( $context['fields']->fields as $field ) {
+			if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
+				continue;
+			}
+
+			$field_id    = ic_formbuilder_field_cid( $field, $context['prefix'] );
+			$field_value = $this->posted_admin_field_value( $field_id );
+			if ( null === $field_value ) {
+				continue;
+			}
+
+			$payload['values'][ $field->cid ] = $field_value;
+		}
+
+		return $payload;
+	}
+
+	/**
 	 * Adds selected shipping-address fields to the saved form values.
 	 *
 	 * @param array $filled_fields Existing filled fields.
@@ -928,6 +1487,10 @@ class IC_Shipping_Address_Form {
 
 		foreach ( $pre_names as $pre_name ) {
 			foreach ( $this->request_shipping_address_contexts( $pre_name ) as $context ) {
+				if ( $this->is_same_as_billing_context( $context ) ) {
+					continue;
+				}
+
 				if ( empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
 					continue;
 				}
@@ -968,6 +1531,10 @@ class IC_Shipping_Address_Form {
 
 		foreach ( $pre_names as $pre_name ) {
 			foreach ( $this->request_shipping_address_contexts( $pre_name ) as $context ) {
+				if ( $this->is_same_as_billing_context( $context ) ) {
+					continue;
+				}
+
 				if ( empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
 					continue;
 				}
@@ -1020,8 +1587,21 @@ class IC_Shipping_Address_Form {
 	public function save_shipping_address_summary( $payment_details ) {
 		foreach ( $this->request_pre_names( $this->submitted_form_name() ) as $pre_name ) {
 			$shipping_address = $this->render_selected_shipping_address( $pre_name );
-			if ( ! empty( $shipping_address ) ) {
+			$contexts         = array();
+			foreach ( $this->request_shipping_address_contexts( $pre_name ) as $context ) {
+				$payload = $this->build_request_context_payload( $context );
+				if ( empty( $payload ) ) {
+					continue;
+				}
+
+				$contexts[] = $payload;
+			}
+
+			if ( ! empty( $shipping_address ) || ! empty( $contexts ) ) {
 				$payment_details['shipping_address'] = $shipping_address;
+				if ( ! empty( $contexts ) ) {
+					$payment_details[ self::payment_details_contexts_key() ] = $contexts;
+				}
 
 				return $payment_details;
 			}
@@ -1038,17 +1618,32 @@ class IC_Shipping_Address_Form {
 	 * @return array
 	 */
 	public function add_shipping_address_to_payment_details( $payment_details ) {
-		if ( ! is_array( $payment_details ) || ! empty( $payment_details['shipping_address'] ) ) {
+		if ( ! is_array( $payment_details ) ) {
 			return $payment_details;
 		}
 
 		foreach ( $this->request_pre_names( $this->submitted_form_name() ) as $pre_name ) {
 			$shipping_address = $this->render_selected_shipping_address( $pre_name );
-			if ( empty( $shipping_address ) ) {
+			$contexts         = array();
+			foreach ( $this->request_shipping_address_contexts( $pre_name ) as $context ) {
+				$payload = $this->build_request_context_payload( $context );
+				if ( empty( $payload ) ) {
+					continue;
+				}
+
+				$contexts[] = $payload;
+			}
+
+			if ( empty( $shipping_address ) && empty( $contexts ) ) {
 				continue;
 			}
 
-			$payment_details['shipping_address'] = $shipping_address;
+			if ( empty( $payment_details['shipping_address'] ) ) {
+				$payment_details['shipping_address'] = $shipping_address;
+			}
+			if ( empty( $payment_details[ self::payment_details_contexts_key() ] ) && ! empty( $contexts ) ) {
+				$payment_details[ self::payment_details_contexts_key() ] = $contexts;
+			}
 
 			return $payment_details;
 		}
@@ -1070,7 +1665,11 @@ class IC_Shipping_Address_Form {
 		}
 
 		if ( is_numeric( $pre_name ) && function_exists( 'ic_get_order_payment_details' ) ) {
-			$payment_details = ic_get_order_payment_details( intval( $pre_name ) );
+			$payment_details  = ic_get_order_payment_details( intval( $pre_name ) );
+			$shipping_address = $this->render_saved_notification_shipping_address( $payment_details );
+			if ( '' !== $shipping_address ) {
+				return $shipping_address;
+			}
 			if ( ! empty( $payment_details['shipping_address'] ) ) {
 				return $payment_details['shipping_address'];
 			}
@@ -1091,6 +1690,175 @@ class IC_Shipping_Address_Form {
 	}
 
 	/**
+	 * Returns notification shipping-address HTML rendered from saved structured contexts.
+	 *
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return string
+	 */
+	protected function render_saved_notification_shipping_address( $payment_details ) {
+		if ( empty( $payment_details ) || ! is_array( $payment_details ) ) {
+			return '';
+		}
+
+		$contexts = $this->payment_details_contexts( $payment_details );
+		if ( empty( $contexts ) ) {
+			return '';
+		}
+
+		$output = '';
+		foreach ( $contexts as $context ) {
+			$rows = $this->render_saved_notification_context_rows( $context, $payment_details );
+			if ( '' === $rows ) {
+				continue;
+			}
+
+			$output .= $rows . '<br>';
+		}
+
+		return preg_replace( '/(?:<br>)+$/', '', $output );
+	}
+
+	/**
+	 * Renders one saved structured shipping-address context for notifications.
+	 *
+	 * @param array $context         Saved shipping-address context.
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return string
+	 */
+	protected function render_saved_notification_context_rows( $context, $payment_details ) {
+		$fields = $this->context_fields( $context );
+		if ( empty( $fields ) ) {
+			return '';
+		}
+
+		$rows = '';
+		foreach ( $fields as $field ) {
+			if ( empty( $field->cid ) || 'section_break' === $field->field_type ) {
+				continue;
+			}
+
+			$field_value = $this->saved_notification_context_field_value( $context, $field, $payment_details );
+			if ( null === $field_value ) {
+				continue;
+			}
+			$field_value = $this->normalize_notification_field_value( $field_value, $field );
+			if ( '' === trim( (string) $field_value ) ) {
+				continue;
+			}
+
+			$rows .= ic_message_row( $field, $field_value, $field->cid, '<br>', false );
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * Returns the decoded field definitions for a saved shipping-address context.
+	 *
+	 * @param array $context Saved shipping-address context.
+	 *
+	 * @return array
+	 */
+	protected function context_fields( $context ) {
+		if ( empty( $context['fields_json'] ) || ! is_string( $context['fields_json'] ) ) {
+			return array();
+		}
+
+		$fields = json_decode( $context['fields_json'] );
+		if ( empty( $fields->fields ) || ! is_array( $fields->fields ) ) {
+			return array();
+		}
+
+		return $fields->fields;
+	}
+
+	/**
+	 * Returns one saved notification field value.
+	 *
+	 * @param array  $context         Saved shipping-address context.
+	 * @param object $field           Shipping-address field definition.
+	 * @param array  $payment_details Saved payment details.
+	 *
+	 * @return array|string|null
+	 */
+	protected function saved_notification_context_field_value( $context, $field, $payment_details ) {
+		if ( ! empty( $context['same_as_billing'] ) ) {
+			return $this->same_as_billing_notification_field_value( $field, $payment_details );
+		}
+
+		if ( empty( $context['values'] ) || ! is_array( $context['values'] ) ) {
+			return null;
+		}
+
+		return array_key_exists( $field->cid, $context['values'] ) ? $context['values'][ $field->cid ] : null;
+	}
+
+	/**
+	 * Returns a billing/payment-detail value for a same-as-billing notification field.
+	 *
+	 * @param object $field           Shipping-address field definition.
+	 * @param array  $payment_details Saved payment details.
+	 *
+	 * @return string|null
+	 */
+	protected function same_as_billing_notification_field_value( $field, $payment_details ) {
+		if ( function_exists( 'ic_qc_sc_same_as_billing_notification_field_value' ) ) {
+			return ic_qc_sc_same_as_billing_notification_field_value( $field, $payment_details );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Normalizes one notification field value using the shared formbuilder formatter.
+	 *
+	 * @param mixed       $field_value Raw field value.
+	 * @param object      $field       Shipping-address field definition.
+	 * @param string|null $field_id    Optional concrete field identifier.
+	 *
+	 * @return string
+	 */
+	protected function normalize_notification_field_value( $field_value, $field, $field_id = null ) {
+		$field_id   = null !== $field_id ? (string) $field_id : ( ! empty( $field->cid ) ? (string) $field->cid : '' );
+		$field_type = ! empty( $field->field_type ) ? (string) $field->field_type : '';
+
+		if ( is_array( $field_value ) ) {
+			$normalized_values = array();
+			foreach ( $field_value as $single_value ) {
+				if ( is_array( $single_value ) ) {
+					$single_value = implode( ', ', $single_value );
+				}
+
+				$single_value = $this->normalize_notification_scalar_value( $single_value, $field_id, $field_type );
+				if ( '' === trim( (string) $single_value ) ) {
+					continue;
+				}
+
+				$normalized_values[] = $single_value;
+			}
+
+			return implode( ', ', $normalized_values );
+		}
+
+		return (string) $this->normalize_notification_scalar_value( $field_value, $field_id, $field_type );
+	}
+
+	/**
+	 * Normalizes one scalar notification field value.
+	 *
+	 * @param mixed  $field_value Raw scalar value.
+	 * @param string $field_id    Concrete field identifier.
+	 * @param string $field_type  Formbuilder field type.
+	 *
+	 * @return mixed
+	 */
+	protected function normalize_notification_scalar_value( $field_value, $field_id, $field_type ) {
+		return apply_filters( 'ic_formbuilder_message_field_value', $field_value, $field_id, $field_type );
+	}
+
+	/**
 	 * Returns rendered selected shipping-address summary HTML.
 	 *
 	 * @param string $pre_name Checkout prefix.
@@ -1107,6 +1875,15 @@ class IC_Shipping_Address_Form {
 		$multiple = count( $contexts ) > 1;
 
 		foreach ( $contexts as $context ) {
+			if ( $this->is_same_as_billing_context( $context ) ) {
+				if ( $multiple && ! empty( $context['shipping_option']['product_names'] ) ) {
+					$output .= '<strong>' . esc_html( $context['shipping_option']['product_names'] ) . '</strong><br>';
+				}
+				$output .= self::same_as_billing_summary();
+				$output .= '<br>';
+				continue;
+			}
+
 			if ( empty( $context['fields']->fields ) || ! is_array( $context['fields']->fields ) ) {
 				continue;
 			}
@@ -1123,10 +1900,7 @@ class IC_Shipping_Address_Form {
 					continue;
 				}
 
-				if ( is_array( $field_value ) ) {
-					$field_value = implode( ', ', $field_value );
-				}
-
+				$field_value = $this->normalize_notification_field_value( $field_value, $field, $field_id );
 				if ( '' === trim( $field_value ) ) {
 					continue;
 				}
@@ -1149,4 +1923,21 @@ class IC_Shipping_Address_Form {
 	}
 }
 
-new IC_Shipping_Address_Form();
+$GLOBALS['ic_shipping_address_form'] = new IC_Shipping_Address_Form();
+
+if ( ! function_exists( 'ic_get_saved_shipping_address_contexts' ) ) {
+	/**
+	 * Returns structured shipping-address contexts saved with an order.
+	 *
+	 * @param array $payment_details Saved payment details.
+	 *
+	 * @return array
+	 */
+	function ic_get_saved_shipping_address_contexts( $payment_details ) {
+		if ( empty( $GLOBALS['ic_shipping_address_form'] ) || ! $GLOBALS['ic_shipping_address_form'] instanceof IC_Shipping_Address_Form ) {
+			return array();
+		}
+
+		return $GLOBALS['ic_shipping_address_form']->payment_details_contexts( $payment_details );
+	}
+}

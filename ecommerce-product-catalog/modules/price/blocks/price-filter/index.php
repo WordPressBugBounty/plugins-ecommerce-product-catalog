@@ -25,6 +25,7 @@ function ic_block_render_price_filter( $atts = array() ) {
 	the_widget( 'product_price_filter', $atts );
 	$block_content = ob_get_clean();
 	if ( ( empty( $block_content ) || ic_string_contains( $block_content, 'ic-empty-filter' ) ) && ic_is_rendering_block() ) {
+		/* translators: Placeholders are substituted with runtime values. */
 		$block_content = '<div style="padding: 20px 10px">' . sprintf( __( '%s will only show up on the front-end if something is available in the context.', 'ecommerce-product-catalog' ), __( 'Catalog Price Filter', 'ecommerce-product-catalog' ) ) . '</div>';
 	}
 
@@ -40,9 +41,11 @@ function ic_block_price_filter_localize( $localize ) {
 }
 
 
+global $wp_version;
 register_block_type(
 	__DIR__,
 	array(
+		'api_version'     => version_compare( $wp_version, '6.3', '>=' ) ? 3 : 2,
 		'title'           => __( 'Catalog Price Filter', 'ecommerce-product-catalog' ),
 		'render_callback' => 'ic_block_render_price_filter',
 	)

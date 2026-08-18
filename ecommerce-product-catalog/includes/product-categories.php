@@ -172,6 +172,7 @@ function ic_limit_products_to_loose_home( $query ) {
 	$multiple_settings = get_multiple_settings();
 	if ( 'cats_only' === $multiple_settings['product_listing_cats'] ) {
 		if ( empty( $query['tax_query'] ) ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Cats-only catalog mode requires this taxonomy constraint to preserve its configured result set.
 			$query['tax_query'] = array();
 		}
 		$query['tax_query'][] = ic_get_limit_loose_products_args();

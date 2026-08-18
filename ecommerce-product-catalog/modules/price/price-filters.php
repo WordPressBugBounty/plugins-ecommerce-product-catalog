@@ -20,7 +20,9 @@ add_action( 'ic_set_product_filters', 'ic_price_filter' );
  */
 function ic_price_filter() {
 	$session = get_product_catalog_session();
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session; the raw value is floatval()'d on the next line.
 	if ( isset( $_GET['min-price'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter; the raw value is floatval()'d on this line.
 		$filter_value = floatval( $_GET['min-price'] );
 		if ( ! empty( $filter_value ) ) {
 			if ( ! isset( $session['filters'] ) ) {
@@ -33,7 +35,9 @@ function ic_price_filter() {
 	} elseif ( isset( $session['filters']['min-price'] ) ) {
 		unset( $session['filters']['min-price'] );
 	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter that only affects the current visitor's own catalog session; the raw value is floatval()'d on the next line.
 	if ( isset( $_GET['max-price'] ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, bookmarkable catalog filter parameter; the raw value is floatval()'d on this line.
 		$filter_value = floatval( $_GET['max-price'] );
 		if ( ! empty( $filter_value ) ) {
 			if ( ! isset( $session['filters'] ) ) {
@@ -129,6 +133,7 @@ function ic_price_filter_shortcode_apply( $shortcode_query, $taxonomy = null ) {
 				'type'    => 'DECIMAL',
 			);
 		}
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The price-filter shortcode must constrain products by the requested price range.
 		$shortcode_query['meta_query'] = $metaquery;
 	}
 
@@ -148,7 +153,7 @@ function ic_catalog_price_filter_reset() {
 		}
 		?>
 		<a class="price-filter-reset"
-			href="<?php echo esc_url( $reset_url ); ?>"><?php _e( 'Reset', 'ecommerce-product-catalog' ); ?></a>
+			href="<?php echo esc_url( $reset_url ); ?>"><?php esc_html_e( 'Reset', 'ecommerce-product-catalog' ); ?></a>
 		<?php
 	}
 }

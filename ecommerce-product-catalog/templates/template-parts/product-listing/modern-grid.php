@@ -28,14 +28,14 @@ $modern_grid_settings = get_modern_grid_settings();
 		<div class="pseudo"></div>
 		<a href="<?php echo esc_url( $product->url() ); ?>">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by listing_image_html().
 		echo $product->listing_image_html();
 		?>
 			<h3 class="product-name <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?>"><?php echo esc_html( wp_strip_all_tags( $product->name() ) ); ?></h3>
 			<?php
 			do_action( 'ic_product_listing_element_inside', $product->ID, $modern_grid_settings );
 			do_action( 'modern_grid_entry_inside', $product->ID, $modern_grid_settings );
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by archive_price_html().
 			echo $product->archive_price_html();
 			?>
 		</a>

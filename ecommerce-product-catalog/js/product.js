@@ -846,6 +846,10 @@ if (typeof implecode.confirm_dialog !== 'function') {
 					autoOpen: true,
 					width: 'auto',
 					resizable: false,
+					closeOnEscape: false,
+					open: function () {
+						jQuery( this ).dialog( 'widget' ).find( '.ui-dialog-titlebar-close' ).remove();
+					},
 					buttons: {
 						Yes: function () {
 							if (typeof yes === 'function') {

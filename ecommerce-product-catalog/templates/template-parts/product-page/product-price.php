@@ -35,7 +35,7 @@ if ( ! empty( $price ) || '' !== $raw_price ) {
 	?>
 	<div class="<?php echo esc_attr( $container_class ); ?>"
 	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 	echo $container_attr;
 	?>
 	>
@@ -48,7 +48,7 @@ if ( ! empty( $price ) || '' !== $raw_price ) {
 				<?php } ?>
 				<td class="<?php echo esc_attr( $class ); ?>">
 					<?php
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'ic_product_page_price_display' filter, which extensions and themes legitimately use to inject their own HTML.
 					echo apply_filters( 'ic_product_page_price_display', $price, $product_id );
 					?>
 				</td>

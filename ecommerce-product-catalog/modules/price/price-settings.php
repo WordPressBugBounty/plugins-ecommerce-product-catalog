@@ -310,6 +310,7 @@ function ic_epc_render_currency_switcher_row() {
 		<td>
 			<span title="<?php echo esc_attr__( 'Select a currency from the list. If your currency is not available in the list, please use the Custom Currency Symbol option below.', 'ecommerce-product-catalog' ); ?>" class="dashicons dashicons-editor-help ic_tip"></span><?php esc_html_e( 'Your currency', 'ecommerce-product-catalog' ); ?>:
 		</td>
+		<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_cat_get_currency_switcher(). ?>
 		<td><?php echo ic_cat_get_currency_switcher(); ?></td>
 	</tr>
 	<?php
@@ -374,7 +375,7 @@ function ic_cat_get_currency_switcher( $name = 'product_currency', $product_curr
 	$currency_names = ic_cat_get_currencies();
 	ob_start();
 	?>
-	<select class="ic_chosen" id="product_currency" name="<?php echo $name; ?>" style="width:200px">
+	<select class="ic_chosen" id="product_currency" name="<?php echo esc_attr( $name ); ?>" style="width:200px">
 		<?php
 		$currencies = available_currencies();
 		asort( $currencies );
@@ -384,7 +385,7 @@ function ic_cat_get_currency_switcher( $name = 'product_currency', $product_curr
 				$currency_name = $currency . ' (' . $currency_names[ $currency ] . '}';
 			}
 			?>
-			<option value="<?php echo $currency; ?>" <?php selected( $currency, $product_currency ); ?>><?php echo $currency_name; ?></option>
+			<option value="<?php echo esc_attr( $currency ); ?>" <?php selected( $currency, $product_currency ); ?>><?php echo esc_html( $currency_name ); ?></option>
 			<?php
 		}
 		?>

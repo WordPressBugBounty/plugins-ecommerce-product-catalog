@@ -230,7 +230,7 @@ class IC_EPC_Block_Edit {
 	 */
 	public function default_mode() {
 		$forced = $this->use_block_editor();
-		if ( $forced ) {
+		if ( true === $forced ) {
 			return 'blocks';
 		} else {
 			return 'classic';
@@ -281,7 +281,7 @@ class IC_EPC_Block_Edit {
 			2
 		);
 		$forced        = apply_filters( 'use_block_editor_for_post_type', 'not_changed', 'al_product' );
-		if ( 'post.php' === $GLOBALS['pagenow'] && isset( $_GET['action'], $_GET['post'] ) && 'edit' === $_GET['action'] && empty( $_GET['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		if ( 'post.php' === $GLOBALS['pagenow'] && isset( $_GET['action'], $_GET['post'] ) && 'edit' === $_GET['action'] && empty( $_GET['meta-box-loader'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection: these $_GET values are only compared to decide which editor filter applies and nothing is written; post.php?post=X&action=edit is a plain WordPress admin navigation URL that carries no nonce.
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin screen context.
 			$post_id        = intval( $_GET['post'] );
 			$post           = get_post( $post_id );

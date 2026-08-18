@@ -65,8 +65,8 @@ class IC_Product_Size_Filter extends WP_Widget {
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
 				echo $args['before_widget'];
 				if ( $title ) {
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
-					echo $args['before_title'] . $title . $args['after_title'];
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+					echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 				}
 				do_action( 'ic_size_widget_before_sliders', $instance );
 				echo '<form class="product-size-filter-container ic-slider-container toReload ic_ajax ' . esc_attr( design_schemes( 'box', 0 ) ) . '" data-ic_responsive_label="' . esc_attr__( 'Size', 'ecommerce-product-catalog' ) . '" data-ic_ajax="product-size-filter-container" action="' . esc_url( get_filter_widget_action( $instance ) ) . '">';

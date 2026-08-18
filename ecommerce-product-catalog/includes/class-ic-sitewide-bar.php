@@ -13,6 +13,33 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles sitewide catalog bar rendering and settings.
  */
 class IC_Sitewide_Bar {
+	/**
+	 * Excluded menu location score.
+	 *
+	 * @var int
+	 */
+	const MENU_LOCATION_EXCLUDED = -1;
+
+	/**
+	 * Neutral menu location score.
+	 *
+	 * @var int
+	 */
+	const MENU_LOCATION_NEUTRAL = 0;
+
+	/**
+	 * Footer fallback menu location score.
+	 *
+	 * @var int
+	 */
+	const MENU_LOCATION_FOOTER_FALLBACK = 1;
+
+	/**
+	 * Preferred menu location score.
+	 *
+	 * @var int
+	 */
+	const MENU_LOCATION_PREFERRED = 2;
 
 	/**
 	 * Icons display mode.
@@ -43,10 +70,24 @@ class IC_Sitewide_Bar {
 	private $search_type = '';
 
 	/**
+	 * Menu target mode.
+	 *
+	 * @var string
+	 */
+	private $menu_target = 'auto';
+
+	/**
+	 * Tracks whether the icons already rendered on the current request.
+	 *
+	 * @var bool
+	 */
+	private $rendered = false;
+
+	/**
 	 * Hooks the sitewide bar integrations.
 	 */
 	public function __construct() {
-		add_action( 'wp_footer', array( $this, 'show' ) );
+		add_filter( 'wp_nav_menu_args', array( $this, 'wrap_fallback_callback' ), 99 );
 		add_filter( 'wp_nav_menu_items', array( $this, 'show' ), 99, 2 );
 
 		add_action( 'ic_catalog_design_schemes_top', array( $this, 'settings' ) );
@@ -85,6 +126,8 @@ class IC_Sitewide_Bar {
 		$this->search      = $design_schemes['icons_display_search'];
 		$this->catalog     = $design_schemes['icons_display_catalog'];
 		$this->search_type = $design_schemes['icons_search'];
+		$this->menu_target = isset( $design_schemes['icons_menu_target'] ) ? (string) $design_schemes['icons_menu_target'] : 'auto';
+		$this->rendered    = false;
 	}
 
 	/**
@@ -95,19 +138,80 @@ class IC_Sitewide_Bar {
 	 * @return string|null
 	 */
 	public function show( $nav_menu = null, $args = null ) {
-		if ( ! $this->is_displayed() ) {
+		if ( ! $this->should_append_to_menu( $nav_menu, $args ) ) {
 			return $nav_menu;
 		}
-		if ( ! empty( $nav_menu ) && ! empty( $args ) ) {
 
-			if ( ( ! ic_string_contains( $args->theme_location, 'primary' ) && ! ic_string_contains( $args->theme_location, 'main' ) ) || 'all' !== $this->display ) {
-				return $nav_menu;
-			}
+		return $nav_menu . $this->icons();
+	}
 
-			$nav_menu .= $this->icons();
+	/**
+	 * Wraps menu fallback callbacks so automatically generated menus can receive icons too.
+	 *
+	 * @param array $args Menu arguments.
+	 * @return array
+	 */
+	public function wrap_fallback_callback( $args ) {
+		if ( ! $this->is_displayed() || ! $this->supports_classic_menu_auto_detection() ) {
+			return $args;
+		}
+
+		if ( empty( $args['fallback_cb'] ) || ! is_callable( $args['fallback_cb'] ) ) {
+			return $args;
+		}
+
+		if ( $this->is_fallback_callback_wrapped( $args['fallback_cb'] ) ) {
+			return $args;
+		}
+
+		$args['ic_catalog_original_fallback_cb'] = $args['fallback_cb'];
+		$args['fallback_cb']                     = array( $this, 'show_fallback_menu' );
+
+		return $args;
+	}
+
+	/**
+	 * Renders a wrapped fallback menu and appends icons when the fallback target is eligible.
+	 *
+	 * @param array $args Menu arguments.
+	 * @return string|false
+	 */
+	public function show_fallback_menu( $args ) {
+		if ( empty( $args['ic_catalog_original_fallback_cb'] ) || ! is_callable( $args['ic_catalog_original_fallback_cb'] ) ) {
+			return false;
+		}
+
+		ob_start();
+		$result = call_user_func( $args['ic_catalog_original_fallback_cb'], $args );
+		$output = ob_get_clean();
+
+		if ( '' !== $output ) {
+			$nav_menu = $output;
+		} elseif ( is_string( $result ) ) {
+			$nav_menu = $result;
+		} else {
+			return $result;
+		}
+
+		if ( $this->should_append_to_menu( $nav_menu, (object) $args ) ) {
+			$nav_menu = $this->append_icons_to_fallback_menu( $nav_menu );
+		}
+
+		if ( ! empty( $args['echo'] ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Menu markup is already escaped by the original fallback callback and icon renderer.
+			echo $nav_menu;
 		}
 
 		return $nav_menu;
+	}
+
+	/**
+	 * Legacy no-op. Sitewide icons now use menu-only fallback targets.
+	 *
+	 * @return void
+	 */
+	public function render_fallback() {
+		// Standalone fallback output was removed in favor of menu-only injection.
 	}
 
 	/**
@@ -116,6 +220,7 @@ class IC_Sitewide_Bar {
 	 * @return string
 	 */
 	public function icons() {
+		$this->rendered = true;
 		ob_start();
 		echo '<div id="ic-catalog-menu-bar">';
 		ic_show_template_file( 'sitewide-icons/icon-bar.php' );
@@ -144,7 +249,7 @@ class IC_Sitewide_Bar {
 		?>
 		<div class="ic-bar-icon <?php echo esc_attr( $css_class ); ?>">
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $content;
 			?>
 		</div>
@@ -199,7 +304,7 @@ class IC_Sitewide_Bar {
 		?>
 		<div class="ic-bar-text <?php echo esc_attr( $css_class ); ?>">
 			<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 			echo $text;
 			?>
 		</div>
@@ -213,6 +318,266 @@ class IC_Sitewide_Bar {
 	 */
 	public function icons_type() {
 		return apply_filters( 'ic_catalog_bar_icons_type', 'dashicons dashicons-' );
+	}
+
+	/**
+	 * Determines whether icons should append to the current menu.
+	 *
+	 * @param string|null $nav_menu Existing menu HTML.
+	 * @param object|null $args     Menu arguments.
+	 * @return bool
+	 */
+	private function should_append_to_menu( $nav_menu, $args ) {
+		if ( ! $this->is_displayed() || $this->rendered || ! $this->supports_classic_menu_auto_detection() ) {
+			return false;
+		}
+
+		if ( empty( $nav_menu ) || empty( $args ) ) {
+			return false;
+		}
+
+		return $this->matches_menu_target( $args );
+	}
+
+	/**
+	 * Determines whether the current render matches the configured menu target.
+	 *
+	 * @param object $args Menu arguments.
+	 * @return bool
+	 */
+	private function matches_menu_target( $args ) {
+		$menu_target = $this->selected_menu_target();
+
+		if ( 'auto' === $menu_target ) {
+			return $this->get_menu_location_score( $args ) >= self::MENU_LOCATION_NEUTRAL;
+		}
+
+		if ( 'theme_header' === $menu_target ) {
+			return self::MENU_LOCATION_PREFERRED === $this->get_menu_location_score( $args );
+		}
+
+		if ( 'theme_footer' === $menu_target ) {
+			return self::MENU_LOCATION_FOOTER_FALLBACK === $this->get_menu_location_score( $args );
+		}
+
+		if ( 0 === strpos( $menu_target, 'location:' ) ) {
+			$location = substr( $menu_target, 9 );
+			if ( '' === $location ) {
+				return false;
+			}
+
+			return in_array( $location, $this->get_menu_location_candidates( $args ), true );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the current menu score for the provided menu args.
+	 *
+	 * @param object $args Menu arguments.
+	 * @return int
+	 */
+	private function get_menu_location_score( $args ) {
+		$registered_locations = get_registered_nav_menus();
+
+		if ( ! empty( $args->theme_location ) && is_string( $args->theme_location ) ) {
+			return $this->get_menu_location_candidate_score( $args->theme_location, $args, $registered_locations );
+		}
+
+		$menu_locations = $this->get_menu_locations_from_args( $args );
+		if ( empty( $menu_locations ) ) {
+			return $this->get_menu_location_candidate_score( '', $args, $registered_locations );
+		}
+
+		$score = self::MENU_LOCATION_EXCLUDED;
+		foreach ( $menu_locations as $theme_location ) {
+			$location_score = $this->get_menu_location_candidate_score( $theme_location, $args, $registered_locations );
+			if ( $location_score > $score ) {
+				$score = $location_score;
+			}
+		}
+
+		return $score;
+	}
+
+	/**
+	 * Returns runtime menu location candidates for the provided args.
+	 *
+	 * @param object $args Menu arguments.
+	 * @return array
+	 */
+	private function get_menu_location_candidates( $args ) {
+		if ( ! empty( $args->theme_location ) && is_string( $args->theme_location ) ) {
+			return array( $args->theme_location );
+		}
+
+		return $this->get_menu_locations_from_args( $args );
+	}
+
+	/**
+	 * Returns the score for a single menu location candidate.
+	 *
+	 * @param string $theme_location      Menu location slug.
+	 * @param object $args                Menu arguments.
+	 * @param array  $registered_locations Registered menu location labels.
+	 * @return int
+	 */
+	private function get_menu_location_candidate_score( $theme_location, $args, $registered_locations ) {
+		$location_label = ! empty( $registered_locations[ $theme_location ] ) ? $registered_locations[ $theme_location ] : '';
+		$score          = self::MENU_LOCATION_NEUTRAL;
+
+		if ( $this->matches_menu_location_terms( array( $location_label ), $this->excluded_menu_location_terms() ) || $this->matches_menu_location_terms( array( $theme_location ), $this->excluded_menu_location_terms() ) ) {
+			$score = self::MENU_LOCATION_EXCLUDED;
+		} elseif ( $this->matches_menu_location_terms( array( $location_label ), $this->footer_fallback_menu_location_terms() ) || $this->matches_menu_location_terms( array( $theme_location ), $this->footer_fallback_menu_location_terms() ) ) {
+			$score = self::MENU_LOCATION_FOOTER_FALLBACK;
+		} elseif ( $this->matches_menu_location_terms( array( $location_label ), $this->preferred_menu_location_terms() ) || $this->matches_menu_location_terms( array( $theme_location ), $this->preferred_menu_location_terms() ) ) {
+			$score = self::MENU_LOCATION_PREFERRED;
+		}
+
+		return (int) apply_filters( 'ic_catalog_sitewide_menu_location_score', $score, $theme_location, $args, $registered_locations );
+	}
+
+	/**
+	 * Returns assigned menu locations for the resolved menu in the args.
+	 *
+	 * @param object $args Menu arguments.
+	 * @return array
+	 */
+	private function get_menu_locations_from_args( $args ) {
+		$menu = $this->get_menu_object_from_args( $args );
+		if ( empty( $menu->term_id ) ) {
+			return array();
+		}
+
+		$menu_term_id       = (int) $menu->term_id;
+		$assigned_locations = array();
+		foreach ( get_nav_menu_locations() as $location => $term_id ) {
+			if ( (int) $term_id === $menu_term_id ) {
+				$assigned_locations[] = $location;
+			}
+		}
+
+		return $assigned_locations;
+	}
+
+	/**
+	 * Resolves the current menu object from the menu args.
+	 *
+	 * @param object $args Menu arguments.
+	 * @return object|null
+	 */
+	private function get_menu_object_from_args( $args ) {
+		if ( empty( $args->menu ) ) {
+			return null;
+		}
+
+		$menu = wp_get_nav_menu_object( $args->menu );
+		if ( ! empty( $menu ) && ! is_wp_error( $menu ) ) {
+			return $menu;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Checks whether the provided callback is already wrapped by EPC.
+	 *
+	 * @param mixed $fallback_callback Fallback callback.
+	 * @return bool
+	 */
+	private function is_fallback_callback_wrapped( $fallback_callback ) {
+		return is_array( $fallback_callback ) && isset( $fallback_callback[0], $fallback_callback[1] ) && $this === $fallback_callback[0] && 'show_fallback_menu' === $fallback_callback[1];
+	}
+
+	/**
+	 * Inserts the icon bar into fallback markup before the closing list tag when available.
+	 *
+	 * @param string $nav_menu Fallback menu markup.
+	 * @return string
+	 */
+	private function append_icons_to_fallback_menu( $nav_menu ) {
+		$icons                = $this->icons();
+		$closing_tag_position = strripos( $nav_menu, '</ul>' );
+
+		if ( false === $closing_tag_position ) {
+			return $nav_menu . $icons;
+		}
+
+		return substr( $nav_menu, 0, $closing_tag_position ) . $icons . substr( $nav_menu, $closing_tag_position );
+	}
+
+	/**
+	 * Checks if the current request should use classic menu auto-detection.
+	 *
+	 * @return bool
+	 */
+	private function supports_classic_menu_auto_detection() {
+		if ( function_exists( 'wp_is_block_theme' ) && wp_is_block_theme() ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns excluded menu location terms.
+	 *
+	 * @return array
+	 */
+	private function excluded_menu_location_terms() {
+		return array();
+	}
+
+	/**
+	 * Returns footer fallback menu location terms.
+	 *
+	 * @return array
+	 */
+	private function footer_fallback_menu_location_terms() {
+		return array(
+			'footer',
+			'bottom',
+		);
+	}
+
+	/**
+	 * Returns preferred menu location terms.
+	 *
+	 * @return array
+	 */
+	private function preferred_menu_location_terms() {
+		return array(
+			'primary',
+			'main',
+			'header',
+			'top',
+			'navigation',
+			'menu-1',
+		);
+	}
+
+	/**
+	 * Checks whether any location value contains the provided terms.
+	 *
+	 * @param array $location_values Theme location values to inspect.
+	 * @param array $terms           Terms to match.
+	 * @return bool
+	 */
+	private function matches_menu_location_terms( $location_values, $terms ) {
+		foreach ( $location_values as $location_value ) {
+			if ( ! is_string( $location_value ) || '' === $location_value ) {
+				continue;
+			}
+
+			foreach ( $terms as $term ) {
+				if ( ic_string_contains( $location_value, $term, false ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -274,9 +639,11 @@ class IC_Sitewide_Bar {
 	 * @return void
 	 */
 	public function register_block() {
+		global $wp_version;
 		register_block_type(
 			__DIR__ . '/blocks/sitewide-icons/',
 			array(
+				'api_version'     => version_compare( $wp_version, '6.3', '>=' ) ? 3 : 2,
 				'render_callback' => array( $this, 'icons' ),
 			)
 		);
@@ -294,6 +661,7 @@ class IC_Sitewide_Bar {
 		<table>
 			<?php
 			implecode_settings_radio( __( 'Icons Display', 'ecommerce-product-catalog' ), 'design_schemes[icons_display]', $design_schemes['icons_display'], $this->icons_display_options() );
+			implecode_settings_dropdown( __( 'Menu Target', 'ecommerce-product-catalog' ), 'design_schemes[icons_menu_target]', $design_schemes['icons_menu_target'], $this->icons_menu_target_options() );
 			implecode_settings_checkbox( __( 'Hide Catalog Icon', 'ecommerce-product-catalog' ), 'design_schemes[icons_display_catalog]', $design_schemes['icons_display_catalog'] );
 			implecode_settings_checkbox( __( 'Hide Search Icon', 'ecommerce-product-catalog' ), 'design_schemes[icons_display_search]', $design_schemes['icons_display_search'] );
 			implecode_settings_radio( __( 'Search Icon', 'ecommerce-product-catalog' ), 'design_schemes[icons_search]', $design_schemes['icons_search'], $this->icons_search_options() );
@@ -317,6 +685,25 @@ class IC_Sitewide_Bar {
 	}
 
 	/**
+	 * Returns menu target options.
+	 *
+	 * @return array
+	 */
+	public function icons_menu_target_options() {
+		$options = array(
+			'auto'         => __( 'Auto', 'ecommerce-product-catalog' ),
+			'theme_header' => __( 'Theme Header', 'ecommerce-product-catalog' ),
+			'theme_footer' => __( 'Theme Footer', 'ecommerce-product-catalog' ),
+		);
+
+		foreach ( get_registered_nav_menus() as $location => $label ) {
+			$options[ 'location:' . $location ] = $this->menu_target_location_label( $location, $label );
+		}
+
+		return $options;
+	}
+
+	/**
 	 * Returns search mode options.
 	 *
 	 * @return array
@@ -336,6 +723,7 @@ class IC_Sitewide_Bar {
 	 */
 	public function settings_default( $settings ) {
 		$settings['icons_display']         = isset( $settings['icons_display'] ) ? $settings['icons_display'] : 'none';
+		$settings['icons_menu_target']     = isset( $settings['icons_menu_target'] ) ? $settings['icons_menu_target'] : 'auto';
 		$settings['icons_display_catalog'] = isset( $settings['icons_display_catalog'] ) ? $settings['icons_display_catalog'] : '';
 		$settings['icons_display_search']  = isset( $settings['icons_display_search'] ) ? $settings['icons_display_search'] : '';
 		$settings['icons_search']          = isset( $settings['icons_search'] ) ? $settings['icons_search'] : 'ic_popup';
@@ -392,7 +780,7 @@ class IC_Sitewide_Bar {
 	 * @return void
 	 */
 	public function customizer_sections( $wp_customize ) {
-		$message         = __( 'The icons will appear in the main menu.', 'ecommerce-product-catalog' );
+		$message         = __( 'In Auto mode the icons will appear in the most appropriate classic theme menu.', 'ecommerce-product-catalog' );
 		$site_editor_url = admin_url( 'site-editor.php' );
 		if ( ! empty( $site_editor_url ) ) {
 			$message .= ' ';
@@ -433,6 +821,24 @@ class IC_Sitewide_Bar {
 					'settings' => 'design_schemes[icons_display]',
 					'type'     => 'radio',
 					'choices'  => $this->icons_display_options(),
+				),
+			),
+		);
+		$settings[] = array(
+			'name'    => 'design_schemes[icons_menu_target]',
+			'args'    => array(
+				'type'              => 'option',
+				'default'           => 'auto',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'control' => array(
+				'name' => 'ic_pc_integration_icons_menu_target',
+				'args' => array(
+					'label'    => __( 'Menu Target', 'ecommerce-product-catalog' ),
+					'section'  => 'ic_product_catalog_icons',
+					'settings' => 'design_schemes[icons_menu_target]',
+					'type'     => 'select',
+					'choices'  => $this->icons_menu_target_options(),
 				),
 			),
 		);
@@ -489,6 +895,42 @@ class IC_Sitewide_Bar {
 		);
 
 		return $settings;
+	}
+
+	/**
+	 * Returns the active menu target mode.
+	 *
+	 * @return string
+	 */
+	private function selected_menu_target() {
+		if ( '' === $this->menu_target ) {
+			return 'auto';
+		}
+
+		if ( 0 === strpos( $this->menu_target, 'location:' ) ) {
+			$location = substr( $this->menu_target, 9 );
+			if ( '' === $location || ! isset( get_registered_nav_menus()[ $location ] ) ) {
+				return 'auto';
+			}
+		}
+
+		return $this->menu_target;
+	}
+
+	/**
+	 * Builds a menu-target option label for one registered theme location.
+	 *
+	 * @param string $location Theme location slug.
+	 * @param string $label    Theme location label.
+	 * @return string
+	 */
+	private function menu_target_location_label( $location, $label ) {
+		if ( empty( $label ) ) {
+			return $location;
+		}
+
+		/* translators: 1: menu location label, 2: menu location slug. */
+		return sprintf( __( '%1$s (%2$s)', 'ecommerce-product-catalog' ), $label, $location );
 	}
 }
 

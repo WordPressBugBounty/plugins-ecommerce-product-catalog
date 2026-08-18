@@ -23,7 +23,7 @@ $archive_template   = ic_get_global( 'current_product_archive_template' );
 ?>
 	<div class="product-subcategories responsive <?php echo esc_attr( $archive_template . ' ' . product_list_class( $archive_template, 'category-list' ) ); ?>">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags.
 		echo $product_categories;
 		?>
 	</div>

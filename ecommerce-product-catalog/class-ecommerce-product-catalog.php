@@ -167,7 +167,7 @@ final class eCommerce_Product_Catalog {
 	 * @return void
 	 */
 	public function implecode_register_styles() {
-		wp_register_style( 'al_product_styles', AL_PLUGIN_BASE_PATH . 'css/al_product.min.css' . ic_filemtime( AL_BASE_PATH . '/css/al_product.min.css' ) );
+		wp_register_style( 'al_product_styles', AL_PLUGIN_BASE_PATH . 'css/al_product.min.css' . ic_filemtime( AL_BASE_PATH . '/css/al_product.min.css' ), array(), IC_EPC_VERSION );
 		do_action( 'register_catalog_styles' );
 		wp_register_script(
 			'ic-integration',
@@ -175,9 +175,11 @@ final class eCommerce_Product_Catalog {
 			array(
 				'al_product_scripts',
 				'jquery-ui-tooltip',
-			)
+			),
+			IC_EPC_VERSION,
+			true
 		);
-		wp_register_style( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.css' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.css' ) );
+		wp_register_style( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.css' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.css' ), array(), IC_EPC_VERSION );
 		wp_register_style(
 			'al_product_admin_styles',
 			AL_PLUGIN_BASE_PATH . 'css/al_product-admin.min.css' . ic_filemtime( AL_BASE_PATH . '/css/al_product-admin.min.css' ),
@@ -185,11 +187,12 @@ final class eCommerce_Product_Catalog {
 				'wp-color-picker',
 				'ic_chosen',
 				'editor-buttons',
-			)
+			),
+			IC_EPC_VERSION
 		);
-		wp_register_style( 'ic_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider/css/ion.rangeSlider.css' . ic_filemtime( AL_BASE_PATH . '/js/range-slider/css/ion.rangeSlider.css' ) );
-		wp_register_script( 'ic_ion_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider/ion.rangeSlider.min.js' . ic_filemtime( AL_BASE_PATH . '/js/range-slider/ion.rangeSlider.min.js' ), array( 'jquery' ) );
-		wp_register_script( 'ic_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider.min.js' . ic_filemtime( AL_BASE_PATH . '/js/range-slider.min.js' ), array( 'ic_ion_range_slider' ) );
+		wp_register_style( 'ic_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider/css/ion.rangeSlider.css' . ic_filemtime( AL_BASE_PATH . '/js/range-slider/css/ion.rangeSlider.css' ), array(), IC_EPC_VERSION );
+		wp_register_script( 'ic_ion_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider/ion.rangeSlider.min.js' . ic_filemtime( AL_BASE_PATH . '/js/range-slider/ion.rangeSlider.min.js' ), array( 'jquery' ), IC_EPC_VERSION, true );
+		wp_register_script( 'ic_range_slider', AL_PLUGIN_BASE_PATH . 'js/range-slider.min.js' . ic_filemtime( AL_BASE_PATH . '/js/range-slider.min.js' ), array( 'ic_ion_range_slider' ), IC_EPC_VERSION, true );
 	}
 
 	/**
@@ -216,6 +219,7 @@ final class eCommerce_Product_Catalog {
 						'import_screen_url' => current_user_can( 'manage_product_settings' ) ? admin_url( 'edit.php?post_type=al_product&page=product-settings.php&tab=product-settings&submenu=csv' ) : '',
 						'import_export'     => __( 'Import / Export', 'ecommerce-product-catalog' ),
 						'nonce'             => wp_create_nonce( 'ic-ajax-nonce' ),
+						'formbuilder_state_nonce' => wp_create_nonce( 'ic_state_dropdown' ),
 					)
 				)
 			);
@@ -229,18 +233,19 @@ final class eCommerce_Product_Catalog {
 	 * @return void
 	 */
 	public function implecode_register_admin_styles() {
-		wp_register_style( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.css' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.css' ) );
+		wp_register_style( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.css' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.css' ), array(), IC_EPC_VERSION );
 		wp_register_style(
 			'al_product_admin_styles',
 			AL_PLUGIN_BASE_PATH . 'css/al_product-admin.min.css' . ic_filemtime( AL_BASE_PATH . '/css/al_product-admin.min.css' ),
 			array(
 				'wp-color-picker',
 				'ic_chosen',
-			)
+			),
+			IC_EPC_VERSION
 		);
-		wp_register_script( 'jquery-validate', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js', array( 'jquery' ) );
-		wp_register_script( 'jquery-validate-add', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js', array( 'jquery-validate' ) );
-		wp_register_script( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.jquery.js' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.jquery.js' ), array( 'jquery' ) );
+		wp_register_script( 'jquery-validate', AL_PLUGIN_BASE_PATH . 'js/jquery-validate/jquery.validate.min.js' . ic_filemtime( AL_BASE_PATH . '/js/jquery-validate/jquery.validate.min.js' ), array( 'jquery' ), '1.19.5', true );
+		wp_register_script( 'jquery-validate-add', AL_PLUGIN_BASE_PATH . 'js/jquery-validate/additional-methods.min.js' . ic_filemtime( AL_BASE_PATH . '/js/jquery-validate/additional-methods.min.js' ), array( 'jquery-validate' ), '1.19.5', true );
+		wp_register_script( 'ic_chosen', AL_PLUGIN_BASE_PATH . 'js/chosen/chosen.jquery.js' . ic_filemtime( AL_BASE_PATH . '/js/chosen/chosen.jquery.js' ), array( 'jquery' ), IC_EPC_VERSION, true );
 		wp_register_script(
 			'al_product_admin-scripts',
 			AL_PLUGIN_BASE_PATH . 'js/admin-scripts.min.js' . ic_filemtime( AL_BASE_PATH . '/js/admin-scripts.min.js' ),
@@ -251,7 +256,9 @@ final class eCommerce_Product_Catalog {
 				'wp-color-picker',
 				'jquery-ui-autocomplete',
 				'ic_chosen',
-			)
+			),
+			IC_EPC_VERSION,
+			true
 		);
 		do_action( 'register_catalog_admin_styles' );
 	}
@@ -287,6 +294,7 @@ final class eCommerce_Product_Catalog {
 		if ( ! defined( 'IC_EPC_TEXTDOMAIN_PATH' ) ) {
 			define( 'IC_EPC_TEXTDOMAIN_PATH', dirname( plugin_basename( AL_PLUGIN_MAIN_FILE ) ) . '/lang' );
 		}
+		// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Bundled translations and non-WordPress.org installs require the legacy language-directory fallback on WordPress 5.9.
 		load_plugin_textdomain( 'ecommerce-product-catalog', false, IC_EPC_TEXTDOMAIN_PATH );
 	}
 

@@ -30,7 +30,7 @@ if ( empty( $product_cat ) ) {
 		<div class="pseudo"></div>
 		<a href="<?php echo esc_url( ic_get_category_url( $product_cat->term_id ) ); ?>">
 		<?php
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_get_category_listing_image_html().
 		echo ic_get_category_listing_image_html( $product_cat->term_id );
 		?>
 			<h3 class="product-name <?php echo esc_attr( design_schemes( 'box', 0 ) ); ?>"><?php echo esc_html( $product_cat->name ); ?></h3>

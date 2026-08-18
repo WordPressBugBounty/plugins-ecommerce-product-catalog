@@ -29,10 +29,10 @@ if ( ! empty( $product_description ) ) {
 			<?php
 		}
 		if ( 'simple' === get_integration_type() && ! is_ic_shortcode_integration() ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'product_simple_description' filter, which extensions and themes legitimately use to inject their own HTML.
 			echo apply_filters( 'product_simple_description', $product_description );
 		} else {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: the return value of the 'the_content' filter, which extensions and themes legitimately use to inject their own HTML.
 			echo apply_filters( 'the_content', $product_description );
 		}
 		?>

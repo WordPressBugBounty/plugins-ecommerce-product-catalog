@@ -217,7 +217,9 @@ if ( ! function_exists( 'implecode_wp_tooltip_hide' ) ) {
 	 * @return void
 	 */
 	function implecode_ajax_wp_tooltip_hide() {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'ic-ajax-nonce' ) ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 			$selector = isset( $_POST['selector'] ) ? sanitize_text_field( wp_unslash( $_POST['selector'] ) ) : '';
 			implecode_wp_tooltip_hide( $selector );
 			$tooltips = implecode_wp_tooltip_get();
@@ -242,7 +244,9 @@ if ( ! function_exists( 'implecode_wp_tooltip_dismiss_all' ) ) {
 	 * @return void
 	 */
 	function implecode_wp_tooltip_dismiss_all() {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'ic-ajax-nonce' ) ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability is registered by the plugin.
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'ic-ajax-nonce' ) && current_user_can( 'manage_product_settings' ) ) {
 			update_option( 'implecode_wp_tooltips', 'disabled', false );
 		}
 		wp_die();

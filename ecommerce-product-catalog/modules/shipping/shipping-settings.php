@@ -260,9 +260,11 @@ function ic_render_shipping_settings_table( $args = array() ) {
 			'address_header'          => esc_html__( 'Collect shipping address', 'ecommerce-product-catalog' ),
 			'address_name_pattern'    => 'product_shipping_address_collection[%d]',
 			'address_button_callback' => '',
+			'location_id'             => 0,
 			'values'                  => array(),
 		)
 	);
+	$args['location_id'] = intval( $args['location_id'] );
 
 	$shipping_count = intval( $args['shipping_count'] );
 	if ( $shipping_count < 1 ) {
@@ -278,7 +280,11 @@ function ic_render_shipping_settings_table( $args = array() ) {
 	}
 	echo '>';
 	echo '<table class="' . esc_attr( $args['table_class'] ) . '">';
-	echo '<thead><tr><th></th><th class="title"><b>' . esc_html( $args['label_header'] ) . '</b></th><th></th><th class="title"><b>' . esc_html( $args['cost_header'] ) . '</b></th><th class="title"><b>' . esc_html( $args['note_header'] ) . '</b></th>';
+	echo '<thead><tr>';
+	do_action( 'ic_shipping_settings_table_header_start', $args );
+	echo '<th></th><th class="title"><b>' . esc_html( $args['label_header'] ) . '</b></th><th></th><th class="title"><b>' . esc_html( $args['cost_header'] ) . '</b></th>';
+	do_action( 'ic_shipping_settings_table_header_after_cost', $args );
+	echo '<th class="title"><b>' . esc_html( $args['note_header'] ) . '</b></th>';
 	if ( ! empty( $args['show_address_collection'] ) ) {
 		echo '<th class="title"><b>' . esc_html( $args['address_header'] ) . '</b></th>';
 	}
@@ -288,7 +294,11 @@ function ic_render_shipping_settings_table( $args = array() ) {
 			$cost            = ic_get_shipping_table_value( $args['values'], 'cost', $i, 0 );
 			$note            = ic_get_shipping_table_value( $args['values'], 'note', $i, '' );
 			$collect_address = ic_get_shipping_table_value( $args['values'], 'address_collection', $i, '' );
-		echo '<tr><td class="lp-column">' . intval( $i ) . '.</td><td class="product-shipping-label-column"><input class="product-shipping-label" type="text" name="' . esc_attr( ic_get_shipping_table_field_name( $args['label_name_pattern'], $i ) ) . '" value="' . esc_attr( $label ) . '" /></td><td class="lp-column">:</td><td><input id="admin-number-field" class="product-shipping-cost" type="number" min="0" step="0.01" name="' . esc_attr( ic_get_shipping_table_field_name( $args['cost_name_pattern'], $i ) ) . '" value="' . esc_attr( $cost ) . '" /> ' . esc_html( $args['currency'] ) . '</td><td class="product-shipping-note-column"><textarea class="large-text" rows="2" name="' . esc_attr( ic_get_shipping_table_field_name( $args['note_name_pattern'], $i ) ) . '">' . esc_textarea( $note ) . '</textarea></td>';
+		echo '<tr>';
+		do_action( 'ic_shipping_settings_table_row_start', $i, $args );
+		echo '<td class="lp-column">' . intval( $i ) . '.</td><td class="product-shipping-label-column"><input class="product-shipping-label" type="text" name="' . esc_attr( ic_get_shipping_table_field_name( $args['label_name_pattern'], $i ) ) . '" value="' . esc_attr( $label ) . '" /></td><td class="lp-column">:</td><td><input id="admin-number-field" class="product-shipping-cost" type="number" min="0" step="0.01" name="' . esc_attr( ic_get_shipping_table_field_name( $args['cost_name_pattern'], $i ) ) . '" value="' . esc_attr( $cost ) . '" /> ' . esc_html( $args['currency'] ) . '</td>';
+		do_action( 'ic_shipping_settings_table_row_after_cost', $i, $args );
+		echo '<td class="product-shipping-note-column"><textarea class="large-text" rows="2" name="' . esc_attr( ic_get_shipping_table_field_name( $args['note_name_pattern'], $i ) ) . '">' . esc_textarea( $note ) . '</textarea></td>';
 		if ( ! empty( $args['show_address_collection'] ) ) {
 			echo '<td class="product-shipping-address-column"><label><input class="ic-shipping-address-toggle" type="checkbox" name="' . esc_attr( ic_get_shipping_table_field_name( $args['address_name_pattern'], $i ) ) . '" value="1" ' . checked( ! empty( $collect_address ), true, false ) . ' /> ' . esc_html__( 'Enable', 'ecommerce-product-catalog' ) . '</label>';
 			do_action( 'ic_render_shipping_settings_table_collect_address', $i, $collect_address, $args );

@@ -41,17 +41,20 @@ class product_shopping_cart extends WP_Widget {
 		if ( $instance['hide_empty'] && empty( $how_many ) ) {
 			echo '<div class="cart-hide-container ic_hidden">';
 		}
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
 		echo $args['before_widget'];
 		if ( $title ) {
-			echo $args['before_title'] . $title . $args['after_title'];
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML comes from the theme; the title itself is escaped.
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
 		}
 		// echo '<div id="shopping_cart_widget_container"><form id="shopping_cart_widget" method="post" action="'.ic_shopping_cart_page_url().'"><input hidden type="hidden" name="cart_content" value=\''.$cart_content.'\'><div class="product-shopping-cart"><input type="submit" value="'.$how_many.' '.__('selected', 'implecode-shopping-cart').'"></div></form>';
 		$class = ! empty( $instance['hide_empty'] ) ? 'check-if-empty' : '';
 		if ( ! empty( $class ) && empty( $how_many ) ) {
 			$class .= ' ic_hidden';
 		}
-		echo '<div id="shopping_cart_widget_container" class="cart-widget-container ' . $class . '">';
+		echo '<div id="shopping_cart_widget_container" class="cart-widget-container ' . esc_attr( $class ) . '">';
 		$show_empty = ! empty( $instance['hide_empty'] ) ? false : true;
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by ic_shopping_cart_button().
 		echo ic_shopping_cart_button( $show_empty, $instance['text'] );
 		if ( $instance['show_search'] == 1 ) {
 			the_widget( 'product_widget_search' );
@@ -73,6 +76,7 @@ class product_shopping_cart extends WP_Widget {
 			</script>';
 		}
 		echo '</div>';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML is provided by WordPress/theme.
 		echo $args['after_widget'];
 		if ( $instance['hide_empty'] && empty( $how_many ) ) {
 			echo '</div>';
@@ -94,7 +98,7 @@ class product_shopping_cart extends WP_Widget {
 		$instance['hide_empty']  = isset( $instance['hide_empty'] ) ? $instance['hide_empty'] : '';
 		$instance['text']        = isset( $instance['text'] ) ? $instance['text'] : '';
 		?>
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'ecommerce-product-catalog' ); ?> <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></label></p>
+		<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'ecommerce-product-catalog' ); ?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></label></p>
 		<?php
 	}
 

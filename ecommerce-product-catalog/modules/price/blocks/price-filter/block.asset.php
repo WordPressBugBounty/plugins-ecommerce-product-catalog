@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 return array(
 	'title'        => __( 'Catalog Price Filter', 'ecommerce-product-catalog' ),
 	'dependencies' => array(

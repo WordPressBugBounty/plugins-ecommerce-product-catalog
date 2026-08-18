@@ -31,7 +31,10 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 	 * @return void
 	 */
 	function implecode_custom_support_settings_content() {
-		$submenu = filter_input( INPUT_GET, 'submenu', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$submenu              = filter_input( INPUT_GET, 'submenu', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$support_bold_markup  = array( 'b' => array() );
+		$support_link_markup  = array( 'a' => array( 'href' => array() ) );
+		$support_mixed_markup = array_merge( $support_bold_markup, $support_link_markup );
 		?>
 		<?php if ( 'support' === $submenu ) { ?>
 			<div class="setting-content submenu support-tab">
@@ -47,24 +50,19 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 				<h2><?php esc_html_e( 'impleCode Support', 'ecommerce-product-catalog' ); ?></h2>
 				<p>
 					<?php
-					/*
-					 * translators: %s: plugin name.
-					 */
-					printf( __( '<b>%s is free to use</b>. That\'s great! It\'s a pleasure to serve it to you. Let\'s keep it free forever!', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					/* translators: %s: plugin name. */
+					echo wp_kses( sprintf( __( '<b>%s is free to use</b>. That\'s great! It\'s a pleasure to serve it to you. Let\'s keep it free forever!', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ), $support_bold_markup );
 					?>
 				</p>
 				<p>
 					<?php
-					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
-					echo __( 'This awesome plugin is being developed under impleCode brand, which is a legally operating European company. It means that you can be assured that the high-quality <b>development will be continuous</b>.', 'ecommerce-product-catalog' );
+					echo wp_kses( __( 'This awesome plugin is being developed under impleCode brand, which is a legally operating European company. It means that you can be assured that the high-quality <b>development will be continuous</b>.', 'ecommerce-product-catalog' ), $support_bold_markup );
 					?>
 				</p>
 				<p>
 					<?php
-					/*
-					 * translators: 1: opening support forum link, 2: closing support forum link.
-					 */
-					printf( __( 'For <b>free support</b>, please visit %1$ssupport forums%2$s where the plugin developers will give you valuable advice.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/' . IC_CATALOG_PLUGIN_SLUG ) . '">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					/* translators: 1: opening support forum link, 2: closing support forum link. */
+					echo wp_kses( sprintf( __( 'For <b>free support</b>, please visit %1$ssupport forums%2$s where the plugin developers will give you valuable advice.', 'ecommerce-product-catalog' ), '<a href="' . esc_url( 'https://wordpress.org/support/plugin/' . IC_CATALOG_PLUGIN_SLUG ) . '">', '</a>' ), $support_mixed_markup );
 					?>
 				</p>
 				<p>
@@ -77,10 +75,8 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 					<p><?php esc_html_e( 'An upgrade that will add many valuable features to the catalog functionality!', 'ecommerce-product-catalog' ); ?></p>
 					<p>
 						<?php
-						/*
-						 * translators: 1: opening premium support link, 2: closing premium support link, 3: price.
-						 */
-						printf( __( 'One year of high quality and speedy %1$sPremium Support%2$s from the developers for just %3$s.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link">', '</a>', '$49' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: 1: opening premium support link, 2: closing premium support link, 3: price. */
+						echo wp_kses( sprintf( __( 'One year of high quality and speedy %1$sPremium Support%2$s from the developers for just %3$s.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link">', '</a>', '$49' ), $support_link_markup );
 						?>
 					</p>
 					<form style="text-align: center; position: relative; top: 10px;"
@@ -90,8 +86,6 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 						<input style="cursor:pointer;" type="image"
 								src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0"
 								name="submit" alt="PayPal - The safer, easier way to pay online!">
-						<img alt="" border="0" src="https://www.paypalobjects.com/pl_PL/i/scr/pixel.gif" width="1"
-							height="1">
 					</form>
 				</div>
 				<div class="extension premium-support">
@@ -99,10 +93,8 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 							<h3><span><?php echo esc_html( IC_CATALOG_PLUGIN_NAME ); ?> <?php esc_html_e( 'Extensions', 'ecommerce-product-catalog' ); ?></span></h3></a>
 					<p>
 						<?php
-						/*
-						 * translators: 1: SEO URL, 2: usability URL, 3: productivity URL, 4: conversion URL, 5: plugin name.
-						 */
-						printf( __( '<b>Extensions apart of premium support</b> provide additional useful features. They improve %5$s in a field of <a href="%1$s">SEO</a>, <a href="%2$s">Usability</a>, <a href="%3$s">Productivity</a> and <a href="%4$s">Conversion</a>.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/#seo_usability_boosters&cam=catalog-support-tab&key=extensions-link-seo' ), esc_url( 'https://implecode.com/wordpress/plugins/#seo_usability_boosters&cam=catalog-support-tab&key=extensions-link-usability' ), esc_url( 'https://implecode.com/wordpress/plugins/#productivity_boosters&cam=catalog-support-tab&key=extensions-link-productivity' ), esc_url( 'https://implecode.com/wordpress/plugins/#conversion_boosters&cam=catalog-support-tab&key=extensions-link-conversion' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: 1: SEO URL, 2: usability URL, 3: productivity URL, 4: conversion URL, 5: plugin name. */
+						echo wp_kses( sprintf( __( '<b>Extensions apart of premium support</b> provide additional useful features. They improve %5$s in a field of <a href="%1$s">SEO</a>, <a href="%2$s">Usability</a>, <a href="%3$s">Productivity</a> and <a href="%4$s">Conversion</a>.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/#seo_usability_boosters&cam=catalog-support-tab&key=extensions-link-seo' ), esc_url( 'https://implecode.com/wordpress/plugins/#seo_usability_boosters&cam=catalog-support-tab&key=extensions-link-usability' ), esc_url( 'https://implecode.com/wordpress/plugins/#productivity_boosters&cam=catalog-support-tab&key=extensions-link-productivity' ), esc_url( 'https://implecode.com/wordpress/plugins/#conversion_boosters&cam=catalog-support-tab&key=extensions-link-conversion' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ), $support_mixed_markup );
 						?>
 					</p>
 					<p>
@@ -114,10 +106,8 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 					<h2><?php esc_html_e( 'Premium Toolset Features', 'ecommerce-product-catalog' ); ?></h2>
 					<p>
 						<?php
-						/*
-						 * translators: %s: plugin name.
-						 */
-						printf( __( 'Apart of fast, confidential email support <b>you will receive some advanced features</b> for %s.', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: %s: plugin name. */
+						echo wp_kses( sprintf( __( 'Apart of fast, confidential email support <b>you will receive some advanced features</b> for %s.', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ), $support_bold_markup );
 						?>
 					</p>
 					<h4><?php esc_html_e( 'Premium Features:', 'ecommerce-product-catalog' ); ?></h4>
@@ -197,43 +187,33 @@ if ( ! function_exists( 'implecode_support_menu' ) ) :
 					<p><?php esc_html_e( 'Go ahead and use the Buy Now button above to receive the premium support service and the described features immediately. You will receive the premium extension on your PayPal email address immediately after the payment is confirmed.', 'ecommerce-product-catalog' ); ?></p>
 					<p>
 						<?php
-						/*
-						 * translators: %s: impleCode premium support URL.
-						 */
-						printf( __( 'If you need to get it on a different email address, please use the <a href="%s">impleCode website to order the premium support</a>. It will let you set a different email address than the one for PayPal.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-1' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: %s: impleCode premium support URL. */
+						echo wp_kses( sprintf( __( 'If you need to get it on a different email address, please use the <a href="%s">impleCode website to order the premium support</a>. It will let you set a different email address than the one for PayPal.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-1' ) ), $support_link_markup );
 						?>
 					</p>
 					<p>
 						<?php
-						/*
-						 * translators: 1: opening extensions link, 2: closing extensions link.
-						 */
-						printf( __( 'You can also choose one of the %1$scatalog extensions%2$s to get the premium support.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/plugins/#cam=catalog-support-tab&key=extensions-link">', '</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: 1: opening extensions link, 2: closing extensions link. */
+						echo wp_kses( sprintf( __( 'You can also choose one of the %1$scatalog extensions%2$s to get the premium support.', 'ecommerce-product-catalog' ), '<a href="https://implecode.com/wordpress/plugins/#cam=catalog-support-tab&key=extensions-link">', '</a>' ), $support_link_markup );
 						?>
 					</p>
 					<h2><?php esc_html_e( 'Theme Integration', 'ecommerce-product-catalog' ); ?></h2>
 					<p>
 						<?php
-						/*
-						 * translators: 1: plugin name, 2: theme integration guide URL, 3: advanced theme integration URL, 4: premium support URL.
-						 */
-						printf( __( 'As you may already know some themes may need Theme Integration to support %1$s fully. We wrote this <a href="%2$s">theme integrations guide</a>, however, to make it even easier you will get <a href="%3$s">Advanced Theme Integration</a> service for free if you choose <a href="%4$s">Premium Support</a> service.', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ), esc_url( 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=catalog-support-tab&key=integration-link' ), esc_url( 'https://implecode.com/wordpress/plugins/advanced-theme-integration/#cam=catalog-support-tab&key=integration-service-link' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-2' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: 1: plugin name, 2: theme integration guide URL, 3: advanced theme integration URL, 4: premium support URL. */
+						echo wp_kses( sprintf( __( 'As you may already know some themes may need Theme Integration to support %1$s fully. We wrote this <a href="%2$s">theme integrations guide</a>, however, to make it even easier you will get <a href="%3$s">Advanced Theme Integration</a> service for free if you choose <a href="%4$s">Premium Support</a> service.', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ), esc_url( 'https://implecode.com/wordpress/product-catalog/theme-integration-guide/#cam=catalog-support-tab&key=integration-link' ), esc_url( 'https://implecode.com/wordpress/plugins/advanced-theme-integration/#cam=catalog-support-tab&key=integration-service-link' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-2' ) ), $support_link_markup );
 						?>
 					</p>
 					<h2>
 						<?php
-						/*
-						 * translators: %s: plugin name.
-						 */
-						printf( __( '%s documentation', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: %s: plugin name. */
+						printf( esc_html__( '%s documentation', 'ecommerce-product-catalog' ), esc_html( IC_CATALOG_PLUGIN_NAME ) );
 						?>
 					</h2>
 					<p>
 						<?php
-						/*
-						 * translators: 1: documentation URL, 2: support forum URL, 3: premium support URL, 4: plugin name.
-						 */
-						printf( __( '<b>%4$s</b> documentation is being developed <a href="%1$s">here</a>. For questions about %4$s please use <a href="%2$s">support forum</a> or <a href="%3$s">Premium Support service</a>.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/product-catalog/#cam=catalog-support-tab&key=docs-link' ), esc_url( 'http://wordpress.org/support/plugin/ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-3' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+						/* translators: 1: documentation URL, 2: support forum URL, 3: premium support URL, 4: plugin name. */
+						echo wp_kses( sprintf( __( '<b>%4$s</b> documentation is being developed <a href="%1$s">here</a>. For questions about %4$s please use <a href="%2$s">support forum</a> or <a href="%3$s">Premium Support service</a>.', 'ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/product-catalog/#cam=catalog-support-tab&key=docs-link' ), esc_url( 'http://wordpress.org/support/plugin/ecommerce-product-catalog' ), esc_url( 'https://implecode.com/wordpress/plugins/premium-support/#cam=catalog-support-tab&key=support-link-3' ), esc_html( IC_CATALOG_PLUGIN_NAME ) ), $support_mixed_markup );
 						?>
 					</p>
 			</div>

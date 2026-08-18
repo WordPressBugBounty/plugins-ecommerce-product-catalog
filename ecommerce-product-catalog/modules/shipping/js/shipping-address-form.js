@@ -34,6 +34,58 @@ jQuery(
 			return '';
 		}
 
+		function markRequiredFields(fields) {
+			fields.each(
+				function () {
+					var field = jQuery(this);
+
+					if (field.is('[required]') || field.prop('required')) {
+						field.data('ic-shipping-address-required', true);
+					}
+				}
+			);
+		}
+
+		function updateRequiredFields(fields, isRequired) {
+			fields.each(
+				function () {
+					var field = jQuery(this);
+
+					if (field.data('ic-shipping-address-required')) {
+						if (isRequired) {
+							field.attr('required', 'required');
+							field.prop('required', true);
+						} else {
+							field.removeAttr('required');
+							field.prop('required', false);
+						}
+					}
+				}
+			);
+		}
+
+		function updateSameAsBilling(option) {
+			var toggle = option.find('.ic-shipping-address-same-as-billing-toggle').first();
+			var container = option.find('.shipping-address-form-fields-container').first();
+			var formFields;
+			var fields;
+			var isSame;
+
+			if (!toggle.length || !container.length) {
+				return;
+			}
+
+			formFields = container.find('input, select, textarea');
+			fields = formFields.add(container.find('button'));
+			isSame = toggle.is(':checked');
+
+			markRequiredFields(formFields);
+			container.toggle(!isSame);
+			fields.prop('disabled', isSame);
+			updateRequiredFields(formFields, !isSame);
+			fields.filter('select').trigger('chosen:updated');
+		}
+
 		function getFieldValue(field, container) {
 			var fieldName = field.attr('name');
 			var fieldValue = '';
@@ -57,8 +109,8 @@ jQuery(
 		function saveField(field) {
 			var ajaxUrl = getAjaxUrl();
 			var fieldName = field.attr('name');
-			var container = field.closest('.shipping-address-form-fields');
-			var preName = container.data('pre_name');
+			var container = field.closest('.shipping-address-form-row');
+			var preName = container.find('.shipping-address-form-fields').first().data('pre_name');
 
 			if (!ajaxUrl || !fieldName || !preName || field.prop('disabled') || (field[0] && !field[0].checkValidity())) {
 				return;
@@ -94,6 +146,11 @@ jQuery(
 					option.toggle(isActive);
 					option.toggleClass('active', isActive);
 					fields.prop('disabled', !isActive);
+					if (isActive) {
+						updateSameAsBilling(option);
+					} else {
+						option.find('.shipping-address-form-fields-container').show();
+					}
 					fields.filter('select').trigger('chosen:updated');
 				}
 			);
@@ -121,9 +178,13 @@ jQuery(
 
 		jQuery(document.body).on(
 			'change',
-			'.shipping-address-form-fields input, .shipping-address-form-fields select, .shipping-address-form-fields textarea',
+			'.ic-shipping-address-same-as-billing-toggle, .shipping-address-form-fields input, .shipping-address-form-fields select, .shipping-address-form-fields textarea',
 			function () {
-				saveField(jQuery(this));
+				var field = jQuery(this);
+				if (field.hasClass('ic-shipping-address-same-as-billing-toggle')) {
+					updateSameAsBilling(field.closest('.ic-shipping-address-option'));
+				}
+				saveField(field);
 			}
 		);
 

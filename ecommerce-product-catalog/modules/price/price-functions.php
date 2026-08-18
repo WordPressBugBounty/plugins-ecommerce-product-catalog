@@ -207,6 +207,7 @@ class ic_price_display {
 		if ( ! empty( $price_value ) ) {
 			?>
 			<div class="product-price <?php design_schemes( 'color' ); ?>">
+				<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: built by price_format(), which emits the currency markup. ?>
 				<?php echo self::price_format( $price_value ); ?>
 			</div>
 			<?php

@@ -64,18 +64,23 @@ class IC_EPC_Context_Blocks {
 	 * @return void
 	 */
 	public function register() {
-		$blocks = apply_filters(
+		$epc_blocks = array(
+			__DIR__ . '/image-gallery/',
+			__DIR__ . '/name/',
+			__DIR__ . '/short-description/',
+		);
+		$blocks     = apply_filters(
 			'ic_product_parts_blocks',
-			array(
-				__DIR__ . '/image-gallery/',
-				__DIR__ . '/name/',
-				__DIR__ . '/short-description/',
-			)
+			$epc_blocks
 		);
 		foreach ( $blocks as $block_dir ) {
 			$args = array(
 				'render_callback' => array( $this, 'render' ),
 			);
+			if ( in_array( $block_dir, $epc_blocks, true ) ) {
+				global $wp_version;
+				$args['api_version'] = version_compare( $wp_version, '6.3', '>=' ) ? 3 : 2;
+			}
 			if ( file_exists( $block_dir . 'block.json' ) ) {
 				if ( ! empty( $block_dir ) ) {
 					// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a local block.json file from the plugin.
@@ -101,6 +106,10 @@ class IC_EPC_Context_Blocks {
 	 */
 	public function configure_metadata( $metadata ) {
 		if ( ! empty( $metadata['name'] ) && ( ic_string_contains( $metadata['name'], 'ic-epc' ) || ic_string_contains( $metadata['name'], 'ic-price-field' ) ) ) {
+			global $wp_version;
+			if ( version_compare( $wp_version, '6.3', '>=' ) ) {
+				$metadata['apiVersion'] = 3;
+			}
 			if ( ! empty( $metadata['attributes']['fontSize'] ) ) {
 				$metadata['attributes']['style']    = array(
 					'type'    => 'object',
@@ -244,4 +253,3 @@ class IC_EPC_Context_Blocks {
 		return '<div ' . $wrapper_attributes . '>' . $content . '</div>';
 	}
 }
-
