@@ -559,8 +559,9 @@ class IC_Simple_Form_Legacy {
 			$field->label = '';
 		}
 		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field">';
-		foreach ( $field->field_options->options as $radio_option ) {
+		foreach ( $field->field_options->options as $option_key => $radio_option ) {
 			$radio_option = apply_filters( 'ic_formbuilder_option', $radio_option );
+			$option_id    = sanitize_html_class( $field->cid . '_' . $option_key );
 			if ( ! $this->posted_isset( $field->cid ) && $radio_option->checked ) {
 				$checked = 'checked';
 			} elseif ( $this->posted_isset( $field->cid ) && $this->posted_value( $field->cid ) == $radio_option->label ) {
@@ -569,7 +570,7 @@ class IC_Simple_Form_Legacy {
 				$checked = '';
 			}
 			$checked          = apply_filters( 'ic_formbuilder_option_attributes', $checked, $radio_option, $field );
-			$this->form_html .= '<input class="input ' . $this->error_class . '" id="' . strip_tags( $radio_option->label ) . $field->cid . '" value="' . strip_tags( $radio_option->label ) . '" ' . $checked . ' ' . $field_attributes . ' type="checkbox" name="' . $field->cid . '[]" /> <label for="' . strip_tags( $radio_option->label ) . $field->cid . '">' . apply_filters( 'ic_formbuilder_option_label', $radio_option->label, $radio_option ) . '</label><br>';
+			$this->form_html .= '<input class="input ' . $this->error_class . '" id="' . esc_attr( $option_id ) . '" value="' . esc_attr( strip_tags( $radio_option->label ) ) . '" ' . $checked . ' ' . $field_attributes . ' type="checkbox" name="' . $field->cid . '[]" /> <label for="' . esc_attr( $option_id ) . '">' . apply_filters( 'ic_formbuilder_option_label', $radio_option->label, $radio_option ) . '</label><br>';
 		}
 		$this->form_html .= '</div>';
 
@@ -593,8 +594,9 @@ class IC_Simple_Form_Legacy {
 	function radio( $field, $field_id, $field_form_value, $field_attributes ) {
 		$checked          = '';
 		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field">';
-		foreach ( $field->field_options->options as $radio_option ) {
+		foreach ( $field->field_options->options as $option_key => $radio_option ) {
 			$radio_option = apply_filters( 'ic_formbuilder_option', $radio_option );
+			$option_id    = sanitize_html_class( $field->cid . '_' . $option_key );
 			if ( ! $this->posted_isset( $field->cid ) && $radio_option->checked ) {
 				$checked = 'checked';
 			} elseif ( $this->posted_isset( $field->cid ) && $this->posted_value( $field->cid ) == $radio_option->label ) {
@@ -603,7 +605,7 @@ class IC_Simple_Form_Legacy {
 				$checked = '';
 			}
 			$checked          = apply_filters( 'ic_formbuilder_option_attributes', $checked, $radio_option, $field );
-			$this->form_html .= '<input class="input ' . $this->error_class . '" id="' . $radio_option->label . $field->cid . '" value="' . $radio_option->label . '" ' . $checked . ' ' . $field_attributes . ' type="' . $field->field_type . '" name="' . $field->cid . '" /> <label for="' . $radio_option->label . $field->cid . '">' . apply_filters( 'ic_formbuilder_option_label', $radio_option->label, $radio_option ) . '</label>' . $this->line;
+			$this->form_html .= '<input class="input ' . $this->error_class . '" id="' . esc_attr( $option_id ) . '" value="' . esc_attr( $radio_option->label ) . '" ' . $checked . ' ' . $field_attributes . ' type="' . $field->field_type . '" name="' . $field->cid . '" /> <label for="' . esc_attr( $option_id ) . '">' . apply_filters( 'ic_formbuilder_option_label', $radio_option->label, $radio_option ) . '</label>' . $this->line;
 		}
 		$this->form_html .= '</div>';
 

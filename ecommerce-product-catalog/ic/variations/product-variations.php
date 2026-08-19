@@ -107,6 +107,9 @@ function get_variations_modificators(
 		foreach ( $selected as $var_name => $var_lp ) {
 			$var_id = current( explode( '_', $var_name ) ) - 1;
 			$found  = false;
+			if ( ! isset( $variation_values[ $var_id ] ) || ! isset( $variation_prices[ $var_id ] ) ) {
+				continue;
+			}
 			if ( ! is_array( $variation_values[ $var_id ] ) ) {
 				$values = explode( "\r\n", $variation_values[ $var_id ] );
 			} else {

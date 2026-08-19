@@ -390,9 +390,17 @@ class IC_EPC_Extension_Compatibility {
 	 */
 	private static function legacy_extension_compatibility_map() {
 		$fallbacks = array(
-			'catalog-users-manager/catalog-users-manager.php' => array(
+			'catalog-users-manager/catalog-users-manager.php'     => array(
 				'minimum_version' => '1.1.9',
 				'note'            => 'Catalog Users Manager 1.1.9 or newer is required for the current EPC version.',
+			),
+			'implecode-shopping-cart/implecode-shopping-cart.php' => array(
+				'minimum_version' => '2.12.28',
+				'note'            => 'Shopping Cart PRO 2.12.28 or newer is required for the current EPC version.',
+			),
+			'implecode-quote-cart/implecode-quote-cart.php'       => array(
+				'minimum_version' => '2.6.6',
+				'note'            => 'Quote Cart PRO 2.6.6 or newer is required for the current EPC version.',
 			),
 		);
 

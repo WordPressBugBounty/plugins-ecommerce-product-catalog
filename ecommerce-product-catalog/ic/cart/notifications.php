@@ -394,6 +394,11 @@ class ic_cart_checkout_form_email {
 	}
 
 	function summary_total( $pre_message, $product_id, $cart_id, $p_quantity, $product_price, $product_total, $td, $etd ) {
+		if ( '' === $product_price || false === $product_price ) {
+			$pre_message .= $td . apply_filters( 'ic_cart_checkout_email_total_td', '', $cart_id ) . $etd;
+
+			return $pre_message;
+		}
 		$pre_message .= $td . apply_filters( 'ic_cart_checkout_email_total_td', price_format( $product_total, 1, 0 ), $cart_id ) . $etd;
 
 		return $pre_message;
