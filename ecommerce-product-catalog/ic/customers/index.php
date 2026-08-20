@@ -51,19 +51,19 @@ if ( ! empty( $settings['form_registration'] ) && 'user' === $settings['form_reg
 	add_action( 'register_catalog_styles', 'register_digital_customers_styles' );
 
 	function register_digital_customers_styles() {
-		wp_register_style( 'jquery-ui-css', AL_CUSTOMERS_BASE_URL . 'css/jquery-ui.css', array(), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_CUSTOMERS_BASE_PATH . '/css/jquery-ui.css' ) );
+		wp_register_style( 'jquery-ui-css', AL_CUSTOMERS_BASE_URL . 'css/jquery-ui.css', array(), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/css/jquery-ui.css', true ) );
 		wp_register_style( 'al_digital_customers_styles', AL_CUSTOMERS_BASE_URL . 'css/digital-customers.min.css' . ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/css/digital-customers.min.css' ), array(
 			'dashicons',
 			'jquery-ui-css'
-		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_CUSTOMERS_BASE_PATH . '/css/digital-customers.min.css' ) );
+		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/css/digital-customers.min.css', true ) );
 		wp_register_script( 'front_edit_customer_panel', AL_CUSTOMERS_BASE_URL . 'js/customer-panel.min.js' . ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/js/customer-panel.min.js' ), array(
 			'jquery-ui-tabs',
 			'wp-api-fetch'
-		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_CUSTOMERS_BASE_PATH . '/js/customer-panel.min.js' ), true );
+		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/js/customer-panel.min.js', true ), true );
 		wp_register_script( 'front_digital_customers', AL_CUSTOMERS_BASE_URL . 'js/digital-customers.min.js' . ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/js/digital-customers.min.js' ), array(
 			'jquery-effects-slide',
 			'jquery-ui-tabs'
-		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_CUSTOMERS_BASE_PATH . '/js/digital-customers.min.js' ), true );
+		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/js/digital-customers.min.js', true ), true );
 	}
 
 	function digital_customers_styles() {

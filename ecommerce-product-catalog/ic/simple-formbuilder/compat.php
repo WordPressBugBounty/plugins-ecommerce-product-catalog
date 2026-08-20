@@ -79,8 +79,8 @@ if ( ! function_exists( 'form_builder_register_admin_styles' ) ) {
 	 * @return void
 	 */
 	function form_builder_register_admin_styles() {
-		wp_register_style( 'implecode-form-css', IC_FORMBUILDER_URL . 'ic-form.min.css', array( 'ic-html' ), file_exists( IC_FORMBUILDER_PATH . '/ic-form.min.css' ) ? (string) filemtime( IC_FORMBUILDER_PATH . '/ic-form.min.css' ) : false );
-		wp_register_script( 'implecode-form-js', IC_FORMBUILDER_URL . 'ic-form.js', array( 'jquery' ), file_exists( IC_FORMBUILDER_PATH . '/ic-form.js' ) ? (string) filemtime( IC_FORMBUILDER_PATH . '/ic-form.js' ) : false, true );
+		wp_register_style( 'implecode-form-css', IC_FORMBUILDER_URL . 'ic-form.min.css', array( 'ic-html' ), (string) ic_filemtime( IC_FORMBUILDER_PATH . '/ic-form.min.css', true ) );
+		wp_register_script( 'implecode-form-js', IC_FORMBUILDER_URL . 'ic-form.js', array( 'jquery' ), (string) ic_filemtime( IC_FORMBUILDER_PATH . '/ic-form.js', true ), true );
 	}
 }
 

@@ -111,8 +111,14 @@ class ic_orders_caps {
 		}
 		if ( 'edit_digital_order' == $cap || 'delete_digital_order' == $cap || 'read_digital_order' == $cap ) {
 			$post      = get_post( $args[0] );
-			$post_type = get_post_type_object( $post->post_type );
-			$caps      = array();
+			$post_type = empty( $post ) ? null : get_post_type_object( $post->post_type );
+			if ( empty( $post ) || empty( $post_type ) ) {
+				// Deny explicitly. Returning an empty caps array from a map_meta_cap filter
+				// means "no capability required", which granted these caps to everyone
+				// whenever the order post was missing or already deleted.
+				return array( 'do_not_allow' );
+			}
+			$caps = array();
 		}
 		if ( empty( $post ) || empty( $post_type ) ) {
 			return $caps;

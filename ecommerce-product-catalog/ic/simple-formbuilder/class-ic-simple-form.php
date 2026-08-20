@@ -575,7 +575,7 @@ class IC_Simple_Form {
 			} elseif ( isset( $posted_data[ $field_id ] ) ) {
 				if ( is_array( $posted_data[ $field_id ] ) ) {
 					$field_value = array_map( 'sanitize_text_field', $posted_data[ $field_id ] );
-				} elseif ( 'textarea' === $field->field_type ) {
+				} elseif ( ic_formbuilder_is_multiline_field( $field ) ) {
 					$field_value = sanitize_textarea_field( $posted_data[ $field_id ] );
 				} else {
 					$field_value = sanitize_text_field( $posted_data[ $field_id ] );
@@ -606,7 +606,7 @@ class IC_Simple_Form {
 			if ( 'file' === $field->field_type && empty( $field_value ) ) {
 				continue;
 			}
-			if ( 'textarea' === $field->field_type ) {
+			if ( ic_formbuilder_is_multiline_field( $field ) ) {
 				$field_value = nl2br( $field_value );
 			}
 
@@ -781,7 +781,7 @@ class IC_Simple_Form {
 			return array_map( 'sanitize_text_field', $posted_data[ $field->cid ] );
 		}
 
-		if ( 'textarea' === $field->field_type ) {
+		if ( ic_formbuilder_is_multiline_field( $field ) ) {
 			return is_string( $posted_data[ $field->cid ] ) ? sanitize_textarea_field( $posted_data[ $field->cid ] ) : '';
 		}
 

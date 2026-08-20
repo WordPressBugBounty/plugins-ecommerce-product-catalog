@@ -336,7 +336,7 @@ class ic_cart {
 		$product_id = cart_id_to_product_id( $cart_id );
 		if ( $product_price !== '' && $product_price !== false ) {
 			$price   = apply_filters( 'shopping_cart_product_price_second_mod', $product_price, $cart_id, $quantity );
-			$p_total = apply_filters( 'ic_cart_product_total_calc', $price * $quantity, $cart_id );
+			$p_total = apply_filters( 'ic_cart_product_total_calc', floatval( $price ) * $quantity, $cart_id );
 			$this->calculation( $p_total, $price, $quantity, $cart_id );
 			if ( function_exists( 'is_ic_order_taxed' ) && is_ic_order_taxed() ) {
 				ic_cart_update_tax( $product_id, $p_total, $quantity, $cart_id );

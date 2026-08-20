@@ -611,9 +611,9 @@ class ic_cart_variations_selectors {
 							$mod  = $mod_type == '+' ? ' (' . $sign . ' ' . price_format( abs( $price_effect ) ) . ')' : ' (' . $sign . ' ' . abs( $price_effect ) . '%)';
 						}
 					} else {
-						if ( empty( $product_price ) ) {
-							$product_price = 0;
-						}
+						// Both values arrive as raw meta strings; '' would be a PHP 8 TypeError below.
+						$product_price = floatval( $product_price );
+						$price_effect  = floatval( $price_effect );
 						if ( $mod_type === '+' ) {
 							$modified_price = $product_price + $price_effect;
 						} elseif ( $mod_type === '%' ) {

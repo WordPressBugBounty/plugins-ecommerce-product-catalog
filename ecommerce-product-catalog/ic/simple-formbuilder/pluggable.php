@@ -837,9 +837,10 @@ if ( ! function_exists( 'ic_container_shortcode' ) ) {
 			'style'     => '',
 		);
 		$args           = shortcode_atts( $available_args, $atts );
-		$style          = $args['style'];
+		$container      = ( 'div' === $args['container'] ) ? 'div' : 'span';
+		$style          = esc_attr( (string) $args['style'] );
 
-		return '<' . $args['container'] . ' style="' . $style . '">';
+		return '<' . $container . ' style="' . $style . '">';
 	}
 
 }
@@ -860,7 +861,34 @@ if ( ! function_exists( 'ic_container_shortcode_close' ) ) {
 		);
 		$args           = shortcode_atts( $available_args, $atts );
 
-		return '</' . $args['container'] . '>';
+		$container = ( 'div' === $args['container'] ) ? 'div' : 'span';
+
+		return '</' . $container . '>';
 	}
 
+}
+
+if ( ! function_exists( 'ic_formbuilder_is_multiline_field' ) ) {
+	/**
+	 * Tells whether a form field holds multi-line text.
+	 *
+	 * The builder UI stores a textarea as 'paragraph'; 'textarea' is the newer runtime name
+	 * for the same control, and both are in use. They must be sanitized with
+	 * sanitize_textarea_field(): sanitize_text_field() collapses every run of \r\n into a
+	 * single space, which silently flattened multi-line customer input such as the checkout
+	 * "Comment:" field into one line in the order and in the notification email.
+	 *
+	 * @param object|string $field Field definition, or a field type string.
+	 *
+	 * @return bool
+	 */
+	function ic_formbuilder_is_multiline_field( $field ) {
+		$field_type = ( is_object( $field ) && isset( $field->field_type ) ) ? $field->field_type : $field;
+		if ( ! is_string( $field_type ) ) {
+			return false;
+		}
+		$multiline_types = apply_filters( 'ic_formbuilder_multiline_field_types', array( 'paragraph', 'textarea' ) );
+
+		return in_array( $field_type, (array) $multiline_types, true );
+	}
 }

@@ -24,14 +24,14 @@ add_action( 'init', 'ic_register_styles_scripts' );
 function ic_register_styles_scripts() {
 	$path_root = __DIR__;
 	$url_root  = plugins_url( '/', __FILE__ );
-	wp_register_style( 'jquery-ui-css', plugins_url( '/customers/css/jquery-ui.css', __FILE__ ), array(), file_exists( $path_root . '/customers/css/jquery-ui.css' ) ? (string) filemtime( $path_root . '/customers/css/jquery-ui.css' ) : false );
-	wp_register_style( 'ic-selectors', $url_root . 'css/ic-selectors.min.css', array(), file_exists( $path_root . '/css/ic-selectors.min.css' ) ? (string) filemtime( $path_root . '/css/ic-selectors.min.css' ) : false );
-	wp_register_style( 'ic-html', $url_root . 'css/ic-html.min.css', array(), file_exists( $path_root . '/css/ic-html.min.css' ) ? (string) filemtime( $path_root . '/css/ic-html.min.css' ) : false );
-	wp_register_style( 'ic-user-login', $url_root . 'css/ic-user-login.min.css', array( 'dashicons', 'jquery-ui-css' ), file_exists( $path_root . '/css/ic-user-login.min.css' ) ? (string) filemtime( $path_root . '/css/ic-user-login.min.css' ) : false );
-	wp_register_style( 'ic-user-panel', $url_root . 'css/ic-user-panel.min.css', array( 'dashicons', 'jquery-ui-css' ), file_exists( $path_root . '/css/ic-user-panel.min.css' ) ? (string) filemtime( $path_root . '/css/ic-user-panel.min.css' ) : false );
-	wp_register_style( 'ic-chosen-general', $url_root . 'ext/chosen/chosen.min.css', array(), file_exists( $path_root . '/ext/chosen/chosen.min.css' ) ? (string) filemtime( $path_root . '/ext/chosen/chosen.min.css' ) : false );
+	wp_register_style( 'jquery-ui-css', plugins_url( '/customers/css/jquery-ui.css', __FILE__ ), array(), (string) ic_filemtime( $path_root . '/customers/css/jquery-ui.css', true ) );
+	wp_register_style( 'ic-selectors', $url_root . 'css/ic-selectors.min.css', array(), (string) ic_filemtime( $path_root . '/css/ic-selectors.min.css', true ) );
+	wp_register_style( 'ic-html', $url_root . 'css/ic-html.min.css', array(), (string) ic_filemtime( $path_root . '/css/ic-html.min.css', true ) );
+	wp_register_style( 'ic-user-login', $url_root . 'css/ic-user-login.min.css', array( 'dashicons', 'jquery-ui-css' ), (string) ic_filemtime( $path_root . '/css/ic-user-login.min.css', true ) );
+	wp_register_style( 'ic-user-panel', $url_root . 'css/ic-user-panel.min.css', array( 'dashicons', 'jquery-ui-css' ), (string) ic_filemtime( $path_root . '/css/ic-user-panel.min.css', true ) );
+	wp_register_style( 'ic-chosen-general', $url_root . 'ext/chosen/chosen.min.css', array(), (string) ic_filemtime( $path_root . '/ext/chosen/chosen.min.css', true ) );
 
-	wp_register_script( 'ic-hooks', $url_root . 'js/ic-hooks.min.js', array( 'jquery' ), file_exists( $path_root . '/js/ic-hooks.min.js' ) ? (string) filemtime( $path_root . '/js/ic-hooks.min.js' ) : false, false );
+	wp_register_script( 'ic-hooks', $url_root . 'js/ic-hooks.min.js', array( 'jquery' ), (string) ic_filemtime( $path_root . '/js/ic-hooks.min.js', true ), false );
 	wp_register_script(
 		'ic-html',
 		$url_root . 'js/ic-html.min.js',
@@ -39,14 +39,14 @@ function ic_register_styles_scripts() {
 			'jquery',
 			'ic-hooks',
 		),
-		file_exists( $path_root . '/js/ic-html.min.js' ) ? (string) filemtime( $path_root . '/js/ic-html.min.js' ) : false,
+		(string) ic_filemtime( $path_root . '/js/ic-html.min.js', true ),
 		false
 	);
-	wp_register_script( 'ic-selectors', $url_root . 'js/ic-selectors.min.js', array( 'ic-hooks' ), file_exists( $path_root . '/js/ic-selectors.min.js' ) ? (string) filemtime( $path_root . '/js/ic-selectors.min.js' ) : false, false );
-	wp_register_script( 'ic-user-login', $url_root . 'js/ic-user-login.min.js', array( 'jquery', 'jquery-effects-slide', 'jquery-ui-tabs', 'ic-hooks' ), file_exists( $path_root . '/js/ic-user-login.min.js' ) ? (string) filemtime( $path_root . '/js/ic-user-login.min.js' ) : false, false );
-	wp_register_script( 'ic-user-panel', plugins_url( '/customers/js/customer-panel.min.js', __FILE__ ), array( 'jquery', 'jquery-ui-tabs', 'wp-api-fetch' ), file_exists( $path_root . '/customers/js/customer-panel.min.js' ) ? (string) filemtime( $path_root . '/customers/js/customer-panel.min.js' ) : false, false );
-	wp_register_script( 'ic-chosen-general', $url_root . 'ext/chosen/chosen.jquery.min.js', array( 'jquery' ), file_exists( $path_root . '/ext/chosen/chosen.jquery.min.js' ) ? (string) filemtime( $path_root . '/ext/chosen/chosen.jquery.min.js' ) : false, false );
-	wp_register_script( 'ic-chosen', $url_root . 'js/ic-chosen.min.js', array( 'ic-chosen-general', 'ic-hooks' ), file_exists( $path_root . '/js/ic-chosen.min.js' ) ? (string) filemtime( $path_root . '/js/ic-chosen.min.js' ) : false, false );
+	wp_register_script( 'ic-selectors', $url_root . 'js/ic-selectors.min.js', array( 'ic-hooks' ), (string) ic_filemtime( $path_root . '/js/ic-selectors.min.js', true ), false );
+	wp_register_script( 'ic-user-login', $url_root . 'js/ic-user-login.min.js', array( 'jquery', 'jquery-effects-slide', 'jquery-ui-tabs', 'ic-hooks' ), (string) ic_filemtime( $path_root . '/js/ic-user-login.min.js', true ), false );
+	wp_register_script( 'ic-user-panel', plugins_url( '/customers/js/customer-panel.min.js', __FILE__ ), array( 'jquery', 'jquery-ui-tabs', 'wp-api-fetch' ), (string) ic_filemtime( $path_root . '/customers/js/customer-panel.min.js', true ), false );
+	wp_register_script( 'ic-chosen-general', $url_root . 'ext/chosen/chosen.jquery.min.js', array( 'jquery' ), (string) ic_filemtime( $path_root . '/ext/chosen/chosen.jquery.min.js', true ), false );
+	wp_register_script( 'ic-chosen', $url_root . 'js/ic-chosen.min.js', array( 'ic-chosen-general', 'ic-hooks' ), (string) ic_filemtime( $path_root . '/js/ic-chosen.min.js', true ), false );
 	wp_register_script(
 		'ic-screen-api',
 		$url_root . 'js/ic-screen-api.min.js',
@@ -55,7 +55,7 @@ function ic_register_styles_scripts() {
 			'wp-api-fetch',
 			'ic-hooks',
 		),
-		file_exists( $path_root . '/js/ic-screen-api.min.js' ) ? (string) filemtime( $path_root . '/js/ic-screen-api.min.js' ) : false,
+		(string) ic_filemtime( $path_root . '/js/ic-screen-api.min.js', true ),
 		false
 	);
 }

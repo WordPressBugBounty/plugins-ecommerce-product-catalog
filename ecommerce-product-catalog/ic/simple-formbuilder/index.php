@@ -14,6 +14,13 @@ if ( ! defined( 'IC_SIMPLE_FORMBUILDER_URL' ) ) {
 	define( 'IC_SIMPLE_FORMBUILDER_PATH', __DIR__ );
 }
 
+// This runtime can be loaded without the framework bootstrap (see the require_once fallback
+// below), so ic_filemtime() is not guaranteed. Pull in ic/functions.php when it is reachable;
+// it declares every helper behind function_exists, so this can never redeclare anything.
+if ( ! function_exists( 'ic_filemtime' ) && file_exists( dirname( __DIR__ ) . '/functions.php' ) ) {
+	require_once dirname( __DIR__ ) . '/functions.php';
+}
+
 if ( function_exists( 'ic_framework_require_once' ) ) {
 	ic_framework_require_once( IC_SIMPLE_FORMBUILDER_PATH . '/pluggable.php' );
 	ic_framework_require_once( IC_SIMPLE_FORMBUILDER_PATH . '/class-ic-simple-form.php' );
@@ -51,8 +58,8 @@ if ( did_action( 'init' ) ) {
  * @return void
  */
 function ic_sl_register_form_css() {
-	$form_css_version = file_exists( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.css' ) ? (string) filemtime( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.css' ) : false;
-	$form_js_version  = file_exists( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.js' ) ? (string) filemtime( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.js' ) : false;
+	$form_css_version = (string) ic_filemtime( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.css', true );
+	$form_js_version  = (string) ic_filemtime( IC_SIMPLE_FORMBUILDER_PATH . '/ic-form.js', true );
 
 	wp_register_style( 'implecode-simple-form-css', IC_SIMPLE_FORMBUILDER_URL . 'ic-form.css', array( 'ic-html' ), $form_css_version );
 	wp_register_script( 'implecode-simple-form-js', IC_SIMPLE_FORMBUILDER_URL . 'ic-form.js', array( 'jquery' ), $form_js_version, true );

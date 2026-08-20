@@ -28,9 +28,9 @@ class IC_Simple_Form_Legacy {
 	// phpcs:disable Universal.Operators.StrictComparisons
 	// phpcs:disable Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnValueFound
 	// phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-	// NOT listed: Generic.Files.LineEndings.InvalidEOLChar. It is a file-level sniff reported at
-	// line 1, so a disable starting here cannot reach it. This file is CRLF by design and must
-	// NEVER be run through PHPCBF - the WP ruleset sets eolChar to \n and would rewrite it.
+	// Generic.Files.LineEndings.InvalidEOLChar is deliberately not listed. It is a file-level
+	// sniff reported at line 1, so a disable starting here could not reach it anyway. It no
+	// longer fires: this file is LF, in line with the whole tree since 2026-08-19.
 	// phpcs:disable PSR2.Classes.ClassDeclaration.CloseBraceAfterBody
 	// phpcs:disable WordPress.DateTime.RestrictedFunctions.date_date
 	// phpcs:disable WordPress.WP.AlternativeFunctions.strip_tags_strip_tags
@@ -425,23 +425,56 @@ class IC_Simple_Form_Legacy {
 			return $default_value;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- See the docblock for the nonce. sanitize_posted() IS the sanitizer: it recurses into arrays and applies sanitize_text_field() to every leaf, which PHPCS cannot follow through a method call.
-		return $this->sanitize_posted( wp_unslash( $_POST[ $key ] ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- See the docblock for the nonce. sanitize_posted() IS the sanitizer: it recurses into arrays and applies sanitize_text_field(), or sanitize_textarea_field() for multi-line fields, to every leaf, which PHPCS cannot follow through a method call.
+		return $this->sanitize_posted( wp_unslash( $_POST[ $key ] ), $this->is_multiline_key( $key ) );
+	}
+
+	/**
+	 * Tells whether a posted key belongs to a multi-line field of this form.
+	 *
+	 * The process_form() loop rewrites each $field->cid in place to the prefixed name it
+	 * posts under,
+	 * so both the bare and the prefixed form are matched: this runs before and after that.
+	 *
+	 * @param string $key Posted field name.
+	 *
+	 * @return bool
+	 */
+	private function is_multiline_key( $key ) {
+		if ( empty( $this->contact->fields ) || ! function_exists( 'ic_formbuilder_is_multiline_field' ) ) {
+			return false;
+		}
+		foreach ( $this->contact->fields as $field ) {
+			if ( empty( $field->cid ) || ! ic_formbuilder_is_multiline_field( $field ) ) {
+				continue;
+			}
+			if ( $key === $field->cid || $key === $this->pre_name . $field->cid ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * Recursively sanitizes a posted value, so array fields (checkboxes) are covered too.
 	 *
-	 * @param mixed $value Raw value.
+	 * @param mixed $value     Raw value.
+	 * @param bool  $multiline Whether the value comes from a textarea and must keep newlines.
 	 *
 	 * @return array|string
 	 */
-	private function sanitize_posted( $value ) {
+	private function sanitize_posted( $value, $multiline = false ) {
 		if ( is_array( $value ) ) {
-			return array_map( array( $this, 'sanitize_posted' ), $value );
+			$clean = array();
+			foreach ( $value as $index => $item ) {
+				$clean[ $index ] = $this->sanitize_posted( $item, $multiline );
+			}
+
+			return $clean;
 		}
 
-		return sanitize_text_field( $value );
+		return $multiline ? sanitize_textarea_field( $value ) : sanitize_text_field( $value );
 	}
 
 	/**
@@ -950,7 +983,7 @@ class IC_Simple_Form_Legacy {
 			$field_comment = isset( $field->field_options->description ) ? '<div class="order_form_row row comment"><div class="label"></div><div class="field"><div class="field-comment">' . $field->field_options->description . '</div></div></div>' : '';
 		} else {
 			$field_comment              = isset( $field->field_options->description ) ? '<div class="field-comment">' . $field->field_options->description . '</div>' : '';
-			$field->field_options->size = ( $field->field_type == 'section_break' || $field->field_type == 'address'/* || $field->field_type == 'date' || $field->field_type == 'time' */ ) ? 'large' : $field->field_options->size;
+			$field->field_options->size = ( $field->field_type == 'section_break' || $field->field_type == 'address'/* || $field->field_type == 'date' || $field->field_type == 'time' */ ) ? 'large' : ( isset( $field->field_options->size ) ? $field->field_options->size : 'medium' );
 		}
 
 		return $field_comment;
@@ -1039,7 +1072,7 @@ class IC_Simple_Form_Legacy {
 				}
 
 				if ( $this->form_type == 'label-top' ) {
-					$field->field_options->size = ( $field->field_type == 'section_break' || $field->field_type == 'address'/* || $field->field_type == 'date' || $field->field_type == 'time' */ ) ? 'large' : $field->field_options->size;
+					$field->field_options->size = ( $field->field_type == 'section_break' || $field->field_type == 'address'/* || $field->field_type == 'date' || $field->field_type == 'time' */ ) ? 'large' : ( isset( $field->field_options->size ) ? $field->field_options->size : 'medium' );
 				} else {
 					$field->field_options->size = isset( $field->field_options->size ) ? $field->field_options->size : 'medium';
 				}

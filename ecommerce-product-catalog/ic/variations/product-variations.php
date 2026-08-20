@@ -37,11 +37,11 @@ function get_variations_modificators(
 	$variation_prices = get_product_variations_prices( $product_id );
 	$variation_values = get_product_variations_values( $product_id );
 	$variation_mod    = get_product_variations_price_mod_type( $product_id );
-	$price_value      = isset( $price_value ) ? $price_value : product_price( $product_id );
-	if ( empty( $price_value ) ) {
-		$price_value = 0;
-	}
-	$var_qties = apply_filters( 'ic_selected_variation_quantities', $var_qties );
+	// Variation prices and the base price are raw meta strings ('' for a blank textarea
+	// line). On PHP 8 an empty string reaching * or / is a fatal TypeError, so every value
+	// feeding the arithmetic below is coerced to float where it is read.
+	$price_value = floatval( isset( $price_value ) ? $price_value : product_price( $product_id ) );
+	$var_qties   = apply_filters( 'ic_selected_variation_quantities', $var_qties );
 	if ( empty( $selected ) ) {
 		$modificators = array();
 		foreach ( $variation_prices as $i => $prices ) {
@@ -50,6 +50,7 @@ function get_variations_modificators(
 				if ( ! is_array( $prices ) ) {
 					$prices = explode( "\r\n", $prices );
 				}
+				$prices   = array_map( 'floatval', $prices );
 				$var_name = $i . '_variation_' . $product_id;
 				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The structured request value is shape-checked, unslashed once, and normalized by the field-specific downstream parser before use.
 				$selected = isset( $_POST[ $var_name ] ) ? ic_sanitize( wp_unslash( $_POST[ $var_name ] ) ) : '';
@@ -120,6 +121,7 @@ function get_variations_modificators(
 			} else {
 				$prices = $variation_prices[ $var_id ];
 			}
+			$prices = array_map( 'floatval', $prices );
 
 			/*
 				if ( !empty( $var_lps ) ) {
@@ -193,6 +195,7 @@ function get_variations_modificators(
 		} else {
 			$prices = $variation_prices[ $variation_id ];
 		}
+		$prices   = array_map( 'floatval', $prices );
 		$selected = apply_filters( 'ic_selected_variations', $selected );
 		foreach ( $values as $z => $value ) {
 			if ( $z == $selected ) {
@@ -290,6 +293,7 @@ function get_variations_shipping_modificators(
 				if ( ! is_array( $prices ) ) {
 					$prices = explode( "\r\n", $prices );
 				}
+				$prices = array_map( 'floatval', $prices );
 				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The structured request value is shape-checked, unslashed once, and normalized by the field-specific downstream parser before use.
 				$selected = isset( $_POST[ $i . '_variation_' . $product_id ] ) ? ic_sanitize( wp_unslash( $_POST[ $i . '_variation_' . $product_id ] ) ) : '';
 				if ( $selected == '' ) {
@@ -386,9 +390,11 @@ function get_shipping_price_mod( $shipping_price_a, $variation_shipping, $variat
 	if ( empty( $variation_shipping ) ) {
 		return 0;
 	}
+	$variation_shipping = floatval( $variation_shipping );
 	if ( $variation_mod === '%' ) {
 		$price_mod = ! is_array( $price_mod ) ? array() : $price_mod;
 		foreach ( $shipping_price_a as $i => $shipping_price ) {
+			$shipping_price  = floatval( $shipping_price );
 			$price_mod[ $i ] = isset( $price_mod[ $i ] ) ? $price_mod[ $i ] : 0;
 			$price_mod[ $i ] = $price_mod[ $i ] + ( $shipping_price * ( 1 + ( $variation_shipping / 100 ) ) - $shipping_price );
 		}

@@ -26,6 +26,88 @@ function product_variations_settings() {
 }
 
 /**
+ * Settings keys whose values are newline-delimited lists, one entry per variation option.
+ *
+ * @return string[]
+ */
+function ic_variation_multiline_setting_keys() {
+	return array( 'values', 'prices', 'shipping' );
+}
+
+/**
+ * Sanitizes one level of the variation settings tree.
+ *
+ * $parent_key is tracked because the multiline keys hold an array of textareas
+ * ( $settings['values'][1] ), so the key that says "this is a textarea" belongs to the
+ * level above the string being sanitized. It is deliberately NOT a second parameter of
+ * ic_sanitize_product_variations_settings(): that function is a register_setting()
+ * sanitize_callback, and WordPress runs it through sanitize_option_{$option}, which
+ * passes the option name as the second filter argument.
+ *
+ * @param array  $settings   Submitted settings level.
+ * @param string $parent_key Key of the level above, '' at the root.
+ * @return array
+ */
+function ic_sanitize_product_variations_branch( $settings, $parent_key ) {
+	$multiline = ic_variation_multiline_setting_keys();
+	$clean     = array();
+	foreach ( $settings as $key => $value ) {
+		if ( is_array( $value ) ) {
+			$clean[ $key ] = ic_sanitize_product_variations_branch( $value, (string) $key );
+			continue;
+		}
+		if ( ! in_array( $parent_key, $multiline, true ) ) {
+			$clean[ $key ] = sanitize_text_field( (string) $value );
+			continue;
+		}
+		// sanitize_text_field() collapses every \r\n into a space, which silently merged all
+		// options of a variation into one entry ("Red\r\nGreen" became "Red Green") the first
+		// time this screen was saved. These lists must keep their line breaks.
+		$value = sanitize_textarea_field( (string) $value );
+		if ( 'prices' === $parent_key || 'shipping' === $parent_key ) {
+			$value = ic_normalize_variation_price_list( $value );
+		}
+		$clean[ $key ] = $value;
+	}
+
+	return $clean;
+}
+
+/**
+ * Stores a newline-delimited price list in canonical dot-decimal form.
+ *
+ * The per-product variation fields are <input type="number">, so they always submit
+ * dot-decimal. This screen uses free-text textareas instead, so on a store configured with
+ * a comma decimal separator an admin can type "10,50" here. Left alone it reaches the
+ * price arithmetic as a string and is read as 10.0, so it is parsed once, on the way in,
+ * with the same helper both _price save paths use.
+ *
+ * @param string $value Newline-delimited list.
+ * @return string
+ */
+function ic_normalize_variation_price_list( $value ) {
+	if ( '' === $value || ! is_callable( array( 'ic_price_display', 'raw_price_format' ) ) ) {
+		return $value;
+	}
+	$eol   = ( false !== strpos( $value, "\r\n" ) ) ? "\r\n" : "\n";
+	$lines = explode( $eol, $value );
+	foreach ( $lines as $i => $line ) {
+		$trimmed = trim( $line );
+		// A blank line keeps this list aligned with the values list, and an already canonical
+		// number is left byte-identical so saving the screen never rewrites correct data.
+		if ( '' === $trimmed || is_numeric( $trimmed ) ) {
+			continue;
+		}
+		$number = ic_price_display::raw_price_format( $trimmed );
+		if ( is_numeric( $number ) ) {
+			$lines[ $i ] = rtrim( rtrim( number_format( (float) $number, 6, '.', '' ), '0' ), '.' );
+		}
+	}
+
+	return implode( $eol, $lines );
+}
+
+/**
  * Sanitizes variation settings recursively without dropping extension keys.
  *
  * @param mixed $settings Submitted settings.
@@ -35,10 +117,7 @@ function ic_sanitize_product_variations_settings( $settings ) {
 	if ( ! is_array( $settings ) ) {
 		return array();
 	}
-	$clean = array();
-	foreach ( $settings as $key => $value ) {
-		$clean[ $key ] = is_array( $value ) ? ic_sanitize_product_variations_settings( $value ) : sanitize_text_field( (string) $value );
-	}
+	$clean = ic_sanitize_product_variations_branch( $settings, '' );
 	if ( isset( $clean['count'] ) ) {
 		$clean['count'] = min( 100, absint( $clean['count'] ) );
 	}

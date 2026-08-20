@@ -532,9 +532,10 @@ if ( ! function_exists( 'ic_container_shortcode' ) ) {
 			'style'     => '',
 		);
 		$args           = shortcode_atts( $available_args, $atts );
-		$style          = $args['style'];
+		$container      = ( 'div' === $args['container'] ) ? 'div' : 'span';
+		$style          = esc_attr( (string) $args['style'] );
 
-		return '<' . $args['container'] . ' style="' . $style . '">';
+		return '<' . $container . ' style="' . $style . '">';
 	}
 
 }
@@ -548,7 +549,9 @@ if ( ! function_exists( 'ic_container_shortcode_close' ) ) {
 		);
 		$args           = shortcode_atts( $available_args, $atts );
 
-		return '</' . $args['container'] . '>';
+		$container = ( 'div' === $args['container'] ) ? 'div' : 'span';
+
+		return '</' . $container . '>';
 	}
 
 }

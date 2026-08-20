@@ -431,7 +431,7 @@ class ic_cart_shipping {
 				'jquery',
 				'ic_ajax_cart',
 			),
-			defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( __DIR__ . '/js/cart-shipping.js' ),
+			defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( __DIR__ . '/js/cart-shipping.js', true ),
 			true
 		);
 	}
