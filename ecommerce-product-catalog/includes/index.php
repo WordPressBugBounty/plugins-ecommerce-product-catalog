@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once AL_BASE_PATH . '/includes/tracking.php';
 require_once AL_BASE_PATH . '/includes/util/index.php';
-require_once AL_BASE_PATH . '/includes/class-ic-epc-defaults-sync-controller.php';
 require_once AL_BASE_PATH . '/includes/class-ic-activation-wizard.php';
 require_once AL_BASE_PATH . '/includes/activation-config.php';
 require_once AL_BASE_PATH . '/includes/class-ic-catalog-hooks.php';

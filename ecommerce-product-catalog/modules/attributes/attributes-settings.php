@@ -306,10 +306,10 @@ function ic_epc_attributes_settings_page() {
 	if ( null === $page ) {
 		$page = new IC_Settings_Page(
 			array(
-				'title'              => __( 'Attributes Settings', 'ecommerce-product-catalog' ),
-				'option_group'       => 'product_attributes',
-				'option_name'        => 'general_attributes_settings',
-				'registered_options' => array(
+				'title'                            => __( 'Attributes Settings', 'ecommerce-product-catalog' ),
+				'option_group'                     => 'product_attributes',
+				'option_name'                      => 'general_attributes_settings',
+				'registered_options'               => array(
 					'product_attributes_number'   => array(
 						'sanitize_callback' => 'ic_epc_sanitize_product_attributes_number',
 					),
@@ -330,30 +330,30 @@ function ic_epc_attributes_settings_page() {
 						'sanitize_callback' => 'ic_epc_sanitize_general_attributes_settings',
 					),
 				),
-				'submenu'            => 'attributes',
-				'screen'             => 'product-settings.php',
-				'screen_tab'         => 'attributes-settings',
-				'screen_tab_label'   => __( 'Attributes', 'ecommerce-product-catalog' ),
-				'screen_tab_menu_item_id' => 'attributes-settings',
-				'screen_tab_query_args' => array(
+				'submenu'                          => 'attributes',
+				'screen'                           => 'product-settings.php',
+				'screen_tab'                       => 'attributes-settings',
+				'screen_tab_label'                 => __( 'Attributes', 'ecommerce-product-catalog' ),
+				'screen_tab_menu_item_id'          => 'attributes-settings',
+				'screen_tab_query_args'            => array(
 					'submenu' => 'attributes',
 				),
 				'screen_tab_content_wrapper_class' => 'attributes-product-settings',
 				'screen_tab_content_wrapper_style' => 'clear:both;',
-				'screen_submenu_label' => __( 'Attributes Settings', 'ecommerce-product-catalog' ),
-				'submenu_item_id'    => 'attributes-settings',
-				'container_class'    => 'setting-content submenu',
-				'settings'           => ic_epc_attributes_settings_page_settings(),
-				'content_settings'   => ic_epc_attributes_settings_page_content_settings(),
-				'sections'           => ic_epc_attributes_settings_page_sections(),
-				'helpers'            => array(
+				'screen_submenu_label'             => __( 'Attributes Settings', 'ecommerce-product-catalog' ),
+				'submenu_item_id'                  => 'attributes-settings',
+				'container_class'                  => 'setting-content submenu',
+				'settings'                         => ic_epc_attributes_settings_page_settings(),
+				'content_settings'                 => ic_epc_attributes_settings_page_content_settings(),
+				'sections'                         => ic_epc_attributes_settings_page_sections(),
+				'helpers'                          => array(
 					'ic_epc_main_helper',
 					array(
 						'callback' => 'ic_epc_doc_helper',
 						'args'     => array( __( 'attributes', 'ecommerce-product-catalog' ), 'product-attributes' ),
 					),
 				),
-				'submit_label'       => __( 'Save changes', 'ecommerce-product-catalog' ),
+				'submit_label'                     => __( 'Save changes', 'ecommerce-product-catalog' ),
 			)
 		);
 	}
@@ -802,7 +802,7 @@ function ic_attributes_settings_rows( $attribute, $attribute_label, $attribute_u
 							value="<?php echo esc_html( $attribute_unit[ $i ] ); ?>"/></td>
 			<?php do_action( 'product_attributes_settings_table_td', $i, $names, $attribute_label[ $i ], $attribute[ $i ], $attribute_unit[ $i ] ); ?>
 			<td class="dragger"></td>
-		</tr> 
+		</tr>
 		<?php
 	}
 }

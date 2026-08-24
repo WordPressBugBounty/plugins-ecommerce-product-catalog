@@ -44,13 +44,14 @@ class IC_Shipping_Address_Form {
 	 * @return void
 	 */
 	public function register_scripts() {
+		$script_path = __DIR__ . '/js/shipping-address-form.js';
 		wp_register_script(
 			'ic-shipping-address-form',
-			AL_PLUGIN_BASE_PATH . 'modules/shipping/js/shipping-address-form.js' . ic_filemtime( AL_BASE_PATH . '/modules/shipping/js/shipping-address-form.js' ),
+			plugins_url( 'js/shipping-address-form.js', __FILE__ ),
 			array(
 				'jquery',
 			),
-			IC_EPC_VERSION,
+			ic_filemtime( $script_path ),
 			true
 		);
 	}
@@ -71,13 +72,14 @@ class IC_Shipping_Address_Form {
 	 */
 	protected static function ensure_script_enqueued() {
 		if ( ! wp_script_is( 'ic-shipping-address-form', 'registered' ) ) {
+			$script_path = __DIR__ . '/js/shipping-address-form.js';
 			wp_register_script(
 				'ic-shipping-address-form',
-				AL_PLUGIN_BASE_PATH . 'modules/shipping/js/shipping-address-form.js' . ic_filemtime( AL_BASE_PATH . '/modules/shipping/js/shipping-address-form.js' ),
+				plugins_url( 'js/shipping-address-form.js', __FILE__ ),
 				array(
 					'jquery',
 				),
-				IC_EPC_VERSION,
+				ic_filemtime( $script_path ),
 				true
 			);
 		}
@@ -138,17 +140,17 @@ class IC_Shipping_Address_Form {
 				continue;
 			}
 
-			$option_slug  = sanitize_title( $option['name'] );
-			$field_slot   = self::option_slot( $option );
-			$field_json   = ic_get_shipping_address_form_fields( $field_slot, $pre_name );
-			$is_active    = $option_slug === $selected_value;
-			$field_prefix = self::field_prefix( $pre_name, $group_index, $option_slug );
-			$field_values = self::field_values( $field_prefix );
-			$slot_field_id = self::shipping_slot_field_id( $field_prefix );
-			$same_as_billing_id = self::same_as_billing_field_id( $field_prefix );
+			$option_slug          = sanitize_title( $option['name'] );
+			$field_slot           = self::option_slot( $option );
+			$field_json           = ic_get_shipping_address_form_fields( $field_slot, $pre_name );
+			$is_active            = $option_slug === $selected_value;
+			$field_prefix         = self::field_prefix( $pre_name, $group_index, $option_slug );
+			$field_values         = self::field_values( $field_prefix );
+			$slot_field_id        = self::shipping_slot_field_id( $field_prefix );
+			$same_as_billing_id   = self::same_as_billing_field_id( $field_prefix );
 			$show_same_as_billing = self::same_as_billing_available( $field_slot, $pre_name );
 			$is_same_as_billing   = $show_same_as_billing && self::field_value_is_checked( isset( $field_values[ $same_as_billing_id ] ) ? $field_values[ $same_as_billing_id ] : null );
-			$fields_html  = formbuilder_raw_fields( $field_json, 2, $field_prefix, $field_values );
+			$fields_html          = formbuilder_raw_fields( $field_json, 2, $field_prefix, $field_values );
 			if ( ! $is_active ) {
 				$fields_html = str_replace(
 					array(
@@ -472,19 +474,19 @@ class IC_Shipping_Address_Form {
 					continue;
 				}
 
-					if ( substr( $posted_field_name, -strlen( 'shipping_slot' ) ) === 'shipping_slot' ) {
-						$prefix = substr( $posted_field_name, 0, -strlen( 'shipping_slot' ) );
-						if ( ! $this->is_supported_shipping_address_prefix( $prefix ) ) {
-							continue;
-						}
-						if ( $this->context_prefix_is_nested( $prefix, $contexts ) ) {
-							continue;
-						}
+				if ( substr( $posted_field_name, -strlen( 'shipping_slot' ) ) === 'shipping_slot' ) {
+					$prefix = substr( $posted_field_name, 0, -strlen( 'shipping_slot' ) );
+					if ( ! $this->is_supported_shipping_address_prefix( $prefix ) ) {
+						continue;
+					}
+					if ( $this->context_prefix_is_nested( $prefix, $contexts ) ) {
+						continue;
+					}
 
-						$posted_slot = intval( $this->posted_field_value( $posted_field_name ) );
-						if ( $posted_slot < 1 ) {
-							continue;
-						}
+					$posted_slot = intval( $this->posted_field_value( $posted_field_name ) );
+					if ( $posted_slot < 1 ) {
+						continue;
+					}
 
 					$posted_slot_fields = $this->best_admin_shipping_address_fields_for_prefix( $prefix, $posted_slot, $pre_name, $posted );
 					if ( empty( $posted_slot_fields ) ) {
@@ -1041,8 +1043,8 @@ class IC_Shipping_Address_Form {
 			return;
 		}
 
-		$payment_details = ic_get_order_payment_details( $order_id );
-		$summary         = '';
+		$payment_details  = ic_get_order_payment_details( $order_id );
+		$summary          = '';
 		$contexts_payload = array();
 		foreach ( $contexts as $context ) {
 			$rows = '';
@@ -1070,7 +1072,7 @@ class IC_Shipping_Address_Form {
 				continue;
 			}
 
-			$summary .= $rows . '<br>';
+			$summary           .= $rows . '<br>';
 			$contexts_payload[] = $this->build_admin_context_payload( $context );
 		}
 

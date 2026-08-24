@@ -13,6 +13,10 @@ jQuery(document).ready(function () {
             jQuery(this).attr('name', 'manual_order_product_id_' + count + '[' + product_id + ']');
         });
         jQuery('#new_manual_order_product_id').attr('id', 'manual_order_product_id_' + count);
+        if (window.icSelector) {
+            /* The injected row may carry a shared AJAX selector; enhance it. */
+            window.icSelector.init(document);
+        }
         disable_product_choose();
     });
     jQuery('#add-custom-digital-product').click(function () {

@@ -1064,7 +1064,36 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 
     function ic_select_product( $first_option, $selected_value, $select_name, $class = null, $echo = 1, $attr = null ) {
         $product_count = ic_products_count();
-        if ( $product_count < 2000 ) {
+        // `ic_order_products` carries `edit_digital_orders`, the capability this
+        // screen is actually gated on, while `ic_products` carries
+        // `manage_product_settings`. Pinning the control to either one drops
+        // whichever role holds only the other back to the capped fallback, so
+        // the source is resolved per user instead.
+        $source_key    = apply_filters( 'ic_select_product_selector_source', function_exists( 'ic_selector_first_allowed_source' ) ? ic_selector_first_allowed_source( array( 'ic_order_products', 'ic_products' ) ) : '' );
+        $threshold     = absint( apply_filters( 'ic_select_product_ajax_threshold', 2000 ) );
+        $use_selector  = ( $product_count >= $threshold ) && ! empty( $source_key ) && function_exists( 'ic_selector_field' ) && ic_selector_registry()->has( $source_key );
+        $field_number  = filter_var( $select_name, FILTER_SANITIZE_NUMBER_INT );
+        if ( $use_selector ) {
+            /*
+             * Above the threshold the catalog is too large for a rendered
+             * <select>, so the field becomes the shared AJAX selector instead
+             * of the ID text box it used to degrade into. The control still
+             * submits through a real <select>, so every caller keeps working.
+             */
+            $select_box = ic_selector_field(
+                    array(
+                            'source'       => $source_key,
+                            'name'         => $select_name,
+                            'id'           => str_replace( array( '[', ']' ), '', $select_name ),
+                            'value'        => $selected_value,
+                            'multiple'     => is_array( $selected_value ) || ( is_string( $attr ) && false !== strpos( $attr, 'multiple' ) ),
+                            // `ic_chosen` is dropped on purpose: the selector replaces Chosen on this field, and leaving the class on would have both scripts enhance the same <select>.
+                            'class'        => trim( 'all-products-dropdown ' . str_replace( 'ic_chosen', '', (string) $class ) ),
+                            'first_option' => $first_option,
+                            'attributes'   => array( 'custom' => $field_number ),
+                    )
+            );
+        } elseif ( $product_count < $threshold ) {
             $catalogs = product_post_type_array();
             $set      = array(
                     'posts_per_page'   => - 1,
@@ -1076,8 +1105,7 @@ if ( ! function_exists( 'ic_select_product' ) ) {
                     'fields'           => 'ids'
             );
 
-            $pages        = get_posts( $set );
-            $field_number = filter_var( $select_name, FILTER_SANITIZE_NUMBER_INT );
+            $pages = get_posts( $set );
 
             $select_box = '<select custom="' . $field_number . '" id="' . $select_name . '" name="' . $select_name . '" class="all-products-dropdown ' . $class . '" ' . $attr . '>';
             if ( ! empty( $first_option ) ) {

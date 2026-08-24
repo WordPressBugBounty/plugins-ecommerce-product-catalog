@@ -66,7 +66,17 @@ function country_chosen_admin_select_script() {
 				$_POST = $payment_details;
 			}
 		}
-		wp_enqueue_script( 'digital_order_edit_script', AL_PO_PLUGIN_BASE_URL . 'js/edit-order.min.js' . ic_filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), array( 'ic_chosen' ), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), true );
+		$edit_order_deps = array( 'ic_chosen' );
+		if ( wp_script_is( 'ic-ajax-selector', 'registered' ) ) {
+			// The product field becomes the shared AJAX selector on large catalogs, and this script re-initialises injected rows.
+			$edit_order_deps[] = 'ic-ajax-selector';
+			// A script dependency does not pull in the stylesheet, and the field
+			// renderer only reaches its own enqueue once the metabox is printing,
+			// which defers the CSS to the late-styles pass and flashes an
+			// unstyled control first.
+			wp_enqueue_style( 'ic-ajax-selector' );
+		}
+		wp_enqueue_script( 'digital_order_edit_script', AL_PO_PLUGIN_BASE_URL . 'js/edit-order.min.js' . ic_filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), $edit_order_deps, defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), true );
 		// if ( ic_ic_order_manual() ) {
 		if ( function_exists( 'start_digital_products' ) ) {
 			$translation_array = array(
@@ -80,4 +90,52 @@ function country_chosen_admin_select_script() {
 		wp_localize_script( 'digital_order_edit_script', 'digital_order_edit_script_trans', apply_filters( 'digital_order_edit_sctipt_translations', $translation_array ) );
 		// }
 	}
+}
+
+if ( ! function_exists( 'ic_orders_register_selector_sources' ) ) {
+
+	/**
+	 * Registers the order screen's own product selector source.
+	 *
+	 * The framework already ships `ic_products`, but that source is gated on
+	 * `manage_product_settings` because it serves the catalog settings and the
+	 * statistics screens. The order edit screen is gated on
+	 * `edit_digital_orders` instead, so a role that may edit orders without
+	 * managing product settings would fall back to the plain capped `<select>`
+	 * and lose search on a large catalog. Widening `ic_products` would grant
+	 * catalog-wide search to that role everywhere else too, so the order screen
+	 * gets its own source with its own capability -- which is the whole reason
+	 * the registry keys a capability per source.
+	 *
+	 * Everything else matches `ic_products`: the same post types, the same
+	 * `ic_visible_product_status()` callable resolved per request, and the same
+	 * search fields.
+	 *
+	 * @return void
+	 */
+	function ic_orders_register_selector_sources() {
+		if ( ! function_exists( 'ic_register_selector_source' ) || ! function_exists( 'product_post_type_array' ) ) {
+			return;
+		}
+
+		ic_register_selector_source(
+			'ic_order_products',
+			array(
+				'type'           => 'post',
+				'subtypes'       => 'product_post_type_array',
+				'post_status'    => function_exists( 'ic_visible_product_status' ) ? 'ic_visible_product_status' : array( 'publish' ),
+				'capability'     => 'edit_digital_orders',
+				'search'         => array(
+					'title',
+					'id',
+					'meta' => array( '_sku' ),
+				),
+				'per_page'       => 20,
+				'label'          => __( 'products', 'ecommerce-product-catalog' ),
+				'label_callback' => function_exists( 'get_product_name' ) ? 'get_product_name' : '',
+			)
+		);
+	}
+
+	add_action( 'ic_register_selector_sources', 'ic_orders_register_selector_sources' );
 }
