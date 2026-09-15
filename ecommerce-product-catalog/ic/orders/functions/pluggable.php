@@ -502,8 +502,9 @@ if ( ! function_exists( 'ic_mail' ) ) {
 				"\r\n"
 			);
 		}
-		wp_mail( $receiver_email, $title, $message, $headers, $attachments );
+		$sent = wp_mail( $receiver_email, $title, $message, $headers, $attachments );
 		remove_filter( 'wp_mail_content_type', 'ic_mail_set_html' );
+		return $sent;
 	}
 
 }

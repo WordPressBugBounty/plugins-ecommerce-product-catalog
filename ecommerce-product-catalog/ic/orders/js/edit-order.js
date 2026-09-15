@@ -27,30 +27,14 @@ jQuery(document).ready(function () {
         jQuery('#manual_order_product_name_' + count).show();
     });
     jQuery('#order_product_list').on('change', '.digital_products_dropdown', function () {
-        var product_id = jQuery(this).val();
-        var price = jQuery('#product_price_' + product_id).val();
-        if (!price) {
-            price = 0;
-        }
-        update_row(jQuery(this), price);
-        /*
-        var field_number = jQuery(this).attr('custom');
-        var pre_name = '#manual_order_';
-        if (jQuery(this).attr('name') === 'order_product_id_' + field_number) {
-            pre_name = '#order_';
-        }
-        jQuery(pre_name + 'product_price_' + field_number).val(price);
-        var quantity = jQuery(pre_name + 'product_quantity_' + field_number).val();
-        var sum = Math.round(quantity * price * 100) / 100;
-        sum = sum.toFixed(2);
-        jQuery(pre_name + "product_summary_" + field_number).val(sum);
-
-         */
+		load_product_price(jQuery(this));
     });
     jQuery('#order_product_list').on('change', '.product-quantity', function () {
         update_row(jQuery(this));
     });
     jQuery('#order_product_list').on('change', '.product-price', function () {
+		invalidate_price_request(jQuery(this));
+		clear_price_error(jQuery(this));
         update_row(jQuery(this));
     });
     jQuery('.ic-payment-data-form h2').on('click', function () {
@@ -99,6 +83,88 @@ jQuery(document).ready(function () {
         sum = sum.toFixed(2);
         jQuery(pre_name + 'product_summary_' + field_number).val(sum);
     }
+
+	function row_price_field(field) {
+		var field_number = field.attr('custom');
+		var pre_name = '#manual_order_';
+		if (field.attr('name') === 'order_product_id_' + field_number) {
+			pre_name = '#order_';
+		}
+		return jQuery(pre_name + 'product_price_' + field_number);
+	}
+
+	function invalidate_price_request(price_field) {
+		var request = price_field.data('ic-price-request');
+		if (request && request.xhr) {
+			request.xhr.abort();
+		}
+		price_field.data('ic-price-sequence', (price_field.data('ic-price-sequence') || 0) + 1);
+		price_field.removeData('ic-price-request').removeAttr('aria-busy');
+	}
+
+	function clear_price_error(price_field) {
+		price_field.removeAttr('aria-invalid title placeholder');
+	}
+
+	function show_price_error(field, price_field, message) {
+		price_field.val('').removeAttr('aria-busy').attr({
+			'aria-invalid': 'true',
+			'title': message,
+			'placeholder': message
+		});
+		update_row(field, 0);
+	}
+
+	function load_product_price(field) {
+		var config = digital_order_edit_script_trans.product_price || {};
+		var product_id = String(field.val() || '');
+		var price_field = row_price_field(field);
+		var previous = price_field.data('ic-price-request');
+		if (previous && previous.xhr) {
+			previous.xhr.abort();
+		}
+		var sequence = (price_field.data('ic-price-sequence') || 0) + 1;
+		price_field.data('ic-price-sequence', sequence).removeData('ic-price-request');
+		clear_price_error(price_field);
+
+		if (!product_id || product_id === 'noid') {
+			price_field.removeAttr('aria-busy');
+			update_row(field, 0);
+			return;
+		}
+
+		var original_price = String(price_field.val() || '');
+		price_field.attr({'aria-busy': 'true', 'placeholder': config.loading || ''});
+		var xhr = jQuery.ajax({
+			url: config.ajax_url,
+			type: 'POST',
+			dataType: 'json',
+			data: {
+				action: config.action,
+				nonce: config.nonce,
+				order_id: config.order_id,
+				product_id: product_id
+			}
+		});
+		price_field.data('ic-price-request', {xhr: xhr, sequence: sequence, product_id: product_id});
+
+		xhr.done(function (response) {
+			var current = price_field.data('ic-price-request');
+			if (!current || current.sequence !== sequence || String(field.val() || '') !== product_id || !response || !response.success || !response.data || String(response.data.product_id) !== product_id || String(price_field.val() || '') !== original_price) {
+				return;
+			}
+			price_field.removeData('ic-price-request').removeAttr('aria-busy');
+			clear_price_error(price_field);
+			update_row(field, response.data.price === '' ? 0 : String(response.data.price));
+		}).fail(function (request, status) {
+			var current = price_field.data('ic-price-request');
+			if (status === 'abort' || !current || current.sequence !== sequence || String(field.val() || '') !== product_id || String(price_field.val() || '') !== original_price) {
+				return;
+			}
+			price_field.removeData('ic-price-request');
+			show_price_error(field, price_field, config.error || '');
+		});
+	}
 });
 
 function ic_toggle_section_containers(container, toggle_container) {

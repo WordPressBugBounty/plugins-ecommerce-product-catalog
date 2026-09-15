@@ -90,13 +90,29 @@ class IC_User_Login {
 		if ( ! class_exists( 'IC_Html_Util' ) && file_exists( __DIR__ . '/class-ic-html-util.php' ) ) {
 			require_once __DIR__ . '/class-ic-html-util.php';
 		}
-		$this->maybe_enable_registration( $registration );
-		$this->maybe_enable_guest( $guest_login );
+		$this->enable_features( $registration, $guest_login );
 
 		add_filter( 'body_class', array( $this, 'body_class' ) );
 		add_action( 'login_form_middle', array( $this, 'lost_password_link_html' ) );
 		add_filter( 'ic_customer_login_form_class', array( $this, 'css_class' ), 10, 2 );
 		add_filter( 'ic_customer_login_form', array( $this, 'form_options' ), 10, 4 );
+	}
+
+	/**
+	 * Enables optional login features requested by a later shared consumer.
+	 *
+	 * A cached customer login helper may first be created by a guest-only flow
+	 * and later reused by a checkout that enables registration. Features are
+	 * additive for the request and must not create a second filter owner.
+	 *
+	 * @param bool $registration Whether registration support should be enabled.
+	 * @param bool $guest_login  Whether guest-login support should be enabled.
+	 *
+	 * @return void
+	 */
+	public function enable_features( $registration = false, $guest_login = false ) {
+		$this->maybe_enable_registration( $registration );
+		$this->maybe_enable_guest( $guest_login );
 	}
 
 	/**
@@ -287,7 +303,7 @@ class IC_User_Login {
 		$tabs_num     = substr_count( $tabs, '<li>' );
 		$inside_class = 'inside_login';
 		if ( $tabs_num > 1 ) {
-			$inside_class .= 'ui-tabs';
+			$inside_class .= ' ui-tabs';
 		}
 		$form .= '<div class="' . $inside_class . '">';
 		if ( $closer ) {

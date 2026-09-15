@@ -58,6 +58,13 @@ function ic_register_styles_scripts() {
 		(string) ic_filemtime( $path_root . '/js/ic-screen-api.min.js', true ),
 		false
 	);
+	// Only consumers that actually loaded ic/ai/index.php need these handles. ic_ai_manager() is
+	// defined there, and this runs on init - long after ic/index.php - so the probe is reliable.
+	if ( function_exists( 'ic_ai_manager' ) ) {
+		wp_register_style( 'ic-ai-admin', $url_root . 'ai/css/ic-ai-admin.css', array(), (string) ic_filemtime( $path_root . '/ai/css/ic-ai-admin.css', true ) );
+		wp_register_script( 'ic-ai-admin', $url_root . 'ai/js/ic-ai-admin.js', array( 'jquery' ), (string) ic_filemtime( $path_root . '/ai/js/ic-ai-admin.js', true ), true );
+		wp_register_script( 'ic-ai-settings', $url_root . 'ai/js/ic-ai-settings.js', array( 'jquery' ), (string) ic_filemtime( $path_root . '/ai/js/ic-ai-settings.js', true ), true );
+	}
 }
 
 /**

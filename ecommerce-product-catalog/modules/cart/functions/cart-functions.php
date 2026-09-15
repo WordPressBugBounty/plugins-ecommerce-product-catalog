@@ -33,8 +33,11 @@ add_action( 'init', 'ic_add_recent_new_product_in_cart', 5 );
 function ic_add_recent_new_product_in_cart() {
 	if ( ! is_admin() ) {
 		$shopping_cart_settings = get_shopping_cart_settings();
+		// cart_redirect is a premium-only setting that free EPC no longer returns. An absent
+		// key means "no redirect configured", which is the same branch the empty stored value
+		// used to take, so the recent product is still recorded.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public add-to-cart post that only records the product in the current visitor's own cart session; the id is cast with intval() below.
-		if ( $shopping_cart_settings['cart_redirect'] != 1 && ! empty( $_POST['current_product'] ) ) {
+		if ( ( empty( $shopping_cart_settings['cart_redirect'] ) || 1 !== (int) $shopping_cart_settings['cart_redirect'] ) && ! empty( $_POST['current_product'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public add-to-cart post scoped to the visitor's own session; the id is cast with intval() on this line.
 			ic_cart_store_recent_product( intval( $_POST['current_product'] ) );
 		}

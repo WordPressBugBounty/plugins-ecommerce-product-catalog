@@ -104,20 +104,27 @@ if ( ! function_exists( 'ic_mail_alternate' ) ) {
 			if ( strpos( $ic_mail_content, $table_tag ) !== false ) {
 				preg_match_all( '/<tr[^>]*>(.*?)<\/tr>/s', $ic_mail_content, $matches );
 				$rows = $matches[1];
-				preg_match_all( '/<td[^>]*>(.*?)<\/td>/s', $rows[0], $matches );
-				$th      = $matches[1];
-				$replace = '';
-				foreach ( $rows as $row_key => $row ) {
-					if ( 0 !== $row_key ) {
-						preg_match_all( '/<td[^>]*>(.*?)<\/td>/s', $row, $matches );
-						$row_fields = $matches[1];
-						foreach ( $row_fields as $key => $field ) {
-							$replace .= $th[ $key ] . ': ' . $field . '<br>';
+				// A table without a single row has no header to map the cells onto, so leave it as it is.
+				if ( ! empty( $rows ) ) {
+					preg_match_all( '/<td[^>]*>(.*?)<\/td>/s', $rows[0], $matches );
+					$th      = $matches[1];
+					$replace = '';
+					foreach ( $rows as $row_key => $row ) {
+						if ( 0 !== $row_key ) {
+							preg_match_all( '/<td[^>]*>(.*?)<\/td>/s', $row, $matches );
+							$row_fields = $matches[1];
+							foreach ( $row_fields as $key => $field ) {
+								if ( ! isset( $th[ $key ] ) ) {
+									// A row may hold more cells than the header row; drop the orphan cell.
+									continue;
+								}
+								$replace .= $th[ $key ] . ': ' . $field . '<br>';
+							}
+							$replace .= '<br>';
 						}
-						$replace .= '<br>';
 					}
+					$ic_mail_content = preg_replace( '/<table[^>]*>(.*?)<\/table>/s', $replace, $ic_mail_content );
 				}
-				$ic_mail_content = preg_replace( '/<table[^>]*>(.*?)<\/table>/s', $replace, $ic_mail_content );
 			}
 			$button = addslashes( ic_email_button( '(.*?)' ) );
 			if ( strpos( $button, $ic_mail_content ) !== false ) {

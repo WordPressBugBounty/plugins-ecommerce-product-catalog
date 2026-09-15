@@ -54,10 +54,82 @@ function digital_orders_enqeueue_styles() {
 	}
 }
 
+if ( ! function_exists( 'ic_orders_register_identity_source' ) ) {
+	/**
+	 * Registers statutory order records for two-phase identity erasure.
+	 */
+	function ic_orders_register_identity_source() {
+		if ( ! function_exists( 'ic_register_erasable_identity_source' ) ) {
+			return;
+		}
+		ic_register_erasable_identity_source(
+			'ic_orders',
+			array(
+				'post_type'       => 'al_digital_orders',
+				'customer_meta'   => '_customer_id',
+				'identity_meta'   => '_payment_details',
+				'identity_fields' => array( 'customer_name', 'customer_email', 'shipping_email', 'email', 'name', 'billing_name', 'street', 'postcode', 'city', 'vatid', 'vat_name', 'vat_address', 'vat_ver_id', 'address', 'tax_code' ),
+				'summary_meta'    => '_order_summary',
+				'summary_fields'  => array( 'email' ),
+				'statutory'       => true,
+			)
+		);
+	}
+}
+add_action( 'ic_register_erasable_identity_sources', 'ic_orders_register_identity_source' );
+
 add_action( 'enqueue_catalog_admin_styles', 'country_chosen_admin_select_script' );
+
+add_action( 'wp_ajax_ic_order_product_price', 'ic_ajax_order_product_price' );
+
+/**
+ * Returns the current filtered catalog price for one editable order row.
+ *
+ * @return void
+ */
+function ic_ajax_order_product_price() {
+	if ( ! check_ajax_referer( 'ic_order_product_price', 'nonce', false ) ) {
+		wp_send_json_error( array( 'code' => 'invalid_nonce' ), 403 );
+	}
+
+	if ( ! current_user_can( 'edit_digital_orders' ) ) {
+		wp_send_json_error( array( 'code' => 'forbidden' ), 403 );
+	}
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The action-specific nonce is verified above before request data is read.
+	$order_id = isset( $_POST['order_id'] ) && is_scalar( $_POST['order_id'] ) ? absint( wp_unslash( $_POST['order_id'] ) ) : 0;
+	$order    = get_post( $order_id );
+	if ( ! $order instanceof WP_Post || 'al_digital_orders' !== $order->post_type ) {
+		wp_send_json_error( array( 'code' => 'invalid_order' ), 404 );
+	}
+
+	if ( ! current_user_can( 'edit_digital_order', $order_id ) ) {
+		wp_send_json_error( array( 'code' => 'forbidden' ), 403 );
+	}
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The action-specific nonce is verified above before request data is read.
+	$product_id       = isset( $_POST['product_id'] ) && is_scalar( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
+	$product          = get_post( $product_id );
+	$product_types    = function_exists( 'product_post_type_array' ) ? (array) product_post_type_array() : array();
+	$visible_statuses = function_exists( 'ic_visible_product_status' ) ? (array) ic_visible_product_status() : array();
+	if ( ! $product instanceof WP_Post || ! in_array( $product->post_type, $product_types, true ) || ! in_array( $product->post_status, $visible_statuses, true ) || ! current_user_can( 'read_product', $product_id ) ) {
+		wp_send_json_error( array( 'code' => 'invalid_product' ), 404 );
+	}
+
+	$price = apply_filters( 'digital_product_prices_table_price', get_post_meta( $product_id, '_price', true ), $product_id );
+	$price = is_scalar( $price ) ? (string) $price : '';
+	wp_send_json_success(
+		array(
+			'product_id' => $product_id,
+			'price'      => $price,
+		)
+	);
+}
 
 function country_chosen_admin_select_script() {
 	if ( is_ic_order_edit_screen() ) {
+		global $post;
+		$order_id = $post instanceof WP_Post && 'al_digital_orders' === $post->post_type ? (int) $post->ID : 0;
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
 		if ( ! empty( $_GET['payment_details'] ) ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The structured request value is shape-checked, unslashed once, and normalized by the field-specific downstream parser before use.
@@ -87,7 +159,16 @@ function country_chosen_admin_select_script() {
 				'digital_products_dropdown_action' => ic_select_product( __( 'Choose product from catalog', 'ecommerce-product-catalog' ), '', 'new_manual_order_product_id', 'digital_products_dropdown', 0 ),
 			);
 		}
-		wp_localize_script( 'digital_order_edit_script', 'digital_order_edit_script_trans', apply_filters( 'digital_order_edit_sctipt_translations', $translation_array ) );
+		$translation_array                  = apply_filters( 'digital_order_edit_sctipt_translations', $translation_array );
+		$translation_array['product_price'] = array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'action'   => 'ic_order_product_price',
+			'nonce'    => wp_create_nonce( 'ic_order_product_price' ),
+			'order_id' => $order_id,
+			'loading'  => __( 'Loading price&hellip;', 'ecommerce-product-catalog' ),
+			'error'    => __( 'Could not load the price. Enter it manually.', 'ecommerce-product-catalog' ),
+		);
+		wp_localize_script( 'digital_order_edit_script', 'digital_order_edit_script_trans', $translation_array );
 		// }
 	}
 }

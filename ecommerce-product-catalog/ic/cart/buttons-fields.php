@@ -81,7 +81,12 @@ function ic_cart_add_button(
 		$cart_content = ic_shopping_cart_content( true );
 	}
 
-	$shopping_cart_settings = get_shopping_cart_settings();
+	// cart_page_template is read raw further down, and it is only ever stored by the premium
+	// cart settings screens, so the framework defaults have to be filled in first - the same
+	// way ic_cart::normalize_settings() and ic_cart_checkout_form_email::__construct() do it.
+	// The function_exists() guard is here because this file is required before ic/cart/functions.php
+	// in implecode-shopping-cart's bootstrap; every other read below is empty()-guarded.
+	$shopping_cart_settings = function_exists( 'ic_cart_normalize_settings' ) ? ic_cart_normalize_settings( get_shopping_cart_settings() ) : get_shopping_cart_settings();
 	$button_class           = ( ! empty( $shopping_cart_settings['url_button'] ) && intval( $shopping_cart_settings['url_button'] ) === 1 ) ? 'link' : 'button';
 	$button_class          .= ' ' . design_schemes( 'box', 0 );
 	$action                 = '';

@@ -371,7 +371,8 @@ class IC_Simple_Form_Legacy {
 		$this->submit_state_key       = 'formbuilder_submit_state_' . $this->pre_name;
 		$this->content                = ic_get_global( 'formbuilder_submit_content_' . $this->pre_name );
 		if ( $this->content ) {
-			return $this->content;
+			// Cached content is already stored on the instance; stop the rest of the setup.
+			return;
 		} else {
 			$this->content = '';
 		}

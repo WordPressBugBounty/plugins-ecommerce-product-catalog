@@ -34,6 +34,8 @@ if ( ! function_exists( 'ic_customer_login_is_custom_logged' ) ) {
  * @return IC_User_Login|null
  */
 function ic_get_customer_login_instance( $settings = array() ) {
+	static $instance;
+
 	if ( ! function_exists( 'ic_user_login_instance' ) ) {
 		$user_functions = dirname( dirname( __DIR__ ) ) . '/user-functions.php';
 		if ( file_exists( $user_functions ) ) {
@@ -56,8 +58,16 @@ function ic_get_customer_login_instance( $settings = array() ) {
 	$registration = apply_filters( 'ic_customer_login_registration_enabled', false, $settings );
 	$guest_login  = apply_filters( 'ic_customer_login_guest_enabled', false, $settings );
 	$redirect     = function_exists( 'ic_get_login_redirect_url' ) ? ic_get_login_redirect_url() : '';
+	if ( $instance instanceof IC_User_Login ) {
+		if ( method_exists( $instance, 'enable_features' ) ) {
+			$instance->enable_features( $registration, $guest_login );
+		}
+		return $instance;
+	}
 
-	return ic_user_login_instance( $registration, true, $guest_login, $redirect );
+	$instance = ic_user_login_instance( $registration, true, $guest_login, $redirect );
+
+	return $instance;
 }
 
 /**
@@ -129,7 +139,7 @@ function ic_digital_customer_login_form(
 	$tabs_num     = substr_count( $tabs, '<li>' );
 	$inside_class = 'inside_login';
 	if ( $tabs_num > 1 ) {
-		$inside_class .= 'ui-tabs';
+		$inside_class .= ' ui-tabs';
 	}
 	$form .= '<div class="' . $inside_class . '">';
 	if ( $closer ) {

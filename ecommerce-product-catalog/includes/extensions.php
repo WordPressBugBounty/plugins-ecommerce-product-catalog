@@ -1588,12 +1588,16 @@ function ic_license_valid_until() {
 /**
  * Returns the valid-until timestamp when the license is active.
  *
- * @return int|false
+ * @return int|false Valid-until timestamp, PHP_INT_MAX for a non-expiring license, or false.
  */
 function ic_is_license_valid() {
 	$valid_until = ic_license_valid_until();
 	if ( empty( $valid_until ) ) {
 		return false;
+	}
+	// The update server reports non-expiring licenses as the untranslated literal "Never".
+	if ( is_string( $valid_until ) && 'never' === strtolower( trim( $valid_until ) ) ) {
+		return PHP_INT_MAX;
 	}
 	$valid_until_time = strtotime( $valid_until );
 	$current_time     = (int) gmdate( 'U' );

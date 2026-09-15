@@ -52,12 +52,29 @@ function ic_show_customer_url( $content_id ) {
 	}
 }
 
-function ic_get_customer_id_from_email( $email ) {
-	$customer_id = username_exists( $email );
-	if ( ! empty( $customer_id ) ) {
-		return $customer_id;
-	} else {
-		return false;
+
+if ( ! function_exists( 'ic_get_customer_id_from_email' ) ) {
+	/**
+	 * Resolves a customer user ID from an address.
+	 *
+	 * The address is looked up as an email first, which is what the function name
+	 * promises and the only lookup that works when a customer's WordPress login
+	 * differs from the email used on their order. The historical username_exists()
+	 * lookup is kept as a fallback so no install that resolves today stops
+	 * resolving; where login equals email both lookups return the same user.
+	 *
+	 * @param string $email Customer email address.
+	 *
+	 * @return int|false Customer user ID or false when no user matches.
+	 */
+	function ic_get_customer_id_from_email( $email ) {
+		$user = get_user_by( 'email', $email );
+		if ( $user ) {
+			return $user->ID;
+		}
+		$customer_id = username_exists( $email );
+
+		return ! empty( $customer_id ) ? $customer_id : false;
 	}
 }
 

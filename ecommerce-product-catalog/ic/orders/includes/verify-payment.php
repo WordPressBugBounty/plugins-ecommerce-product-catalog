@@ -116,11 +116,17 @@ function ic_expected_order_amount( $product_price, $payment_amount, $product_id,
 
 
 function ic_digital_order_status( $trans_id, $order_id = null ) {
+	// Never leave $payment_details undefined: the order may not exist at all.
+	$payment_details = array();
 	if ( empty( $order_id ) ) {
 		$order_id = ic_order_exists( $trans_id );
 	}
 	if ( ! empty( $order_id ) ) {
 		$payment_details = get_post_meta( $order_id, '_payment_details', true );
+		// Missing meta returns an empty string; writing an offset on it is a PHP 8 TypeError.
+		if ( ! is_array( $payment_details ) ) {
+			$payment_details = array();
+		}
 	}
 	$payment_details['status'] = isset( $payment_details['status'] ) ? $payment_details['status'] : 'pending';
 

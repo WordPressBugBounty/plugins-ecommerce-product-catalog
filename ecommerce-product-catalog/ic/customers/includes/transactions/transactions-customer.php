@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Package: transactions-customer.php
  */
+if ( ! class_exists( 'ic_orders_customer' ) ) {
 class ic_orders_customer {
 	public $settings;
 
@@ -204,3 +205,4 @@ class ic_orders_customer {
 }
 
 $ic_orders_customer = new ic_orders_customer();
+}

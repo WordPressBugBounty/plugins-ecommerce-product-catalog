@@ -13,11 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ic_cart_checkout_form_email {
 
 	/**
-	 * @var string
-	 */
-	private $order_reminder_meta = '_ic_order_reminder_sent';
-
-	/**
 	 * @var boolean
 	 */
 	private $price_summary = true;
@@ -85,6 +80,9 @@ class ic_cart_checkout_form_email {
 		} else {
 			$this->settings = get_shopping_cart_settings();
 		}
+		// This class does not extend ic_cart, so it has to normalize the layout and label
+		// defaults itself before reading cart_page_template or any summary_total_* label.
+		$this->settings = ic_cart_normalize_settings( $this->settings );
 		if ( $run ) {
 			add_filter( 'ic_formbuilder_admin_email', array( $this, 'modify_admin_email' ), 5, 2 );
 			add_filter( 'ic_formbuilder_admin_email', array( $this, 'ensure_shipping_address_in_email' ), 8, 2 );
@@ -94,10 +92,17 @@ class ic_cart_checkout_form_email {
 			add_filter( 'ic_formbuilder_user_email', array( $this, 'ensure_shipping_address_in_email' ), 8, 2 );
 			add_filter( 'ic_formbuilder_user_email', 'strip_shortcodes', 99 );
 
-			add_action( 'ic_formbuilder_email', array( $this, 'send_packing_list' ), 10, 5 );
-
-			add_action( 'ic_new_order_created', array( $this, 'reminder' ), 10, 6 );
-			add_action( 'ic_send_order_reminder', array( $this, 'send_reminder' ), 10, 4 );
+			/**
+			 * Extension point for packages that add their own order notifications.
+			 *
+			 * Fires only on a $run = true construction, so a listener registered here
+			 * inherits exactly the same on/off decision the built-in filters above do.
+			 * ic/cart/qc-sc/notifications.php uses it to attach the premium packing-list
+			 * and unpaid-order-reminder listeners without the free catalog shipping them.
+			 *
+			 * @param ic_cart_checkout_form_email $this Notifier instance being constructed.
+			 */
+			do_action( 'ic_cart_notifications_init', $this );
 		}
 		if ( $default_columns ) {
 			$this->default_columns();
@@ -130,91 +135,6 @@ class ic_cart_checkout_form_email {
 		return str_replace( '<p>', $this->p, $content );
 	}
 
-	function reminder( $payment_details, $order_products, $order_summary, $trans_id, $order_id ) {
-		$settings = get_shopping_cart_settings();
-		if ( ! isset( $settings['unpaid_order_notification_delay'] ) || ( isset( $settings['unpaid_order_notification_delay'] ) && $settings['unpaid_order_notification_delay'] === '' ) ) {
-			return;
-		}
-		if ( ! is_email( $payment_details['email'] ) ) {
-			return;
-		}
-		$days = intval( $settings['unpaid_order_notification_delay'] );
-		if ( empty( $days ) && empty( $settings['unpaid_order_notification_delay_date'] ) ) {
-			return;
-		}
-		if ( ! empty( $settings['unpaid_order_notification_time'] ) ) {
-			$time = strtotime( $settings['unpaid_order_notification_time'] );
-		} else {
-			$time = time();
-		}
-		if ( ! empty( $settings['unpaid_order_notification_delay_date'] ) ) {
-			if ( ! empty( $payment_details[ $settings['unpaid_order_notification_delay_date'] ] ) ) {
-				$new_time = strtotime( $payment_details[ $settings['unpaid_order_notification_delay_date'] ] . ' ' . wp_timezone_string() );
-				if ( $new_time ) {
-					$time = $new_time;
-					if ( ! empty( $settings['unpaid_order_notification_time'] ) ) {
-						$hours    = strtotime( $settings['unpaid_order_notification_time'] );
-						$midnight = strtotime( 'today midnight' );
-						if ( ! empty( $hours ) && ! empty( $midnight ) ) {
-							$hours_in_seconds = $hours - $midnight;
-							$time             = $time + $hours_in_seconds;
-						}
-					}
-				}
-			}
-		}
-		update_post_meta( $order_id, $this->order_reminder_meta, 1 );
-		wp_schedule_single_event(
-			$time + $days * DAY_IN_SECONDS,
-			'ic_send_order_reminder',
-			array(
-				$payment_details['email'],
-				$order_id,
-				$order_products,
-				$payment_details,
-			)
-		);
-	}
-
-	function correct_cron_time( $time ) {
-		$crons = _get_cron_array();
-		if ( isset( $crons[ $time ] ) ) {
-			if ( count( $crons[ $time ] ) > 30 ) {
-				$time = $time + 1;
-				$time = $this->correct_cron_time( $time );
-			}
-		}
-
-		return $time;
-	}
-
-	function send_reminder( $email, $order_id, $order_products, $payment_details ) {
-		if ( empty( $order_id ) ) {
-			return;
-		}
-		$status = ic_digital_order_status( '', $order_id );
-		if ( $status == 'completed' ) {
-			return;
-		}
-		if ( ! is_email( $email ) ) {
-			return;
-		}
-
-		$sent = get_post_meta( $order_id, $this->order_reminder_meta, true );
-		if ( empty( $sent ) || ( ! empty( $sent ) && $sent != 1 ) ) {
-			return;
-		}
-		$settings = get_shopping_cart_settings();
-		// $email         = ic_get_digital_customer_email( $customer_id );
-		if ( ! empty( $settings['unpaid_order_notification'] ) && ! empty( $settings['unpaid_order_notification_subject'] ) && ! empty( $settings['send_cart'] ) && ! empty( $settings['cart_name'] ) && ! empty( $email ) ) {
-			ic_mail( $settings['unpaid_order_notification'], $settings['cart_name'], $settings['send_cart'], $email, $settings['unpaid_order_notification_subject'] );
-		}
-
-		do_action( 'ic_sc_notification_send', $email, $order_id, $order_products, $payment_details, $settings );
-
-		update_post_meta( $order_id, $this->order_reminder_meta, 2 );
-	}
-
 	/**
 	 * Replaces customer_details shortcode in admin email template with order data
 	 *
@@ -236,34 +156,6 @@ class ic_cart_checkout_form_email {
 			$new_message    = str_replace( array( '<p>', '</p>' ), array( $p, $ep ), $new_message );
 
 			return do_shortcode( $new_message );
-		}
-
-		return $message;
-	}
-
-	/**
-	 * Replaces customer_details shortcode in admin email template with order data
-	 *
-	 * @param string $message
-	 * @param string $pre_name
-	 *
-	 * @return string
-	 */
-	function send_packing_list( $message, $customer_email, $redirect, $pre_name = null, $template = null ) {
-		if ( $pre_name == 'cart_' ) {
-			$email_settings = get_shopping_cart_settings();
-			if ( empty( $email_settings['receive_packing_list'] ) ) {
-				return;
-			}
-			$order_data  = $this->packing_list();
-			$order_data .= $message;
-			$p           = ic_email_paragraph();
-			$ep          = ic_email_paragraph_end();
-			$new_message = $email_settings['packing_email'];
-			$new_message = shortcode_unautop( wpautop( $new_message ) );
-			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
-			$new_message = do_shortcode( str_replace( array( '<p>', '</p>' ), array( $p, $ep ), $new_message ) );
-			ic_mail( $new_message, $email_settings['cart_name'], $email_settings['send_cart'], $email_settings['receive_packing_list'], $email_settings['packing_email_subject'], $template );
 		}
 
 		return $message;
@@ -584,75 +476,5 @@ class ic_cart_checkout_form_email {
 		}
 
 		return $this->p . $this->span . $label . ' ' . $this->espan . $value . $this->ep;
-	}
-
-	/**
-	 * Returns order products summary for email
-	 *
-	 * @param string $message
-	 * @param string $pre_name
-	 *
-	 * @return string
-	 */
-	function packing_list() {
-		$cart_content   = ic_shopping_cart_content( true );
-		$products_array = shopping_cart_products_array( $cart_content );
-		$pre_message    = '';
-		$line           = '<br>';
-		$td             = ic_email_table_td();
-		$etd            = ic_email_table_td_end();
-		$pre_message   .= ic_email_table();
-		$pre_message   .= ic_email_table_th();
-
-		$pre_message .= apply_filters( 'ic_cart_checkout_email_name_header', ic_email_table_td_first() . __( 'Product name', 'ecommerce-product-catalog' ) . ic_email_table_td_end(), $products_array );
-		if ( is_ic_cart_sku_enabled() ) {
-			$single_names = get_single_names();
-			$pre_message .= $td . str_replace( ':', '', $single_names['product_sku'] ) . $etd;
-		}
-		$pre_message .= $td . __( 'Quantity', 'ecommerce-product-catalog' ) . $etd;
-		$pre_message .= ic_email_table_th_end();
-		foreach ( $products_array as $cart_id => $p_quantity ) {
-			$product_id   = cart_id_to_product_id( $cart_id );
-			$pre_message .= ic_email_table_tr();
-			$pre_message .= apply_filters( 'ic_cart_checkout_email_name_td', ic_email_table_td_first() . apply_filters( 'cart_email_product_name', html_entity_decode( get_the_title( $product_id ), ENT_NOQUOTES | ENT_HTML401, 'UTF-8' ), $product_id, $cart_id ) . ic_email_table_td_end(), $product_id );
-			if ( is_ic_cart_sku_enabled() ) {
-				$sku          = get_product_sku( $product_id );
-				$pre_message .= $td . $sku . $etd;
-			}
-			$pre_message .= $td . $p_quantity . $etd;
-		}
-		$pre_message .= ic_email_table_end();
-		$p            = ic_email_paragraph();
-		$ep           = ic_email_paragraph_end();
-		if ( function_exists( 'ic_count_shipping_cost_payment' ) ) {
-			$shipping = ic_count_shipping_cost_payment( 0, 'cart_' );
-			if ( ! empty( $shipping ) ) {
-				$labels = '';
-				// Display only: this string is printed in the customer packing-list email. Prefer the
-				// display variant for the human-readable option name; ic_get_order_shipping_labels()
-				// returns sanitize_title() slugs, which reach the shopper as "express-shipping" or, for
-				// non-Latin names, as a percent-encoded string. Guarded like save-order.php and
-				// payment-render.php. Do not revert this to the slug variant.
-				// The function_exists() guard on the FALLBACK is deliberate - do not simplify this
-				// back to a ternary. Some legacy cart layouts ship ic_count_shipping_cost_payment()
-				// without either label function, and an unguarded fallback call is a fatal error
-				// there. Same shape as ecommerce-product-catalog/modules/cart/includes/cart-form.php.
-				if ( function_exists( 'ic_get_order_shipping_display_labels' ) ) {
-					$labels = ic_get_order_shipping_display_labels( 'cart_' );
-				} elseif ( function_exists( 'ic_get_order_shipping_labels' ) ) {
-					$labels = ic_get_order_shipping_labels( 'cart_' );
-				}
-				if ( ! empty( $labels ) ) {
-					$labels = ' (' . $labels . ')';
-				}
-				$shipping_label = __( 'Shipping', 'ecommerce-product-catalog' ) . $labels;
-			}
-			if ( ! empty( $shipping_label ) ) {
-				$shipping_price = function_exists( 'ic_shipping_price_format' ) ? ic_shipping_price_format( $shipping ) : price_format( $shipping );
-				$pre_message   .= $p . $shipping_label . ': ' . $shipping_price . $ep;
-			}
-		}
-
-		return apply_filters( 'cart_checkout_packing_list_product_data', $pre_message, $p, $ep, $line );
 	}
 }

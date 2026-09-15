@@ -301,7 +301,13 @@ div.address-form .cart_row .field {
 	color: #bfbfbf;
 	font-size: 20px;
 	font-weight: normal;
-	content: "\f335";
+	content: "\f182";
+}
+
+#shopping-cart-container.no_qty table.cart-products td.td-name > .delete_product {
+	display: block;
+	width: 20px;
+	margin-top: 5px;
 }
 
 #shopping-cart-submit-container.no_qty .al-box {

@@ -31,5 +31,6 @@ if ( ! defined( 'IC_SIMPLE_FORMBUILDER_ENABLE_LEGACY_COMPAT' ) ) {
 	define( 'IC_SIMPLE_FORMBUILDER_ENABLE_LEGACY_COMPAT', true );
 }
 ic_framework_require_once( __DIR__ . '/simple-formbuilder/index.php' );
+ic_framework_require_once( __DIR__ . '/ai/index.php' );
 ic_framework_require_once( __DIR__ . '/selectors/index.php' );
-
+ic_framework_require_once( __DIR__ . '/privacy/index.php' );

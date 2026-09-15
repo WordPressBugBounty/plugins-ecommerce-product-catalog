@@ -33,6 +33,40 @@ function ic_cart_normalize_session( $session = null ) {
 	return $session;
 }
 
+if ( ! function_exists( 'ic_cart_normalize_settings' ) ) {
+	/**
+	 * Fills in the cart layout and label defaults every cart consumer depends on.
+	 *
+	 * These keys are only ever stored by the premium cart settings screens, so any
+	 * installation without them holds no value at all for them. Every consumer that
+	 * reads them has to normalize first - see ic_cart::normalize_settings() and
+	 * ic_cart_checkout_form_email::__construct().
+	 *
+	 * @param array|mixed $settings Raw shopping cart settings.
+	 *
+	 * @return array
+	 */
+	function ic_cart_normalize_settings( $settings ) {
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		$defaults = array(
+			'cart_page_template'        => 'qty',
+			'cart_page_image'           => '',
+			'product_name_column_label' => __( 'Product name', 'ecommerce-product-catalog' ),
+			'quantity_column_label'     => __( 'Quantity', 'ecommerce-product-catalog' ),
+			'unit_proice_column_label'  => __( 'Unit Price', 'ecommerce-product-catalog' ),
+			'total_column_label'        => __( 'Total', 'ecommerce-product-catalog' ),
+			'summary_total_label'       => __( 'Total', 'ecommerce-product-catalog' ) . ' = ',
+			'summary_total_net_label'   => __( 'Total NET', 'ecommerce-product-catalog' ) . ' = ',
+			'summary_total_gross_label' => __( 'Total GROSS', 'ecommerce-product-catalog' ) . ' = ',
+		);
+
+		return wp_parse_args( $settings, $defaults );
+	}
+}
+
 /**
  * Returns given cart content
  *

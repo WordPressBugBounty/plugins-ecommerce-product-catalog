@@ -27,10 +27,12 @@ if ( ! empty( $settings['form_registration'] ) && 'user' === $settings['form_reg
 	/**
 	 * Initialize transaction related files
 	 */
-	function start_transaction_digital_customers() {
-		if ( function_exists( 'ic_framework_require_once' ) ) {
-			ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/includes/transactions/index.php' );
-			ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/functions/transactions/index.php' );
+	if ( ! function_exists( 'start_transaction_digital_customers' ) ) {
+		function start_transaction_digital_customers() {
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/includes/transactions/index.php' );
+				ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/functions/transactions/index.php' );
+			}
 		}
 	}
 
@@ -39,17 +41,20 @@ if ( ! empty( $settings['form_registration'] ) && 'user' === $settings['form_reg
 	/**
 	 * Initialize core extension files
 	 */
-	function start_digital_customers() {
-		if ( function_exists( 'ic_framework_require_once' ) ) {
-			ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/functions/index.php' );
-			ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/includes/index.php' );
-			ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/ext/index.php' );
+	if ( ! function_exists( 'start_digital_customers' ) ) {
+		function start_digital_customers() {
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/functions/index.php' );
+				ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/includes/index.php' );
+				ic_framework_require_once( AL_CUSTOMERS_BASE_PATH . '/ext/index.php' );
+			}
+			do_action( 'digital_customers_addons' );
 		}
-		do_action( 'digital_customers_addons' );
 	}
 
 	add_action( 'register_catalog_styles', 'register_digital_customers_styles' );
 
+	if ( ! function_exists( 'register_digital_customers_styles' ) ) {
 	function register_digital_customers_styles() {
 		wp_register_style( 'jquery-ui-css', AL_CUSTOMERS_BASE_URL . 'css/jquery-ui.css', array(), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/css/jquery-ui.css', true ) );
 		wp_register_style( 'al_digital_customers_styles', AL_CUSTOMERS_BASE_URL . 'css/digital-customers.min.css' . ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/css/digital-customers.min.css' ), array(
@@ -65,7 +70,9 @@ if ( ! empty( $settings['form_registration'] ) && 'user' === $settings['form_reg
 			'jquery-ui-tabs'
 		), defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : ic_filemtime( AL_CUSTOMERS_BASE_PATH . '/js/digital-customers.min.js', true ), true );
 	}
+	}
 
+	if ( ! function_exists( 'digital_customers_styles' ) ) {
 	function digital_customers_styles() {
 		wp_enqueue_style( 'al_digital_customers_styles' );
 		wp_enqueue_script( 'front_digital_customers' );
@@ -81,5 +88,6 @@ if ( ! empty( $settings['form_registration'] ) && 'user' === $settings['form_reg
 				'ajax_nonce'  => wp_create_nonce( 'ic_ajax' )
 			) );
 		}
+	}
 	}
 }

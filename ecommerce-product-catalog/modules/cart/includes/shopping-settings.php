@@ -69,36 +69,23 @@ function get_shopping_cart_settings() {
 	if ( ! is_array( $shopping_cart_settings ) ) {
 		$shopping_cart_settings = array();
 	}
+	// Seventeen premium-only cart settings are neither defaulted here nor returned - they are
+	// dropped just before the filter runs at the end of this function.
 	$shopping_cart_settings['shopping_cart_page']      = isset( $shopping_cart_settings['shopping_cart_page'] ) ? $shopping_cart_settings['shopping_cart_page'] : '';
 	$shopping_cart_settings['cart_submit_page']        = isset( $shopping_cart_settings['cart_submit_page'] ) ? $shopping_cart_settings['cart_submit_page'] : '';
 	$shopping_cart_settings['thank_you_page']          = isset( $shopping_cart_settings['thank_you_page'] ) ? $shopping_cart_settings['thank_you_page'] : '';
 	$shopping_cart_settings['receive_cart']            = isset( $shopping_cart_settings['receive_cart'] ) ? trim( $shopping_cart_settings['receive_cart'] ) : '';
-	$shopping_cart_settings['receive_packing_list']    = isset( $shopping_cart_settings['receive_packing_list'] ) ? trim( $shopping_cart_settings['receive_packing_list'] ) : '';
 	$shopping_cart_settings['send_cart']               = isset( $shopping_cart_settings['send_cart'] ) ? trim( $shopping_cart_settings['send_cart'] ) : '';
 	$shopping_cart_settings['cart_name']               = isset( $shopping_cart_settings['cart_name'] ) ? $shopping_cart_settings['cart_name'] : '';
 	$shopping_cart_settings['form_registration']       = isset( $shopping_cart_settings['form_registration'] ) ? $shopping_cart_settings['form_registration'] : 'cookie';
-	$shopping_cart_settings['country_field']           = isset( $shopping_cart_settings['country_field'] ) ? $shopping_cart_settings['country_field'] : 'dropdown';
 	$shopping_cart_settings['stick_cart']              = isset( $shopping_cart_settings['stick_cart'] ) ? $shopping_cart_settings['stick_cart'] : '';
-	$shopping_cart_settings['disable_captcha']         = isset( $shopping_cart_settings['disable_captcha'] ) ? $shopping_cart_settings['disable_captcha'] : '';
 	$shopping_cart_settings['button_desc']             = isset( $shopping_cart_settings['button_desc'] ) ? $shopping_cart_settings['button_desc'] : __( 'Click to add this item to cart.', 'ecommerce-product-catalog' );
 	$shopping_cart_settings['button_label']            = isset( $shopping_cart_settings['button_label'] ) ? $shopping_cart_settings['button_label'] : __( 'Add to Cart', 'ecommerce-product-catalog' );
-	$shopping_cart_settings['url_button']              = isset( $shopping_cart_settings['url_button'] ) ? $shopping_cart_settings['url_button'] : '';
-	$shopping_cart_settings['cart_redirect']           = isset( $shopping_cart_settings['cart_redirect'] ) ? $shopping_cart_settings['cart_redirect'] : '';
-	$shopping_cart_settings['empty_cart']              = isset( $shopping_cart_settings['empty_cart'] ) ? $shopping_cart_settings['empty_cart'] : '';
 	$shopping_cart_settings['place_order_label']       = isset( $shopping_cart_settings['place_order_label'] ) ? $shopping_cart_settings['place_order_label'] : __( 'Place an order', 'ecommerce-product-catalog' );
 	$shopping_cart_settings['contnue_shopping_label']  = isset( $shopping_cart_settings['contnue_shopping_label'] ) ? $shopping_cart_settings['contnue_shopping_label'] : __( 'Continue shopping', 'ecommerce-product-catalog' );
 	$shopping_cart_settings['contnue_shopping_target'] = isset( $shopping_cart_settings['contnue_shopping_target'] ) ? $shopping_cart_settings['contnue_shopping_target'] : 'product_listing';
-	$shopping_cart_settings['quantity_box']            = isset( $shopping_cart_settings['quantity_box'] ) ? $shopping_cart_settings['quantity_box'] : '';
-	$shopping_cart_settings['add_on_price']            = isset( $shopping_cart_settings['add_on_price'] ) ? $shopping_cart_settings['add_on_price'] : '';
-	$shopping_cart_settings['listing_separate_name']   = isset( $shopping_cart_settings['listing_separate_name'] ) ? $shopping_cart_settings['listing_separate_name'] : '';
-	$shopping_cart_settings['email_separate_name']     = isset( $shopping_cart_settings['listing_separate_name'] ) ? $shopping_cart_settings['listing_separate_name'] : '';
-	$shopping_cart_settings['cart_separate_name']      = isset( $shopping_cart_settings['listing_separate_name'] ) ? $shopping_cart_settings['listing_separate_name'] : '';
 	$shopping_cart_settings['user_email']              = isset( $shopping_cart_settings['user_email'] ) ? $shopping_cart_settings['user_email'] : apply_filters( 'ic_simple_cart_default_customer_email_text', __( 'Dear Customer,', 'ecommerce-product-catalog' ) . ' ' . "\n\r" . __( 'Thank you for your order.', 'ecommerce-product-catalog' ) . ' ' . "\r" . '[customer_details] ' . "\n\r" . '[account_info] ' . "\n\r" . __( 'We will get in touch with you soon.', 'ecommerce-product-catalog' ) . "\n\r" . '[payment_details]' . "\n\r" . __( 'Kind regards,', 'ecommerce-product-catalog' ) . "\r" . 'impleCode Team' );
 	$shopping_cart_settings['admin_email']             = isset( $shopping_cart_settings['admin_email'] ) ? $shopping_cart_settings['admin_email'] : apply_filters( 'ic_simple_cart_default_admin_email_text', __( 'New order from a customer.', 'ecommerce-product-catalog' ) . "\n\r" . __( 'Order details', 'ecommerce-product-catalog' ) . ': ' . "\r" . '[customer_details]' . "\n\r" . '[edit_order_url]' . "\n\r" . '[payment_details]' . "\n\r" . __( 'Kind regards,', 'ecommerce-product-catalog' ) . "\r" . 'impleCode Team' );
-	$shopping_cart_settings['qty_box']                 = isset( $shopping_cart_settings['qty_box'] ) ? $shopping_cart_settings['qty_box'] : '';
-	$shopping_cart_settings['max_qty_box']             = isset( $shopping_cart_settings['max_qty_box'] ) ? $shopping_cart_settings['max_qty_box'] : '';
-	$shopping_cart_settings['custom_payments']         = isset( $shopping_cart_settings['custom_payments'] ) ? array_filter( array_map( 'array_filter', $shopping_cart_settings['custom_payments'] ) ) : array();
-	$shopping_cart_settings['cart_page_template']      = isset( $shopping_cart_settings['cart_page_template'] ) ? $shopping_cart_settings['cart_page_template'] : 'qty';
 	if ( ! empty( $shopping_cart_settings['cart_name'] ) ) {
 		$site_name = $shopping_cart_settings['cart_name'];
 	} else {
@@ -114,15 +101,9 @@ function get_shopping_cart_settings() {
 		__( 'New Order on %s', 'ecommerce-product-catalog' ),
 		$site_name
 	);
-	$shopping_cart_settings['packing_email_subject'] = isset( $shopping_cart_settings['packing_email_subject'] ) ? $shopping_cart_settings['packing_email_subject'] : sprintf(
-		/* translators: %s: Site name. */
-		__( 'New Packing List on %s', 'ecommerce-product-catalog' ),
-		$site_name
-	);
 	$shopping_cart_settings['order_registration_disable'] = isset( $shopping_cart_settings['order_registration_disable'] ) ? $shopping_cart_settings['order_registration_disable'] : '';
-	$shopping_cart_settings['disable_payment']            = isset( $shopping_cart_settings['disable_payment'] ) ? $shopping_cart_settings['disable_payment'] : '';
-	$shopping_cart_settings['enable_recommendations']     = isset( $shopping_cart_settings['enable_recommendations'] ) ? $shopping_cart_settings['enable_recommendations'] : '';
 	$shopping_cart_settings['disable_state']              = isset( $shopping_cart_settings['disable_state'] ) ? $shopping_cart_settings['disable_state'] : '';
+	$shopping_cart_settings['identity_retention_years']   = isset( $shopping_cart_settings['identity_retention_years'] ) ? max( 1, absint( $shopping_cart_settings['identity_retention_years'] ) ) : 10;
 
 	return apply_filters( 'ic_shopping_cart_settings', $shopping_cart_settings );
 }
@@ -276,6 +257,7 @@ function shopping_cart_settings_content() {
 				<table>
 					<?php
 					implecode_settings_checkbox( __( 'Disable Order Registration', 'ecommerce-product-catalog' ), 'shopping_cart_settings[order_registration_disable]', $shopping_cart_settings['order_registration_disable'], 1, __( 'If you check this the orders will not be saved into database. Only the notification email will be sent.', 'ecommerce-product-catalog' ) );
+					implecode_settings_number( __( 'Invoice identity retention', 'ecommerce-product-catalog' ), 'shopping_cart_settings[identity_retention_years]', $shopping_cart_settings['identity_retention_years'], __( 'years', 'ecommerce-product-catalog' ), 1, 1, __( 'Personal invoice fields are erased after this statutory retention period.', 'ecommerce-product-catalog' ) );
 					?>
 				</table>
 				<h3><?php esc_html_e( 'Cart Widget', 'ecommerce-product-catalog' ); ?></h3>
@@ -296,6 +278,19 @@ function shopping_cart_settings_content() {
 		<?php
 	}
 }
+
+/**
+ * Applies the merchant's statutory invoice-identity retention period.
+ *
+ * @param string $period Current relative retention period.
+ * @return string
+ */
+function ic_epc_identity_retention_period( $period ) {
+	$settings = get_shopping_cart_settings();
+	$years    = isset( $settings['identity_retention_years'] ) ? absint( $settings['identity_retention_years'] ) : 0;
+	return $years ? '+' . $years . ' years' : $period;
+}
+add_filter( 'ic_identity_retention_period', 'ic_epc_identity_retention_period' );
 
 add_action( 'product-settings', 'shopping_cart_settings_content' );
 

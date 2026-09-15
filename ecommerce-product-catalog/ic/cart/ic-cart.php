@@ -21,7 +21,6 @@ class ic_cart {
 		}
 		add_action( 'ic_cart_products_start', array( $this, 'clear_globals' ) );
 
-		add_filter( 'ic_cart_checkout_default_columns', array( $this, 'delete_button' ), 2, 5 );
 		add_filter( 'ic_cart_checkout_default_columns', array( $this, 'image_td' ), 5, 4 );
 		add_filter( 'ic_cart_checkout_default_columns', array( $this, 'name_td' ), 6, 5 );
 		add_filter( 'ic_cart_checkout_default_columns', array( $this, 'sku_td' ), 7, 2 );
@@ -40,28 +39,23 @@ class ic_cart {
 		ic_delete_global( 'current_cart_tax_counted' );
 	}
 
+	/**
+	 * Fills in the cart layout and label defaults.
+	 *
+	 * Kept as a thin wrapper so the shared implementation in cart/functions.php
+	 * stays reachable from classes that do not extend ic_cart.
+	 *
+	 * @param array|mixed $settings Raw shopping cart settings.
+	 *
+	 * @return array
+	 */
 	function normalize_settings( $settings ) {
-		if ( ! is_array( $settings ) ) {
-			$settings = array();
-		}
-
-		$defaults = array(
-			'cart_page_template'        => 'qty',
-			'cart_page_image'           => '',
-			'product_name_column_label' => __( 'Product name', 'ecommerce-product-catalog' ),
-			'quantity_column_label'     => __( 'Quantity', 'ecommerce-product-catalog' ),
-			'unit_proice_column_label'  => __( 'Unit Price', 'ecommerce-product-catalog' ),
-			'total_column_label'        => __( 'Total', 'ecommerce-product-catalog' ),
-			'summary_total_label'       => __( 'Total', 'ecommerce-product-catalog' ) . ' = ',
-			'summary_total_net_label'   => __( 'Total', 'ecommerce-product-catalog' ) . ' = ',
-			'summary_total_gross_label' => __( 'Total GROSS', 'ecommerce-product-catalog' ),
-		);
-
-		return wp_parse_args( $settings, $defaults );
+		return ic_cart_normalize_settings( $settings );
 	}
 
 	function product_table( $raw = 1, $price = true, $cart = 'cart_content', $settings = null ) {
 		ic_save_global( 'inside_cart_products', 1 );
+		$pricing_enabled = $price;
 		if ( empty( $settings ) ) {
 			$settings = get_shopping_cart_settings();
 		}
@@ -132,17 +126,17 @@ class ic_cart {
 						continue;
 					}
 					ic_set_product_id( $product_id );
-					$quantity = apply_filters( 'ic_cart_qty', $quantity, $product_id, $cart_id );
-					if ( $price !== false ) {
+					$quantity      = apply_filters( 'ic_cart_qty', $quantity, $product_id, $cart_id );
+					$product_price = false;
+					if ( $pricing_enabled !== false ) {
 						$product_price = get_shopping_cart_product_price( $product_id, $cart_id, $quantity );
-						$price         = $product_price;
 					}
 					$class = apply_filters( 'ic_cart_tr_class', '', $cart_id );
 					if ( ! empty( $class ) ) {
 						$class = ' class="' . $class . '"';
 					}
 					$products_table .= '<tr' . $class . '>';
-					$products_table .= apply_filters( 'ic_cart_checkout_default_columns', '', $cart_id, $quantity, $settings, $raw, $price );
+					$products_table .= apply_filters( 'ic_cart_checkout_default_columns', '', $cart_id, $quantity, $settings, $raw, $product_price );
 					$products_table .= '</tr>';
 					ic_reset_product_id();
 				}
@@ -158,17 +152,17 @@ class ic_cart {
 						continue;
 					}
 					ic_set_product_id( $product_id );
-					$quantity = apply_filters( 'ic_cart_qty', $quantity, $product_id, $cart_id );
-					if ( $price !== false ) {
+					$quantity      = apply_filters( 'ic_cart_qty', $quantity, $product_id, $cart_id );
+					$product_price = false;
+					if ( $pricing_enabled !== false ) {
 						$product_price = get_shopping_cart_product_price( $product_id, $cart_id, $quantity );
-						$price         = $product_price;
 					}
 					$class = apply_filters( 'ic_cart_tr_class', '', $cart_id );
 					if ( ! empty( $class ) ) {
 						$class = ' class="' . $class . '"';
 					}
 					$products_table .= '<tr' . $class . '>';
-					$products_table .= apply_filters( 'ic_cart_checkout_default_columns', '', $cart_id, $quantity, $settings, $raw, $price );
+					$products_table .= apply_filters( 'ic_cart_checkout_default_columns', '', $cart_id, $quantity, $settings, $raw, $product_price );
 					$products_table .= '</tr>';
 					ic_reset_product_id();
 				}
@@ -183,13 +177,18 @@ class ic_cart {
 			if ( isset( $settings['empty_cart'] ) && $settings['empty_cart'] != '' ) {
 				$no_products_text = $settings['empty_cart'];
 			}
-			$products_table .= '<tr class="no-products" ' . $style . '><td colspan="4">' . apply_filters( 'ic_no_products_text', $no_products_text ) . '</td></tr>';
+			// The empty-state cell must span the whole body row. ic_cart_colspan() returns the width of
+			// every column BUT the trailing total cell (that is why the summary rows below emit
+			// colspan + one td), so colspan + 1 is the full row width: 4 for the qty template and 3 for
+			// no_qty, before the optional SKU and image columns. A fixed literal cannot serve both.
+			$empty_row_colspan = ic_cart_colspan( $settings ) + 1;
+			$products_table   .= '<tr class="no-products" ' . $style . '><td colspan="' . esc_attr( $empty_row_colspan ) . '">' . apply_filters( 'ic_no_products_text', $no_products_text ) . '</td></tr>';
 		}
 
-		$products_table .= apply_filters( 'ic_checkout_products_table_end', '', $price, $cart, $settings );
+		$products_table .= apply_filters( 'ic_checkout_products_table_end', '', $pricing_enabled, $cart, $settings );
 		$products_table .= '</tbody></table>';
 		ob_start();
-		do_action( 'ic_cart_products_end', $products_array, $cart, $price, $raw );
+		do_action( 'ic_cart_products_end', $products_array, $cart, $pricing_enabled, $raw );
 		$products_table .= ob_get_clean();
 		$products_table .= '</div>';
 		ic_delete_global( 'inside_cart_products' );
@@ -197,16 +196,30 @@ class ic_cart {
 		return $products_table;
 	}
 
+	/**
+	 * Appends the no-qty delete controls (hidden cart id, hidden quantity, delete span).
+	 *
+	 * Emits NO cell wrapper: the controls are rendered inside the product name cell by name_td().
+	 * The signature is kept unchanged for third-party direct callers.
+	 *
+	 * @param string $products_table Markup collected so far.
+	 * @param string $cart_id        Cart item identifier.
+	 * @param mixed  $quantity       Item quantity (unused, kept for the column callback signature).
+	 * @param array  $settings       Cart display settings.
+	 * @param bool   $raw            True on the raw (summary/submit) rendering.
+	 *
+	 * @return string Markup with the delete controls appended when applicable.
+	 */
 	function delete_button( $products_table, $cart_id, $quantity, $settings, $raw ) {
 		if ( ! $raw && isset( $settings['cart_page_template'] ) && $settings['cart_page_template'] == 'no_qty' ) {
 			$product_id      = cart_id_to_product_id( $cart_id );
-			$products_table .= '<td><input hidden type="hidden" name="p_id[]" class="product_id" value="' . esc_attr( $cart_id ) . '">';
+			$products_table .= '<input hidden type="hidden" name="p_id[]" class="product_id" value="' . esc_attr( $cart_id ) . '">';
 			$p_price         = product_price( $product_id, 1 );
 			if ( ! empty( $p_price ) ) {
 				$p_price = price_format( $p_price, 1, 0 );
 			}
 			$products_table .= '<input class="edit-product-quantity" data-p_id="' . esc_attr( $product_id ) . '" data-price="' . esc_attr( $p_price ) . '" type="hidden" name="p_quantity[]" value="1">';
-			$products_table .= '<span class="delete_product"></span></td>';
+			$products_table .= '<span class="delete_product"></span>';
 		}
 
 		return $products_table;
@@ -300,7 +313,13 @@ class ic_cart {
 		} else {
 			$filter_name = 'cart_product_name';
 		}
-		$products_table .= apply_filters( 'cart_summary_product_name_td', '<td class="td-name">' . apply_filters( $filter_name, $product_name_url, $cart_id, $product_id ) . '</td>', $product_id, $cart_id );
+		$name_cell = apply_filters( $filter_name, $product_name_url, $cart_id, $product_id );
+		// The delete controls MUST stay DIRECT children of td.td-name: ic/cart/js/cart-page.js:76 finds
+		// the hidden quantity input with a single jQuery( this ).parent().find( '.edit-product-quantity' )
+		// hop from the delete span, with no .closest(). Wrapping them in an inner element silently breaks
+		// cart removal. delete_button() self-guards to the non-raw no_qty template.
+		$name_cell      .= $this->delete_button( '', $cart_id, $quantity, $settings, $raw );
+		$products_table .= apply_filters( 'cart_summary_product_name_td', '<td class="td-name">' . $name_cell . '</td>', $product_id, $cart_id );
 
 		return $products_table;
 	}
@@ -1145,22 +1164,41 @@ if ( ! function_exists( 'cart_id_to_product_id' ) ) {
 
 if ( ! function_exists( 'ic_cart_colspan' ) ) {
 
+	/**
+	 * Returns the checkout table colspan: the full body row width MINUS the trailing total cell.
+	 *
+	 * The summary rows emit this colspan plus one trailing `<td>`, and the empty-state row emits
+	 * `colspan + 1`, so the value must stay exactly one less than the number of cells a body row
+	 * renders. The base counts the columns the template always draws, less that trailing cell;
+	 * the SKU and image columns are then added on exactly the conditions their own renderers use.
+	 *
+	 * @param array $settings Cart display settings.
+	 *
+	 * @return int
+	 */
 	function ic_cart_colspan( $settings ) {
+		$is_no_qty = isset( $settings['cart_page_template'] ) && $settings['cart_page_template'] == 'no_qty';
+		// qty: name + qty + unit price + total, less the trailing total cell.
 		$def_colspan = 3;
-		if ( $settings['cart_page_template'] == 'no_qty' ) {
-			if ( is_ic_shopping_order() ) {
-				$def_colspan = 1;
-			} else {
-				$def_colspan = 2;
-			}
-			if ( function_exists( 'is_ic_quote_pricing_enabled' ) && is_ic_quote_pricing_enabled() ) {
-				++$def_colspan;
+		if ( $is_no_qty ) {
+			// no_qty draws neither the qty cell nor the unit-price cell, and the delete controls no
+			// longer occupy their own cell (they render inside td-name), so the raw (submit page) and
+			// non-raw no_qty rows are now the same width and the former is_ic_shopping_order()
+			// distinction is obsolete. That leaves the name cell plus the trailing total cell.
+			$def_colspan = 1;
+			if ( function_exists( 'is_ic_quote_pricing_enabled' ) && ! is_ic_quote_pricing_enabled() ) {
+				// Quote pricing off: price_td() draws no total cell at all, so only the name cell is
+				// left and there is nothing to subtract for.
+				--$def_colspan;
 			}
 		}
 		if ( is_ic_cart_sku_enabled() ) {
 			++$def_colspan;
 		}
-		if ( ! empty( $settings['cart_page_image'] ) ) {
+		// image_td() draws the image cell UNCONDITIONALLY on the no_qty template and only when
+		// cart_page_image is set on qty. The increment has to follow that same condition, or the
+		// derived width disagrees with the rendered row whenever no_qty runs with the image off.
+		if ( $is_no_qty || ! empty( $settings['cart_page_image'] ) ) {
 			++$def_colspan;
 		}
 

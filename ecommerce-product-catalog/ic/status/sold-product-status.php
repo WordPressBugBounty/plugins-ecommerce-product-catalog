@@ -186,7 +186,7 @@ if ( ! class_exists( 'ic_sold_product_status' ) ) {
 
 			$script .= '});';
 
-			wp_print_inline_script_tag( $script );
+			$this->print_inline_script( $script );
 		}
 
 		/**
@@ -205,6 +205,25 @@ if ( ! class_exists( 'ic_sold_product_status' ) ) {
 			$script .= 'var $status=$("select#post_status,.inline-edit-status select[name=\"_status\"]");';
 			$script .= 'if(!$status.find("option[value=\"sold\"]").length){$status.append($("<option>",{value:"sold",text:' . wp_json_encode( $this->sold_label() ) . '}));}';
 			$script .= '});';
+
+			$this->print_inline_script( $script );
+		}
+
+		/**
+		 * Prints an inline admin script when WordPress can do it safely.
+		 *
+		 * wp_print_inline_script_tag() only exists since WordPress 5.7. The plugin
+		 * requires 5.9, so older installs simply skip the enhancement instead of
+		 * fataling on an undefined function.
+		 *
+		 * @param string $script Inline script body.
+		 *
+		 * @return void
+		 */
+		private function print_inline_script( $script ) {
+			if ( ! function_exists( 'wp_print_inline_script_tag' ) ) {
+				return;
+			}
 
 			wp_print_inline_script_tag( $script );
 		}

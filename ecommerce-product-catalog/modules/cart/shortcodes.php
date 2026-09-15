@@ -72,8 +72,13 @@ if ( ! class_exists( 'ic_shopping_ecommerce_shortcodes' ) ) {
 				return;
 			}
 			ic_save_global( 'inside_shopping_cart', 1 );
-			$shopping_cart_settings = get_shopping_cart_settings();
-			if ( 1 !== (int) $shopping_cart_settings['url_button'] ) {
+			// cart_page_template is read raw below and is a premium-only setting, so the
+			// framework layout defaults have to be filled in first.
+			$shopping_cart_settings = ic_cart_normalize_settings( get_shopping_cart_settings() );
+			// url_button is premium-only and ic_cart_normalize_settings() does not supply it.
+			// An absent key means "no URL button", which is the same branch an empty stored
+			// value takes, and matches ic/orders/includes/save-order.php.
+			if ( empty( $shopping_cart_settings['url_button'] ) || 1 !== (int) $shopping_cart_settings['url_button'] ) {
 				$button_class = 'button ' . design_schemes( 'box', 0 );
 			} else {
 				$button_class = 'link';
@@ -123,7 +128,8 @@ if ( ! class_exists( 'ic_shopping_ecommerce_shortcodes' ) ) {
 		public function cart_submit() {
 			ic_save_global( 'inside_checkout', 1 );
 
-			$shopping_cart_settings = get_shopping_cart_settings();
+			// cart_page_template is premium-only, so normalize before reading it raw.
+			$shopping_cart_settings = ic_cart_normalize_settings( get_shopping_cart_settings() );
 			$form                   = '<div id="shopping-cart-submit-container" class="' . $shopping_cart_settings['cart_page_template'] . '">';
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Presence-only read that decides whether to render the login box; no value is read and nothing is written.
 			if ( 'user' === $shopping_cart_settings['form_registration'] && ! isset( $_POST['cart_submit'] ) ) {
