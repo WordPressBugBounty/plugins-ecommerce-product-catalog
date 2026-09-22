@@ -93,7 +93,8 @@ function ic_localize_scripts() {
 		'ic-screen-api',
 		'ic_screen_api',
 		array(
-			'nonce' => wp_create_nonce( 'wp_rest' ),
+			'nonce'      => wp_create_nonce( 'wp_rest' ),
+			'form_nonce' => wp_create_nonce( 'ic_screen_api_form' ),
 		)
 	);
 }

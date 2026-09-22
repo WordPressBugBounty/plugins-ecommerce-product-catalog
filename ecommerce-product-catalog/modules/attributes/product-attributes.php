@@ -547,11 +547,16 @@ function ic_sanitize_product_attribute( $attribute, $label = null ) {
 		}
 
 		return $sanitized_attribute;
+	} elseif ( ! is_scalar( $attribute ) ) {
+		return '';
 	} elseif ( is_serialized( $attribute ) ) {
-		$unserialized = unserialize( $attribute );
-		if ( ! empty( $unserialized ) && is_array( $unserialized ) ) {
-			return ic_sanitize_product_attribute( $unserialized, $label );
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize -- Legacy attribute arrays require decoding; object creation is disabled.
+		$unserialized = unserialize( $attribute, array( 'allowed_classes' => false ) );
+		if ( ! is_array( $unserialized ) ) {
+			return '';
 		}
+
+		return ic_sanitize_product_attribute( $unserialized, $label );
 	}
 	$sanitized_attribute = trim( wp_unslash( sanitize_term_field( 'name', $attribute, 0, 'al_product-attributes', 'db' ) ) );
 	if ( strlen( $sanitized_attribute ) > 200 ) {

@@ -307,11 +307,23 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 				if ( ! empty( $field->field_options->include_blank_option ) ) {
 					$content .= '<option value=""></option>';
 				}
+				$country_field    = in_array( $field->cid, array( 'customer_country', 'payment_details_country' ), true );
+				$country_selected = false;
 				foreach ( $field->field_options->options as $radio_option ) {
 					$option_value = isset( $radio_option->value ) ? $radio_option->value : $radio_option->label;
 					$option_value = apply_filters( 'ic_formbuilder_dorpdown_option_value', $option_value, $field->cid );
-					$selected     = (string) $option_value === (string) $field_value || ! empty( $radio_option->checked ) ? 'selected' : '';
-					$content     .= '<option value="' . esc_attr( $option_value ) . '" ' . $selected . '>' . esc_html( $radio_option->label ) . '</option>';
+					if ( $country_field && '' !== $field_value && preg_match( '/^(.*) - ([A-Z]{2})$/', $radio_option->label, $country_parts ) && in_array( html_entity_decode( $field_value, ENT_QUOTES, 'UTF-8' ), array( $country_parts[1], $country_parts[2] ), true ) ) {
+						// Keep the historical submitted value while displaying its current country label.
+						$option_value = html_entity_decode( $field_value, ENT_QUOTES, 'UTF-8' );
+					}
+					$selected         = htmlspecialchars( (string) $option_value ) === (string) $field_value || ( ( ! $country_field || '' === $field_value ) && ! empty( $radio_option->checked ) ) ? 'selected' : '';
+					$country_selected = $country_selected || 'selected' === $selected;
+					$content         .= '<option value="' . esc_attr( $option_value ) . '" ' . $selected . '>' . esc_html( $radio_option->label ) . '</option>';
+				}
+				if ( $country_field && '' !== $field_value && ! $country_selected ) {
+					// Obsolete country codes cannot be inferred safely; preserve their explicit value.
+					$historical_country = html_entity_decode( $field_value, ENT_QUOTES, 'UTF-8' );
+					$content           .= '<option value="' . esc_attr( $historical_country ) . '" selected>' . esc_html( $historical_country ) . '</option>';
 				}
 				$content .= '</select></div>';
 			} elseif ( 'paragraph' === $field->field_type ) {

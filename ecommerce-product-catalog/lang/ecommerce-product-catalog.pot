@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-14T19:19:29+02:00\n"
+"POT-Creation-Date: 2026-09-17T21:28:40+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: ecommerce-product-catalog\n"
@@ -395,7 +395,7 @@ msgstr ""
 #: functions/content-functions.php:189
 #: ic/ai/class-ic-ai-admin.php:1530
 #: ic/ai/class-ic-ai-admin.php:1539
-#: ic/ai/class-ic-ai-settings.php:2058
+#: ic/ai/class-ic-ai-settings.php:2059
 #: ic/class-ic-user-login.php:196
 #: includes/class-ic-epc-tracking.php:397
 #: includes/stats/class-ic-epc-stats-integration.php:402
@@ -426,7 +426,7 @@ msgid "Reset image"
 msgstr ""
 
 #: functions/functions.php:277
-#: ic/orders/includes/register-digital-orders.php:1253
+#: ic/orders/includes/register-digital-orders.php:1286
 msgid "Set Product ID"
 msgstr ""
 
@@ -777,7 +777,7 @@ msgstr ""
 #: ic/ai/class-ic-ai-admin.php:1040
 #: ic/ai/class-ic-ai-admin.php:1060
 #: ic/ai/class-ic-ai-admin.php:1166
-#: ic/ai/class-ic-ai-settings.php:1218
+#: ic/ai/class-ic-ai-settings.php:1219
 #: includes/class-ic-product-details.php:43
 #: includes/class-ic-product-details.php:245
 #: includes/class-ic-product-details.php:248
@@ -903,20 +903,20 @@ msgstr ""
 #: ic/ai/class-ic-ai-admin.php:697
 #: ic/ai/class-ic-ai-client.php:2552
 #: ic/ai/class-ic-ai-client.php:3260
-#: ic/ai/class-ic-ai-settings.php:1677
+#: ic/ai/class-ic-ai-settings.php:1678
 msgid "Upgrade now"
 msgstr ""
 
 #: ic/ai/class-ic-ai-admin.php:698
 #: ic/ai/class-ic-ai-admin.php:2976
 #: ic/ai/class-ic-ai-admin.php:3128
-#: ic/ai/class-ic-ai-settings.php:2478
+#: ic/ai/class-ic-ai-settings.php:2479
 msgid "Upgrade Plan"
 msgstr ""
 
 #: ic/ai/class-ic-ai-admin.php:699
 #: ic/ai/class-ic-ai-admin.php:2977
-#: ic/ai/class-ic-ai-settings.php:2482
+#: ic/ai/class-ic-ai-settings.php:2483
 msgid "Buy AI Credits"
 msgstr ""
 
@@ -925,7 +925,7 @@ msgid "Open AI Settings"
 msgstr ""
 
 #: ic/ai/class-ic-ai-admin.php:701
-#: ic/ai/class-ic-ai-settings.php:2529
+#: ic/ai/class-ic-ai-settings.php:2530
 msgid "I already have AI License Key"
 msgstr ""
 
@@ -1239,8 +1239,8 @@ msgstr ""
 #: ic/ai/class-ic-ai-admin.php:3386
 #: ic/ai/class-ic-ai-admin.php:3448
 #: ic/ai/class-ic-ai-admin.php:3485
-#: ic/ai/class-ic-ai-settings.php:2917
-#: ic/ai/class-ic-ai-settings.php:3075
+#: ic/ai/class-ic-ai-settings.php:2918
+#: ic/ai/class-ic-ai-settings.php:3076
 msgid "Unknown AI integration."
 msgstr ""
 
@@ -1502,7 +1502,8 @@ msgid "The saved AI connection is no longer valid. Save AI Settings again to rec
 msgstr ""
 
 #: ic/ai/class-ic-ai-client.php:3089
-msgid "The AI service took too long to respond. Please try again. If this keeps happening, increase Request Timeout in the implecode AI server settings, then retry."
+#: ic/ai/class-ic-ai-settings.php:1178
+msgid "The AI service took too long to respond. Please try again."
 msgstr ""
 
 #: ic/ai/class-ic-ai-client.php:3155
@@ -1532,7 +1533,7 @@ msgid "You are not allowed to edit AI settings for this post type."
 msgstr ""
 
 #: ic/ai/class-ic-ai-settings.php:174
-#: ic/ai/class-ic-ai-settings.php:1819
+#: ic/ai/class-ic-ai-settings.php:1820
 msgid "You must confirm the data-sharing disclosure before enabling or updating AI."
 msgstr ""
 
@@ -1569,8 +1570,8 @@ msgid "Preparing secure checkout..."
 msgstr ""
 
 #: ic/ai/class-ic-ai-settings.php:353
-#: ic/ai/class-ic-ai-settings.php:2547
-#: ic/ai/class-ic-ai-settings.php:2630
+#: ic/ai/class-ic-ai-settings.php:2548
+#: ic/ai/class-ic-ai-settings.php:2631
 msgid "Waiting for the AI license notification from impleCode..."
 msgstr ""
 
@@ -1585,7 +1586,7 @@ msgid "The subscription could not be cancelled."
 msgstr ""
 
 #: ic/ai/class-ic-ai-settings.php:359
-#: ic/ai/class-ic-ai-settings.php:1191
+#: ic/ai/class-ic-ai-settings.php:1192
 msgid "Retry"
 msgstr ""
 
@@ -1599,7 +1600,7 @@ msgid "Connection restored."
 msgstr ""
 
 #: ic/ai/class-ic-ai-settings.php:362
-#: ic/ai/class-ic-ai-settings.php:1193
+#: ic/ai/class-ic-ai-settings.php:1194
 msgid "Reconnect"
 msgstr ""
 
@@ -1705,355 +1706,364 @@ msgstr ""
 msgid "The AI service endpoint could not be found. Confirm the service URL is online, then click Retry."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1178
-msgid "If this keeps happening, increase Request Timeout in the implecode AI server settings, then click Retry."
-msgstr ""
-
-#: ic/ai/class-ic-ai-settings.php:1181
+#: ic/ai/class-ic-ai-settings.php:1179
+#: ic/ai/class-ic-ai-settings.php:1182
 msgid "Please click Retry. If the problem persists, try again in a few minutes."
 msgstr ""
 
 #. translators: %s: integration label.
-#: ic/ai/class-ic-ai-settings.php:1217
-#: ic/ai/class-ic-ai-settings.php:1222
+#: ic/ai/class-ic-ai-settings.php:1218
+#: ic/ai/class-ic-ai-settings.php:1223
 #, php-format
 msgid "%s AI"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1225
-#: ic/ai/class-ic-ai-settings.php:1256
+#: ic/ai/class-ic-ai-settings.php:1226
+#: ic/ai/class-ic-ai-settings.php:1257
 msgid "AI Settings"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1277
+#: ic/ai/class-ic-ai-settings.php:1278
 msgid "Save AI Settings"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1329
+#: ic/ai/class-ic-ai-settings.php:1330
 msgid "License Key"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1332
+#: ic/ai/class-ic-ai-settings.php:1333
 msgid "Used to register or re-register this site with impleCode AI."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1356
+#: ic/ai/class-ic-ai-settings.php:1357
 msgid "impleCode AI Configuration"
 msgstr ""
 
 #. translators: %s: AI target label.
-#: ic/ai/class-ic-ai-settings.php:1442
+#: ic/ai/class-ic-ai-settings.php:1443
 #, php-format
 msgid "Enable AI for %s"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1445
+#: ic/ai/class-ic-ai-settings.php:1446
 msgid "Enable impleCode AI for this post type."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1462
+#: ic/ai/class-ic-ai-settings.php:1463
 msgid "Enhance Fields"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1466
+#: ic/ai/class-ic-ai-settings.php:1467
 msgid "Select fields the AI may rewrite or suggest values for. Fields enabled here are not available as Context Fields."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1471
+#: ic/ai/class-ic-ai-settings.php:1472
 msgid "Custom Meta to Enhance"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1473
+#: ic/ai/class-ic-ai-settings.php:1474
 msgid "Choose custom meta to enhance..."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1475
+#: ic/ai/class-ic-ai-settings.php:1476
 msgid "Registered custom fields selected here are sent to the AI for enhancement and can be applied back to the product."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1480
+#: ic/ai/class-ic-ai-settings.php:1481
 msgid "Context Fields"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1484
+#: ic/ai/class-ic-ai-settings.php:1485
 msgid "Select reference-only fields to send with the AI request. Context fields are never modified."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1487
+#: ic/ai/class-ic-ai-settings.php:1488
 msgid "Context data is sent to the AI as reference only and is never modified."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1493
+#: ic/ai/class-ic-ai-settings.php:1494
 msgid "Custom Meta as Context"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1495
+#: ic/ai/class-ic-ai-settings.php:1496
 msgid "Choose custom meta as context..."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1497
+#: ic/ai/class-ic-ai-settings.php:1498
 msgid "Registered custom fields selected here are sent to the AI as reference data only and are never modified."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1685
+#: ic/ai/class-ic-ai-settings.php:1686
 msgid "to solve this problem."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1727
+#: ic/ai/class-ic-ai-settings.php:1728
 msgid "(Required)"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1837
+#: ic/ai/class-ic-ai-settings.php:1838
 msgid "Use server default"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:1914
+#: ic/ai/class-ic-ai-settings.php:1915
 msgid "AI settings couldn't be loaded from impleCode — click Retry above to try again."
 msgstr ""
 
 #. translators: 1: formatted number of AI Credits remaining in the plan, 2: formatted number of extra AI Credits remaining.
-#: ic/ai/class-ic-ai-settings.php:2028
+#: ic/ai/class-ic-ai-settings.php:2029
 #, php-format
 msgid "Plan: %1$s · Extra: %2$s"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2044
+#: ic/ai/class-ic-ai-settings.php:2045
 msgid "No active subscription"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2048
+#: ic/ai/class-ic-ai-settings.php:2049
 msgid "Cancelled — access continues until your license expires"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2052
+#: ic/ai/class-ic-ai-settings.php:2053
 #: includes/stats/class-ic-epc-stats-admin.php:679
 msgid "Active"
 msgstr ""
 
 #. translators: %s: renewal date.
-#: ic/ai/class-ic-ai-settings.php:2055
+#: ic/ai/class-ic-ai-settings.php:2056
 #, php-format
 msgid "renews on %s"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2073
+#: ic/ai/class-ic-ai-settings.php:2074
 msgid "This plan has expired. Included AI Credits were set to zero and will not refill. Extra AI Credits remain available and can still be used."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2075
+#: ic/ai/class-ic-ai-settings.php:2076
 msgid "This Free license is grandfathered and remains non-expiring. The configured expiration term applies only to newly issued or manually regranted Free plans."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2077
+#: ic/ai/class-ic-ai-settings.php:2078
 msgid "This Free license remains non-expiring under the policy in force when it was issued. Newly issued or manually regranted Free plans use the currently configured expiration term."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2079
+#: ic/ai/class-ic-ai-settings.php:2080
 msgid "When this plan expires, Included AI Credits will be set to zero and will no longer refill. Extra AI Credits will remain available and usable."
 msgstr ""
 
 #. translators: %s: localized license expiration date.
-#: ic/ai/class-ic-ai-settings.php:2104
+#: ic/ai/class-ic-ai-settings.php:2105
 #, php-format
 msgid "Expired on %s"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2121
+#: ic/ai/class-ic-ai-settings.php:2122
 msgid "Never"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2219
+#: ic/ai/class-ic-ai-settings.php:2220
 msgid "Not Selected"
 msgstr ""
 
 #. translators: %s: active AI plan name.
-#: ic/ai/class-ic-ai-settings.php:2241
+#: ic/ai/class-ic-ai-settings.php:2242
 #, php-format
 msgid "View plan details for %s"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2292
+#: ic/ai/class-ic-ai-settings.php:2293
 msgid " / month"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2463
+#: ic/ai/class-ic-ai-settings.php:2464
 msgid "Connection"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2466
+#: ic/ai/class-ic-ai-settings.php:2467
 msgid "Client ID"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2467
+#: ic/ai/class-ic-ai-settings.php:2468
 #: ic/orders/includes/digital-order-columns.php:32
 #: ic/orders/includes/save-order.php:366
 #: includes/stats/class-ic-epc-stats-admin.php:1528
 msgid "Status"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2468
+#: ic/ai/class-ic-ai-settings.php:2469
 msgid "Last registration"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2469
+#: ic/ai/class-ic-ai-settings.php:2470
 msgid "Current plan"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2470
+#: ic/ai/class-ic-ai-settings.php:2471
 msgid "AI Credits"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2470
+#: ic/ai/class-ic-ai-settings.php:2471
 msgid "One AI Credit is used for each item processed by impleCode AI. When multiple items are processed at once, each item uses one credit."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2471
+#: ic/ai/class-ic-ai-settings.php:2472
 msgid "Active Subscription"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2472
+#: ic/ai/class-ic-ai-settings.php:2473
 msgid "License Expiration Date"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2478
+#: ic/ai/class-ic-ai-settings.php:2479
 msgid "Renew Plan"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2492
+#: ic/ai/class-ic-ai-settings.php:2493
 msgid "Unregister Site"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2510
+#: ic/ai/class-ic-ai-settings.php:2511
 msgid "Connect Your AI License Key"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2511
+#: ic/ai/class-ic-ai-settings.php:2512
 msgid "This site already has a saved AI License Key."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2513
+#: ic/ai/class-ic-ai-settings.php:2514
 msgid "Save AI Settings to register or re-register this site with impleCode AI using the saved license key."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2516
+#: ic/ai/class-ic-ai-settings.php:2517
 msgid "Use Your Existing AI License Key"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2517
+#: ic/ai/class-ic-ai-settings.php:2518
 msgid "Your AI plan payment was processed, but this site could not retrieve the existing license key automatically."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2519
+#: ic/ai/class-ic-ai-settings.php:2520
 msgid "Paste the AI License Key from your existing impleCode AI plan above, enable AI if needed, and save the settings to activate this site."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2522
+#: ic/ai/class-ic-ai-settings.php:2523
 msgid "Choose Your AI Plan"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2523
+#: ic/ai/class-ic-ai-settings.php:2524
 msgid "Buy an AI plan first, or use an existing AI License Key to activate AI on this site."
 msgstr ""
 
 #. translators: %s: remote AI service host.
-#: ic/ai/class-ic-ai-settings.php:2525
+#: ic/ai/class-ic-ai-settings.php:2526
 #, php-format
 msgid "After payment, you will return here and this screen will wait for the AI license notification from %s."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2527
+#: ic/ai/class-ic-ai-settings.php:2528
 msgid "Loading available AI plans from impleCode..."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2532
+#: ic/ai/class-ic-ai-settings.php:2533
 msgid "Paste your AI License Key above, enable AI if needed, and save the settings to activate the feature."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2550
+#: ic/ai/class-ic-ai-settings.php:2551
 msgid "AI activation in progress"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2560
+#: ic/ai/class-ic-ai-settings.php:2561
 msgid "Resend confirmation email"
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2626
+#: ic/ai/class-ic-ai-settings.php:2566
+msgid "Your email is confirmed. If setup does not finish automatically, enter the AI License Key from your impleCode email in the License Key field and save AI Settings."
+msgstr ""
+
+#: ic/ai/class-ic-ai-settings.php:2627
 msgid "The AI license was received and the site has been activated."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2657
+#: ic/ai/class-ic-ai-settings.php:2658
 msgid "A confirmation email was sent to the address you used at checkout. Confirm it to activate the Free AI plan."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2889
+#: ic/ai/class-ic-ai-settings.php:2674
+msgid "Automatic setup may not work on this website."
+msgstr ""
+
+#: ic/ai/class-ic-ai-settings.php:2676
+msgid "This website appears to be local or private, so impleCode may not be able to connect to it automatically. You can continue. If setup does not finish, use the AI License Key sent by impleCode."
+msgstr ""
+
+#: ic/ai/class-ic-ai-settings.php:2890
 msgid "No pending AI activation was found."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2896
+#: ic/ai/class-ic-ai-settings.php:2897
 msgid "The AI activation notification is stale."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2900
+#: ic/ai/class-ic-ai-settings.php:2901
 msgid "The AI activation signature is invalid."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2906
+#: ic/ai/class-ic-ai-settings.php:2907
 msgid "The AI activation notification was already processed."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2922
+#: ic/ai/class-ic-ai-settings.php:2923
 msgid "A confirmation email was sent. Confirm it before the Free AI plan can be activated."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:2975
+#: ic/ai/class-ic-ai-settings.php:2976
 msgid "Missing AI license key."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3068
+#: ic/ai/class-ic-ai-settings.php:3069
 msgid "The AI checkout request is no longer valid. Refresh the page and try again."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3078
+#: ic/ai/class-ic-ai-settings.php:3079
 msgid "You are not allowed to use the AI checkout proxy."
 msgstr ""
 
 #. translators: %s: formatted number of extra AI Credits now available.
-#: ic/ai/class-ic-ai-settings.php:3175
+#: ic/ai/class-ic-ai-settings.php:3176
 #, php-format
 msgid "Your extra AI Credits were added. Extra AI Credits available: %s."
 msgstr ""
 
 #. translators: %s: active AI plan name.
-#: ic/ai/class-ic-ai-settings.php:3193
+#: ic/ai/class-ic-ai-settings.php:3194
 #, php-format
 msgid "The AI plan has been upgraded. Current plan: %s."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3198
+#: ic/ai/class-ic-ai-settings.php:3199
 msgid "The AI plan has been upgraded."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3204
+#: ic/ai/class-ic-ai-settings.php:3205
 msgid "The AI License Key has been filled in. Save AI settings to activate AI on this site."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3207
+#: ic/ai/class-ic-ai-settings.php:3208
 msgid "The AI License Key has been filled in. Check Enable AI and save AI settings to activate AI on this site."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3216
+#: ic/ai/class-ic-ai-settings.php:3217
 msgid "If the payment was successful, the AI License Key will arrive by email. Paste that key into these AI settings and save to activate the feature."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3226
+#: ic/ai/class-ic-ai-settings.php:3227
 msgid "Applying your extra AI Credits. This will only take a moment..."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3235
+#: ic/ai/class-ic-ai-settings.php:3236
 msgid "If the payment was successful, your extra AI Credits will be applied automatically. If this message persists, click Retry or contact support."
 msgstr ""
 
-#: ic/ai/class-ic-ai-settings.php:3302
+#: ic/ai/class-ic-ai-settings.php:3303
 msgid "We could not retrieve your existing AI License Key automatically. Enter your existing key below, then save AI settings to activate AI on this site."
 msgstr ""
 
@@ -2170,8 +2180,8 @@ msgid "Total GROSS"
 msgstr ""
 
 #: ic/cart/functions.php:814
-#: ic/simple-formbuilder/compat.php:448
-#: ic/simple-formbuilder/compat.php:517
+#: ic/simple-formbuilder/compat.php:460
+#: ic/simple-formbuilder/compat.php:529
 msgid "Choose your country..."
 msgstr ""
 
@@ -2264,13 +2274,13 @@ msgstr ""
 #. translators: 1: opening reset password link, 2: closing reset password link.
 #. translators: Placeholders are substituted with runtime values.
 #: ic/class-ic-user-login.php:352
-#: ic/customers/includes/transactions/customer-panel-security.php:245
+#: ic/customers/includes/transactions/customer-panel-security.php:252
 #, php-format
 msgid "The login failed. If you forgot your password please try to %1$sreset it here%2$s."
 msgstr ""
 
 #: ic/class-ic-user-login.php:356
-#: ic/customers/includes/transactions/customer-panel-security.php:248
+#: ic/customers/includes/transactions/customer-panel-security.php:255
 msgid "Please enter both username and password."
 msgstr ""
 
@@ -2757,54 +2767,54 @@ msgstr ""
 msgid "Email will be set as system user name. This email will be used to send all account credentials to a customer."
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:984
-#: ic/orders/includes/register-digital-orders.php:987
+#: ic/orders/includes/register-digital-orders.php:1017
+#: ic/orders/includes/register-digital-orders.php:1020
 msgid "Digital order updated."
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:985
+#: ic/orders/includes/register-digital-orders.php:1018
 #: includes/class-ic-register-product.php:895
 msgid "Custom field updated."
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:986
+#: ic/orders/includes/register-digital-orders.php:1019
 #: includes/class-ic-register-product.php:896
 msgid "Custom field deleted."
 msgstr ""
 
 #. translators: %s: title of the restored revision.
-#: ic/orders/includes/register-digital-orders.php:989
+#: ic/orders/includes/register-digital-orders.php:1022
 #, php-format
 msgid "Digital order restored to revision from %s"
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:990
+#: ic/orders/includes/register-digital-orders.php:1023
 msgid "Digital order published."
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:991
+#: ic/orders/includes/register-digital-orders.php:1024
 #: includes/class-ic-register-product.php:903
 msgid "Page saved."
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:992
+#: ic/orders/includes/register-digital-orders.php:1025
 msgid "Digital order submitted."
 msgstr ""
 
 #. translators: %1$s: scheduled publication date and time.
-#: ic/orders/includes/register-digital-orders.php:994
+#: ic/orders/includes/register-digital-orders.php:1027
 #, php-format
 msgid "Digital order scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
 #. translators: %1$s: scheduled publication date and time.
 #. translators: 1: scheduled date, 2: preview URL, 3: product label.
-#: ic/orders/includes/register-digital-orders.php:994
+#: ic/orders/includes/register-digital-orders.php:1027
 #: includes/class-ic-register-product.php:907
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: ic/orders/includes/register-digital-orders.php:995
+#: ic/orders/includes/register-digital-orders.php:1028
 msgid "Digital order draft updated."
 msgstr ""
 
@@ -2864,7 +2874,7 @@ msgstr ""
 
 #: ic/orders/includes/save-order.php:239
 #: ic/simple-formbuilder/class-ic-simple-form-legacy.php:797
-#: ic/simple-formbuilder/compat.php:537
+#: ic/simple-formbuilder/compat.php:549
 #: modules/cart/includes/shopping-settings.php:300
 #: modules/quote-cart/index.php:301
 #: modules/shipping/shipping-functions.php:266
@@ -2873,7 +2883,7 @@ msgstr ""
 
 #: ic/orders/includes/save-order.php:239
 #: ic/simple-formbuilder/class-ic-simple-form-legacy.php:798
-#: ic/simple-formbuilder/compat.php:538
+#: ic/simple-formbuilder/compat.php:550
 #: modules/cart/includes/shopping-settings.php:301
 #: modules/quote-cart/index.php:302
 #: modules/shipping/shipping-functions.php:267
@@ -3177,17 +3187,17 @@ msgid "Submit"
 msgstr ""
 
 #: ic/simple-formbuilder/class-ic-simple-form-legacy.php:796
-#: ic/simple-formbuilder/compat.php:536
+#: ic/simple-formbuilder/compat.php:548
 msgid "Street"
 msgstr ""
 
 #: ic/simple-formbuilder/class-ic-simple-form-legacy.php:797
-#: ic/simple-formbuilder/compat.php:537
+#: ic/simple-formbuilder/compat.php:549
 msgid "State / Province / Region"
 msgstr ""
 
 #: ic/simple-formbuilder/class-ic-simple-form-legacy.php:798
-#: ic/simple-formbuilder/compat.php:538
+#: ic/simple-formbuilder/compat.php:550
 msgid "ZIP code"
 msgstr ""
 
@@ -3222,7 +3232,7 @@ msgstr ""
 msgid "Please fix the following errors:"
 msgstr ""
 
-#: ic/simple-formbuilder/compat.php:470
+#: ic/simple-formbuilder/compat.php:482
 msgid "Choose your state..."
 msgstr ""
 

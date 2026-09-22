@@ -707,7 +707,8 @@ class ic_orders {
 			if ( ! isset( $_POST['payment_details_status'] ) ) {
 				return $post_id;
 			}
-			$order_meta['_payment_details']           = ic_get_order_payment_details( $post_id );
+			$stored_payment_details                   = get_post_meta( $post_id, '_payment_details', true );
+			$order_meta['_payment_details']           = is_array( $stored_payment_details ) ? $stored_payment_details : array();
 			$prev_status                              = isset( $order_meta['_payment_details']['status'] ) ? $order_meta['_payment_details']['status'] : '';
 			$order_meta['_payment_details']['status'] = ic_epc_order_post_text( 'payment_details_status' );
 			$requested_status                         = $order_meta['_payment_details']['status'];
@@ -715,28 +716,60 @@ class ic_orders {
 			if ( $auto_promote_shipped ) {
 				$order_meta['_payment_details']['status'] = ic_get_order_completion_status();
 			}
-			$order_meta['_payment_details']['date']           = preg_match( '/^\d{1,2}-\d{1,2}-\d{4}$/', ic_epc_order_post_text( 'payment_details_date' ) ) ? ic_epc_order_post_text( 'payment_details_date' ) : wp_date( 'd-m-Y' );
-			$order_meta['_payment_details']['name']           = ic_epc_order_post_text( 'payment_details_name' );
-			$order_meta['_payment_details']['email']          = sanitize_email( ic_epc_order_post_text( 'payment_details_email' ) );
-			$order_meta['_payment_details']['vatid']          = ic_epc_order_post_text( 'payment_details_vatid' );
-			$order_meta['_payment_details']['street']         = ic_epc_order_post_text( 'payment_details_address' );
-			$order_meta['_payment_details']['postcode']       = ic_epc_order_post_text( 'payment_details_postcode' );
-			$order_meta['_payment_details']['city']           = ic_epc_order_post_text( 'payment_details_city' );
-			$order_meta['_payment_details']['country']        = ic_epc_order_post_text( 'payment_details_country' );
-			$order_meta['_payment_details']['country_code']   = sanitize_key( ic_epc_order_post_text( 'payment_details_country_code' ) );
-			$order_meta['_payment_details']['billing_name']   = ic_epc_order_post_text( 'payment_details_billing_name' );
-			$order_meta['_payment_details']['shipping_email'] = sanitize_email( ic_epc_order_post_text( 'payment_details_shipping_email' ) );
-			if ( empty( $order_meta['_payment_details']['shipping_email'] ) ) {
-				$order_meta['_payment_details']['shipping_email'] = sanitize_email( ic_epc_order_post_text( 'order_summary_email' ) );
+			$payment_fields = array(
+				'date'           => 'date',
+				'name'           => 'name',
+				'email'          => 'email',
+				'vatid'          => 'vatid',
+				'street'         => 'address',
+				'postcode'       => 'postcode',
+				'city'           => 'city',
+				'country'        => 'country',
+				'country_code'   => 'country_code',
+				'billing_name'   => 'billing_name',
+				'shipping_email' => 'shipping_email',
+				'currency'       => 'currency',
+				'order-currency' => 'order_currency',
+				'vat_name'       => 'vat_name',
+				'vat_address'    => 'vat_address',
+			);
+			foreach ( $payment_fields as $meta_key => $input_key ) {
+				$input_key = 'payment_details_' . $input_key;
+				if ( ! isset( $_POST[ $input_key ] ) || ! is_scalar( $_POST[ $input_key ] ) ) {
+					continue;
+				}
+				$value = ic_epc_order_post_text( $input_key );
+				if ( array_key_exists( $meta_key, $order_meta['_payment_details'] ) && is_scalar( $order_meta['_payment_details'][ $meta_key ] ) && (string) $order_meta['_payment_details'][ $meta_key ] === $value ) {
+					continue;
+				}
+				if ( '' === $value && ! array_key_exists( $meta_key, $order_meta['_payment_details'] ) ) {
+					continue;
+				}
+				if ( 'date' === $meta_key ) {
+					$value = preg_match( '/^\d{1,2}-\d{1,2}-\d{4}$/', $value ) ? $value : wp_date( 'd-m-Y' );
+				} elseif ( in_array( $meta_key, array( 'email', 'shipping_email' ), true ) ) {
+					$value = sanitize_email( $value );
+				} elseif ( in_array( $meta_key, array( 'currency', 'order-currency' ), true ) ) {
+					$value = sanitize_key( $value );
+				}
+				$order_meta['_payment_details'][ $meta_key ] = $value;
+				if ( 'country' === $meta_key && ! isset( $_POST['payment_details_country_code'] ) ) {
+					$country_code = array_search( $value, implecode_supported_countries(), true );
+					if ( false !== $country_code ) {
+						$order_meta['_payment_details']['country_code'] = $country_code;
+					}
+				}
 			}
-			$order_meta['_payment_details']['currency']       = sanitize_key( ic_epc_order_post_text( 'payment_details_currency' ) );
-			$order_meta['_payment_details']['order-currency'] = sanitize_key( ic_epc_order_post_text( 'payment_details_order_currency' ) );
-			$order_meta['_payment_details']['vat_name']       = ic_epc_order_post_text( 'payment_details_vat_name' );
-			$order_meta['_payment_details']['vat_address']    = ic_epc_order_post_text( 'payment_details_vat_address' );
 			if ( function_exists( 'get_shopping_checkout_form_fields' ) ) {
 				$fields = json_decode( get_shopping_checkout_form_fields() );
 				foreach ( $fields->fields as $field ) {
-					$cid                                    = apply_filters( 'ic_formbuilder_cid', $pre_name . $field->cid, $field, $pre_name );
+					$cid = apply_filters( 'ic_formbuilder_cid', $pre_name . $field->cid, $field, $pre_name );
+					if ( ! isset( $_POST[ $cid ] ) || ! is_scalar( $_POST[ $cid ] ) ) {
+						continue;
+					}
+					if ( '' === ic_epc_order_post_text( $cid ) && ! array_key_exists( $cid, $order_meta['_payment_details'] ) ) {
+						continue;
+					}
 					$order_meta['_payment_details'][ $cid ] = ic_epc_order_post_text( $cid, isset( $field->field_type ) ? $field->field_type : '' );
 				}
 			}

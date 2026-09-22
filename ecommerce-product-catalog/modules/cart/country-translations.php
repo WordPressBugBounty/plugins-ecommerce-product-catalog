@@ -224,7 +224,6 @@ if ( ! function_exists( 'ic_formbuilder_country_name_translations' ) ) {
 			'Spain' => __( 'Spain', 'ecommerce-product-catalog' ),
 			'Sri Lanka' => __( 'Sri Lanka', 'ecommerce-product-catalog' ),
 			'State of Palestine' => __( 'State of Palestine', 'ecommerce-product-catalog' ),
-			'Statia' => __( 'Statia', 'ecommerce-product-catalog' ),
 			'Sudan' => __( 'Sudan', 'ecommerce-product-catalog' ),
 			'Suriname' => __( 'Suriname', 'ecommerce-product-catalog' ),
 			'Svalbard and Jan Mayen' => __( 'Svalbard and Jan Mayen', 'ecommerce-product-catalog' ),

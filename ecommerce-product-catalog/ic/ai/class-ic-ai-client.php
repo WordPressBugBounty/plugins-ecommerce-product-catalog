@@ -385,56 +385,108 @@ class IC_AI_Client {
 	const PUBLIC_CATALOG_TTL = HOUR_IN_SECONDS;
 
 	/**
+	 * How long cached service-owned display definitions stay fresh.
+	 */
+	const DISPLAY_DEFINITIONS_TTL = WEEK_IN_SECONDS;
+
+	/**
 	 * Returns the default site settings.
 	 *
 	 * @return array
 	 */
 	public function default_site_settings() {
 		return array(
-			'license_key'                   => '',
-			'client_id'                     => '',
-			'client_secret'                 => '',
-			'client_status'                 => '',
-			'available_models'              => array(),
-			'plans'                         => array(),
-			'field_modes'                   => array(),
-			'marketing_control_definitions' => array(),
-			'disclosure'                    => array(),
-			'active_plan'                   => array(),
-			'quota'                         => array(),
-			'subscription'                  => array(),
-			'license'                       => array(),
-			'seo'                           => array(),
-			'upgrade_url'                   => '',
-			'buy_enhancements_url'          => '',
-			'last_registration'             => '',
-			'last_error'                    => '',
-			'last_error_code'               => '',
-			'registration_label'            => '',
-			'catalog_available'             => 0,
-			'catalog_message'               => '',
-			'request_timeout'               => 40,
-			'enhancement_packs'             => array(),
-			'plans_synced_at'               => 0,
-			'pending_status'                => '',
-			'pending_client_id'             => '',
-			'pending_callback_secret'       => '',
-			'pending_post_type'             => '',
-			'pending_source'                => '',
-			'pending_started_at'            => '',
-			'pending_message'               => '',
-			'pending_user_id'               => 0,
-			'pending_plan_slug'             => '',
-			'pending_purchase_type'         => '',
-			'pending_item_slug'             => '',
-			'pending_quantity'              => 0,
-			'pending_recovery_type'         => '',
-			'field_error_field'             => '',
-			'field_error_message'           => '',
-			'field_error_code'              => '',
-			'field_error_action_url'        => '',
-			'field_error_action_label'      => '',
+			'license_key'                        => '',
+			'client_id'                          => '',
+			'client_secret'                      => '',
+			'client_status'                      => '',
+			'available_models'                   => array(),
+			'plans'                              => array(),
+			'field_modes'                        => array(),
+			'marketing_control_definitions'      => array(),
+			'disclosure'                         => array(),
+			'display_definitions_synced_at'      => 0,
+			'display_definitions_plugin_version' => '',
+			'active_plan'                        => array(),
+			'quota'                              => array(),
+			'subscription'                       => array(),
+			'license'                            => array(),
+			'seo'                                => array(),
+			'upgrade_url'                        => '',
+			'buy_enhancements_url'               => '',
+			'last_registration'                  => '',
+			'last_error'                         => '',
+			'last_error_code'                    => '',
+			'registration_label'                 => '',
+			'catalog_available'                  => 0,
+			'catalog_message'                    => '',
+			'request_timeout'                    => 40,
+			'enhancement_packs'                  => array(),
+			'plans_synced_at'                    => 0,
+			'pending_status'                     => '',
+			'pending_client_id'                  => '',
+			'pending_callback_secret'            => '',
+			'pending_post_type'                  => '',
+			'pending_source'                     => '',
+			'pending_started_at'                 => '',
+			'pending_message'                    => '',
+			'pending_user_id'                    => 0,
+			'pending_plan_slug'                  => '',
+			'pending_purchase_type'              => '',
+			'pending_item_slug'                  => '',
+			'pending_quantity'                   => 0,
+			'pending_recovery_type'              => '',
+			'field_error_field'                  => '',
+			'field_error_message'                => '',
+			'field_error_code'                   => '',
+			'field_error_action_url'             => '',
+			'field_error_action_label'           => '',
 		);
+	}
+
+	/**
+	 * Returns the running catalog plugin version used for display definitions.
+	 *
+	 * @return string
+	 */
+	public function display_definitions_plugin_version() {
+		if ( ! defined( 'IC_CATALOG_VERSION' ) || ! is_scalar( IC_CATALOG_VERSION ) ) {
+			return '';
+		}
+
+		return trim( (string) IC_CATALOG_VERSION );
+	}
+
+	/**
+	 * Returns complete service-owned display definition cache updates.
+	 *
+	 * The existing cache remains authoritative when either response block is
+	 * absent or empty, so transient or incomplete responses cannot erase the
+	 * settings UI or mark an incomplete cache as fresh.
+	 *
+	 * @param array $response Decoded service response.
+	 *
+	 * @return array
+	 */
+	private function display_definition_updates( $response ) {
+		$definitions = isset( $response['marketing_controls'] ) && is_array( $response['marketing_controls'] ) ? $response['marketing_controls'] : array();
+		$disclosure  = isset( $response['disclosure'] ) && is_array( $response['disclosure'] ) ? $response['disclosure'] : array();
+
+		if ( empty( $definitions ) || empty( $disclosure ) ) {
+			return array();
+		}
+
+		$updates = array(
+			'marketing_control_definitions' => $definitions,
+			'disclosure'                    => $disclosure,
+			'display_definitions_synced_at' => time(),
+		);
+		$version = $this->display_definitions_plugin_version();
+		if ( '' !== $version ) {
+			$updates['display_definitions_plugin_version'] = $version;
+		}
+
+		return $updates;
 	}
 
 	/**
@@ -1438,8 +1490,6 @@ class IC_AI_Client {
 				'plans'                         => isset( $decoded['plans'] ) && is_array( $decoded['plans'] ) ? $decoded['plans'] : array(),
 				'enhancement_packs'             => isset( $decoded['enhancement_packs'] ) && is_array( $decoded['enhancement_packs'] ) ? $decoded['enhancement_packs'] : array(),
 				'field_modes'                   => isset( $decoded['field_modes'] ) && is_array( $decoded['field_modes'] ) ? $decoded['field_modes'] : array(),
-				'marketing_control_definitions' => isset( $decoded['marketing_controls'] ) && is_array( $decoded['marketing_controls'] ) ? $decoded['marketing_controls'] : array(),
-				'disclosure'                    => isset( $decoded['disclosure'] ) && is_array( $decoded['disclosure'] ) ? $decoded['disclosure'] : array(),
 				'active_plan'                   => isset( $decoded['active_plan'] ) && is_array( $decoded['active_plan'] ) ? $decoded['active_plan'] : array(),
 				'quota'                         => isset( $decoded['quota'] ) && is_array( $decoded['quota'] ) ? $decoded['quota'] : array(),
 				'subscription'                  => isset( $decoded['subscription'] ) && is_array( $decoded['subscription'] ) ? $decoded['subscription'] : array(),
@@ -1454,7 +1504,8 @@ class IC_AI_Client {
 				'last_error'                    => '',
 				'last_error_code'               => '',
 			),
-			$this->site_field_error_updates( array() )
+			$this->site_field_error_updates( array() ),
+			$this->display_definition_updates( $decoded )
 		);
 		$this->update_site_settings( $payload );
 
@@ -1541,8 +1592,6 @@ class IC_AI_Client {
 					'plans'                         => isset( $decoded['plans'] ) && is_array( $decoded['plans'] ) ? $decoded['plans'] : array(),
 					'enhancement_packs'             => isset( $decoded['enhancement_packs'] ) && is_array( $decoded['enhancement_packs'] ) ? $decoded['enhancement_packs'] : array(),
 					'field_modes'                   => isset( $decoded['field_modes'] ) && is_array( $decoded['field_modes'] ) ? $decoded['field_modes'] : array(),
-					'marketing_control_definitions' => isset( $decoded['marketing_controls'] ) && is_array( $decoded['marketing_controls'] ) ? $decoded['marketing_controls'] : array(),
-					'disclosure'                    => isset( $decoded['disclosure'] ) && is_array( $decoded['disclosure'] ) ? $decoded['disclosure'] : array(),
 					'active_plan'                   => isset( $decoded['active_plan'] ) && is_array( $decoded['active_plan'] ) ? $decoded['active_plan'] : array(),
 					'quota'                         => isset( $decoded['quota'] ) && is_array( $decoded['quota'] ) ? $decoded['quota'] : array(),
 					'subscription'                  => isset( $decoded['subscription'] ) && is_array( $decoded['subscription'] ) ? $decoded['subscription'] : array(),
@@ -1555,7 +1604,8 @@ class IC_AI_Client {
 					'last_error'                    => '',
 					'last_error_code'               => '',
 				),
-				$this->site_field_error_updates( array() )
+				$this->site_field_error_updates( array() ),
+				$this->display_definition_updates( $decoded )
 			)
 		);
 
@@ -1662,8 +1712,6 @@ class IC_AI_Client {
 					'plans'                         => isset( $decoded['plans'] ) && is_array( $decoded['plans'] ) ? $decoded['plans'] : array(),
 					'enhancement_packs'             => isset( $decoded['enhancement_packs'] ) && is_array( $decoded['enhancement_packs'] ) ? $decoded['enhancement_packs'] : array(),
 					'field_modes'                   => isset( $decoded['field_modes'] ) && is_array( $decoded['field_modes'] ) ? $decoded['field_modes'] : array(),
-					'marketing_control_definitions' => isset( $decoded['marketing_controls'] ) && is_array( $decoded['marketing_controls'] ) ? $decoded['marketing_controls'] : array(),
-					'disclosure'                    => isset( $decoded['disclosure'] ) && is_array( $decoded['disclosure'] ) ? $decoded['disclosure'] : array(),
 					'active_plan'                   => isset( $decoded['active_plan'] ) && is_array( $decoded['active_plan'] ) ? $decoded['active_plan'] : array(),
 					'quota'                         => isset( $decoded['quota'] ) && is_array( $decoded['quota'] ) ? $decoded['quota'] : array(),
 					'subscription'                  => isset( $decoded['subscription'] ) && is_array( $decoded['subscription'] ) ? $decoded['subscription'] : array(),
@@ -1676,7 +1724,8 @@ class IC_AI_Client {
 					'last_error'                    => '',
 					'last_error_code'               => '',
 				),
-				$this->site_field_error_updates( array() )
+				$this->site_field_error_updates( array() ),
+				$this->display_definition_updates( $decoded )
 			)
 		);
 
@@ -1739,10 +1788,11 @@ class IC_AI_Client {
 	 * @param string            $batch_group_id  Optional same-task batch group identifier for worker-side merging.
 	 * @param array             $qa_context      Optional clarifying-question answers to refine the fields.
 	 * @param bool              $questions_suppressed Whether to suppress further clarifying questions (refine call).
+	 * @param string            $editor_type     Optional allowlisted editor type for a fresh editor request.
 	 *
 	 * @return array|WP_Error
 	 */
-	public function request_enhancement( $integration, $payload, $context_payload = array(), $job_id = '', $batch_total = 1, $queue_only = false, $batch_group_id = '', $qa_context = array(), $questions_suppressed = false ) {
+	public function request_enhancement( $integration, $payload, $context_payload = array(), $job_id = '', $batch_total = 1, $queue_only = false, $batch_group_id = '', $qa_context = array(), $questions_suppressed = false, $editor_type = '' ) {
 		$target = $integration instanceof IC_AI_Target ? $integration : null;
 		$stats  = $target && $target->is_valid() ? array(
 			'integration' => (string) $target->plugin_slug(),
@@ -1755,7 +1805,7 @@ class IC_AI_Client {
 		if ( $stats ) {
 			$this->record_stats_event( 'ai_request', $stats ); }
 		$started = microtime( true );
-		$result  = $this->enhancement_request( $integration, $payload, $context_payload, $job_id, $batch_total, $queue_only, $batch_group_id, $qa_context, $questions_suppressed );
+		$result  = $this->enhancement_request( $integration, $payload, $context_payload, $job_id, $batch_total, $queue_only, $batch_group_id, $qa_context, $questions_suppressed, $editor_type );
 		if ( ! $stats ) {
 			return $result; }
 		if ( is_wp_error( $result ) ) {
@@ -1801,10 +1851,11 @@ class IC_AI_Client {
 	 * @param string            $batch_group_id  Optional same-task batch group identifier for worker-side merging.
 	 * @param array             $qa_context      Optional clarifying-question answers to refine the fields.
 	 * @param bool              $questions_suppressed Whether to suppress further clarifying questions (refine call).
+	 * @param string            $editor_type     Optional allowlisted editor type for a fresh editor request.
 	 *
 	 * @return array|WP_Error
 	 */
-	private function enhancement_request( $integration, $payload, $context_payload = array(), $job_id = '', $batch_total = 1, $queue_only = false, $batch_group_id = '', $qa_context = array(), $questions_suppressed = false ) {
+	private function enhancement_request( $integration, $payload, $context_payload = array(), $job_id = '', $batch_total = 1, $queue_only = false, $batch_group_id = '', $qa_context = array(), $questions_suppressed = false, $editor_type = '' ) {
 		$target = $integration instanceof IC_AI_Target ? $integration : null;
 		if ( $target ) {
 			$integration = $target->integration(); }
@@ -1829,6 +1880,10 @@ class IC_AI_Client {
 		if ( '' !== $job_id ) {
 			$request['job_id'] = $job_id;
 		} else {
+			$editor_type = sanitize_key( (string) $editor_type );
+			if ( in_array( $editor_type, array( 'classic', 'block' ), true ) ) {
+				$request['editor_type'] = $editor_type;
+			}
 			$request['marketing_controls'] = $this->normalize_marketing_controls( $settings['marketing_controls'] ?? array() );
 			$request['analysis_opt_in']    = ! empty( $settings['analysis_opt_in'] );
 			$request['selected_fields']    = array_keys( $payload );
@@ -2244,17 +2299,18 @@ class IC_AI_Client {
 		}
 
 		$this->update_site_settings(
-			array(
-				'plans'                         => isset( $decoded['plans'] ) && is_array( $decoded['plans'] ) ? $decoded['plans'] : array(),
-				'enhancement_packs'             => isset( $decoded['enhancement_packs'] ) && is_array( $decoded['enhancement_packs'] ) ? $decoded['enhancement_packs'] : array(),
-				'field_modes'                   => isset( $decoded['field_modes'] ) && is_array( $decoded['field_modes'] ) ? $decoded['field_modes'] : array(),
-				'marketing_control_definitions' => isset( $decoded['marketing_controls'] ) && is_array( $decoded['marketing_controls'] ) ? $decoded['marketing_controls'] : array(),
-				'disclosure'                    => isset( $decoded['disclosure'] ) && is_array( $decoded['disclosure'] ) ? $decoded['disclosure'] : array(),
-				'catalog_available'             => ! empty( $decoded['catalog_available'] ) ? 1 : 0,
-				'catalog_message'               => isset( $decoded['catalog_message'] ) ? sanitize_text_field( $decoded['catalog_message'] ) : '',
-				'plans_synced_at'               => time(),
-				'last_error'                    => '',
-				'last_error_code'               => '',
+			array_merge(
+				array(
+					'plans'             => isset( $decoded['plans'] ) && is_array( $decoded['plans'] ) ? $decoded['plans'] : array(),
+					'enhancement_packs' => isset( $decoded['enhancement_packs'] ) && is_array( $decoded['enhancement_packs'] ) ? $decoded['enhancement_packs'] : array(),
+					'field_modes'       => isset( $decoded['field_modes'] ) && is_array( $decoded['field_modes'] ) ? $decoded['field_modes'] : array(),
+					'catalog_available' => ! empty( $decoded['catalog_available'] ) ? 1 : 0,
+					'catalog_message'   => isset( $decoded['catalog_message'] ) ? sanitize_text_field( $decoded['catalog_message'] ) : '',
+					'plans_synced_at'   => time(),
+					'last_error'        => '',
+					'last_error_code'   => '',
+				),
+				$this->display_definition_updates( $decoded )
 			)
 		);
 
@@ -3086,7 +3142,7 @@ class IC_AI_Client {
 	 * @return string
 	 */
 	private function timeout_user_message() {
-		return __( 'The AI service took too long to respond. Please try again. If this keeps happening, increase Request Timeout in the implecode AI server settings, then retry.', 'ecommerce-product-catalog' );
+		return __( 'The AI service took too long to respond. Please try again.', 'ecommerce-product-catalog' );
 	}
 
 	/**

@@ -374,6 +374,14 @@ jQuery( document ).ready(
 					.attr( 'name', 'form_data' )
 					.val( form.serialize() );
 				form.append( input );
+				if ( ic_screen_api.form_nonce && 0 === form.find( 'input[name="_ic_screen_nonce"]' ).length ) {
+					form.append(
+						$( '<input>' )
+							.attr( 'type', 'hidden' )
+							.attr( 'name', '_ic_screen_nonce' )
+							.val( ic_screen_api.form_nonce )
+					);
+				}
 				form.parents( '.ic-ajax-container' ).off( 'submit' );
 				form.off( 'submit' ).trigger( 'submit' );
 				return true;

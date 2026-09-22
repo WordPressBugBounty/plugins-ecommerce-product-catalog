@@ -1247,6 +1247,8 @@ input.error {
 
 span.ic_tip, input.ic_tip {
 	cursor: help;
+    top: 0;
+    left: 0;
 }
 
 .ic_deactivate_confirm {

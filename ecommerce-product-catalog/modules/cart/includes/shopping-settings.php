@@ -69,7 +69,7 @@ function get_shopping_cart_settings() {
 	if ( ! is_array( $shopping_cart_settings ) ) {
 		$shopping_cart_settings = array();
 	}
-	// Seventeen premium-only cart settings are neither defaulted here nor returned - they are
+	// Eighteen premium-only cart settings are neither defaulted here nor returned - they are
 	// dropped just before the filter runs at the end of this function.
 	$shopping_cart_settings['shopping_cart_page']      = isset( $shopping_cart_settings['shopping_cart_page'] ) ? $shopping_cart_settings['shopping_cart_page'] : '';
 	$shopping_cart_settings['cart_submit_page']        = isset( $shopping_cart_settings['cart_submit_page'] ) ? $shopping_cart_settings['cart_submit_page'] : '';
@@ -105,6 +105,30 @@ function get_shopping_cart_settings() {
 	$shopping_cart_settings['disable_state']              = isset( $shopping_cart_settings['disable_state'] ) ? $shopping_cart_settings['disable_state'] : '';
 	$shopping_cart_settings['identity_retention_years']   = isset( $shopping_cart_settings['identity_retention_years'] ) ? max( 1, absint( $shopping_cart_settings['identity_retention_years'] ) ) : 10;
 
+	foreach (
+		array(
+			'cart_page_template',
+			'country_field',
+			'qty_box',
+			'max_qty_box',
+			'quantity_box',
+			'url_button',
+			'cart_redirect',
+			'add_on_price',
+			'empty_cart',
+			'listing_separate_name',
+			'email_separate_name',
+			'cart_separate_name',
+			'custom_payments',
+			'disable_payment',
+			'enable_recommendations',
+			'receive_packing_list',
+			'disable_captcha',
+			'packing_email_subject',
+		) as $premium_only_key
+	) {
+		unset( $shopping_cart_settings[ $premium_only_key ] );
+	}
 	return apply_filters( 'ic_shopping_cart_settings', $shopping_cart_settings );
 }
 

@@ -233,6 +233,7 @@
 
 	function updateEditorField(selector, value) {
 		var $field = $(selector).first();
+		var editor;
 
 		if (!$field.length) {
 			return;
@@ -241,8 +242,14 @@
 		$field.val(value).trigger('change');
 
 		if ('content' === $field.attr('id') || 'excerpt' === $field.attr('id')) {
-			if (window.tinymce && tinymce.get($field.attr('id'))) {
-				tinymce.get($field.attr('id')).setContent(value);
+			if (window.tinymce) {
+				editor = tinymce.get($field.attr('id'));
+				if (editor) {
+					editor.setContent(value);
+					if ('classic' === icAIAdmin.editorType && typeof editor.setDirty === 'function') {
+						editor.setDirty(true);
+					}
+				}
 			}
 		}
 	}
@@ -295,6 +302,87 @@
 		}
 
 		return true;
+	}
+
+	var coreBlockRegistrationAttempted = false;
+
+	/**
+	 * Ensure the native raw handler has the core block definitions it needs.
+	 *
+	 * @param {Object} blocks WordPress blocks package.
+	 * @return {boolean} Whether the required core block types are registered.
+	 */
+	function coreBlockRegistryReady(blocks) {
+		var requiredTypes = ['core/paragraph', 'core/list', 'core/list-item'];
+		var registeredTypes;
+		var hasCoreType;
+
+		if (!blocks || typeof blocks.rawHandler !== 'function' || typeof blocks.serialize !== 'function' ||
+			typeof blocks.getBlockTypes !== 'function' || typeof blocks.getBlockType !== 'function' ||
+			!window.wp.blockLibrary || typeof window.wp.blockLibrary.registerCoreBlocks !== 'function') {
+			return false;
+		}
+
+		try {
+			registeredTypes = blocks.getBlockTypes();
+			if (!Array.isArray(registeredTypes)) {
+				return false;
+			}
+			if (requiredTypes.every(function (blockName) { return !!blocks.getBlockType(blockName); })) {
+				return true;
+			}
+
+			hasCoreType = registeredTypes.some(function (blockType) {
+				return blockType && typeof blockType.name === 'string' && blockType.name.indexOf('core/') === 0;
+			});
+			if (hasCoreType || coreBlockRegistrationAttempted) {
+				return false;
+			}
+
+			coreBlockRegistrationAttempted = true;
+			window.wp.blockLibrary.registerCoreBlocks();
+
+			return requiredTypes.every(function (blockName) { return !!blocks.getBlockType(blockName); });
+		} catch (error) {
+			return false;
+		}
+	}
+
+	/**
+	 * Convert raw post content through WordPress's native HTML-to-block pipeline.
+	 *
+	 * @param {Object} config Field configuration.
+	 * @param {*}      value  Candidate field value.
+	 * @return {*} Serialized block content, or the unchanged value on fallback.
+	 */
+	function normalizePostContentBlocks(config, value) {
+		var blocks = window.wp && window.wp.blocks;
+		var html;
+		var parsed;
+		var serialized;
+
+		if (!config || 'post_field' !== config.type || 'post_content' !== config.post_field) {
+			return value;
+		}
+		if ('classic' === icAIAdmin.editorType) {
+			return value;
+		}
+
+		html = String(value);
+		if (/<!--\s*\/?wp:/i.test(html) || !coreBlockRegistryReady(blocks)) {
+			return value;
+		}
+
+		try {
+			parsed = blocks.rawHandler({ HTML: html });
+			if (!Array.isArray(parsed) || !parsed.length) {
+				return value;
+			}
+			serialized = blocks.serialize(parsed);
+			return serialized ? serialized : value;
+		} catch (error) {
+			return value;
+		}
 	}
 
 	function replaceEditorPayload(payload, value) {
@@ -669,6 +757,9 @@
 			job_id: jobId || '',
 			answers: answers
 		};
+		if ('review' !== (state.context || '') && ('classic' === icAIAdmin.editorType || 'block' === icAIAdmin.editorType)) {
+			postData.editor_type = icAIAdmin.editorType;
+		}
 		if ('review' === (state.context || '')) {
 			postData.review_context = 1;
 		}
@@ -1074,6 +1165,7 @@
 		}
 
 		if ('post_field' === config.type) {
+			value = normalizePostContentBlocks(config, value);
 			applyGutenbergPostFieldAdapter(config, value);
 			applyEditorValue(config, value);
 			return $.Deferred().resolve();
@@ -1094,6 +1186,9 @@
 			object_id: icAIAdmin.postId,
 			form_data: formData
 		};
+		if ('classic' === icAIAdmin.editorType || 'block' === icAIAdmin.editorType) {
+			requestData.editor_type = icAIAdmin.editorType;
+		}
 
 		clearQueuedRetry($box, false);
 		$button.prop('disabled', true);
@@ -1730,7 +1825,7 @@
 		var value = $field.find('.ic-ai-preview-value').val();
 
 		if (!config || config.type !== 'group') {
-			return value;
+			return normalizePostContentBlocks(config, value);
 		}
 
 		try {

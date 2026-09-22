@@ -51,6 +51,13 @@ class ic_customer_panel_security {
 	}
 
 	static function redirect_admin() {
+		if ( 'admin-post.php' === ( $GLOBALS['pagenow'] ?? '' ) && is_user_logged_in() ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Request routing only; the allowed handler verifies its nonce.
+			$action = isset( $_REQUEST['action'] ) && is_string( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
+			if ( apply_filters( 'ic_customers_allow_authenticated_admin_post', false, $action, get_current_user_id() ) ) {
+				return;
+			}
+		}
 		if ( self::restricted_logged_customer() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 			$url = ic_get_login_redirect_url();
 			if ( ! empty( $url ) ) {

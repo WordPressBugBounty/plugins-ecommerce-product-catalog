@@ -18,10 +18,14 @@ jQuery( document ).ready(
 		if (nonce === '' && typeof ic_catalog !== 'undefined') {
 			nonce = ic_catalog.formbuilder_state_nonce || ic_catalog.nonce;
 		}
-		var state_container = jQuery( '.ic-form .dropdown_state, .ic-order-checkout-data .dropdown_state, .shipping-address-form-fields .dropdown_state' );
+		if (typeof ic_user_profile_form !== 'undefined') {
+			ic_ajaxurl = ic_user_profile_form.ajaxurl || ic_ajaxurl;
+			nonce      = ic_user_profile_form.nonce || nonce;
+		}
+		var state_container = jQuery( '.ic-form .dropdown_state, .ic-order-checkout-data .dropdown_state, .shipping-address-form-fields .dropdown_state, .ic-user-type-edit-form .dropdown_state' );
 
 		function icFormbuilderFormScope(country_container) {
-			return country_container.closest( '.shipping-address-form-fields, .ic-form, .ic-order-checkout-data, .ic-checkout-form-data, form' );
+			return country_container.closest( '.shipping-address-form-fields, .ic-user-type-edit-form, .ic-form, .ic-order-checkout-data, .ic-checkout-form-data, form' );
 		}
 
 		function icFormbuilderStateContainer(country_selector, country_container) {
@@ -71,7 +75,7 @@ jQuery( document ).ready(
 		}
 
 		if (state_container.length) {
-			jQuery( '.ic-form .dropdown_country select, .ic-order-checkout-data .dropdown_country select, .shipping-address-form-fields .dropdown_country select' ).on(
+			jQuery( '.ic-form .dropdown_country select, .ic-order-checkout-data .dropdown_country select, .shipping-address-form-fields .dropdown_country select, .ic-user-type-edit-form .dropdown_country select' ).on(
 				'change',
 				function () {
 					var country_selector     = jQuery( this );

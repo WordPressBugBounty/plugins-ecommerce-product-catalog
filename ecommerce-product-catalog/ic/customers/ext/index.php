@@ -1,7 +1,12 @@
 <?php
+/**
+ * Initialize customer extensions.
+ *
+ * @package impleCode
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 /**
  * Manages ext files

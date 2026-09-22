@@ -162,6 +162,18 @@ class IC_AI_Admin {
 	}
 
 	/**
+	 * Returns the allowlisted editor type submitted by an authenticated AJAX request.
+	 *
+	 * @return string
+	 */
+	private function request_editor_type() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- AJAX callers verify the shared nonce before this helper is used.
+		$editor_type = isset( $_POST['editor_type'] ) ? sanitize_key( wp_unslash( $_POST['editor_type'] ) ) : '';
+
+		return in_array( $editor_type, array( 'classic', 'block' ), true ) ? $editor_type : '';
+	}
+
+	/**
 	 * Rejects review mutations while a target-wide bulk task is active.
 	 *
 	 * @param IC_AI_Target|false $target Target object.
@@ -548,6 +560,13 @@ class IC_AI_Admin {
 			return;
 		}
 		$post_id       = 'editor' === $mode ? $this->current_admin_post_id( $screen ) : 0;
+		$editor_type   = '';
+		if ( $post_id && function_exists( 'use_block_editor_for_post' ) ) {
+			$editor_post = get_post( $post_id );
+			if ( $editor_post instanceof WP_Post ) {
+				$editor_type = use_block_editor_for_post( $editor_post ) ? 'block' : 'classic';
+			}
+		}
 		$term_id       = 'taxonomy' === $mode ? $this->current_admin_term_id( $screen ) : 0;
 		$saved_preview = $post_id ? $this->saved_preview_response( $post_id, $integration ) : ( $term_id && ! empty( $context['target'] ) ? $this->target_saved_preview( $context['target'], $term_id ) : array() );
 		$field_config  = $this->integration_field_config( $integration, 'taxonomy' === $mode && ! empty( $context['target'] ) ? $context['target'] : null );
@@ -644,6 +663,9 @@ class IC_AI_Admin {
 		}
 
 		wp_enqueue_style( 'ic-ai-admin' );
+		if ( 'editor' === $mode || ( 'review' === $mode && $asset_target instanceof IC_AI_Target && 'post' === $asset_target->kind() ) ) {
+			wp_enqueue_script( 'wp-block-library' );
+		}
 		wp_enqueue_script( 'ic-ai-admin' );
 		$localized_target    = ( ! empty( $context['target'] ) && $context['target'] instanceof IC_AI_Target && 'taxonomy' === $context['target']->kind() ) ? $context['target'] : $integration->target( 'post' );
 		$localized_object_id = ( 'review' === $mode && ! empty( $review_context ) ? $review_context['current_object_id'] : ( 'taxonomy' === $mode ? $this->current_admin_term_id( $screen ) : $post_id ) );
@@ -654,6 +676,7 @@ class IC_AI_Admin {
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( 'ic-ai-admin' ),
 				'screenMode'     => $mode,
+				'editorType'     => $editor_type,
 				'postType'       => $integration->post_type(),
 				'targetKey'      => $localized_target ? $localized_target->key() : '',
 				'postId'         => $localized_object_id,
@@ -2572,7 +2595,8 @@ class IC_AI_Admin {
 		wp_parse_str( $form_data, $parsed );
 		$payload = 'taxonomy' === $target->kind() ? $this->collect_target_term_payload( $target, $object_id, $parsed ) : $this->collect_payload( $integration, $object_id, $parsed );
 		$context = 'taxonomy' === $target->kind() ? array_merge( $this->collect_context_payload( $target, $object_id, $parsed ), is_callable( $target->context_callback() ) ? (array) call_user_func( $target->context_callback(), $object_id, $target ) : array() ) : $this->collect_context_payload( $integration, $object_id, $parsed );
-		$result  = $this->manager->client()->request_enhancement( $target, $payload, $context, $job_id );
+		$editor_type = 'post' === $target->kind() ? $this->request_editor_type() : '';
+		$result      = $this->manager->client()->request_enhancement( $target, $payload, $context, $job_id, 1, false, '', array(), false, $editor_type );
 		if ( is_wp_error( $result ) ) {
 			$error_payload = $this->enhancement_error_payload( $integration, $result, $site_settings, $target );
 			$status        = ! empty( $error_payload['license_flow'] ) ? 409 : 400;
@@ -2661,7 +2685,8 @@ class IC_AI_Admin {
 		}
 		// A queued/202 refine returns a job_id; polling with it resumes the same job the way
 		// ajax_preview() does, so a rate-limited refine finishes instead of stalling.
-		$result = $this->manager->client()->request_enhancement( $target, $payload, $context, $job_id, 1, false, '', $qa_context, true );
+		$editor_type = 'review' !== $context_screen && 'post' === $target->kind() ? $this->request_editor_type() : '';
+		$result      = $this->manager->client()->request_enhancement( $target, $payload, $context, $job_id, 1, false, '', $qa_context, true, $editor_type );
 		if ( is_wp_error( $result ) ) {
 			$error_payload = $this->enhancement_error_payload( $integration, $result, $site_settings, $target );
 			$status        = ! empty( $error_payload['license_flow'] ) ? 409 : 400;
@@ -5934,9 +5959,10 @@ class IC_AI_Admin {
 				return is_array( $parsed[ $form_key ] ) ? $parsed[ $form_key ] : wp_kses_post( $parsed[ $form_key ] );
 			}
 			if ( $post_id ) {
-				$post = get_post( $post_id );
-				if ( ! empty( $field['post_field'] ) && ! empty( $post->{ $field['post_field'] } ) ) {
-					return $post->{ $field['post_field'] };
+				$post       = get_post( $post_id );
+				$post_field = ! empty( $field['post_field'] ) ? (string) $field['post_field'] : '';
+				if ( $post instanceof WP_Post && '' !== $post_field && property_exists( $post, $post_field ) ) {
+					return $post->{ $post_field };
 				}
 			}
 		} elseif ( in_array( $type, array( 'meta', 'custom_meta', 'post_meta', 'term_meta', 'extension' ), true ) ) {

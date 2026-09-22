@@ -13,7 +13,7 @@ document.addEventListener(
 			ic_cart_auto_refresh = 1;
 		} else if (ic_cart_auto_refresh === 1) {
 			ic_cart_auto_refresh = 0;
-			if (ic_cart_has_refreshable_container() && ic_cart_has_cached_markup() && ic_cart_has_session_cookie()) {
+			if (ic_cart_has_refreshable_container() && ic_cart_has_cached_markup()) {
 				ic_cart_refresh_active_cart();
 			}
 		}
@@ -26,7 +26,7 @@ jQuery( document ).ready(
 		var dec_sep = (typeof ic_cart_ajax_object !== 'undefined') ? ic_cart_ajax_object.dec_sep : '.';
 		var th_sep  = (typeof ic_cart_ajax_object !== 'undefined') ? ic_cart_ajax_object.th_sep : '';
 
-		if (ic_cart_has_refreshable_container() && ic_cart_has_cached_markup() && ic_cart_has_session_cookie()) {
+		if (ic_cart_has_refreshable_container() && ic_cart_has_cached_markup()) {
 			ic_cart_refresh_active_cart();
 		}
 

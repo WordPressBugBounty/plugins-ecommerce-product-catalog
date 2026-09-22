@@ -95,6 +95,31 @@ jQuery( document ).ready(
 
 		loginFormContainer.on(
 			'click',
+			'.ic-create-account',
+			function ( event ) {
+				var currentContainer = $( this ).closest( '.ic-login-form-container' );
+				event.preventDefault();
+				currentContainer.find( '.login_form, .ic-login-form-options' ).hide();
+				currentContainer.find( '.ic-user-register' ).show();
+				currentContainer.find( '.ic-top-registration-link' ).hide();
+			}
+		);
+
+		loginFormContainer.on(
+			'click',
+			'.ic-user-register-cancel',
+			function ( event ) {
+				var currentContainer = $( this ).closest( '.ic-login-form-container' );
+				event.preventDefault();
+				currentContainer.find( '.ic-user-register' ).hide();
+				currentContainer.find( '.login_form' ).show();
+				currentContainer.find( '.ic-login-form-options' ).hide();
+				currentContainer.find( '.ic-top-registration-link' ).show();
+			}
+		);
+
+		loginFormContainer.on(
+			'click',
 			'.sign-in',
 			function () {
 				var currentContainer = $( this ).closest( '.ic-login-form-container' );

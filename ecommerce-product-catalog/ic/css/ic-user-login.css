@@ -138,6 +138,10 @@ body:not(.logged-in) .menu-item-type-custom.show-popup-for-logged-1 .ic-customer
 	max-width: 700px;
 }
 
+.ic-login-form-container .ic-user-register {
+	display: none;
+}
+
 .ic-design.button.ic-cancel-login {
 	margin-left: 7px;
 }

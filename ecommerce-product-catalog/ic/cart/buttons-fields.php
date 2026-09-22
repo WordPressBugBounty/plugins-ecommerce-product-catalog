@@ -241,6 +241,14 @@ function ic_ajax_shopping_add_cart_add_part( $parts, $args = array() ) {
 	$first_arg = reset( $this_args );
 	if ( is_array( $first_arg ) ) {
 		foreach ( $this_args as $product_id => $product_args ) {
+			if ( is_array( $product_args ) && empty( $product_args[3] ) ) {
+				$mapped_product_id = absint( $product_id );
+				if ( empty( $mapped_product_id ) ) {
+					$parts['ic_shopping_add_cart_get'][ $product_id ] = '';
+					continue;
+				}
+				$product_args[3] = $mapped_product_id;
+			}
 			$parts['ic_shopping_add_cart_get'][ $product_id ] = ic_get_cart_add_button_part( $product_args );
 		}
 	} else {

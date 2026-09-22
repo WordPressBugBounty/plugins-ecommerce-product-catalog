@@ -1175,7 +1175,8 @@ class IC_AI_Settings {
 				$guidance = __( 'The impleCode AI service is temporarily unavailable — please Retry in a few minutes.', 'ecommerce-product-catalog' );
 				break;
 			case 'ic_ai_timeout':
-				$guidance = __( 'If this keeps happening, increase Request Timeout in the implecode AI server settings, then click Retry.', 'ecommerce-product-catalog' );
+				$message  = __( 'The AI service took too long to respond. Please try again.', 'ecommerce-product-catalog' );
+				$guidance = __( 'Please click Retry. If the problem persists, try again in a few minutes.', 'ecommerce-product-catalog' );
 				break;
 			default:
 				$guidance = __( 'Please click Retry. If the problem persists, try again in a few minutes.', 'ecommerce-product-catalog' );
@@ -2159,6 +2160,29 @@ class IC_AI_Settings {
 	}
 
 	/**
+	 * Returns whether cached service-owned display definitions need refreshing.
+	 *
+	 * @param array $site_settings Site settings.
+	 *
+	 * @return bool
+	 */
+	private function cached_display_definitions_stale( $site_settings ) {
+		if ( $this->cached_display_definitions_missing( $site_settings ) ) {
+			return true;
+		}
+
+		$synced_at       = ! empty( $site_settings['display_definitions_synced_at'] ) ? absint( $site_settings['display_definitions_synced_at'] ) : 0;
+		$now             = time();
+		$current_version = $this->manager->client()->display_definitions_plugin_version();
+		$stored_version  = isset( $site_settings['display_definitions_plugin_version'] ) && is_scalar( $site_settings['display_definitions_plugin_version'] ) ? (string) $site_settings['display_definitions_plugin_version'] : '';
+
+		return empty( $synced_at )
+			|| $synced_at > $now
+			|| ( $now - $synced_at ) > IC_AI_Client::DISPLAY_DEFINITIONS_TTL
+			|| ( '' !== $current_version && $current_version !== $stored_version );
+	}
+
+	/**
 	 * Refreshes the remote catalog/plan cache before cache-backed UI renders.
 	 *
 	 * Runs only during actual settings-page rendering (never on every `init`).
@@ -2189,7 +2213,7 @@ class IC_AI_Settings {
 			if ( ! is_wp_error( $refreshed ) ) {
 				$site_settings = $client->site_settings();
 			}
-		} elseif ( $client->has_registered_client( $site_settings ) && ( $this->current_plan_needs_remote_detail_refresh( $site_settings ) || $this->cached_display_definitions_missing( $site_settings ) ) ) {
+		} elseif ( $client->has_registered_client( $site_settings ) && ( $this->current_plan_needs_remote_detail_refresh( $site_settings ) || $this->cached_display_definitions_stale( $site_settings ) ) ) {
 			$refreshed = $client->refresh_plan_state();
 			if ( ! is_wp_error( $refreshed ) ) {
 				$site_settings = $client->site_settings();
