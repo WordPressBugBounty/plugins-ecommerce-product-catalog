@@ -132,6 +132,10 @@ jQuery(document).ready(function () {
             }
         }
     });
+    jQuery('.variable-product .variations-container').each(function () {
+        var initial_shipping = jQuery(this).closest('.variable-product').find('.shipping-table-container').first();
+        jQuery(this).data('base-shipping', initial_shipping.length ? initial_shipping.clone() : '');
+    });
     jQuery('.variation_select').on('change', function (event, force) {
         var dropdown = jQuery(this);
         var variation = dropdown.attr('name');
@@ -396,6 +400,7 @@ jQuery(document).ready(function () {
                 } else {
                     jQuery('.variable-product #product_details').append(out[0]);
                 }
+                jQuery('.variable-product .variations-container').data('shipping-modified', 1);
 //jQuery( ".variable-price-effect .shipping-table-container" ).show( );
                 jQuery('.variable-price-effect .price-container, .variable-price-effect .shipping-table-container, .variable-price-effect .sku-table').fadeTo('slow', 1);
                 jQuery.ic.doAction('ic_update_variation_details', [out, product_id]);
@@ -415,6 +420,20 @@ jQuery(document).ready(function () {
             jQuery('.sku-table').fadeTo('fast', 0);
         } else {
             jQuery('.variable-price-effect td.price-value').first().text(jQuery('.variable-price-effect .variations-container').data('base-price'));
+            var base_container = jQuery('.variable-product .variations-container').first();
+            var base_shipping = base_container.data('base-shipping');
+            if (base_container.data('shipping-modified')) {
+                if (base_shipping) {
+                    if (jQuery('.variable-product .shipping-table-container').length) {
+                        jQuery('.variable-product .shipping-table-container').replaceWith(base_shipping.clone());
+                    } else {
+                        jQuery('.variable-product #product_details').append(base_shipping.clone());
+                    }
+                } else {
+                    jQuery('.variable-product .shipping-table-container').remove();
+                }
+                base_container.removeData('shipping-modified');
+            }
             button_container.find('.cart_info').show();
             button_container.find('form.add-to-shopping-cart button').fadeIn();
             button_container.find('form.add-to-shopping-cart input[type="image"]').fadeIn();

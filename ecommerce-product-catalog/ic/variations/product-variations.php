@@ -326,7 +326,7 @@ function get_variations_shipping_modificators(
 			} else {
 				$prices = $variation_shipping[ $var_id ];
 			}
-			if ( ! empty( $var_selected ) ) {
+			if ( ! empty( $var_selected ) || 0 === $var_selected || '0' === $var_selected ) {
 				foreach ( $values as $z => $value ) {
 					if ( $z == $var_selected ) {
 						$found = true;

@@ -4,8 +4,11 @@ Adds appropriate scripts to admin settings
 (c) 2014 Norbert Dreszer - http://implecode.com
  */
 
-jQuery( document ).ready(
-	function () {
+function ic_cart_initialize() {
+	if (window.ic_cart_initialized) {
+		return;
+	}
+	window.ic_cart_initialized = true;
 		/* global product_object */
 		if ( typeof product_object !== 'undefined' && ! window.ic_cart_nonce_prefilter ) {
 			window.ic_cart_nonce_prefilter = true;
@@ -151,6 +154,19 @@ jQuery( document ).ready(
 				);
 			}
 		);
+	}
+
+jQuery( document ).ready(
+	function () {
+		if (window.ic_pre_cached_pending) {
+			var resume_cart_initialization = function () {
+				document.removeEventListener( 'ic_replaced_pre_cached', resume_cart_initialization );
+				ic_cart_initialize();
+			};
+			document.addEventListener( 'ic_replaced_pre_cached', resume_cart_initialization );
+			return;
+		}
+		ic_cart_initialize();
 	}
 );
 

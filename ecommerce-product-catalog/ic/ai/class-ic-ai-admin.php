@@ -114,6 +114,35 @@ class IC_AI_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen routing.
 		return isset( $_GET['tag_ID'] ) ? absint( wp_unslash( $_GET['tag_ID'] ) ) : 0;
 	}
+
+	/**
+	 * Determines whether the current user can configure a target's integration.
+	 *
+	 * @param IC_AI_Target $target Target object.
+	 *
+	 * @return bool
+	 */
+	private function can_manage_target_settings( $target ) {
+		if ( ! $target instanceof IC_AI_Target || ! $target->integration() ) {
+			return false;
+		}
+
+		return current_user_can( $target->integration()->settings_capability() );
+	}
+
+	/**
+	 * Determines whether a target's admin UI is available to the current user.
+	 *
+	 * @param IC_AI_Target $target Target object.
+	 *
+	 * @return bool
+	 */
+	private function target_ui_available( $target ) {
+		return $target instanceof IC_AI_Target
+			&& $target->is_valid()
+			&& ( $this->manager->client()->is_enabled( $target ) || $this->can_manage_target_settings( $target ) );
+	}
+
 	/**
 	 * Determines whether a target has list enhancement enabled.
 	 *
@@ -128,7 +157,7 @@ class IC_AI_Admin {
 			return false;
 		}
 		$target = 'taxonomy' === $kind ? $integration->target( 'taxonomy', $taxonomy ) : $integration->target( 'post' );
-		return $target instanceof IC_AI_Target && $target->is_valid() && $target->list_enhance_enabled();
+		return $this->target_ui_available( $target ) && $target->list_enhance_enabled();
 	}
 
 	/**
@@ -437,7 +466,7 @@ class IC_AI_Admin {
 
 		foreach ( $this->manager->integrations() as $integration ) {
 			$post_target = $integration->target( 'post' );
-			if ( $post_target instanceof IC_AI_Target && $post_target->is_valid() && $post_target->list_enhance_enabled() ) {
+			if ( $this->target_ui_available( $post_target ) && $post_target->list_enhance_enabled() ) {
 				$has_enabled_integrations      = true;
 				$has_enabled_post_integrations = true;
 				add_filter( 'manage_edit-' . $integration->post_type() . '_columns', array( $this, 'register_list_column' ) );
@@ -446,7 +475,7 @@ class IC_AI_Admin {
 				add_filter( 'handle_bulk_actions-edit-' . $integration->post_type(), array( $this, 'handle_bulk_action_fallback' ), 10, 3 );
 			}
 			foreach ( (array) $integration->taxonomy_targets() as $taxonomy_target ) {
-				if ( ! $taxonomy_target instanceof IC_AI_Target || ! $taxonomy_target->is_valid() || ! $taxonomy_target->list_enhance_enabled() ) {
+				if ( ! $this->target_ui_available( $taxonomy_target ) || ! $taxonomy_target->list_enhance_enabled() ) {
 					continue;
 				}
 				$has_enabled_integrations = true;
@@ -476,8 +505,8 @@ class IC_AI_Admin {
 		foreach ( $this->manager->integrations() as $integration ) {
 			$taxonomy_targets = array_filter(
 				(array) $integration->taxonomy_targets(),
-				static function ( $target ) {
-					return $target instanceof IC_AI_Target && $target->list_enhance_enabled();
+				function ( $target ) {
+					return $this->target_ui_available( $target ) && $target->list_enhance_enabled();
 				}
 			);
 			if ( ! $this->target_list_enabled( $integration ) && empty( $taxonomy_targets ) ) {
@@ -509,6 +538,10 @@ class IC_AI_Admin {
 			return;
 		}
 		foreach ( $this->manager->integrations() as $integration ) {
+			$target = $integration->target( 'post' );
+			if ( ! $this->target_ui_available( $target ) ) {
+				continue;
+			}
 			add_meta_box(
 				'ic-ai-' . $integration->post_type(),
 				__( 'impleCode AI', 'ecommerce-product-catalog' ),
@@ -536,6 +569,9 @@ class IC_AI_Admin {
 			return;
 		}
 		$target = $integration->target( 'post' );
+		if ( ! $this->target_ui_available( $target ) ) {
+			return;
+		}
 		wp_nonce_field( 'ic_ai_preview_' . ( $target ? $target->key() : $post_type ), 'ic_ai_preview_nonce' );
 		?>
 		<div class="ic-ai-metabox" data-target-key="<?php echo esc_attr( $target ? $target->key() : '' ); ?>" data-post-type="<?php echo esc_attr( $post_type ); ?>">
@@ -868,7 +904,7 @@ class IC_AI_Admin {
 		if ( $taxonomy ) {
 			foreach ( $this->manager->integrations() as $candidate ) {
 				$target = $candidate->target( 'taxonomy', $taxonomy );
-				if ( $target instanceof IC_AI_Target && $target->list_enhance_enabled() ) {
+				if ( $this->target_ui_available( $target ) && $target->list_enhance_enabled() ) {
 					return array(
 						'mode'        => $this->current_admin_term_id( $screen ) ? 'taxonomy' : 'list',
 						'integration' => $candidate,
@@ -878,13 +914,14 @@ class IC_AI_Admin {
 			}
 		}
 
-		if ( $integration && $post_id && get_post_type( $post_id ) === $post_type ) {
+		$post_target = $integration ? $integration->target( 'post' ) : false;
+		if ( $integration && $this->target_ui_available( $post_target ) && $post_id && get_post_type( $post_id ) === $post_type ) {
 			return array(
 				'mode'        => 'editor',
 				'integration' => $integration,
 			);
 		}
-		if ( $integration && 'post' === $screen->base ) {
+		if ( $integration && $this->target_ui_available( $post_target ) && 'post' === $screen->base ) {
 			return array(
 				'mode'        => 'editor',
 				'integration' => $integration,
@@ -902,7 +939,7 @@ class IC_AI_Admin {
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only review routing.
 				$review_key    = isset( $_GET['target_key'] ) ? sanitize_text_field( wp_unslash( $_GET['target_key'] ) ) : '';
 				$review_target = $review_key ? $this->manager->target( $review_key ) : $registered_integration->target( 'post' );
-				if ( ! $review_target instanceof IC_AI_Target || $review_target->integration() !== $registered_integration || ! $review_target->list_enhance_enabled() ) {
+				if ( ! $review_target instanceof IC_AI_Target || $review_target->integration() !== $registered_integration || ! $this->target_ui_available( $review_target ) || ! $review_target->list_enhance_enabled() ) {
 					continue;
 				}
 				return array(
@@ -995,7 +1032,7 @@ class IC_AI_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Core verifies the taxonomy bulk-action nonce before invoking this callback; this value only resolves the edited taxonomy.
 		$taxonomy = isset( $_REQUEST['taxonomy'] ) ? sanitize_key( wp_unslash( $_REQUEST['taxonomy'] ) ) : '';
 		$target   = $this->find_taxonomy_target( $taxonomy );
-		if ( ! $target || ! $this->can_edit_target( $target, $term_id ) ) {
+		if ( ! $this->target_ui_available( $target ) || ! $this->can_edit_target( $target, $term_id ) ) {
 			return '';
 		}
 		$preview   = $this->target_saved_preview( $target, $term_id );
@@ -1051,7 +1088,7 @@ class IC_AI_Admin {
 		$screen   = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		$taxonomy = $screen && ! empty( $screen->taxonomy ) ? sanitize_key( $screen->taxonomy ) : '';
 		$target   = $this->find_taxonomy_target( $taxonomy );
-		if ( ! $target || ! $target->list_enhance_enabled() ) {
+		if ( ! $this->target_ui_available( $target ) || ! $target->list_enhance_enabled() ) {
 			return;
 		}
 		$count        = $this->display_scope_count( $target->integration(), $target );
@@ -1075,7 +1112,7 @@ class IC_AI_Admin {
 			return;
 		}
 		$target = $this->find_taxonomy_target( $term->taxonomy );
-		if ( ! $target || ! $this->can_edit_target( $target, $term->term_id ) ) {
+		if ( ! $this->target_ui_available( $target ) || ! $this->can_edit_target( $target, $term->term_id ) ) {
 			return;
 		}
 		wp_nonce_field( 'ic_ai_target_' . $target->key(), 'ic_ai_target_nonce' );
@@ -1176,10 +1213,14 @@ class IC_AI_Admin {
 	 * @return string
 	 */
 	private function render_list_actions_box( $integration ) {
+		$target = $integration->target( 'post' );
+		if ( ! $this->target_ui_available( $target ) || ! $target->list_enhance_enabled() ) {
+			return '';
+		}
+
 		$scope_count  = $this->display_scope_count( $integration );
 		$scope_label  = $this->plural_label( $integration );
 		$review_count = $this->saved_preview_count( $integration->post_type() );
-		$target       = $integration->target( 'post' );
 		$locked       = $target instanceof IC_AI_Target && $this->task_blocks_target_review( $target );
 		$review_attrs = $locked ? ' disabled aria-disabled="true" tabindex="-1"' : '';
 		$review_class = ( $review_count ? '' : ' disabled' ) . ( $locked ? ' disabled' : '' );
@@ -1367,7 +1408,7 @@ class IC_AI_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence is checked before check_admin_referer() validates the action.
 		$target_key = isset( $_GET['target_key'] ) ? sanitize_text_field( wp_unslash( $_GET['target_key'] ) ) : '';
 		$target     = $target_key ? $this->manager->target( $target_key ) : $integration->target( 'post' );
-		if ( ! $target || $target->integration() !== $integration || ! $target->list_enhance_enabled() || ! current_user_can( $target->edit_capability() ) ) {
+		if ( ! $target || $target->integration() !== $integration || ! $this->target_ui_available( $target ) || ! $target->list_enhance_enabled() || ! current_user_can( $target->edit_capability() ) ) {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'ecommerce-product-catalog' ) );
 		}
 		$active = $this->resolve_target_active_task( $target );
@@ -1407,7 +1448,7 @@ class IC_AI_Admin {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only review routing.
 		$requested_target_key = isset( $_GET['target_key'] ) ? sanitize_text_field( wp_unslash( $_GET['target_key'] ) ) : '';
 		$requested_target     = $requested_target_key ? $this->manager->target( $requested_target_key ) : $integration->target( 'post' );
-		if ( ! $requested_target instanceof IC_AI_Target || $requested_target->integration() !== $integration || ! $requested_target->list_enhance_enabled() || ! current_user_can( $requested_target->edit_capability() ) ) {
+		if ( ! $requested_target instanceof IC_AI_Target || $requested_target->integration() !== $integration || ! $this->target_ui_available( $requested_target ) || ! $requested_target->list_enhance_enabled() || ! current_user_can( $requested_target->edit_capability() ) ) {
 			wp_die( esc_html__( 'You are not allowed to access this page.', 'ecommerce-product-catalog' ) );
 		}
 		if ( ! empty( $this->resolve_target_active_task( $requested_target ) ) ) {
@@ -2977,6 +3018,15 @@ class IC_AI_Admin {
 	 * @return array
 	 */
 	private function enhancement_error_payload( $integration, $error, $site_settings, $target = null ) {
+		$target = $target instanceof IC_AI_Target ? $target : ( is_object( $integration ) && method_exists( $integration, 'target' ) ? $integration->target( 'post' ) : false );
+		if ( ! $this->can_manage_target_settings( $target ) ) {
+			return array(
+				'message' => $error->get_error_message(),
+				'code'    => $error->get_error_code(),
+				'data'    => $error->get_error_data(),
+			);
+		}
+
 		$field_error = $this->manager->client()->enhancement_license_key_field_error( $error, $site_settings );
 
 		if ( ! empty( $field_error['field'] ) && ! empty( $field_error['message'] ) ) {

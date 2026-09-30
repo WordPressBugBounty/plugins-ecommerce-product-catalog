@@ -54,23 +54,52 @@ function ic_ajax_get_viariation_details() {
 			ob_start();
 			if ( $element == 'shipping' ) {
 				if ( function_exists( 'show_shipping_options' ) ) {
-					$variation_shipping_overrides = function_exists( 'override_variation_shipping_label' ) && function_exists( 'override_variation_shipping_price' );
+					$variation_shipping_label_override  = function_exists( 'override_variation_shipping_label' );
+					$variation_shipping_price_override  = function_exists( 'override_variation_shipping_price' );
+					$variation_shipping_modifier        = static function ( $price, $filtered_product_id, $shipping_index ) use ( $product_id, $selected_variation, $variation_id ) {
+						if ( $product_id !== (int) $filtered_product_id ) {
+							return $price;
+						}
+						$modified_shipping = get_variations_shipping_modificators(
+							$product_id,
+							$selected_variation,
+							$variation_id,
+							false,
+							array( $shipping_index => $price )
+						);
+
+						return is_array( $modified_shipping ) && array_key_exists( $shipping_index, $modified_shipping ) ? $modified_shipping[ $shipping_index ] : $price;
+					};
+					$variation_shipping_detail_override = null;
 					ic_save_global( 'var_details_selected_variation', $selected_variation );
 					ic_save_global( 'var_details_variation_id', $variation_id );
 					ic_set_product_id( $product_id );
-					if ( $variation_shipping_overrides ) {
+					add_filter( 'product_shipping_option_price', $variation_shipping_modifier, 10, 3 );
+					if ( $variation_shipping_label_override ) {
 						add_filter( 'ic_product_shipping_label', 'override_variation_shipping_label', 10, 3 );
-						add_filter( 'product_shipping_option_price', 'override_variation_shipping_price', 10, 3 );
+					}
+					if ( $variation_shipping_price_override ) {
+						$variation_shipping_detail_override = static function ( $price, $filtered_product_id, $shipping_index ) use ( $product_id, $selected_variation, $variation_id ) {
+							if ( $product_id !== (int) $filtered_product_id ) {
+								return $price;
+							}
+
+							return override_variation_shipping_price( $price, $product_id, $shipping_index, $selected_variation, $variation_id, null, false );
+						};
+						add_filter( 'product_shipping_option_price', $variation_shipping_detail_override, 20, 3 );
 					}
 					do_action( 'ic_ajax_variation_' . $element . '_details', $selected_variation, $variation_id, $product_id );
 					show_shipping_options();
+					remove_filter( 'product_shipping_option_price', $variation_shipping_modifier, 10 );
+					if ( $variation_shipping_label_override ) {
+						remove_filter( 'ic_product_shipping_label', 'override_variation_shipping_label', 10 );
+					}
+					if ( $variation_shipping_detail_override ) {
+						remove_filter( 'product_shipping_option_price', $variation_shipping_detail_override, 20 );
+					}
 					ic_delete_global( 'var_details_selected_variation' );
 					ic_delete_global( 'var_details_variation_id' );
 					ic_reset_product_id();
-					if ( $variation_shipping_overrides ) {
-						remove_filter( 'ic_product_shipping_label', 'override_variation_shipping_label', 10, 3 );
-						remove_filter( 'product_shipping_option_price', 'override_variation_shipping_price', 10, 3 );
-					}
 				}
 			} elseif ( $element == 'in_cart' ) {
 				$product_variations_settings = get_product_variations_settings();

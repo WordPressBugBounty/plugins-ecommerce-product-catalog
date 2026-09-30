@@ -33,4 +33,8 @@ if ( ! defined( 'IC_SIMPLE_FORMBUILDER_ENABLE_LEGACY_COMPAT' ) ) {
 ic_framework_require_once( __DIR__ . '/simple-formbuilder/index.php' );
 ic_framework_require_once( __DIR__ . '/ai/index.php' );
 ic_framework_require_once( __DIR__ . '/selectors/index.php' );
+ic_framework_require_once( __DIR__ . '/stats/index.php' );
 ic_framework_require_once( __DIR__ . '/privacy/index.php' );
+ic_framework_require_once( dirname( __DIR__ ) . '/includes/stats/class-ic-epc-stats-integration.php' );
+ic_framework_require_once( dirname( __DIR__ ) . '/includes/stats/class-ic-epc-stats-identity.php' );
+ic_framework_require_once( dirname( __DIR__ ) . '/includes/stats/class-ic-epc-stats-admin.php' );

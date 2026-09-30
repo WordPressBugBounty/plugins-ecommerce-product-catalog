@@ -937,7 +937,7 @@ class ic_orders {
 		}
 		$fields = $this->fields( $order_id );
 		if ( ! empty( $fields ) ) {
-			update_post_meta( $order_id, '_ic_form_fields', $fields );
+			update_post_meta( $order_id, '_ic_form_fields', wp_slash( $fields ) );
 		}
 	}
 

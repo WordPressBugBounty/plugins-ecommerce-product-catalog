@@ -119,6 +119,67 @@ jQuery( document ).ready(
 		);
 
 		loginFormContainer.on(
+			'click.icUserRegistration',
+			'.ic-user-register-submit',
+			function () {
+				$( this ).closest( '.ic-user-register' ).find( ':submit' ).trigger( 'click' );
+			}
+		);
+
+		loginFormContainer.on(
+			'submit.icUserRegistration',
+			'.ic-user-register',
+			function ( event ) {
+				event.preventDefault();
+
+				var userRegisterForm = $( this );
+				var currentContainer = userRegisterForm.closest( '.ic-login-form-container' );
+				var submitButton = userRegisterForm.find( '.ic-user-register-submit' );
+				var formInside = userRegisterForm.find( '.ic-form-inside' );
+				removeLoginAlerts( currentContainer );
+				submitButton.prop( 'disabled', true );
+				formInside.css( 'opacity', '0.5' );
+				userRegisterForm.find( '.ic_ajax_register_response' ).remove();
+
+				var data = {
+					action: 'ic_user_register',
+					ic_nonce: ic_user_login.registration_nonce,
+					email: userRegisterForm.find( '[name=ic-user-register-email]' ).val(),
+					phone: userRegisterForm.find( '[name=ic-user-register-phone]' ).val(),
+					name: userRegisterForm.find( '[name=ic-user-register-name]' ).val(),
+					ic_new_account_confirm: userRegisterForm.find( '[name=ic_new_account_confirm]' ).val()
+				};
+
+				$.post( ic_user_login.ajaxurl, data )
+					.done(
+						function ( response ) {
+							if ( ! response ) {
+								return;
+							}
+							if ( response.includes( 'warning' ) || response.includes( 'ic-modal-container-container' ) ) {
+								userRegisterForm.prepend( response );
+								return;
+							}
+
+							currentContainer.find( '.login_form #login_form' ).prepend( response );
+							userRegisterForm.hide();
+							currentContainer.find( '.login_form' ).show();
+							currentContainer.find( '.ic-login-form-options' ).hide();
+							currentContainer.find( '.ic-top-registration-link' ).show();
+						}
+					)
+					.always(
+						function () {
+							submitButton.prop( 'disabled', false );
+							formInside.css( 'opacity', '' );
+						}
+					);
+
+				return true;
+			}
+		);
+
+		loginFormContainer.on(
 			'click',
 			'.sign-in',
 			function () {

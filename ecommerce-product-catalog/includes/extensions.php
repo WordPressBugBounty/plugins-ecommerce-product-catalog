@@ -1656,8 +1656,7 @@ add_action( 'ic_catalog_admin_priority_notices', 'ic_epc_newsletter_notice' );
  * @return void
  */
 function ic_epc_newsletter_notice( $ic_notices = null ) {
-	if ( ( ! empty( $ic_notices ) && $ic_notices->get_notice_status( 'notice-ic-catalog-newsletter', 'temp' ) ) || function_exists( 'start_implecode_updater' ) || is_ic_edit_product_screen() || is_ic_new_product_screen()) {
-
+	if ( ( ! empty( $ic_notices ) && $ic_notices->get_notice_status( 'notice-ic-catalog-newsletter', 'temp' ) ) || function_exists( 'start_implecode_updater' ) || is_ic_edit_product_screen() || is_ic_new_product_screen() ) {
 		return;
 	}
 	?>
@@ -1667,21 +1666,27 @@ function ic_epc_newsletter_notice( $ic_notices = null ) {
 		<div class="squeezer"></div>
 		<script>
 			async function ic_epc_newsletter_notice() {
+				const notice = document.getElementById('notice-ic-catalog-newsletter');
+				if (!notice) {
+					return;
+				}
+				const container = notice.querySelector('.squeezer');
+				if (!container) {
+					return;
+				}
 				try {
 					const response = await fetch('https://implecode.com/wp-json/ic-mailer/v1/forms?custom=epc_newsletter');
 					if (!response.ok) {
-						throw new Error('Network response was not ok');
+						return;
 					}
-					const data = await response.json();  // Change to .json()
-					if (data.length > 0) {
-						//jQuery('#ic-mailer-forms-container').append(data);
-						jQuery('#notice-ic-catalog-newsletter .squeezer').append(data);
-						jQuery('.notice-ic-catalog-newsletter').show();
+					const data = await response.json();
+					if (typeof data !== 'string' || data.trim() === '') {
+						return;
 					}
+					jQuery(container).append(data);
+					jQuery(notice).show();
 				} catch (error) {
-					console.error('Error loading forms:', error);
-					document.getElementById('ic-mailer-forms-container').innerHTML =
-							'<div class="ic-notice-error"><?php echo esc_js( __( 'Error loading form. Please try again later.', 'ecommerce-product-catalog' ) ); ?></div>';
+					return;
 				}
 			}
 

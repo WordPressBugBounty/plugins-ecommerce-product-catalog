@@ -22,7 +22,7 @@ jQuery( document ).ready(
 			ic_ajaxurl = ic_user_profile_form.ajaxurl || ic_ajaxurl;
 			nonce      = ic_user_profile_form.nonce || nonce;
 		}
-		var state_container = jQuery( '.ic-form .dropdown_state, .ic-order-checkout-data .dropdown_state, .shipping-address-form-fields .dropdown_state, .ic-user-type-edit-form .dropdown_state' );
+		var country_selector = '.ic-form .dropdown_country select, .ic-order-checkout-data .dropdown_country select, .shipping-address-form-fields .dropdown_country select, .ic-user-type-edit-form .dropdown_country select';
 
 		function icFormbuilderFormScope(country_container) {
 			return country_container.closest( '.shipping-address-form-fields, .ic-user-type-edit-form, .ic-form, .ic-order-checkout-data, .ic-checkout-form-data, form' );
@@ -57,7 +57,7 @@ jQuery( document ).ready(
 
 			jQuery( options ).each(
 				function (key, value) {
-					if (value.value !== '') {
+					if (value && typeof value === 'object' && typeof value.value !== 'undefined' && value.value !== '') {
 						real_options.push( value );
 					}
 				}
@@ -66,103 +66,160 @@ jQuery( document ).ready(
 			return real_options;
 		}
 
+		function icFormbuilderNormalizeStateOptions(response) {
+			if (Array.isArray( response )) {
+				return response;
+			}
+
+			if (typeof response !== 'string') {
+				return [];
+			}
+
+			try {
+				var options = JSON.parse( response );
+				return Array.isArray( options ) ? options : [];
+			} catch (e) {
+				var json_regex      = /\[.*?\]/g;
+				var parsed_response = response.match( json_regex );
+				if (!parsed_response) {
+					return [];
+				}
+				try {
+					var fallback_options = JSON.parse( parsed_response[0] );
+					return Array.isArray( fallback_options ) ? fallback_options : [];
+				} catch (parse_error) {
+					return [];
+				}
+			}
+		}
+
+		function icFormbuilderStateVisibilityContainer(state_container) {
+			var user_state_row = state_container.closest( '.ic-user-type-field-row-state' );
+
+			return user_state_row.length ? user_state_row : state_container;
+		}
+
 		function icFormbuilderShowStateContainer(state_container) {
-			state_container.show().css( 'visibility', 'visible' ).attr( 'aria-hidden', 'false' );
+			var visibility_container = icFormbuilderStateVisibilityContainer( state_container );
+			visibility_container.removeAttr( 'hidden' ).show().css( 'visibility', 'visible' ).attr( 'aria-hidden', 'false' );
 		}
 
 		function icFormbuilderHideStateContainer(state_container) {
-			state_container.show().css( 'visibility', 'hidden' ).attr( 'aria-hidden', 'true' );
+			var visibility_container = icFormbuilderStateVisibilityContainer( state_container );
+			if (visibility_container.is( '.ic-user-type-field-row-state' )) {
+				visibility_container.hide().attr( 'hidden', 'hidden' ).attr( 'aria-hidden', 'true' );
+			} else {
+				visibility_container.show().css( 'visibility', 'hidden' ).attr( 'aria-hidden', 'true' );
+			}
 		}
 
-		if (state_container.length) {
-			jQuery( '.ic-form .dropdown_country select, .ic-order-checkout-data .dropdown_country select, .shipping-address-form-fields .dropdown_country select, .ic-user-type-edit-form .dropdown_country select' ).on(
-				'change',
+		function icFormbuilderStateRefreshFinished(state_container, state_select) {
+			implecode.enable_container( state_container );
+			if (state_select.hasClass( 'required' )) {
+				state_select.attr( 'required', false );
+			}
+		}
+
+		function icFormbuilderInitializeCountryState(container) {
+			var context           = jQuery( container || document );
+			var country_selectors = context.find( country_selector ).addBack( country_selector );
+			if (!country_selectors.length) {
+				country_selectors = jQuery( country_selector );
+			}
+			country_selectors.filter(
 				function () {
-					var country_selector     = jQuery( this );
-					var country_container    = country_selector.closest( '.dropdown_country' );
-					var this_state_container = icFormbuilderStateContainer( country_selector, country_container );
-					var this_state_select    = this_state_container.find( 'select' );
-					if (!this_state_select.length) {
-						return;
-					}
-					var country_code = country_selector.val();
-					if (country_code) {
-						var data = {
-							'action': 'ic_state_dropdown',
-							'country_code': country_code,
-							'state_code': this_state_select.val(),
-							'nonce': nonce,
-							'ic_nonce': typeof product_object !== 'undefined' && product_object.formbuilder_state_nonce ? product_object.formbuilder_state_nonce : nonce
-						};
-						implecode.disable_container( this_state_container );
-						jQuery.post(
-							ic_ajaxurl,
-							data,
-							function (response) {
-								var state_updated = false;
-								if (response) {
-									var options = [];
-									try {
-										options = JSON.parse( response );
-									} catch (e) {
-										const json_regex      = /\[.*?\]/g;
-										const parsed_response = response.match( json_regex );
-										options               = JSON.parse( parsed_response );
-									}
-									if (!Array.isArray( options )) {
-										options = [];
-									}
-									this_state_select.find( 'option' ).remove();
-									this_state_select.append( '<option value=""></option>' );
-									var real_options = icFormbuilderRealOptions( options );
-									jQuery( options ).each(
-										function (key, value) {
-											var selected = '';
-											if (value.checked || (real_options.length === 1 && value.value === real_options[0].value)) {
-												selected = ' selected';
-											}
-											this_state_select.append( '<option' + selected + ' value="' + value.value + '">' + value.label + '</option>' );
-										}
-									);
-									if (real_options.length > 0 && country_container.is( ':visible' )) {
-										icFormbuilderShowStateContainer( this_state_container );
-									} else {
-										icFormbuilderHideStateContainer( this_state_container );
-									}
-									if (this_state_container.find( '.chosen-container' ).length) {
-										this_state_select.trigger( 'chosen:updated' );
-									} else if (typeof this_state_select.chosen === 'function') {
-										var chosen_width = '224px';
-										if (this_state_container.hasClass( 'size-medium' )) {
-											chosen_width = '400px';
-										}
-										this_state_select.chosen( {width: chosen_width} );
-									}
-									if (this_state_select.hasClass( 'required' )) {
-										this_state_select.attr( 'required', real_options.length > 0 );
-									}
-									state_updated = true;
-								} else {
-									icFormbuilderHideStateContainer( this_state_container );
-									if (this_state_select.hasClass( 'required' )) {
-										this_state_select.attr( 'required', false );
-									}
-								}
-								implecode.enable_container( this_state_container );
-								if (state_updated) {
-									this_state_select.trigger( 'change' );
-								}
-							}
-						);
-					} else {
-						icFormbuilderHideStateContainer( this_state_container );
-						if (this_state_select.hasClass( 'required' )) {
-							this_state_select.attr( 'required', false );
-						}
-					}
+					return !jQuery( this ).data( 'icFormbuilderStateInitialized' );
+				}
+			).each(
+				function () {
+					jQuery( this ).data( 'icFormbuilderStateInitialized', true ).trigger( 'change' );
 				}
 			);
-			jQuery( '.ic-form .dropdown_country select, .ic-order-checkout-data .dropdown_country select, .shipping-address-form-fields .dropdown_country select' ).trigger( 'change' );
 		}
+
+		jQuery( document ).off( 'change.icFormbuilderState', country_selector ).on(
+			'change.icFormbuilderState',
+			country_selector,
+			function () {
+				var country_select       = jQuery( this );
+				var country_container    = country_select.closest( '.dropdown_country' );
+				var this_state_container = icFormbuilderStateContainer( country_select, country_container );
+				var this_state_select    = this_state_container.find( 'select' );
+				if (!this_state_select.length) {
+					return;
+				}
+				var country_code = country_select.val();
+				if (country_code) {
+					var data = {
+						'action': 'ic_state_dropdown',
+						'country_code': country_code,
+						'state_code': this_state_select.val(),
+						'nonce': nonce,
+						'ic_nonce': typeof product_object !== 'undefined' && product_object.formbuilder_state_nonce ? product_object.formbuilder_state_nonce : nonce
+					};
+					implecode.disable_container( this_state_container );
+					jQuery.post(
+						ic_ajaxurl,
+						data,
+						function (response) {
+							var options = icFormbuilderNormalizeStateOptions( response );
+							this_state_select.find( 'option' ).remove();
+							this_state_select.append( '<option value=""></option>' );
+							var real_options = icFormbuilderRealOptions( options );
+							jQuery( real_options ).each(
+								function (key, value) {
+									var selected = '';
+									if (value.checked || (real_options.length === 1 && value.value === real_options[0].value)) {
+										selected = ' selected';
+									}
+									this_state_select.append( '<option' + selected + ' value="' + value.value + '">' + value.label + '</option>' );
+								}
+							);
+							if (real_options.length > 0 && country_container.is( ':visible' )) {
+								icFormbuilderShowStateContainer( this_state_container );
+							} else {
+								icFormbuilderHideStateContainer( this_state_container );
+							}
+							if (this_state_container.find( '.chosen-container' ).length) {
+								this_state_select.trigger( 'chosen:updated' );
+							} else if (typeof this_state_select.chosen === 'function') {
+								var chosen_width = '224px';
+								if (this_state_container.hasClass( 'size-medium' )) {
+									chosen_width = '400px';
+								}
+								this_state_select.chosen( {width: chosen_width} );
+							}
+							implecode.enable_container( this_state_container );
+							if (this_state_select.hasClass( 'required' )) {
+								this_state_select.attr( 'required', real_options.length > 0 );
+							}
+							this_state_select.trigger( 'change' );
+						}
+					).fail(
+						function () {
+							icFormbuilderHideStateContainer( this_state_container );
+							icFormbuilderStateRefreshFinished( this_state_container, this_state_select );
+						}
+					);
+				} else {
+					icFormbuilderHideStateContainer( this_state_container );
+					if (this_state_select.hasClass( 'required' )) {
+						this_state_select.attr( 'required', false );
+					}
+					}
+				}
+		);
+
+		if (typeof implecode !== 'undefined' && implecode.ic && typeof implecode.ic.addAction === 'function') {
+			implecode.ic.addAction(
+				'ic_screen_updated',
+				function (container) {
+					icFormbuilderInitializeCountryState( container );
+				},
+				'ic_formbuilder_country_state'
+			);
+		}
+
+		icFormbuilderInitializeCountryState( document );
 	}
 );

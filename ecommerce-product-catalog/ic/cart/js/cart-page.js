@@ -402,7 +402,9 @@ function ic_cart_has_cached_markup() {
 
 function ic_cart_refresh_active_cart() {
 	var container = jQuery( '#quote-cart-container, #shopping-cart-container' ).first();
-	var data      = {};
+	var data      = {
+		raw: 0
+	};
 
 	if (container.length === 0) {
 		container = jQuery( '#shopping-cart-submit-container, #quote-cart-submit-container' ).first();

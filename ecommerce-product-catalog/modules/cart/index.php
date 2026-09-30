@@ -225,6 +225,7 @@ if ( ! class_exists( 'ic_shopping_ecommerce_cart' ) ) {
 			}
 
 			require_once AL_SC_BASE_PATH . '/functions/activation.php';
+			ic_framework_require_once( AL_BASE_PATH . '/ic/cache/precache.php' );
 			require_once AL_SC_BASE_PATH . '/functions/compatibility.php';
 			require_once AL_SC_BASE_PATH . '/functions/cart-functions.php';
 			require_once AL_SC_BASE_PATH . '/shortcodes.php';

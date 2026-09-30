@@ -116,7 +116,7 @@ final class eCommerce_Product_Catalog {
 			if ( ! empty( $plugin_data['Version'] ) ) {
 				define( 'IC_EPC_VERSION', $plugin_data['Version'] );
 			} else {
-				define( 'IC_EPC_VERSION', '2.7.21' );
+				define( 'IC_EPC_VERSION', '3.6.2' );
 			}
 		}
 		if ( ! defined( 'IC_CATALOG_VERSION' ) ) {
