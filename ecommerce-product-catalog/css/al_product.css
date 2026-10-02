@@ -1331,11 +1331,11 @@ div.setting-content table td.longer {
 }
 
 /* Product Edit Page */
-.shipping-label {
+.postbox  .shipping-label {
 	width: 100%;
 }
 
-.shipping-value {
+.postbox  .shipping-value {
 	width: 100%;
 }
 
@@ -1344,7 +1344,7 @@ div.setting-content table td.longer {
 	padding-right: 2px;
 }
 
-.shipping-value {
+.postbox .shipping-value {
 	width: 60%;
 	margin-right: 3px;
 }

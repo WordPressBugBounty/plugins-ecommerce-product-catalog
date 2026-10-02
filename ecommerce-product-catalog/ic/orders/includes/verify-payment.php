@@ -239,6 +239,12 @@ function ic_update_digital_order_status(
 			$payment_details['payment_price'] = $order_summary['price'];
 		}
 		$prev_payment_details = get_post_meta( $order_id, '_payment_details', true );
+		if ( ! empty( $prev_payment_details['vatid'] ) && ! empty( $prev_payment_details['vat_country'] ) && ! empty( $prev_payment_details['vat_ver_id'] ) ) {
+			$vat_fields = array( 'vatid', 'vat_name', 'vat_address', 'vat_country', 'vat_ver_id' );
+			foreach ( $vat_fields as $vat_field ) {
+				$payment_details[ $vat_field ] = isset( $prev_payment_details[ $vat_field ] ) ? $prev_payment_details[ $vat_field ] : '';
+			}
+		}
 		$new_payment_details  = array_merge( $prev_payment_details, $payment_details );
 		//$prev_payment_details[ 'status' ]	 = $payment_details[ 'status' ];
 		update_post_meta( $order_id, '_payment_details', $new_payment_details );

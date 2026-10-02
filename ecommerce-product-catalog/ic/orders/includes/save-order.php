@@ -61,14 +61,15 @@ class ic_orders_save {
 		if ( empty( $order ) ) {
 			$order = get_email_order_details();
 		}
+		$product_total  = isset( $order['product_total'] ) ? $order['product_total'] : array();
 		$order_products = array(
 			'product_id'        => $order['product_id'],
 			'cart_id'           => isset( $order['cart_id'] ) ? $order['cart_id'] : '',
 			'product_name'      => $order['product'],
 			'product_quantity'  => $order['quantity'],
 			'product_net_price' => $order['sum'],
-			'product_price'     => $order['product_total'],
-			'product_summary'   => $order['product_total'],
+			'product_price'     => $product_total,
+			'product_summary'   => $product_total,
 		);
 		if ( ! empty( $order['product_gross'] ) ) {
 			$order_products['product_gross_price'] = $order['product_gross'];
@@ -510,8 +511,17 @@ class ic_orders_save {
 	}
 
 	function paid( $payment_details = array(), $order_products = array(), $order_summary = array(), $trans_id = 0 ) {
-		if ( ! is_array( $payment_details ) || ! is_array( $order_products ) || ! is_array( $order_summary ) || empty( $trans_id ) || empty( $order_products['product_id'] ) || ! isset( $order_summary['price'] ) || empty( $payment_details['currency'] ) ) {
+		if ( ! is_array( $payment_details ) || ! is_array( $order_products ) || ! is_array( $order_summary ) || empty( $trans_id ) || ! array_key_exists( 'product_id', $order_products ) || ! isset( $order_summary['price'] ) || empty( $payment_details['currency'] ) ) {
 			return;
+		}
+		if ( empty( $order_products['product_id'] ) ) {
+			if ( ! is_scalar( $order_products['product_id'] ) ) {
+				return;
+			}
+			$order_id = ic_order_exists( $trans_id );
+			if ( empty( $order_id ) || 'order_form_' !== get_post_meta( $order_id, '_pre_name', true ) || ! is_numeric( ic_get_order_product_price( $order_id, $order_products['product_id'] ) ) ) {
+				return;
+			}
 		}
 		global $verify_payment;
 		$verify_payment['payment_details'] = $payment_details;

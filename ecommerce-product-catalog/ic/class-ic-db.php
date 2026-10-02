@@ -54,6 +54,13 @@ if ( ! function_exists( 'ic_db_init' ) ) {
 if ( ! class_exists( 'IC_DB', false ) ) {
 	class IC_DB {
 	/**
+	 * Public API version.
+	 *
+	 * @var int
+	 */
+	const API_VERSION = 2;
+
+	/**
 	 * Table suffix.
 	 *
 	 * @var string
@@ -87,6 +94,13 @@ if ( ! class_exists( 'IC_DB', false ) ) {
 	 * @var bool|string
 	 */
 	private $exists;
+
+	/**
+	 * Problems found during the last schema synchronization.
+	 *
+	 * @var array
+	 */
+	private $schema_problems = array();
 
 	/**
 	 * Initializes the table helper.
@@ -203,11 +217,11 @@ if ( ! class_exists( 'IC_DB', false ) ) {
 	 * @param int|array $id Row ID or where clause.
 	 * @param array     $data Updated data.
 	 *
-	 * @return void
+	 * @return int|false
 	 */
 	public function update( $id, $data ) {
 		if ( ! $this->create_db() ) {
-			return;
+			return false;
 		}
 
 		global $wpdb;
@@ -216,7 +230,7 @@ if ( ! class_exists( 'IC_DB', false ) ) {
 		$where         = is_array( $id ) ? $id : array( 'id' => $id );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Framework helper writes directly to its own table.
-		$wpdb->update( $wp_table_name, array_map( 'maybe_serialize', $data ), $where );
+		return $wpdb->update( $wp_table_name, array_map( 'maybe_serialize', $data ), $where );
 	}
 
 	/**
@@ -274,58 +288,14 @@ if ( ! class_exists( 'IC_DB', false ) ) {
 	 * @return bool
 	 */
 	public function create_db() {
-		global $wpdb;
-
 		if ( $this->exists() ) {
 			return true;
 		}
 
-		if ( empty( $this->columns ) ) {
+		$sql = $this->schema_sql();
+		if ( empty( $sql ) ) {
 			return false;
 		}
-
-		$wp_table_name   = $this->name();
-		$charset_collate = $wpdb->get_charset_collate();
-		$sql             = "CREATE TABLE {$wp_table_name} (
-	id bigint(20) unsigned NOT NULL auto_increment,";
-
-		foreach ( $this->columns as $name => $type ) {
-			$column_name = sanitize_key( $name );
-			$type        = ! empty( $type ) ? $type : 'text';
-
-			if ( ic_string_contains( $type, 'NULL' ) ) {
-				$sql .= "{$column_name} {$type},";
-			} else {
-				$sql .= "{$column_name} {$type} NOT NULL,";
-			}
-		}
-
-		$sql .= 'PRIMARY KEY  (id)';
-
-		if ( ! empty( $this->indexed ) ) {
-			$sql .= ',';
-			foreach ( $this->indexed as $column_name ) {
-				$column_name = sanitize_key( $column_name );
-				$sql        .= "KEY {$column_name} ({$column_name}),";
-			}
-		}
-
-		if ( ! empty( $this->unique ) ) {
-			foreach ( $this->unique as $unique_index ) {
-				if ( is_array( $unique_index ) ) {
-					$index_columns = array_map( 'sanitize_key', $unique_index );
-					$index_name    = implode( '_', $index_columns );
-					$columns       = implode( ',', $index_columns );
-					$sql          .= "UNIQUE KEY {$index_name} ({$columns}),";
-				} else {
-					$unique_index = sanitize_key( $unique_index );
-					$sql         .= "UNIQUE KEY {$unique_index} ({$unique_index}),";
-				}
-			}
-		}
-
-		$sql  = rtrim( $sql, ',' );
-		$sql .= ") {$charset_collate};";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
@@ -339,6 +309,250 @@ if ( ! class_exists( 'IC_DB', false ) ) {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Builds the table creation SQL.
+	 *
+	 * @return string
+	 */
+	private function schema_sql() {
+		global $wpdb;
+
+		if ( empty( $this->columns ) ) {
+			return '';
+		}
+
+		$wp_table_name   = $this->name();
+		$charset_collate = $wpdb->get_charset_collate();
+		$definitions     = array( 'id bigint(20) unsigned NOT NULL auto_increment' );
+
+		foreach ( $this->columns as $name => $type ) {
+			$column_name = sanitize_key( $name );
+			$type        = ! empty( $type ) ? $type : 'text';
+
+			if ( ic_string_contains( $type, 'NULL' ) ) {
+				$definitions[] = "{$column_name} {$type}";
+			} else {
+				$definitions[] = "{$column_name} {$type} NOT NULL";
+			}
+		}
+
+		$definitions[] = 'PRIMARY KEY  (id)';
+
+		if ( ! empty( $this->indexed ) ) {
+			foreach ( $this->indexed as $index ) {
+				if ( is_array( $index ) ) {
+					$index_columns = array_map( 'sanitize_key', $index );
+					$index_name    = implode( '_', $index_columns );
+					$columns       = implode( ',', $index_columns );
+					$definitions[] = "KEY {$index_name} ({$columns})";
+				} else {
+					$index         = sanitize_key( $index );
+					$definitions[] = "KEY {$index} ({$index})";
+				}
+			}
+		}
+
+		if ( ! empty( $this->unique ) ) {
+			foreach ( $this->unique as $unique_index ) {
+				if ( is_array( $unique_index ) ) {
+					$index_columns = array_map( 'sanitize_key', $unique_index );
+					$index_name    = implode( '_', $index_columns );
+					$columns       = implode( ',', $index_columns );
+					$definitions[] = "UNIQUE KEY {$index_name} ({$columns})";
+				} else {
+					$unique_index  = sanitize_key( $unique_index );
+					$definitions[] = "UNIQUE KEY {$unique_index} ({$unique_index})";
+				}
+			}
+		}
+
+		return "CREATE TABLE {$wp_table_name} (\n\t" . implode( ",\n\t", $definitions ) . "\n) {$charset_collate};";
+	}
+
+	/**
+	 * Synchronizes and verifies the declared table schema.
+	 *
+	 * @return bool
+	 */
+	public function sync_schema() {
+		$this->schema_problems = array();
+		$sql                   = $this->schema_sql();
+
+		if ( empty( $sql ) ) {
+			return false;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+		$this->exists = 'not_checked';
+
+		$this->verify_columns();
+		$this->verify_indexes();
+
+		return empty( $this->schema_problems );
+	}
+
+	/**
+	 * Returns problems found during the last schema synchronization.
+	 *
+	 * @return array
+	 */
+	public function schema_problems() {
+		return $this->schema_problems;
+	}
+
+	/**
+	 * Verifies declared table columns.
+	 *
+	 * @return void
+	 */
+	private function verify_columns() {
+		global $wpdb;
+
+		$table_name = $this->name();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is sanitized by name(); schema inspection is intentional.
+		$column_rows = $wpdb->get_results( "SHOW COLUMNS FROM {$table_name}", ARRAY_A );
+		$actual      = array();
+
+		foreach ( (array) $column_rows as $column ) {
+			$actual[ $column['Field'] ] = $column;
+		}
+
+		$declared = array(
+			'id' => array(
+				'type'     => 'bigint(20) unsigned',
+				'nullable' => false,
+			),
+		);
+
+		foreach ( $this->columns as $name => $type ) {
+			$type                     = ! empty( $type ) ? $type : 'text';
+			$declared[ sanitize_key( $name ) ] = array(
+				'type'     => $type,
+				'nullable' => $this->definition_is_nullable( $type ),
+			);
+		}
+
+		foreach ( $declared as $name => $definition ) {
+			if ( ! isset( $actual[ $name ] ) ) {
+				$this->schema_problems[] = 'missing_column:' . $name;
+				continue;
+			}
+
+			$actual_nullable = 'YES' === strtoupper( $actual[ $name ]['Null'] );
+			if ( $definition['nullable'] !== $actual_nullable ) {
+				$this->schema_problems[] = 'nullability:' . $name;
+			}
+			if ( $this->normalize_type( $definition['type'] ) !== $this->normalize_type( $actual[ $name ]['Type'] ) ) {
+				$this->schema_problems[] = 'type:' . $name;
+			}
+		}
+	}
+
+	/**
+	 * Verifies declared table indexes.
+	 *
+	 * @return void
+	 */
+	private function verify_indexes() {
+		global $wpdb;
+
+		$table_name = $this->name();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name is sanitized by name(); schema inspection is intentional.
+		$index_rows = $wpdb->get_results( "SHOW INDEX FROM {$table_name}", ARRAY_A );
+		$actual     = array();
+
+		foreach ( (array) $index_rows as $index ) {
+			$name = $index['Key_name'];
+			if ( ! isset( $actual[ $name ] ) ) {
+				$actual[ $name ] = array(
+					'columns' => array(),
+					'unique'  => 0 === (int) $index['Non_unique'],
+				);
+			}
+			$actual[ $name ]['columns'][ (int) $index['Seq_in_index'] ] = $index['Column_name'];
+		}
+
+		foreach ( $actual as &$definition ) {
+			ksort( $definition['columns'] );
+			$definition['columns'] = array_values( $definition['columns'] );
+		}
+		unset( $definition );
+
+		foreach ( $this->declared_indexes() as $name => $expected ) {
+			if ( ! isset( $actual[ $name ] ) ) {
+				$this->schema_problems[] = 'missing_index:' . $name;
+				continue;
+			}
+			if ( $expected['columns'] !== $actual[ $name ]['columns'] ) {
+				$this->schema_problems[] = 'index_columns:' . $name;
+			}
+			if ( $expected['unique'] !== $actual[ $name ]['unique'] ) {
+				$this->schema_problems[] = 'not_unique:' . $name;
+			}
+		}
+	}
+
+	/**
+	 * Returns normalized declared indexes keyed by generated index name.
+	 *
+	 * @return array
+	 */
+	private function declared_indexes() {
+		$indexes = array();
+
+		foreach ( $this->indexed as $index ) {
+			$columns          = is_array( $index ) ? array_map( 'sanitize_key', $index ) : array( sanitize_key( $index ) );
+			$name             = implode( '_', $columns );
+			$indexes[ $name ] = array(
+				'columns' => $columns,
+				'unique'  => false,
+			);
+		}
+
+		foreach ( $this->unique as $index ) {
+			$columns          = is_array( $index ) ? array_map( 'sanitize_key', $index ) : array( sanitize_key( $index ) );
+			$name             = implode( '_', $columns );
+			$indexes[ $name ] = array(
+				'columns' => $columns,
+				'unique'  => true,
+			);
+		}
+
+		return $indexes;
+	}
+
+	/**
+	 * Returns whether a declared column permits null values.
+	 *
+	 * @param string $definition Column definition.
+	 *
+	 * @return bool
+	 */
+	private function definition_is_nullable( $definition ) {
+		if ( preg_match( '/\\bNOT\\s+NULL\\b/i', $definition ) ) {
+			return false;
+		}
+
+		return (bool) preg_match( '/\\bNULL\\b/i', $definition );
+	}
+
+	/**
+	 * Normalizes a declared or reported column type for comparison.
+	 *
+	 * @param string $type Column type.
+	 *
+	 * @return string
+	 */
+	private function normalize_type( $type ) {
+		$type = strtolower( trim( $type ) );
+		$type = preg_replace( '/\\s+/', ' ', $type );
+		$type = preg_replace( '/\\s+(?:not\\s+null|null|default|auto_increment|primary|unique|comment|collate|character\\s+set)\\b.*$/i', '', $type );
+		$type = preg_replace( '/\\b(tinyint|smallint|mediumint|int|integer|bigint)\\(\\d+\\)/i', '$1', $type );
+
+		return trim( $type );
 	}
 
 	/**

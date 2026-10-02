@@ -247,7 +247,7 @@ class ic_cart_variations_selectors {
 				if ( $mixed_types ) {
 					$class .= ' mixed-variation-types';
 				}
-				$return  = '<div class="' . $class . '" data-product_id="' . $product_id . '" data-base-price="' . esc_attr( price_format( product_price( $product_id ) ) ) . '">';
+				$return  = '<div class="' . $class . '" data-product_id="' . esc_attr( $product_id ) . '" data-base-price="' . esc_attr( price_format( product_price( $product_id ) ) ) . '">';
 				$return .= apply_filters( 'ic_variations_selectors', $selectors, $product_id );
 				$return .= '</div>';
 			}

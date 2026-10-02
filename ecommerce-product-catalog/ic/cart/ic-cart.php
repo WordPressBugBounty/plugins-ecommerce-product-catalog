@@ -1146,13 +1146,16 @@ function ic_encode_string_cart( $cart_content, $filter = false ) {
 if ( ! function_exists( 'cart_id_to_product_id' ) ) {
 
 	function cart_id_to_product_id( $cart_id ) {
-		$product_id = $cart_id;
-		if ( strpos( $cart_id, '::' ) !== false ) {
-			$temp       = explode( '::', $cart_id );
+		if ( ! is_scalar( $cart_id ) ) {
+			return 0;
+		}
+		$product_id = (string) $cart_id;
+		if ( strpos( $product_id, '::' ) !== false ) {
+			$temp       = explode( '::', $product_id );
 			$temp       = explode( '_', $temp[1] );
 			$product_id = $temp[0];
-		} elseif ( strpos( $cart_id, '_' ) !== false ) {
-			$temp       = explode( '_', $cart_id );
+		} elseif ( strpos( $product_id, '_' ) !== false ) {
+			$temp       = explode( '_', $product_id );
 			$product_id = $temp[0];
 		}
 
