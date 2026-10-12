@@ -33,11 +33,81 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 		$prefix  = $wpdb->prefix;
 		$created = false;
 		$tables  = array(
-			"CREATE TABLE {$prefix}ic_stats_events (id bigint(20) unsigned NOT NULL AUTO_INCREMENT,integration varchar(64) NOT NULL,event_key varchar(64) NOT NULL,occurred_at_gmt datetime NOT NULL,recorded_at_gmt datetime NOT NULL,timestamp_quality varchar(32) NOT NULL DEFAULT 'live',timestamp_provenance varchar(64) NOT NULL DEFAULT 'runtime',dedupe_key char(64) NOT NULL,dimension_hash char(64) NOT NULL DEFAULT '',session_hash char(64) NULL,identity_provider varchar(64) NOT NULL DEFAULT '',persistence varchar(16) NOT NULL DEFAULT 'none',identity_quality varchar(32) NOT NULL DEFAULT 'unknown',user_id bigint(20) unsigned NOT NULL DEFAULT 0,user_role varchar(64) NOT NULL DEFAULT '',currency varchar(12) NOT NULL DEFAULT '',dimensions longtext NULL,values_json longtext NULL,PRIMARY KEY (id),UNIQUE KEY dedupe (integration,dedupe_key),KEY event_time (integration,event_key,occurred_at_gmt),KEY dimension_lookup (integration,occurred_at_gmt,dimension_hash)) {$charset};",
-			"CREATE TABLE {$prefix}ic_stats_event_metrics (event_id bigint(20) unsigned NOT NULL,metric varchar(64) NOT NULL,processed tinyint(1) NOT NULL DEFAULT 0,lease_until datetime NULL,attempts int unsigned NOT NULL DEFAULT 0,last_error text NULL,PRIMARY KEY (event_id,metric),KEY pending (processed,lease_until)) {$charset};",
-			"CREATE TABLE {$prefix}ic_stats_aggregates (id bigint(20) unsigned NOT NULL AUTO_INCREMENT,integration varchar(64) NOT NULL,metric varchar(64) NOT NULL,bucket varchar(8) NOT NULL,bucket_start datetime NOT NULL,dimension_hash char(64) NOT NULL,dimensions longtext NULL,currency varchar(12) NOT NULL DEFAULT '',value decimal(20,6) NOT NULL DEFAULT 0,count bigint unsigned NOT NULL DEFAULT 0,PRIMARY KEY(id),UNIQUE KEY aggregate_key (integration,metric,bucket,bucket_start,dimension_hash,currency),KEY dimension_query (integration,metric,bucket,bucket_start,dimension_hash)) {$charset};",
-			"CREATE TABLE {$prefix}ic_stats_dimensions (integration varchar(64) NOT NULL,dimension_hash char(64) NOT NULL,dimension_key varchar(64) NOT NULL,dimension_value varchar(191) NOT NULL,first_seen_gmt datetime NOT NULL,last_seen_gmt datetime NOT NULL,PRIMARY KEY (integration,dimension_hash,dimension_key),KEY value_lookup (integration,dimension_key,dimension_value,dimension_hash),KEY recent_lookup (integration,dimension_key,last_seen_gmt)) {$charset};",
-			"CREATE TABLE {$prefix}ic_stats_unique_facts (integration varchar(64) NOT NULL,metric varchar(64) NOT NULL,period date NOT NULL,dimension_hash char(64) NOT NULL,identity_hash char(64) NOT NULL,visit_hash char(64) NOT NULL DEFAULT '',first_seen_gmt datetime NOT NULL,last_seen_gmt datetime NOT NULL,occurrence_count bigint unsigned NOT NULL DEFAULT 1,PRIMARY KEY (integration,metric,period,identity_hash,visit_hash,dimension_hash),KEY metric_period (integration,metric,period,dimension_hash),KEY identity_history (integration,metric,identity_hash,first_seen_gmt),KEY identity_lookup (identity_hash)) {$charset};",
+			"CREATE TABLE {$prefix}ic_stats_events (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				integration varchar(64) NOT NULL,
+				event_key varchar(64) NOT NULL,
+				occurred_at_gmt datetime NOT NULL,
+				recorded_at_gmt datetime NOT NULL,
+				timestamp_quality varchar(32) NOT NULL DEFAULT 'live',
+				timestamp_provenance varchar(64) NOT NULL DEFAULT 'runtime',
+				dedupe_key char(64) NOT NULL,
+				dimension_hash char(64) NOT NULL DEFAULT '',
+				session_hash char(64) NULL,
+				identity_provider varchar(64) NOT NULL DEFAULT '',
+				persistence varchar(16) NOT NULL DEFAULT 'none',
+				identity_quality varchar(32) NOT NULL DEFAULT 'unknown',
+				user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+				user_role varchar(64) NOT NULL DEFAULT '',
+				currency varchar(12) NOT NULL DEFAULT '',
+				dimensions longtext NULL,
+				values_json longtext NULL,
+				PRIMARY KEY  (id),
+				UNIQUE KEY dedupe (integration,dedupe_key),
+				KEY event_time (integration,event_key,occurred_at_gmt),
+				KEY dimension_lookup (integration,occurred_at_gmt,dimension_hash)
+			) {$charset};",
+			"CREATE TABLE {$prefix}ic_stats_event_metrics (
+				event_id bigint(20) unsigned NOT NULL,
+				metric varchar(64) NOT NULL,
+				processed tinyint(1) NOT NULL DEFAULT 0,
+				lease_until datetime NULL,
+				attempts int unsigned NOT NULL DEFAULT 0,
+				last_error text NULL,
+				PRIMARY KEY  (event_id,metric),
+				KEY pending (processed,lease_until)
+			) {$charset};",
+			"CREATE TABLE {$prefix}ic_stats_aggregates (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				integration varchar(64) NOT NULL,
+				metric varchar(64) NOT NULL,
+				bucket varchar(8) NOT NULL,
+				bucket_start datetime NOT NULL,
+				dimension_hash char(64) NOT NULL,
+				dimensions longtext NULL,
+				currency varchar(12) NOT NULL DEFAULT '',
+				value decimal(20,6) NOT NULL DEFAULT 0,
+				count bigint unsigned NOT NULL DEFAULT 0,
+				PRIMARY KEY  (id),
+				UNIQUE KEY aggregate_key (integration,metric,bucket,bucket_start,dimension_hash,currency),
+				KEY dimension_query (integration,metric,bucket,bucket_start,dimension_hash)
+			) {$charset};",
+			"CREATE TABLE {$prefix}ic_stats_dimensions (
+				integration varchar(64) NOT NULL,
+				dimension_hash char(64) NOT NULL,
+				dimension_key varchar(64) NOT NULL,
+				dimension_value varchar(191) NOT NULL,
+				first_seen_gmt datetime NOT NULL,
+				last_seen_gmt datetime NOT NULL,
+				PRIMARY KEY  (integration,dimension_hash,dimension_key),
+				KEY value_lookup (integration,dimension_key,dimension_value,dimension_hash),
+				KEY recent_lookup (integration,dimension_key,last_seen_gmt)
+			) {$charset};",
+			"CREATE TABLE {$prefix}ic_stats_unique_facts (
+				integration varchar(64) NOT NULL,
+				metric varchar(64) NOT NULL,
+				period date NOT NULL,
+				dimension_hash char(64) NOT NULL,
+				identity_hash char(64) NOT NULL,
+				visit_hash char(64) NOT NULL DEFAULT '',
+				first_seen_gmt datetime NOT NULL,
+				last_seen_gmt datetime NOT NULL,
+				occurrence_count bigint unsigned NOT NULL DEFAULT 1,
+				PRIMARY KEY  (integration,metric,period,identity_hash,visit_hash,dimension_hash),
+				KEY metric_period (integration,metric,period,dimension_hash),
+				KEY identity_history (integration,metric,identity_hash,first_seen_gmt),
+				KEY identity_lookup (identity_hash)
+			) {$charset};",
 		);
 		/**
 		 * Filter additive schema statements supplied by independently loaded Stats modules.

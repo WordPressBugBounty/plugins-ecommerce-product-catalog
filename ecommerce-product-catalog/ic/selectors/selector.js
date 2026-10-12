@@ -82,11 +82,13 @@
 		this.perPage = parseInt(data(container, 'per-page', '20'), 10) || 20;
 		this.placeholder = data(container, 'placeholder', '');
 		this.multiple = data(container, 'multiple', '0') === '1' || this.select.multiple;
+		this.allowClear = !this.multiple && data(container, 'allow-clear', '0') === '1' && !this.select.disabled;
 		this.strings = {
 			searching: data(container, 'searching', 'Searching...'),
 			empty: data(container, 'empty', 'No matches found.'),
 			error: data(container, 'error', 'The list could not be loaded.'),
-			more: data(container, 'more', 'Load more')
+			more: data(container, 'more', 'Load more'),
+			clear: data(container, 'clear-label', 'Clear selection')
 		};
 		this.page = 1;
 		this.term = '';
@@ -95,6 +97,8 @@
 		this.requestId = 0;
 		this.timer = null;
 		this.active = -1;
+		this.suppressOpen = false;
+		this.clearButton = null;
 		this.build();
 	}
 
@@ -121,12 +125,28 @@
 
 		this.control.appendChild(this.tokens);
 		this.control.appendChild(this.input);
+		if (this.allowClear) {
+			this.clearButton = make('button', 'ic-selector-clear', '×');
+			this.clearButton.type = 'button';
+			this.clearButton.setAttribute('aria-label', this.strings.clear);
+			this.clearButton.title = this.strings.clear;
+			this.clearButton.hidden = true;
+			this.control.appendChild(this.clearButton);
+			this.clearButton.addEventListener('click', function (event) {
+				event.preventDefault();
+				self.clear();
+			});
+		}
 		this.container.appendChild(this.control);
 		this.container.appendChild(this.list);
 
 		this.syncFromSelect();
 
 		this.input.addEventListener('focus', function () {
+			if (self.suppressOpen) {
+				self.suppressOpen = false;
+				return;
+			}
 			self.open();
 		});
 		this.input.addEventListener('input', function () {
@@ -195,6 +215,9 @@
 		if (!this.multiple) {
 			this.input.value = selected.length ? selected[0].label : '';
 			this.container.classList.toggle('ic-selector-filled', selected.length > 0);
+			if (this.clearButton) {
+				this.clearButton.hidden = selected.length === 0;
+			}
 			return;
 		}
 
@@ -372,6 +395,34 @@
 		this.input.value = this.multiple ? '' : label;
 		this.syncFromSelect();
 		this.close();
+	};
+
+	/**
+	 * Clears a single selection (opt-in via data-allow-clear).
+	 *
+	 * Empties the native select, fires change and keeps focus on the search
+	 * input without reopening the result list.
+	 */
+	Selector.prototype.clear = function () {
+		var empty = findOption(this.select, '');
+		window.clearTimeout(this.timer);
+		this.requestId++;
+		this.loading = false;
+		if (empty) {
+			this.select.value = '';
+		} else {
+			this.select.selectedIndex = -1;
+		}
+		this.select.dispatchEvent(new Event('change', { bubbles: true }));
+		this.input.value = '';
+		this.list.textContent = '';
+		this.syncFromSelect();
+		this.close();
+		if (document.activeElement !== this.input) {
+			this.suppressOpen = true;
+			this.input.focus();
+			this.suppressOpen = false;
+		}
 	};
 
 	/**

@@ -71,11 +71,11 @@ function ic_catalog_image_sizes_settings() {
 					<legend class="screen-reader-text"><span>Large size</span></legend>
 					<label for="modern_grid_image_w"><?php esc_html_e( 'Max Width', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[modern_grid_image_w]" type="number" step="1" min="0"
-							id="product_page_image_w" value="<?php echo esc_attr( $images['modern_grid_image_w'] ); ?>"
+							id="modern_grid_image_w" value="<?php echo esc_attr( $images['modern_grid_image_w'] ); ?>"
 							class="small-text">
 					<label for="modern_grid_image_h"><?php esc_html_e( 'Max Height', 'ecommerce-product-catalog' ); ?></label>
 					<input name="catalog_image_sizes[modern_grid_image_h]" type="number" step="1" min="0"
-							id="product_page_image_h" value="<?php echo esc_attr( $images['modern_grid_image_h'] ); ?>"
+							id="modern_grid_image_h" value="<?php echo esc_attr( $images['modern_grid_image_h'] ); ?>"
 							class="small-text"><br>
 				</fieldset>
 			</td>

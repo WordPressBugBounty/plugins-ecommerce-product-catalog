@@ -319,14 +319,13 @@ class IC_Cat_Activation_Wizard extends IC_Activation_Wizard {
 		if ( ! function_exists( 'is_ic_shipping_enabled' ) ) {
 			return;
 		}
-		$enable_shipping = false;
-		if ( 'store' === $mode ) {
-			$enable_shipping = true;
-		}
-		if ( $enable_shipping && ! is_ic_shipping_enabled() ) {
-			update_option( 'product_shipping_options_number', 2 );
-		} else {
+		if ( 'store' !== $mode ) {
 			update_option( 'product_shipping_options_number', 0 );
+
+			return;
+		}
+		if ( ! is_ic_shipping_enabled() ) {
+			update_option( 'product_shipping_options_number', 2 );
 		}
 	}
 

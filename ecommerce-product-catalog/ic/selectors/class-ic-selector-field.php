@@ -52,6 +52,8 @@ if ( ! class_exists( 'IC_Selector_Field' ) ) {
 					'disabled'       => false,
 					'fallback_limit' => 0,
 					'attributes'     => array(),
+					'allow_clear'    => false,
+					'clear_label'    => '',
 				)
 			);
 
@@ -163,6 +165,8 @@ if ( ! class_exists( 'IC_Selector_Field' ) ) {
 					'data-empty'       => true,
 					'data-error'       => true,
 					'data-more'        => true,
+					'data-allow-clear' => true,
+					'data-clear-label' => true,
 				),
 				'select' => array(
 					'name'     => true,
@@ -198,7 +202,7 @@ if ( ! class_exists( 'IC_Selector_Field' ) ) {
 				return array();
 			}
 
-			return array(
+			$attributes = array(
 				'data-source'      => $source['key'],
 				'data-nonce'       => wp_create_nonce( IC_Selector_Ajax::NONCE_ACTION ),
 				'data-ajax-url'    => admin_url( 'admin-ajax.php' ),
@@ -210,6 +214,12 @@ if ( ! class_exists( 'IC_Selector_Field' ) ) {
 				'data-error'       => __( 'The list could not be loaded.', 'ecommerce-product-catalog' ),
 				'data-more'        => __( 'Load more', 'ecommerce-product-catalog' ),
 			);
+			if ( ! $args['multiple'] && ! empty( $args['allow_clear'] ) && empty( $args['required'] ) && empty( $args['disabled'] ) ) {
+				$attributes['data-allow-clear'] = '1';
+				$attributes['data-clear-label'] = '' !== (string) $args['clear_label'] ? (string) $args['clear_label'] : __( 'Clear selection', 'ecommerce-product-catalog' );
+			}
+
+			return $attributes;
 		}
 
 		/**

@@ -83,10 +83,14 @@ class ic_catalog_button {
 		}
 	}
 
-	function metabox_content() {
+	function metabox_content( $post ) {
 		echo '<table>';
-		$url = $this->button_url();
-		implecode_settings_text( __( 'Button URL', 'ecommerce-product-catalog' ), $this->meta_name, $url );
+		$url         = get_post_meta( $post->ID, $this->meta_name, true );
+		$placeholder = '';
+		if ( ! empty( $this->settings['use_default'] ) && ! empty( $this->settings['url'] ) ) {
+			$placeholder = 'placeholder="' . esc_attr( $this->settings['url'] ) . '"';
+		}
+		implecode_settings_text( __( 'Button URL', 'ecommerce-product-catalog' ), $this->meta_name, $url, null, 1, null, null, '', $placeholder );
 		echo '</table>';
 	}
 
@@ -100,7 +104,7 @@ class ic_catalog_button {
 	function settings_html() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings submenu routing parameter; sanitized on this line.
 		$submenu = isset( $_GET['submenu'] ) ? sanitize_key( wp_unslash( $_GET['submenu'] ) ) : '';
-		if ( $submenu == $this->menu_element ) {
+		if ( $submenu === $this->menu_element ) {
 			?>
 			<script>
 				jQuery('.settings-submenu a').removeClass('current');

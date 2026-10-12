@@ -189,6 +189,21 @@ class ic_cart_shipping {
 	}
 
 	/**
+	 * Checks if cart shipping cost calculation is disabled.
+	 *
+	 * Disabled mode ("none") exposes no current checkout shipping options, adds no shipping cost
+	 * and returns no shipping labels. options() always appends "none" last, so extensions cannot
+	 * redefine it.
+	 *
+	 * @return bool
+	 */
+	public function calculation_disabled() {
+		$settings = $this->settings();
+
+		return 'none' === $settings['mode'];
+	}
+
+	/**
 	 * Returns current checkout shipping options array
 	 *
 	 * @param string $pre_name
@@ -196,6 +211,9 @@ class ic_cart_shipping {
 	 * @return array
 	 */
 	function selected_options( $pre_name ) {
+		if ( $this->calculation_disabled() ) {
+			return array();
+		}
 		$products_array = ic_cart_products_array( null, $pre_name . 'content' );
 		$cache_key      = $this->selected_options_cache_key( $pre_name, $products_array );
 		if ( $checkout_shipping = ic_get_cache( $cache_key ) ) {
@@ -858,6 +876,9 @@ class ic_cart_shipping {
 	 * @return type
 	 */
 	function selected_cost( $handling, $pre_name ) {
+		if ( $this->calculation_disabled() ) {
+			return $handling;
+		}
 		$shipping_options = $this->selected_options( $pre_name );
 		$selected_values  = $this->selected_values( $shipping_options, $pre_name );
 		$shipping_num     = count( $shipping_options );
@@ -888,6 +909,9 @@ class ic_cart_shipping {
 	 * @return type
 	 */
 	function order_labels( $pre_name ) {
+		if ( $this->calculation_disabled() ) {
+			return '';
+		}
 		$labels           = '';
 		$shipping_options = $this->selected_options( $pre_name );
 		$selected_values  = $this->selected_values( $shipping_options, $pre_name );
@@ -925,6 +949,9 @@ class ic_cart_shipping {
 	 * @return string
 	 */
 	function order_display_labels( $pre_name ) {
+		if ( $this->calculation_disabled() ) {
+			return '';
+		}
 		$labels           = array();
 		$shipping_options = $this->selected_options( $pre_name );
 		$selected_values  = $this->selected_values( $shipping_options, $pre_name );

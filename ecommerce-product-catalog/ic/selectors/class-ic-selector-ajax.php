@@ -186,6 +186,7 @@ if ( ! class_exists( 'IC_Selector_Ajax' ) ) {
 				$query_args['ic_selector_term']   = $args['s'];
 				$query_args['ic_selector_search'] = $source['search'];
 			}
+			$query_args = array_merge( $source['post_query_args'], $query_args );
 
 			add_filter( 'posts_search', array( __CLASS__, 'filter_search_sql' ), 10, 2 );
 			$query = new WP_Query( $query_args );

@@ -500,8 +500,17 @@ class ic_cart {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
 			if ( isset( $_POST['p_id'] ) && $cart === $cart_name ) {
 				$product_variations_settings = get_product_variations_settings();
-				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
-				foreach ( array_map( 'absint', wp_unslash( $_POST['p_id'] ) ) as $num => $product_id ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The owning form or AJAX boundary verifies its action-specific nonce; structured cart IDs are unslashed once and validated below without changing accepted values.
+				$posted_product_ids = wp_unslash( $_POST['p_id'] );
+				$posted_product_ids = is_array( $posted_product_ids ) ? $posted_product_ids : array();
+				foreach ( $posted_product_ids as $num => $product_id ) {
+					if ( ! is_scalar( $product_id ) ) {
+						continue;
+					}
+					$product_id = (string) $product_id;
+					if ( sanitize_text_field( $product_id ) !== $product_id || ! preg_match( '/^[A-Za-z0-9:_> -]+$/', $product_id ) ) {
+						continue;
+					}
 					$product_id                 = get_cart_id_without_variations( $product_id );
 					$current_product_variations = get_current_product_variations_string( $product_id, $product_variations_settings );
 					if ( $current_product_variations ) {

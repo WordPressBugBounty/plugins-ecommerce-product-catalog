@@ -93,6 +93,33 @@
 	color: #d63638;
 }
 
+.ic-selector-clear {
+	flex: 0 0 auto;
+	padding: 0 4px;
+	margin: 0;
+	background: none;
+	border: 0;
+	border-radius: 2px;
+	color: #646970;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+}
+
+.ic-selector-clear:hover,
+.ic-selector-clear:focus {
+	color: #d63638;
+}
+
+.ic-selector-clear:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+}
+
+.ic-selector-clear[hidden] {
+	display: none;
+}
+
 .ic-selector-results {
 	position: absolute;
 	z-index: 100000;

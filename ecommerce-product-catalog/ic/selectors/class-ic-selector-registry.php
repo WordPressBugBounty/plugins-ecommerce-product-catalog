@@ -55,17 +55,18 @@ if ( ! class_exists( 'IC_Selector_Registry' ) ) {
 		 */
 		public static function defaults() {
 			return array(
-				'type'           => 'post',
-				'subtypes'       => array(),
-				'post_status'    => array( 'publish' ),
-				'capability'     => '',
-				'search'         => array( 'title', 'id' ),
-				'per_page'       => 20,
-				'label'          => '',
-				'placeholder'    => '',
-				'label_callback' => '',
-				'orderby'        => 'title',
-				'order'          => 'ASC',
+				'type'            => 'post',
+				'subtypes'        => array(),
+				'post_status'     => array( 'publish' ),
+				'capability'      => '',
+				'search'          => array( 'title', 'id' ),
+				'per_page'        => 20,
+				'label'           => '',
+				'placeholder'     => '',
+				'label_callback'  => '',
+				'post_query_args' => array(),
+				'orderby'         => 'title',
+				'order'           => 'ASC',
 			);
 		}
 
@@ -112,9 +113,10 @@ if ( ! class_exists( 'IC_Selector_Registry' ) ) {
 				return false;
 			}
 
-			$args['per_page'] = self::normalize_per_page( $args['per_page'] );
-			$args['search']   = self::normalize_search( $args['search'] );
-			$args['key']      = $key;
+			$args['per_page']        = self::normalize_per_page( $args['per_page'] );
+			$args['search']          = self::normalize_search( $args['search'] );
+			$args['post_query_args'] = is_array( $args['post_query_args'] ) ? $args['post_query_args'] : array();
+			$args['key']             = $key;
 
 			$this->sources[ $key ] = $args;
 
