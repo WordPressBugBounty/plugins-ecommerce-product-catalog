@@ -407,24 +407,6 @@ if ( ! function_exists( 'ic_array_key_last' ) ) {
 	}
 }
 
-add_filter( 'esc_html', 'ic_esc_html', 10, 2 );
-
-/**
- * Preserves catalog search keyword markup in escaped HTML.
- *
- * @param string $safe_text Escaped text.
- * @param string $text      Original text.
- *
- * @return string
- */
-function ic_esc_html( $safe_text, $text ) {
-	if ( ic_string_contains( $text, 'ic-search-keyword' ) ) {
-		return $text;
-	}
-
-	return $safe_text;
-}
-
 /**
  * Returns HTTP GET parameters with catalog self-submit compatibility.
  *

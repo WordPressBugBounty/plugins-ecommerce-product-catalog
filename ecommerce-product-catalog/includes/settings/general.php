@@ -656,9 +656,9 @@ function ic_epc_render_general_layout_section( $settings ) {
 							<td></td>
 						</tr>
 						<?php
-						implecode_settings_number( __( 'Catalog Container Width', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_width][' . $theme . ']', $archive_multiple_settings['container_width'][ $theme ], '%' );
+						implecode_settings_number( __( 'Catalog Container Width', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_width][' . $theme . ']', $archive_multiple_settings['container_width'][ $theme ], '%', 1, 1, null, null, null, 'ic-wide' );
 						implecode_settings_text_color( __( 'Catalog Container Background', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_bg][' . $theme . ']', $archive_multiple_settings['container_bg'][ $theme ] );
-						implecode_settings_number( __( 'Catalog Container Padding', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_padding][' . $theme . ']', $archive_multiple_settings['container_padding'][ $theme ], 'px' );
+						implecode_settings_number( __( 'Catalog Container Padding', 'ecommerce-product-catalog' ), 'archive_multiple_settings[container_padding][' . $theme . ']', $archive_multiple_settings['container_padding'][ $theme ], 'px', 1, 1, null, null, null, 'ic-wide' );
 						if ( ! defined( 'AL_SIDEBAR_BASE_URL' ) ) {
 							implecode_settings_radio(
 								__( 'Default Sidebar', 'ecommerce-product-catalog' ),

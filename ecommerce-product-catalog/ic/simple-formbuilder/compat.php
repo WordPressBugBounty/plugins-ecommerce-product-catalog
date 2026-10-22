@@ -656,6 +656,9 @@ if ( ! function_exists( 'ic_mail_attachment_folder' ) ) {
 
 if ( ! function_exists( 'ic_validate_formbuilder_form' ) ) {
 	function ic_validate_formbuilder_form( $form ) {
+		if ( ! is_string( $form ) ) {
+			return $form;
+		}
 		$ic_form_updates = (int) get_option( 'ic_formbuilder_updates', 1 );
 		$form            = str_replace(
 			array( '"cid":"c', '"rules":"c' ),

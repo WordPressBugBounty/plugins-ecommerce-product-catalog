@@ -35,6 +35,36 @@
     vertical-align: top;
 }
 
+@media screen and (max-width: 1400px) {
+    #al_digital_order_details > .inside > table {
+        table-layout: fixed;
+    }
+
+    #al_digital_order_details input,
+    #al_digital_order_details select,
+    #al_digital_order_details textarea {
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    #al_digital_order_details .ic-checkout-form-data {
+        display: block;
+        width: 100%;
+    }
+
+    #al_digital_order_details .ic-checkout-form-data .form_row {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    #al_digital_order_details .ic-checkout-form-data .form_field {
+        box-sizing: border-box;
+        flex: 1 1 160px;
+        min-width: 0;
+    }
+}
+
 #al_digital_order_products table td, #al_digital_order_products table, table#original_order_product_list td {
     text-align: center;
 }

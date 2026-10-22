@@ -243,8 +243,9 @@ class IC_Settings_Page {
 			$this->screen_tab_order = self::$screen_tab_page_order;
 		}
 
-		// The key only has to be unique per instance; spl_object_hash() is deprecated in PHP 8.6.
-		self::$screen_tab_pages[ $screen_tab ][ spl_object_id( $this ) ] = $this;
+		// spl_object_hash() is the PHP 7.1 fallback and is deprecated on PHP 8.6.
+		$instance_key = function_exists( 'spl_object_id' ) ? spl_object_id( $this ) : spl_object_hash( $this );
+		self::$screen_tab_pages[ $screen_tab ][ $instance_key ] = $this;
 	}
 
 	/**

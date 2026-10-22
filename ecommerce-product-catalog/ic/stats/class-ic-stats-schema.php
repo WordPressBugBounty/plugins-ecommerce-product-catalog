@@ -28,7 +28,6 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 		global $wpdb;
 		if ( ! $wpdb || ! method_exists( $wpdb, 'get_charset_collate' ) ) {
 			return false; }
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		$charset = $wpdb->get_charset_collate();
 		$prefix  = $wpdb->prefix;
 		$created = false;
@@ -114,27 +113,38 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 		 *
 		 * @param string[] $tables Base schema statements.
 		 */
-		$tables = apply_filters( 'ic_stats_schema_tables', $tables );
+		$tables          = apply_filters( 'ic_stats_schema_tables', $tables );
+		$required_tables = apply_filters( 'ic_stats_schema_required_tables', array( 'ic_stats_events', 'ic_stats_event_metrics', 'ic_stats_aggregates', 'ic_stats_dimensions', 'ic_stats_unique_facts' ) );
+		$columns         = array(
+			'ic_stats_events'       => array( 'dimension_hash char(64) NOT NULL DEFAULT ""', 'KEY dimension_lookup (integration,occurred_at_gmt,dimension_hash)' ),
+			'ic_stats_aggregates'   => array( 'updated_at_gmt datetime NULL', 'KEY query_index (integration,metric,bucket,bucket_start,currency)', 'KEY dimension_rewrite (dimension_hash)' ),
+			'ic_stats_unique_facts' => array( 'KEY identity_lookup (identity_hash)' ),
+		);
+		$columns         = apply_filters( 'ic_stats_schema_columns', $columns );
+		$schema_version  = 4;
+		$contract_hash   = hash( 'sha256', serialize( array( $tables, $required_tables, $columns ) ) );
+		$installed       = get_option( 'ic_stats_schema_version', array() );
+		if ( is_array( $installed ) && (int) ( $installed['version'] ?? 0 ) === $schema_version && ! empty( $installed['contracts'][ $contract_hash ] ) ) {
+			return true;
+		}
 		foreach ( $tables as $sql ) {
 			preg_match( '/CREATE TABLE ([^ ]+)/', $sql, $match );
 			$name = isset( $match[1] ) ? trim( $match[1], '`' ) : '';
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema verification uses a fixed metadata query.
 			if ( $name && $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $name ) ) === $name ) {
 				continue;
-			} dbDelta( $sql );
+			}
+			if ( ! function_exists( 'dbDelta' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+			}
+			dbDelta( $sql );
 			$created = true;
-		} foreach ( apply_filters( 'ic_stats_schema_required_tables', array( 'ic_stats_events', 'ic_stats_event_metrics', 'ic_stats_aggregates', 'ic_stats_dimensions', 'ic_stats_unique_facts' ) ) as $table ) {
+		} foreach ( $required_tables as $table ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema verification uses a fixed metadata query.
 			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $prefix . $table ) ) !== $prefix . $table ) {
 				return false;
 			}
 		}
-		$columns = array(
-			'ic_stats_events'       => array( 'dimension_hash char(64) NOT NULL DEFAULT ""', 'KEY dimension_lookup (integration,occurred_at_gmt,dimension_hash)' ),
-			'ic_stats_aggregates'   => array( 'updated_at_gmt datetime NULL', 'KEY query_index (integration,metric,bucket,bucket_start,currency)', 'KEY dimension_rewrite (dimension_hash)' ),
-			'ic_stats_unique_facts' => array( 'KEY identity_lookup (identity_hash)' ),
-		);
-		$columns = apply_filters( 'ic_stats_schema_columns', $columns );
 		foreach ( $columns as $table => $definitions ) {
 			$name = $prefix . $table;
 			foreach ( $definitions as $definition ) {
@@ -145,7 +155,12 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 					$exists = $index ? $wpdb->get_var( $wpdb->prepare( "SHOW INDEX FROM {$name} WHERE Key_name=%s", $index ) ) : false;
 					if ( $index && ! $exists ) {
 						// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Additive fixed framework index definition.
-						$wpdb->query( "ALTER TABLE {$name} ADD {$definition}" );
+						if ( false === $wpdb->query( "ALTER TABLE {$name} ADD {$definition}" ) ) {
+							if ( $created && function_exists( 'ic_stats_flush_all_has_data' ) ) {
+								ic_stats_flush_all_has_data();
+							}
+							return false;
+						}
 					}
 					continue;
 				}
@@ -158,7 +173,13 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 				$exists = $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM {$name} LIKE %s", $column ) );
 				if ( ! $exists ) {
 					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Additive migration uses validated framework schema definitions.
-					$wpdb->query( "ALTER TABLE {$name} ADD COLUMN {$definition}" ); }
+					if ( false === $wpdb->query( "ALTER TABLE {$name} ADD COLUMN {$definition}" ) ) {
+						if ( $created && function_exists( 'ic_stats_flush_all_has_data' ) ) {
+							ic_stats_flush_all_has_data();
+						}
+						return false;
+					}
+				}
 			}
 		}
 		foreach ( array( 'timestamp_quality varchar(32) NOT NULL DEFAULT "live"', 'timestamp_provenance varchar(64) NOT NULL DEFAULT "runtime"' ) as $definition ) {
@@ -166,11 +187,28 @@ if ( ! function_exists( 'ic_stats_install_schema' ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Schema introspection uses framework-owned identifiers and prepared values.
 			if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM {$prefix}ic_stats_events LIKE %s", $column ) ) ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Additive migration uses validated framework schema definitions.
-				$wpdb->query( "ALTER TABLE {$prefix}ic_stats_events ADD COLUMN {$definition}" ); }
+				if ( false === $wpdb->query( "ALTER TABLE {$prefix}ic_stats_events ADD COLUMN {$definition}" ) ) {
+					if ( $created && function_exists( 'ic_stats_flush_all_has_data' ) ) {
+						ic_stats_flush_all_has_data();
+					}
+					return false;
+				}
+			}
 		}
 		if ( $created && function_exists( 'ic_stats_flush_all_has_data' ) ) {
 			ic_stats_flush_all_has_data();
 		}
+		if ( ! is_array( $installed ) || (int) ( $installed['version'] ?? 0 ) !== $schema_version ) {
+			$installed = array(
+				'version'   => $schema_version,
+				'contracts' => array(),
+			);
+		}
+		if ( ! isset( $installed['contracts'] ) || ! is_array( $installed['contracts'] ) ) {
+			$installed['contracts'] = array();
+		}
+		$installed['contracts'][ $contract_hash ] = true;
+		update_option( 'ic_stats_schema_version', $installed, false );
 		return true;
 	}
 }

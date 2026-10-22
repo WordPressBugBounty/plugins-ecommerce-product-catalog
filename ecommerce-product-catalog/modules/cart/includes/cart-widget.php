@@ -18,14 +18,49 @@ function ic_cart_register_cart_widget() {
 	register_widget( 'product_shopping_cart' );
 }
 
+if ( ! function_exists( 'ic_epc_cart_widget_labels' ) ) {
+
+	/**
+	 * Returns the cart widget display labels for the current catalog mode.
+	 *
+	 * In Inquiry Catalog mode the built-in cart works as a quote cart, so the
+	 * widget and the related settings notice use "Quote Cart" wording. Other
+	 * modes keep the original "Shopping Cart" strings.
+	 *
+	 * @return array {
+	 *     @type string $name            Widget name.
+	 *     @type string $description     Widget description.
+	 *     @type string $settings_notice Settings notice format with %1$s/%2$s widget link placeholders.
+	 * }
+	 */
+	function ic_epc_cart_widget_labels() {
+		if ( function_exists( 'ic_get_catalog_mode' ) && 'inquiry' === ic_get_catalog_mode() ) {
+			return array(
+				'name'            => __( 'Quote Cart', 'ecommerce-product-catalog' ),
+				'description'     => __( 'Display Quote Cart.', 'ecommerce-product-catalog' ),
+				/* translators: 1: opening widget link, 2: closing widget link. */
+				'settings_notice' => __( 'Remember to use the %1$sQuote Cart widget%2$s to show the cart in the sidebar.', 'ecommerce-product-catalog' ),
+			);
+		}
+
+		return array(
+			'name'            => __( 'Shopping Cart', 'ecommerce-product-catalog' ),
+			'description'     => __( 'Display Shopping Cart.', 'ecommerce-product-catalog' ),
+			/* translators: 1: opening widget link, 2: closing widget link. */
+			'settings_notice' => __( 'Remember to use the %1$sShopping Cart widget%2$s to show the cart in the sidebar.', 'ecommerce-product-catalog' ),
+		);
+	}
+}
+
 class product_shopping_cart extends WP_Widget {
 
 	function __construct() {
+		$labels     = ic_epc_cart_widget_labels();
 		$widget_ops = array(
 			'classname'   => 'product_shopping_cart',
-			'description' => __( 'Display Shopping Cart.', 'ecommerce-product-catalog' ),
+			'description' => $labels['description'],
 		);
-		parent::__construct( 'product_shopping_cart', __( 'Shopping Cart', 'ecommerce-product-catalog' ), $widget_ops );
+		parent::__construct( 'product_shopping_cart', $labels['name'], $widget_ops );
 	}
 
 	function widget( $args, $instance ) {

@@ -393,14 +393,8 @@ class ic_orders {
 					<td>
 					<?php
 					if ( ! empty( $manual_order_product[ $i ]['id'] ) || empty( $manual_order_product[ $i ]['name'] ) ) {
-						// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
-						if ( ! isset( $_GET['custom_product'] ) && function_exists( 'digital_products_dropdown' ) ) {
-							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The digital-products helper returns a generated selector; post KSES would remove it.
-							echo digital_products_dropdown( 'manual_order_product_id_' . absint( $i ), __( 'Choose product from catalog', 'ecommerce-product-catalog' ), absint( $manual_order_product[ $i ]['id'] ) );
-						} else {
-							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The catalog helper builds component-escaped selector markup and returns it when its echo flag is disabled.
-							echo ic_select_product( __( 'Choose product from catalog', 'ecommerce-product-catalog' ), absint( $manual_order_product[ $i ]['id'] ), 'manual_order_product_id_' . absint( $i ), 'digital_products_dropdown', 0 );
-						}
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The catalog helper builds component-escaped selector markup and returns it when its echo flag is disabled.
+						echo ic_select_product( __( 'Choose product from catalog', 'ecommerce-product-catalog' ), absint( $manual_order_product[ $i ]['id'] ), 'manual_order_product_id_' . absint( $i ), 'digital_products_dropdown', 0 );
 					}
 					?>
 						<input
@@ -797,7 +791,7 @@ class ic_orders {
 					$manual_order_product[ $i ]['quantity'] = ic_epc_order_post_number( 'manual_order_product_quantity_' . $a );
 					$manual_order_product[ $i ]['price']    = ic_epc_order_post_number( 'manual_order_product_price_' . $a );
 					$manual_order_product[ $i ]['summary']  = ic_epc_order_post_number( 'manual_order_product_summary_' . $a );
-					$order_summary['price']                 = $order_summary['price'] + floatval( $manual_order_product[ $i ]['summary'] );
+					$order_summary['price']                 = floatval( $order_summary['price'] ) + floatval( $manual_order_product[ $i ]['summary'] );
 					do_action( 'order_save_products', $post_id, $manual_order_product[ $i ]['id'], $manual_order_product[ $i ]['c_id'], $a );
 					if ( $manual_order_product[ $i ]['name'] == '' ) {
 						foreach ( $manual_order_product[ $i ] as $key => $value ) {
@@ -1263,11 +1257,21 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 				'orderby'        => 'post_date',
 				'order'          => 'DESC',
 				'post_type'      => $catalogs,
-				'post_status'    => 'publish',
+				'post_status'    => function_exists( 'ic_visible_product_status' ) ? ic_visible_product_status() : array( 'publish' ),
 				'fields'         => 'ids',
 			);
 
-			$pages = get_posts( $set );
+			$pages             = get_posts( $set );
+			$non_private_pages = array();
+			$private_pages     = array();
+			foreach ( $pages as $product_id ) {
+				if ( 'private' === get_post_status( $product_id ) ) {
+					$private_pages[] = $product_id;
+				} else {
+					$non_private_pages[] = $product_id;
+				}
+			}
+			$pages = array_merge( $non_private_pages, $private_pages );
 
 			$select_box = '<select custom="' . $field_number . '" id="' . $select_name . '" name="' . $select_name . '" class="all-products-dropdown ' . $class . '" ' . $attr . '>';
 			if ( ! empty( $first_option ) ) {
@@ -1279,7 +1283,13 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 				} else {
 					$selected = selected( $product_id, $selected_value, 0 );
 				}
-				$select_box .= '<option class="id_' . $product_id . '" value="' . $product_id . '" ' . $selected . '>' . get_product_name( $product_id ) . '</option>';
+				$product_label = get_product_name( $product_id );
+				if ( function_exists( 'ic_product_selector_private_label' ) ) {
+					$product_label = ic_product_selector_private_label( $product_label, $product_id );
+				} elseif ( 'private' === get_post_status( $product_id ) ) {
+					$product_label .= ' ' . __( '(Private)', 'ecommerce-product-catalog' );
+				}
+				$select_box .= '<option class="id_' . $product_id . '" value="' . $product_id . '" ' . $selected . '>' . $product_label . '</option>';
 			}
 			$select_box .= '</select>';
 		} else {

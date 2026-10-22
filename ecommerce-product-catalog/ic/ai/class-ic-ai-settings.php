@@ -396,6 +396,25 @@ class IC_AI_Settings {
 	}
 
 	/**
+	 * Registers the AI REST namespace as private no-cache routes.
+	 *
+	 * @param array $routes No-cache route rules keyed by owner route ID.
+	 *
+	 * @return array
+	 */
+	public static function ai_rest_nocache_routes( $routes ) {
+		if ( ! is_array( $routes ) ) {
+			$routes = array();
+		}
+		$routes['ic-ai'] = array(
+			'match' => 'prefix',
+			'route' => '/implecode/v1/ai/',
+		);
+
+		return $routes;
+	}
+
+	/**
 	 * Returns one same-origin checkout proxy URL for the embedded AI purchase flow.
 	 *
 	 * @param IC_AI_Integration $integration Integration.
@@ -3780,3 +3799,5 @@ class IC_AI_Settings {
 		return add_query_arg( $query_args, admin_url( 'admin.php?page=' . rawurlencode( $parent_slug ) ) );
 	}
 }
+
+add_filter( 'ic_rest_nocache_routes', array( 'IC_AI_Settings', 'ai_rest_nocache_routes' ) );

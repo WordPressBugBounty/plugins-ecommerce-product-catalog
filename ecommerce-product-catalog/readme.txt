@@ -5,7 +5,7 @@ Tags: ecommerce, shopping cart, catalog, quote, request a quote
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.6.4
+Stable tag: 3.6.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -388,6 +388,18 @@ This can be a store but it is not limited to it. It's main purpose is to present
 == Changelog ==
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
+
+= 3.6.5 - 22/10/2026 =
+
+* Size and weight are now grouped together in the product editor with clearer, more accessible fields.
+* Cart widget labels now match the selected catalog mode.
+* Improved search keyword handling and display on catalog pages.
+* Product selectors now list published products first and clearly label private ones.
+* Improved product summaries on manually created orders and the order admin layout on smaller screens.
+* Catalog shortcodes no longer render inside excerpts and SEO descriptions.
+* Plugin activation and setup now complete correctly when run from WP-CLI.
+* Private account and API responses are now reliably excluded from page caching.
+* Improved compatibility with upcoming PHP versions.
 
 = 3.6.4 - 12/10/2026 =
 

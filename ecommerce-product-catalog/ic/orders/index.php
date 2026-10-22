@@ -150,15 +150,9 @@ function country_chosen_admin_select_script() {
 		}
 		wp_enqueue_script( 'digital_order_edit_script', AL_PO_PLUGIN_BASE_URL . 'js/edit-order.min.js' . ic_filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), $edit_order_deps, defined( 'IC_EPC_VERSION' ) ? IC_EPC_VERSION : filemtime( AL_PO_BASE_PATH . '/js/edit-order.min.js' ), true );
 		// if ( ic_ic_order_manual() ) {
-		if ( function_exists( 'start_digital_products' ) ) {
-			$translation_array = array(
-				'digital_products_dropdown_action' => digital_products_dropdown( 'new_manual_order_product_id', __( 'Choose product from catalog', 'ecommerce-product-catalog' ), '' ),
-			);
-		} else {
-			$translation_array = array(
-				'digital_products_dropdown_action' => ic_select_product( __( 'Choose product from catalog', 'ecommerce-product-catalog' ), '', 'new_manual_order_product_id', 'digital_products_dropdown', 0 ),
-			);
-		}
+		$translation_array                  = array(
+			'digital_products_dropdown_action' => ic_select_product( __( 'Choose product from catalog', 'ecommerce-product-catalog' ), '', 'new_manual_order_product_id', 'digital_products_dropdown', 0 ),
+		);
 		$translation_array                  = apply_filters( 'digital_order_edit_sctipt_translations', $translation_array );
 		$translation_array['product_price'] = array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),

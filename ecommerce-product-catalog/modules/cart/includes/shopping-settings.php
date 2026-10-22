@@ -229,7 +229,11 @@ function shopping_cart_settings_content() {
 							?>
 						</td>
 				</tr>
-			</table><?php /* translators: 1: opening widget link, 2: closing widget link. */ implecode_al_box( sprintf( __( 'Remember to use the %1$sShopping Cart widget%2$s to show the cart in the sidebar.', 'ecommerce-product-catalog' ), '<a href="' . admin_url( 'widgets.php' ) . '">', '</a>' ) ); ?>
+			</table>
+			<?php
+			$cart_widget_labels = ic_epc_cart_widget_labels();
+			implecode_al_box( sprintf( $cart_widget_labels['settings_notice'], '<a href="' . esc_url( admin_url( 'widgets.php' ) ) . '">', '</a>' ) );
+			?>
 				<h3><?php esc_html_e( 'Email settings', 'ecommerce-product-catalog' ); ?></h3>
 				<style>
 					textarea[name="shopping_cart_settings[admin_email]"], textarea[name="shopping_cart_settings[user_email]"], textarea[name="shopping_cart_settings[packing_email]"] {

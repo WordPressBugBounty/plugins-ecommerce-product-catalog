@@ -577,6 +577,10 @@ if ( ! function_exists( 'ic_nocache' ) ) {
 		$headers['Pragma']                    = 'no-cache';
 		$headers['X-LiteSpeed-Cache-Control'] = 'no-cache';
 
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		add_filter( 'litespeed_const_DONOTCACHEPAGE', '__return_true' );
 		do_action( 'litespeed_control_set_nocache', 'ic_private_response' );
 
 		if ( $response instanceof WP_REST_Response ) {
@@ -604,6 +608,113 @@ if ( ! function_exists( 'ic_nocache' ) ) {
 	}
 }
 
+if ( ! function_exists( 'ic_get_rest_nocache_routes' ) ) {
+	/**
+	 * Returns the validated REST no-cache route rules.
+	 *
+	 * Route owners register rules through the `ic_rest_nocache_routes` filter,
+	 * next to their own register_rest_route() calls. The filter receives an
+	 * array keyed by `<owner>-<route-id>`; each value is an array with:
+	 * - `match`   (string) One of `prefix`, `exact` or `regex`.
+	 * - `route`   (string) Route starting with `/`. For `regex` it is the
+	 *             unanchored pattern body (no `#` delimiter), matched
+	 *             case-sensitively against the whole route.
+	 * - `methods` (string|string[]) Optional HTTP methods. Empty means all.
+	 *
+	 * A matching rule always applies the private no-cache policy.
+	 *
+	 * @return array List of rules with `match`, `route`, `methods` and `pattern` keys.
+	 */
+	function ic_get_rest_nocache_routes() {
+		$rules = apply_filters( 'ic_rest_nocache_routes', array() );
+		if ( ! is_array( $rules ) ) {
+			_doing_it_wrong( __FUNCTION__, 'The ic_rest_nocache_routes filter must return an array.', '1.0' );
+			$rules = array();
+		}
+
+		$normalized = array();
+		foreach ( $rules as $key => $rule ) {
+			$valid = is_array( $rule )
+				&& isset( $rule['match'], $rule['route'] )
+				&& in_array( $rule['match'], array( 'prefix', 'exact', 'regex' ), true )
+				&& is_string( $rule['route'] )
+				&& '' !== $rule['route']
+				&& '/' === $rule['route'][0];
+			if ( $valid && 'regex' === $rule['match'] && ( false !== strpos( $rule['route'], '#' ) || false !== strpos( $rule['route'], "\0" ) ) ) {
+				$valid = false;
+			}
+
+			$methods = array();
+			if ( $valid && isset( $rule['methods'] ) && '' !== $rule['methods'] && array() !== $rule['methods'] ) {
+				$raw_methods = is_string( $rule['methods'] ) ? array( $rule['methods'] ) : $rule['methods'];
+				if ( ! is_array( $raw_methods ) ) {
+					$valid = false;
+				} else {
+					foreach ( $raw_methods as $method ) {
+						if ( ! is_string( $method ) ) {
+							$valid = false;
+							break;
+						}
+						$methods[] = strtoupper( $method );
+					}
+				}
+			}
+
+			if ( ! $valid ) {
+				_doing_it_wrong( 'ic_rest_nocache_routes', 'Invalid no-cache route rule: ' . esc_html( (string) $key ), '1.0' );
+				continue;
+			}
+
+			$normalized[] = array(
+				'match'   => $rule['match'],
+				'route'   => $rule['route'],
+				'methods' => $methods,
+				'pattern' => 'regex' === $rule['match'] ? '#^' . $rule['route'] . '$#' : '',
+			);
+		}
+
+		return $normalized;
+	}
+}
+
+if ( ! function_exists( 'ic_rest_route_needs_nocache' ) ) {
+	/**
+	 * Checks whether a REST route and method match a registered no-cache rule.
+	 *
+	 * @param string $route  REST route.
+	 * @param string $method HTTP method.
+	 *
+	 * @return bool
+	 */
+	function ic_rest_route_needs_nocache( $route, $method ) {
+		if ( ! is_string( $route ) ) {
+			return false;
+		}
+
+		$method = strtoupper( (string) $method );
+		foreach ( ic_get_rest_nocache_routes() as $rule ) {
+			if ( ! empty( $rule['methods'] ) && ! in_array( $method, $rule['methods'], true ) ) {
+				continue;
+			}
+
+			if ( 'prefix' === $rule['match'] ) {
+				if ( 0 === strpos( $route, $rule['route'] ) ) {
+					return true;
+				}
+			} elseif ( 'exact' === $rule['match'] ) {
+				$base = rtrim( $rule['route'], '/' );
+				if ( $route === $base || $route === $base . '/' ) {
+					return true;
+				}
+			} elseif ( 1 === preg_match( $rule['pattern'], $route ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
 if ( ! function_exists( 'ic_rest_response_needs_nocache' ) ) {
 	/**
 	 * Checks whether a REST request is covered by the private-response policy.
@@ -617,36 +728,7 @@ if ( ! function_exists( 'ic_rest_response_needs_nocache' ) ) {
 			return false;
 		}
 
-		$route  = $request->get_route();
-		$method = strtoupper( $request->get_method() );
-		if ( 0 === strpos( $route, '/implecode/v1/ai/' ) || 0 === strpos( $route, '/ic-stats/v1/' ) ) {
-			return true;
-		}
-
-		if ( 'POST' !== $method ) {
-			return false;
-		}
-
-		$exact_routes = array(
-			'/implecode/v1/options/update',
-			'/implecode/v1/options/update/',
-			'/implecode/v1/screen-update',
-			'/implecode/v1/screen-update/',
-			'/implecode/v1/freight-platform/is-risk-text',
-			'/implecode/v1/freight-platform/is-risk-text/',
-		);
-		if ( in_array( $route, $exact_routes, true ) ) {
-			return true;
-		}
-
-		if ( preg_match( '#^/implecode/v1/g-map-autocomplete/location-selected/\d+/?$#', $route ) ) {
-			return true;
-		}
-		if ( preg_match( '#^/implecode/v1/customer/.+/?$#', $route ) ) {
-			return true;
-		}
-
-		return (bool) preg_match( '#^/implecode/v1/ic_freight_platform/(?:high_risk_zones|ic_freight_trucks_limit|ic_freight_locations|ic_freight_subscriptions|ic_freight_pricing|ic_freight_dates|ic_freight_taxes|ic_freight_transaction_fees|ic_freight_labor|ic_freight_notifications)/new/\d+/?$#', $route );
+		return ic_rest_route_needs_nocache( $request->get_route(), $request->get_method() );
 	}
 }
 

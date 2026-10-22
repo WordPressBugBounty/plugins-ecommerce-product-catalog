@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function epc_activation_function() {
-	if ( is_ic_activation_hook() && current_user_can( 'activate_plugins' ) ) {
+	if ( ic_epc_can_complete_activation() ) {
 		$first_activation = get_option( 'ic_epc_first_activation' );
 		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested, Generic.Formatting.MultipleStatementAlignment.IncorrectWarning -- Legacy local timestamp storage is preserved for backward compatibility.
 		$current_time     = current_time( 'timestamp' );
 		if ( empty( $first_activation ) || $current_time - $first_activation < MONTH_IN_SECONDS ) {
-			if ( ! function_exists( 'start_ic_woocat' ) ) {
+			if ( current_user_can( 'activate_plugins' ) && ! function_exists( 'start_ic_woocat' ) ) {
 				set_transient( '_ic_welcome_screen_activation_redirect', true, 30 );
 			}
 			update_option( 'IC_EPC_activation_message', 1, false );
@@ -59,6 +59,44 @@ function epc_activation_function() {
 		delete_option( 'IC_EPC_install' );
 	}
 }
+
+/**
+ * Checks whether WordPress is running under WP-CLI.
+ *
+ * @return bool
+ */
+function ic_epc_is_wp_cli() {
+	return defined( 'WP_CLI' ) && WP_CLI;
+}
+
+/**
+ * Checks whether the current request may complete pending activation setup.
+ *
+ * WP-CLI is trusted only while the activation marker exists. Web requests still
+ * require the same plugin-activation capability as the activation screen.
+ *
+ * @return bool
+ */
+function ic_epc_can_complete_activation() {
+	if ( ! is_ic_activation_hook() ) {
+		return false;
+	}
+
+	return ic_epc_is_wp_cli() || current_user_can( 'activate_plugins' );
+}
+
+/**
+ * Completes setup left pending by an interrupted activation request.
+ *
+ * @return void
+ */
+function ic_epc_maybe_complete_pending_activation() {
+	if ( ic_epc_can_complete_activation() ) {
+		epc_activation_function();
+	}
+}
+
+add_action( 'init', 'ic_epc_maybe_complete_pending_activation', 99 );
 
 /**
  * Saves default values for multiple settings for compatibility with multilanguage plugins
@@ -102,7 +140,7 @@ function ic_save_default_labels() {
  * @return int|void
  */
 function create_products_page( $status = 'publish' ) {
-	if ( current_user_can( 'publish_pages' ) ) {
+	if ( current_user_can( 'publish_pages' ) || ( ic_epc_is_wp_cli() && is_ic_activation_hook() ) ) {
 		$content      = ic_catalog_shortcode();
 		$product_page = array(
 			'post_title'     => DEF_CATALOG_PLURAL,

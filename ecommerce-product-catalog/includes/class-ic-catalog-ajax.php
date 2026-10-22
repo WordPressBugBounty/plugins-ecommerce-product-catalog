@@ -76,8 +76,10 @@ class IC_Catalog_Ajax {
 			$params = array();
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The serialized payload is sanitized with ic_sanitize() after parse_str() below.
 			$this->self_submit_data = wp_unslash( $_POST['self_submit_data'] );
-			parse_str( $this->self_submit_data, $params );
-			$_GET = array_map( 'ic_sanitize', $params );
+			if ( is_string( $this->self_submit_data ) ) {
+				parse_str( $this->self_submit_data, $params );
+				$_GET = array_map( 'ic_sanitize', $params );
+			}
 		}
 	}
 
@@ -103,7 +105,7 @@ class IC_Catalog_Ajax {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Ajax element metadata is normalized before use.
 		$this->ajax_elements = isset( $_POST['ajax_elements'] ) && is_array( $_POST['ajax_elements'] ) ? wp_unslash( $_POST['ajax_elements'] ) : array();
 
-		if ( ! empty( $this->self_submit_data ) && ! empty( $security ) && wp_verify_nonce( $security, 'ic_ajax' ) ) {
+		if ( is_string( $this->self_submit_data ) && ! empty( $this->self_submit_data ) && ! empty( $security ) && wp_verify_nonce( $security, 'ic_ajax' ) ) {
 			ic_set_time_limit( 3 );
 			remove_filter( 'parse_tax_query', 'exclude_products_from_child_cat' );
 			$params = array();
@@ -406,6 +408,16 @@ class IC_Catalog_Ajax {
 			$query_vars['post_type'] = 'al_product';
 		}
 		$active_filters = get_active_product_filters();
+		$search_title   = '';
+		$search_keyword = '';
+		if ( is_ic_product_search() ) {
+			$search_keyword = ic_get_search_keyword();
+			if ( '' !== $search_keyword ) {
+				$charset        = get_bloginfo( 'charset' );
+				$search_title   = html_entity_decode( ic_get_search_page_title( $search_keyword ), ENT_QUOTES | ENT_HTML5, $charset );
+				$search_keyword = html_entity_decode( esc_html( $search_keyword ), ENT_QUOTES | ENT_HTML5, $charset );
+			}
+		}
 		wp_localize_script(
 			'ic_product_ajax',
 			'ic_ajax',
@@ -414,6 +426,8 @@ class IC_Catalog_Ajax {
 				'request_url'       => esc_url( remove_query_arg( $active_filters, get_pagenum_link( 1, false ) ) ),
 				'filters_reset_url' => get_filters_bar_reset_url(),
 				'is_search'         => is_search(),
+				'search_title'      => $search_title,
+				'search_keyword'    => $search_keyword,
 				'nonce'             => wp_create_nonce( 'ic_ajax' ),
 				'ic_nonce'          => wp_create_nonce( 'ic_catalog_self_submit' ),
 			)

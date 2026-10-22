@@ -106,22 +106,26 @@ function ic_restore_product_caps() {
  * @return void
  */
 function add_product_caps( $additional = true ) {
-	if ( is_user_logged_in() && current_user_can( 'activate_plugins' ) ) {
+	$capable_user           = is_user_logged_in() && current_user_can( 'activate_plugins' );
+	$pending_cli_activation = ic_epc_is_wp_cli() && is_ic_activation_hook();
+
+	if ( $capable_user || $pending_cli_activation ) {
 		$role = get_role( 'administrator' );
 
 		ic_catalog_add_caps( $role );
 
 		if ( $additional ) {
-			$current_user = wp_get_current_user();
-			if ( ! empty( $current_user->roles ) && is_array( $current_user->roles ) ) {
-				foreach ( $current_user->roles as $current_role ) {
-					if ( 'administrator' === $current_role ) {
-						break;
-					}
-					$role         = get_role( $current_role );
-					$capabilities = $role->capabilities;
-					if ( ! empty( $capabilities['activate_plugins'] ) ) {
-						ic_catalog_add_caps( $role, 'administrator' );
+			if ( $capable_user ) {
+				$current_user = wp_get_current_user();
+				if ( ! empty( $current_user->roles ) && is_array( $current_user->roles ) ) {
+					foreach ( $current_user->roles as $current_role ) {
+						if ( 'administrator' === $current_role ) {
+							break;
+						}
+						$role = get_role( $current_role );
+						if ( ! empty( $role->capabilities['activate_plugins'] ) ) {
+							ic_catalog_add_caps( $role, 'administrator' );
+						}
 					}
 				}
 			}

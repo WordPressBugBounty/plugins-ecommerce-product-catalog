@@ -318,6 +318,10 @@ class IC_Shortcode_Catalog {
 
 	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
 	public function auto_add_shortcode( $content ) {
+		if ( doing_filter( 'get_the_excerpt' ) || doing_action( 'wp_head' ) ) {
+			// Excerpt/SEO/head-meta generation runs the_content; rendering the catalog there leaks it into meta and spends the one-shot render.
+			return $content;
+		}
 		if ( is_ic_product_listing() && ! $this->has_listing_shortcode() ) {
 			if ( ! $this->is_page_builder_edit() ) {
 				$content .= do_shortcode( '[show_product_catalog]' );
@@ -1336,6 +1340,25 @@ class IC_Shortcode_Catalog {
 		return $post;
 	}
 
+	/**
+	 * Prepares the listing post used to render a product search.
+	 *
+	 * A zero ID makes explicit get_the_title( $post->ID ) calls resolve the
+	 * current global post instead of reloading the persisted listing page.
+	 *
+	 * @param WP_Post              $listing_post Configured listing post.
+	 * @param WP_Query|object|bool $pre_query    Preserved pre-shortcode query.
+	 * @return WP_Post
+	 */
+	public function prepare_product_search_render_post( $listing_post, $pre_query ) {
+		if ( ! empty( $listing_post->ID ) && is_ic_product_search( $pre_query ) ) {
+			$listing_post     = clone $listing_post;
+			$listing_post->ID = 0;
+		}
+
+		return $listing_post;
+	}
+
 	// phpcs:ignore Squiz.Commenting.FunctionComment.Missing -- Legacy template method.
 	public function page_query( $value = null ) {
 		if ( ! is_admin() && is_ic_catalog_page() && is_ic_shortcode_integration() ) {
@@ -1359,12 +1382,14 @@ class IC_Shortcode_Catalog {
 			}
 
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Legacy shortcode flow requires overriding the main query.
-			$wp_query     = $this->main_listing_query();
+			$pre_post = $this->get_pre_shortcode_query();
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Legacy shortcode flow requires overriding the main query object.
+			$wp_query = $this->main_listing_query();
 			$listing_post = $this->listing_post();
+			$listing_post = $this->prepare_product_search_render_post( $listing_post, $pre_post );
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Legacy shortcode flow requires overriding the current post.
 			$post = $listing_post;
 
-			$pre_post                 = $this->get_pre_shortcode_query();
 			$wp_query->post           = $post;
 			$wp_query->queried_object = $post;
 			$wp_query->posts          = array( 0 => $post );

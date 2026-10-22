@@ -169,6 +169,50 @@ function upload_product_image( $name, $button_value, $option_name, $option_value
 	<?php
 }
 
+if ( ! function_exists( 'ic_product_selector_private_label' ) ) {
+
+	/**
+	 * Appends the private status to a product selector label.
+	 *
+	 * @param string $label      Product label.
+	 * @param int    $product_id Product ID.
+	 *
+	 * @return string
+	 */
+	function ic_product_selector_private_label( $label, $product_id ) {
+		if ( 'private' !== get_post_status( $product_id ) ) {
+			return $label;
+		}
+
+		return $label . ' ' . __( '(Private)', 'ecommerce-product-catalog' );
+	}
+}
+
+if ( ! function_exists( 'ic_product_selector_result_private_label' ) ) {
+
+	/**
+	 * Labels private results from the product selector sources.
+	 *
+	 * @param string $label  Result label.
+	 * @param int    $id     Result ID.
+	 * @param array  $source Selector source definition.
+	 *
+	 * @return string
+	 */
+	function ic_product_selector_result_private_label( $label, $id, $source ) {
+		$source_key = isset( $source['key'] ) ? $source['key'] : '';
+		if ( ! in_array( $source_key, array( 'ic_products', 'ic_order_products' ), true ) ) {
+			return $label;
+		}
+
+		return ic_product_selector_private_label( $label, $id );
+	}
+}
+
+if ( false === has_filter( 'ic_selector_result_label', 'ic_product_selector_result_private_label' ) ) {
+	add_filter( 'ic_selector_result_label', 'ic_product_selector_result_private_label', 10, 3 );
+}
+
 if ( ! function_exists( 'ic_select_product' ) ) {
 
 	/**
@@ -218,7 +262,17 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 				$set['order'] = $order;
 			}
 
-			$pages        = get_posts( $set );
+			$pages             = get_posts( $set );
+			$non_private_pages = array();
+			$private_pages     = array();
+			foreach ( $pages as $product_id ) {
+				if ( 'private' === get_post_status( $product_id ) ) {
+					$private_pages[] = $product_id;
+				} else {
+					$non_private_pages[] = $product_id;
+				}
+			}
+			$pages        = array_merge( $non_private_pages, $private_pages );
 			$field_number = filter_var( $select_name, FILTER_SANITIZE_NUMBER_INT );
 			$select_box   = '<select custom="' . esc_attr( $field_number ) . '" id="' . esc_attr( $select_name ) . '" name="' . esc_attr( $select_name ) . '" class="all-products-dropdown ' . esc_attr( (string) $css_class ) . '" ' . $attr . '>';
 			if ( ! empty( $first_option ) ) {
@@ -230,7 +284,7 @@ if ( ! function_exists( 'ic_select_product' ) ) {
 				} else {
 					$selected = selected( $product_id, $selected_value, false );
 				}
-				$name = get_product_name( $product_id ) . ' (ID:' . $product_id;
+				$name = ic_product_selector_private_label( get_product_name( $product_id ), $product_id ) . ' (ID:' . $product_id;
 				if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
 					$name .= ', SKU:' . get_product_sku( $product_id );
 				}
@@ -431,12 +485,10 @@ function get_product_catalog_page_title() {
 		} else {
 			$title = $the_tax->name;
 		}
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only search query parameter.
-	} elseif ( is_ic_product_search() && isset( $_GET['s'] ) ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,Minnow.PHP.PHPTypecasting.stringLiteralStringConcat -- Read-only search query parameter.
-		$search_keyword = apply_filters( 'ic_search_keayword', sanitize_text_field( wp_unslash( (string) $_GET['s'] ) ) );
+	} elseif ( is_ic_product_search() ) {
+		$search_keyword = ic_get_search_keyword();
 		if ( ! empty( $search_keyword ) ) {
-			$title = esc_html__( 'Search Results for:', 'ecommerce-product-catalog' ) . ' <span class="ic-search-keyword">' . esc_html( $search_keyword ) . '</span>';
+			$title = ic_get_search_page_title( $search_keyword );
 		} else {
 			$title = '';
 		}
@@ -907,12 +959,34 @@ if ( ! function_exists( 'permalink_options_update' ) ) {
 	 */
 	function permalink_options_update() {
 		update_option( 'al_permalink_options_update', 1, false );
+		if ( function_exists( 'ic_epc_is_wp_cli' ) && ic_epc_is_wp_cli() ) {
+			check_permalink_options_update();
+		}
 	}
 
 }
 if ( ! function_exists( 'check_permalink_options_update' ) ) {
 
 	add_action( 'admin_footer', 'check_permalink_options_update', 99 );
+	add_action( 'wp_loaded', 'check_permalink_options_update', 99 );
+
+	/**
+	 * Ensures catalog rewrite objects exist before rules are regenerated.
+	 *
+	 * @return bool
+	 */
+	function ic_epc_rewrite_objects_ready() {
+		global $ic_register_product;
+
+		if ( ! post_type_exists( 'al_product' ) && is_object( $ic_register_product ) && method_exists( $ic_register_product, 'ic_create_product' ) ) {
+			$ic_register_product->ic_create_product();
+		}
+		if ( ! taxonomy_exists( 'al_product-cat' ) && function_exists( 'ic_create_product_categories' ) ) {
+			ic_create_product_categories();
+		}
+
+		return post_type_exists( 'al_product' ) && taxonomy_exists( 'al_product-cat' );
+	}
 
 	/**
 	 * Checks if the permalinks should be rewritten and does it if necessary.
@@ -922,7 +996,7 @@ if ( ! function_exists( 'check_permalink_options_update' ) ) {
 	function check_permalink_options_update() {
 		$options_update = get_option( 'al_permalink_options_update', 'none' );
 		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom catalog capability registered by the plugin.
-		if ( 'none' !== $options_update && ( defined( 'DOING_CRON' ) || current_user_can( 'manage_product_settings' ) || current_user_can( 'edit_pages' ) ) ) {
+		if ( 'none' !== $options_update && ( defined( 'DOING_CRON' ) || current_user_can( 'manage_product_settings' ) || current_user_can( 'edit_pages' ) || ( function_exists( 'ic_epc_is_wp_cli' ) && ic_epc_is_wp_cli() ) ) && ic_epc_rewrite_objects_ready() ) {
 			flush_rewrite_rules();
 			update_option( 'al_permalink_options_update', 'none', false );
 		}

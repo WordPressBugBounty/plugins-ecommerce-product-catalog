@@ -86,10 +86,13 @@ function al_product_attributes( $post, $args = null ) {
 		'label' => '_attribute-label',
 		'unit'  => '_attribute-unit',
 	);
+
+	$label_meta_base = apply_filters( 'ic_attribute_label_field_name', '_attribute-label' );
+	$unit_meta_base  = apply_filters( 'ic_attribute_unit_field_name', '_attribute-unit' );
 	for ( $i = 1; $i <= $attributes_number; $i++ ) {
 		$attributes_option_field       = get_post_meta( $post->ID, ic_attr_value_field_name( $i ), true );
-		$attributes_label_option_field = get_post_meta( $post->ID, '_attribute-label' . $i, true );
-		$attributes_unit_option_field  = get_post_meta( $post->ID, '_attribute-unit' . $i, true );
+		$attributes_label_option_field = get_post_meta( $post->ID, $label_meta_base . $i, true );
+		$attributes_unit_option_field  = get_post_meta( $post->ID, $unit_meta_base . $i, true );
 		$attributes_option[ $i ]       = isset( $attributes_option[ $i ] ) ? $attributes_option[ $i ] : '';
 		$attributes_label_option[ $i ] = isset( $attributes_label_option[ $i ] ) ? $attributes_label_option[ $i ] : '';
 		$attributes_unit_option[ $i ]  = isset( $attributes_unit_option[ $i ] ) ? $attributes_unit_option[ $i ] : '';
@@ -456,12 +459,52 @@ function ic_get_product_weight( $product_id, $force_value = false, $weight = nul
 	return $weight;
 }
 
-add_filter( 'admin_product_details', 'ic_size_metabox', 10, 2 );
+/**
+ * Returns the configured size and weight labels with default fallbacks.
+ *
+ * @return array Array with 'size' and 'weight' labels.
+ */
+function ic_size_weight_labels() {
+	$size_label   = ic_attributes_get_size_label();
+	$weight_label = ic_attributes_get_weight_label();
+	if ( '' === trim( (string) $size_label ) ) {
+		$size_label = __( 'Size', 'ecommerce-product-catalog' );
+	}
+	if ( '' === trim( (string) $weight_label ) ) {
+		$weight_label = __( 'Weight', 'ecommerce-product-catalog' );
+	}
+
+	return array(
+		'size'   => $size_label,
+		'weight' => $weight_label,
+	);
+}
 
 /**
- * Adds attributes meatbox
+ * Returns a single size dimension input with its visible caption.
  *
- * @param array $names
+ * @param string $name       Input name.
+ * @param string $caption    Visible caption and placeholder (e.g. L, W, H).
+ * @param string $aria_label Accessible label including the unit.
+ * @param string $value      Current value.
+ *
+ * @return string
+ */
+function ic_size_metabox_field( $name, $caption, $aria_label, $value ) {
+	return '<label class="ic-size-field-wrap"><span class="ic-size-field-caption" aria-hidden="true">' . esc_html( $caption ) . '</span><input placeholder="' . esc_attr( $caption ) . '" aria-label="' . esc_attr( $aria_label ) . '" type="text" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '" class="widefat ic-size-field" /></label>';
+}
+
+/**
+ * Returns the product size admin table.
+ *
+ * Called by ic_size_weight_metabox() and directly by the variations details.
+ *
+ * @param string     $product_details Product details HTML to append to.
+ * @param int        $product_id      Product ID.
+ * @param array|null $field_name      Optional custom input names (length, width, height).
+ * @param array|null $size            Optional size values.
+ *
+ * @return string
  */
 function ic_size_metabox( $product_details, $product_id, $field_name = null, $size = null ) {
 	if ( is_ic_attributes_size_enabled() ) {
@@ -472,8 +515,15 @@ function ic_size_metabox( $product_details, $product_id, $field_name = null, $si
 		if ( $size === null || ! isset( $size['length'] ) || ! isset( $size['width'] ) || ! isset( $size['height'] ) ) {
 			$size = ic_get_product_size( $product_id );
 		}
+		$unit        = ic_attributes_get_size_unit();
+		$unit_suffix = '' !== (string) $unit ? ' (' . $unit . ')' : '';
+		$aria        = array(
+			'length' => __( 'Length', 'ecommerce-product-catalog' ) . $unit_suffix,
+			'width'  => __( 'Width', 'ecommerce-product-catalog' ) . $unit_suffix,
+			'height' => __( 'Height', 'ecommerce-product-catalog' ) . $unit_suffix,
+		);
+		$fields      = array();
 		if ( ! empty( $field_names ) ) {
-			$fields = '';
 			foreach ( $field_names as $field_name => $field_label ) {
 				if ( $field_name === '_size_length' ) {
 					$val_name = 'length';
@@ -482,48 +532,83 @@ function ic_size_metabox( $product_details, $product_id, $field_name = null, $si
 				} elseif ( $field_name === '_size_height' ) {
 					$val_name = 'height';
 				}
-				if ( ! empty( $fields ) ) {
-					$fields .= 'x ';
-				}
-				$fields .= '<input placeholder="' . $field_label . '" style="max-width: 25%;" type="text" name="' . $field_name . '" value="' . $size[ $val_name ] . '" class="widefat" />';
+				$fields[] = ic_size_metabox_field( $field_name, $field_label, isset( $aria[ $val_name ] ) ? $aria[ $val_name ] : $field_label, $size[ $val_name ] );
 			}
 		} else {
-			$fields  = '<input placeholder="' . ic_attributes_get_length_label() . '" style="max-width: 25%;" type="text" name="' . $field_name[0] . '" value="' . $size['length'] . '" class="widefat" />';
-			$fields .= 'x <input placeholder="' . ic_attributes_get_width_label() . '" style="max-width: 25%;" type="text" name="' . $field_name[1] . '" value="' . $size['width'] . '" class="widefat" />';
-			$fields .= 'x <input placeholder="' . ic_attributes_get_height_label() . '" style="max-width: 25%;" type="text" name="' . $field_name[2] . '" value="' . $size['height'] . '" class="widefat" />';
+			$fields[] = ic_size_metabox_field( $field_name[0], ic_attributes_get_length_label(), $aria['length'], $size['length'] );
+			$fields[] = ic_size_metabox_field( $field_name[1], ic_attributes_get_width_label(), $aria['width'], $size['width'] );
+			$fields[] = ic_size_metabox_field( $field_name[2], ic_attributes_get_height_label(), $aria['height'], $size['height'] );
 		}
-		$label = __( 'Size', 'ecommerce-product-catalog' );
-		$unit  = ic_attributes_get_size_unit();
-		if ( ! empty( $unit ) ) {
-			$label .= ' (' . $unit . ')';
-		}
-		$product_details .= apply_filters( 'admin_size_table', '<table><tr><td class="label-column">' . $label . ':</td><td class="size-column">' . $fields . '</td></tr></table>', $product_id );
+		$fields           = implode( '<span class="ic-size-sep" aria-hidden="true">&times;</span>', $fields );
+		$labels           = ic_size_weight_labels();
+		$label            = $labels['size'] . $unit_suffix;
+		$product_details .= apply_filters( 'admin_size_table', '<table class="ic-size-table"><tr><td class="label-column">' . esc_html( $label ) . ':</td><td class="size-column"><span class="ic-size-fields" role="group" aria-label="' . esc_attr( $label ) . '">' . $fields . '</span></td></tr></table>', $product_id );
 	}
 
 	return $product_details;
 }
 
-add_filter( 'admin_product_details', 'ic_weight_metabox', 10, 2 );
-
 /**
- * Adds attributes meatbox
+ * Returns the product weight admin table.
  *
- * @param array $names
+ * Called by ic_size_weight_metabox() and directly by the variations details.
+ *
+ * @param string      $product_details Product details HTML to append to.
+ * @param int         $product_id      Product ID.
+ * @param string      $field_name      Input name.
+ * @param string|null $weight          Optional weight value.
+ *
+ * @return string
  */
 function ic_weight_metabox( $product_details, $product_id, $field_name = '_weight', $weight = null ) {
 	if ( is_ic_attributes_weight_enabled() ) {
 		if ( $weight === null ) {
 			$weight = get_post_meta( $product_id, '_weight', true );
 		}
-		$label = ic_attributes_get_weight_label();
-		$unit  = ic_attributes_get_weight_unit();
-		if ( ! empty( $unit ) ) {
-			$label .= ' (' . $unit . ')';
-		}
-		$product_details .= apply_filters( 'admin_weight_table', '<table><tr><td class="label-column">' . $label . ':</td><td class="size-column"><input style="width: 130px" type="text" name="' . $field_name . '" value="' . $weight . '" class="widefat" /></td></tr></table>', $product_id );
+		$unit             = ic_attributes_get_weight_unit();
+		$unit_suffix      = '' !== (string) $unit ? ' (' . $unit . ')' : '';
+		$labels           = ic_size_weight_labels();
+		$label            = $labels['weight'] . $unit_suffix;
+		$product_details .= apply_filters( 'admin_weight_table', '<table class="ic-weight-table"><tr><td class="label-column">' . esc_html( $label ) . ':</td><td class="size-column weight-column"><input aria-label="' . esc_attr( $label ) . '" type="text" name="' . esc_attr( $field_name ) . '" value="' . esc_attr( $weight ) . '" class="widefat ic-weight-field" /></td></tr></table>', $product_id );
 	}
 
 	return $product_details;
+}
+
+add_filter( 'admin_product_details', 'ic_size_weight_metabox', 20, 2 );
+
+/**
+ * Appends the grouped Size & Weight section to the Product Details box.
+ *
+ * Priority 20 places the section after SKU/MPN and extension rows (priorities 10-12),
+ * before the extension info notice at 99 (which prepends anyway).
+ *
+ * @param string $product_details Product details HTML.
+ * @param int    $product_id      Product ID.
+ *
+ * @return string
+ */
+function ic_size_weight_metabox( $product_details, $product_id ) {
+	$size       = ic_size_metabox( '', $product_id );
+	$weight     = ic_weight_metabox( '', $product_id );
+	$has_size   = '' !== trim( $size );
+	$has_weight = '' !== trim( $weight );
+	if ( ! $has_size && ! $has_weight ) {
+		return $product_details;
+	}
+	$legend = '';
+	if ( $has_size && $has_weight ) {
+		$labels  = ic_size_weight_labels();
+		$heading = sprintf(
+			/* translators: Product Details box section heading. 1: size label (default "Size"), 2: weight label (default "Weight"). */
+			_x( '%1$s & %2$s', 'size and weight section heading', 'ecommerce-product-catalog' ),
+			$labels['size'],
+			$labels['weight']
+		);
+		$legend = '<legend class="ic-product-details-group-title">' . esc_html( $heading ) . '</legend>';
+	}
+
+	return $product_details . '<fieldset class="ic-product-details-group ic-size-weight-group">' . $legend . $size . $weight . '</fieldset>';
 }
 
 add_filter( 'ic_default_single_names', 'ic_default_unit_labels' );

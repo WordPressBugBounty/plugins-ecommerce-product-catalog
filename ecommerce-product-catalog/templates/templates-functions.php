@@ -783,10 +783,12 @@ function ic_catalog_set_post_title() {
 	if ( is_ic_simple_mode() || is_ic_theme_mode() ) {
 		return;
 	}
-	if ( is_ic_product_listing() ) {
-		$page_title = get_product_listing_title();
-	} elseif ( is_ic_taxonomy_page() ) {
+	if ( is_ic_taxonomy_page() ) {
 		$page_title = get_product_tax_title();
+	} elseif ( is_ic_product_search() ) {
+		$page_title = ic_get_search_page_title();
+	} elseif ( is_ic_product_listing() ) {
+		$page_title = get_product_listing_title();
 	}
 	if ( ! empty( $page_title ) ) {
 		global $post;
@@ -819,15 +821,21 @@ function ic_catalog_reset_post_title() {
 }
 
 /**
- * Gets the search page title.
+ * Gets the current catalog search keyword as plain text.
+ *
+ * The returned value is intended for data transport. Escape it at the output
+ * boundary before rendering it in HTML.
  *
  * @return string
  */
-function ic_get_search_page_title() {
+function ic_get_search_keyword() {
+	$search = '';
+
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only search query check.
 	if ( ! empty( $_GET['s'] ) ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only search query value.
-		$search = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only search query value is unslashed and sanitized immediately below.
+		$request_search = wp_unslash( $_GET['s'] );
+		$search         = is_scalar( $request_search ) ? sanitize_text_field( (string) $request_search ) : '';
 	} else {
 		$search = get_search_query( false );
 		if ( empty( $search ) ) {
@@ -838,7 +846,26 @@ function ic_get_search_page_title() {
 		}
 	}
 
-	return __( 'Search Results for:', 'ecommerce-product-catalog' ) . ' <span class="ic-search-keyword">' . wp_unslash( esc_html( strval( $search ) ) ) . '</span>';
+	$search = is_scalar( $search ) ? wp_unslash( (string) $search ) : '';
+	$search = apply_filters( 'ic_search_keayword', $search );
+
+	return is_scalar( $search ) ? (string) $search : '';
+}
+
+/**
+ * Gets the escaped plain-text search page title.
+ *
+ * @param string|null $search_keyword Optional pre-resolved keyword.
+ *
+ * @return string
+ */
+function ic_get_search_page_title( $search_keyword = null ) {
+	if ( null === $search_keyword ) {
+		$search_keyword = ic_get_search_keyword();
+	}
+	$search_keyword = is_scalar( $search_keyword ) ? (string) $search_keyword : '';
+
+	return esc_html( __( 'Search Results for:', 'ecommerce-product-catalog' ) . ' ' . $search_keyword );
 }
 
 /**

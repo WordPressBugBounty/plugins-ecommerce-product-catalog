@@ -6,11 +6,85 @@ Manages product ajax related scripts
 var ic_popstate     = false;
 var ic_product_list = '';
 var ic_filters_bar  = '';
+
+/**
+ * Adds the fixed catalog keyword wrapper to an exact search-title match.
+ *
+ * @param {string} searchTitle   Visible full search title.
+ * @param {string} searchKeyword Visible search keyword.
+ * @return {boolean} Whether a title was enhanced.
+ */
+function ic_enhance_product_search_title(searchTitle, searchKeyword) {
+	if (typeof searchTitle !== 'string' || typeof searchKeyword !== 'string' || searchTitle === '' || searchKeyword === '') {
+		return false;
+	}
+
+	var normalizeText = function (text) {
+		return text.replace( /\s+/g, ' ' ).trim();
+	};
+	var expectedTitle = normalizeText( searchTitle );
+	var headings      = document.querySelectorAll( 'h1' );
+
+	for (var headingIndex = 0; headingIndex < headings.length; headingIndex++) {
+		var heading = headings[headingIndex];
+		if (heading.querySelector( '.ic-search-keyword' ) || normalizeText( heading.textContent ) !== expectedTitle) {
+			continue;
+		}
+
+		var keywordStart = heading.textContent.lastIndexOf( searchKeyword );
+		if (keywordStart < 0) {
+			continue;
+		}
+
+		var keywordEnd = keywordStart + searchKeyword.length;
+		var walker     = document.createTreeWalker( heading, NodeFilter.SHOW_TEXT );
+		var textNode   = walker.nextNode();
+		var textOffset = 0;
+		var startNode;
+		var startOffset;
+		var endNode;
+		var endOffset;
+
+		while (textNode) {
+			if (typeof startNode === 'undefined' && keywordStart >= textOffset && keywordStart <= textOffset + textNode.data.length) {
+				startNode   = textNode;
+				startOffset = keywordStart - textOffset;
+			}
+			if (keywordEnd >= textOffset && keywordEnd <= textOffset + textNode.data.length) {
+				endNode   = textNode;
+				endOffset = keywordEnd - textOffset;
+				break;
+			}
+			textOffset += textNode.data.length;
+			textNode    = walker.nextNode();
+		}
+
+		if (typeof startNode === 'undefined' || typeof endNode === 'undefined') {
+			continue;
+		}
+
+		var range = document.createRange();
+		range.setStart( startNode, startOffset );
+		range.setEnd( endNode, endOffset );
+		var wrapper = document.createElement( 'span' );
+		wrapper.className = 'ic-search-keyword';
+		wrapper.appendChild( range.extractContents() );
+		range.insertNode( wrapper );
+
+		return wrapper.textContent === searchKeyword && heading.textContent.lastIndexOf( searchKeyword ) === keywordStart;
+	}
+
+	return false;
+}
+
 jQuery( document ).ready(
 	function () {
 		/* globals product_object, ic_ajax */
 		ic_product_list = jQuery( '.product-list' ).first();
 		ic_filters_bar  = jQuery( '.product-sort-bar' ).first();
+		if (typeof ic_ajax !== 'undefined') {
+			ic_enhance_product_search_title( ic_ajax.search_title, ic_ajax.search_keyword );
+		}
 		if ( /*jQuery( ".product-entry" ).length || */jQuery( '.product-list' ).length !== 1 && ic_filters_bar.length === 0) {
 			return true;
 		}
