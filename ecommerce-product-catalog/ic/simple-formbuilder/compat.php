@@ -205,6 +205,19 @@ if ( ! function_exists( 'ic_formbuilder_process_submission' ) ) {
 	}
 }
 
+if ( ! function_exists( 'ic_formbuilder_decode_raw_value' ) ) {
+	function ic_formbuilder_decode_raw_value( $value ) {
+		if ( is_array( $value ) ) {
+			return array_map( 'ic_formbuilder_decode_raw_value', $value );
+		}
+		if ( ! is_scalar( $value ) ) {
+			return $value;
+		}
+
+		return wp_specialchars_decode( (string) $value, ENT_QUOTES );
+	}
+}
+
 if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 	/**
 	 * Render raw legacy formbuilder fields.
@@ -231,6 +244,9 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 		$raw_form = '';
 		$line     = '<br>';
 		$row      = 1;
+		if ( is_array( $field_values ) ) {
+			$field_values = ic_formbuilder_decode_raw_value( $field_values );
+		}
 		foreach ( $fields->fields as $field ) {
 			$cid         = $field->cid;
 			$default_cid = $pre_name . $field->cid;
@@ -243,13 +259,13 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 			$field_value = '';
 			if ( is_array( $field_values ) ) {
 				if ( isset( $field_values[ $value_cid ] ) && is_array( $field_values[ $value_cid ] ) ) {
-					$field_value = array_map( 'htmlspecialchars', $field_values[ $value_cid ] );
+					$field_value = $field_values[ $value_cid ];
 				} elseif ( isset( $field_values[ $value_cid ] ) ) {
-					$field_value = htmlspecialchars( $field_values[ $value_cid ] );
+					$field_value = $field_values[ $value_cid ];
 				} elseif ( isset( $field_values[ $default_cid ] ) ) {
-					$field_value = htmlspecialchars( $field_values[ $default_cid ] );
+					$field_value = $field_values[ $default_cid ];
 				} elseif ( isset( $field_values[ $cid ] ) ) {
-					$field_value = htmlspecialchars( $field_values[ $cid ] );
+					$field_value = $field_values[ $cid ];
 				}
 			}
 
@@ -286,7 +302,7 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 				$content .= '<div class="label"><label>' . $field->label . '</label></div><div class="field">';
 				foreach ( $field->field_options->options as $option_key => $radio_option ) {
 					$option_id      = sanitize_html_class( $field->cid . '_' . $option_key );
-					$checkbox_value = htmlspecialchars( sanitize_text_field( $radio_option->label ) );
+					$checkbox_value = ic_formbuilder_decode_raw_value( sanitize_text_field( $radio_option->label ) );
 					$checked        = is_array( $field_value ) && in_array( $checkbox_value, $field_value, true ) ? 'checked' : '';
 					$content       .= '<input id="' . esc_attr( $option_id ) . '" class="input" value="' . esc_attr( $checkbox_value ) . '" ' . $checked . ' type="checkbox" name="' . esc_attr( $field->cid . '[]' ) . '" ' . $field_attributes . ' /> <label for="' . esc_attr( $option_id ) . '">' . $radio_option->label . '</label>' . $line;
 				}
@@ -296,7 +312,7 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 				$content .= '<div class="label"><label>' . $field->label . '</label></div><div class="field">';
 				foreach ( $field->field_options->options as $option_key => $radio_option ) {
 					$option_id   = sanitize_html_class( $field->cid . '_' . $option_key );
-					$radio_value = htmlspecialchars( sanitize_text_field( $radio_option->label ) );
+					$radio_value = ic_formbuilder_decode_raw_value( sanitize_text_field( $radio_option->label ) );
 					$checked     = $radio_value === $field_value ? 'checked' : '';
 					$content    .= '<input id="' . esc_attr( $option_id ) . '" class="input" value="' . esc_attr( $radio_value ) . '" ' . $required . ' ' . $checked . ' type="radio" name="' . esc_attr( $field->cid ) . '" ' . $field_attributes . ' /> <label for="' . esc_attr( $option_id ) . '">' . $radio_option->label . '</label>' . $line;
 				}
@@ -316,7 +332,7 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 						// Keep the historical submitted value while displaying its current country label.
 						$option_value = html_entity_decode( $field_value, ENT_QUOTES, 'UTF-8' );
 					}
-					$selected         = htmlspecialchars( (string) $option_value ) === (string) $field_value || ( ( ! $country_field || '' === $field_value ) && ! empty( $radio_option->checked ) ) ? 'selected' : '';
+					$selected         = ic_formbuilder_decode_raw_value( sanitize_text_field( (string) $option_value ) ) === (string) $field_value || ( ( ! $country_field || '' === $field_value ) && ! empty( $radio_option->checked ) ) ? 'selected' : '';
 					$country_selected = $country_selected || 'selected' === $selected;
 					$content         .= '<option value="' . esc_attr( $option_value ) . '" ' . $selected . '>' . esc_html( $radio_option->label ) . '</option>';
 				}
@@ -328,7 +344,7 @@ if ( ! function_exists( 'formbuilder_raw_fields' ) ) {
 				$content .= '</select></div>';
 			} elseif ( 'paragraph' === $field->field_type ) {
 				$added    = true;
-				$content .= '<div class="label"><label for="' . esc_attr( $field->cid ) . '">' . $field->label . '</label></div><div class="field"><textarea id="' . esc_attr( $field->cid ) . '" ' . $required . ' name="' . esc_attr( $field->cid ) . '" ' . $field_attributes . '>' . esc_textarea( $field_value ) . '</textarea></div>';
+				$content .= '<div class="label"><label for="' . esc_attr( $field->cid ) . '">' . $field->label . '</label></div><div class="field"><textarea id="' . esc_attr( $field->cid ) . '" ' . $required . ' name="' . esc_attr( $field->cid ) . '" ' . $field_attributes . '>' . esc_html( is_scalar( $field_value ) ? (string) $field_value : '' ) . '</textarea></div>';
 			} elseif ( 'address' === $field->field_type ) {
 				$added    = true;
 				$content .= '<div class="label"><label for="' . esc_attr( $field->cid ) . '">' . $field->label . '</label></div><div class="field">';

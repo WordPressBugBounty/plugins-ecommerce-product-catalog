@@ -178,6 +178,10 @@ class ic_orders_customer {
 		if ( empty( $customer_data['billing_name'] ) && ! empty( $customer_data['name'] ) ) {
 			$customer_data['billing_name'] = $customer_data['name'];
 		}
+		$filtered_customer_data = apply_filters( 'ic_order_customer_data', $customer_data, $trans_id, $payment_details );
+		if ( is_array( $filtered_customer_data ) ) {
+			$customer_data = $filtered_customer_data;
+		}
 
 		return $customer_data;
 	}

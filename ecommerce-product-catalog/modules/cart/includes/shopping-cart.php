@@ -121,7 +121,7 @@ function ic_shopping_cart_button( $show_empty = true, $label = '' ) {
 	$how_many     = ic_get_cart_items_count( $cart_content );
 	$attr         = '';
 	if ( ! empty( $label ) ) {
-		$attr = 'data-label="' . $label . '"';
+		$attr = 'data-label="' . esc_attr( $label ) . '"';
 	}
 	if ( $how_many || $show_empty ) {
 		$content   = '<div id="shopping_cart_widget" class="shopping-cart-widget" ' . $attr . '>';
@@ -134,7 +134,7 @@ function ic_shopping_cart_button( $show_empty = true, $label = '' ) {
 			if ( empty( $label ) ) {
 				$label = $how_many . ' ' . __( 'selected', 'ecommerce-product-catalog' );
 			}
-			$content .= '<a href="' . ic_shopping_cart_page_url() . '" class="button ' . design_schemes( 'box', 0 ) . '"><span class="cart_button_text">' . $label . '</span></a>';
+			$content .= '<a href="' . ic_shopping_cart_page_url() . '" class="button ' . design_schemes( 'box', 0 ) . '"><span class="cart_button_text">' . wp_kses_post( $label ) . '</span></a>';
 		}
 		$content .= '</div>';
 	} else {

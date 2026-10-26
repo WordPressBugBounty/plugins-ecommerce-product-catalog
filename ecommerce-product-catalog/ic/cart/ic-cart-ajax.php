@@ -167,7 +167,7 @@ class ic_cart_ajax {
 					ic_shopping_cart_content( true );
 				}
 			}
-			echo wp_json_encode( $return );
+			echo wp_json_encode( $return, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
 		}
 
 		wp_die();

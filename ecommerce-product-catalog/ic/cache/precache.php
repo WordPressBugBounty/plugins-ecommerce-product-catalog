@@ -119,7 +119,7 @@ if ( ! function_exists( 'implecode_pre_cached_script' ) ) {
 					request.open("POST", url, true);
 					request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;');
 					request.onreadystatechange = ic_replace_pre_cached(containers, request);
-					request.send("action=ic_pre_cached_parts&args=" + JSON.stringify(args))
+					request.send("action=ic_pre_cached_parts&args=" + encodeURIComponent(JSON.stringify(args)))
 				}
 			}
 
@@ -241,7 +241,7 @@ if ( ! function_exists( 'ic_ajax_pre_cached_parts' ) ) {
 		}
 		$parts                             = apply_filters( 'ic_pre_cached_parts', array(), $args );
 		$parts['ic_product_object_nonces'] = apply_filters( 'ic_catalog_product_object_nonces', array() );
-		echo wp_json_encode( $parts );
+		echo wp_json_encode( $parts, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
 		wp_die();
 	}
 }

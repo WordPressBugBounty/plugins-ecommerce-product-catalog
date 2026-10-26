@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Copy it to your theme implecode folder to edit the output: your-theme-folder-name/implecode/product-attributes.php
  *
- * @version        1.1.2
+ * @version        1.1.3
  * @package        ecommerce-product-catalog/templates/template-parts/product-page
  * @author        impleCode
  */
@@ -47,7 +47,7 @@ if ( has_product_any_attributes( $product_id ) && function_exists( 'is_ic_attrib
 					$unit          = get_attribute_unit( $i, $product_id );
 					?>
 					<tr>
-						<td class="attribute-label-single <?php echo esc_attr( sanitize_title( $label . '-label' ) ); ?>"><?php echo esc_html( $label ); ?></td>
+						<td class="attribute-label-single <?php echo esc_attr( sanitize_title( $label . '-label' ) ); ?>"><?php echo esc_html( $label ); ?><?php do_action( 'ic_product_attribute_label_after', $label, $i, $product_id ); ?></td>
 						<td class="attribute-value-unit-single"><span
 									class="attribute-value-single <?php echo esc_attr( sanitize_title( $label . '-value' ) ); ?> <?php echo esc_attr( sanitize_title( $display_value ) ); ?>">
 									<?php

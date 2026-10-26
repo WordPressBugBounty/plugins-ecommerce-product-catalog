@@ -131,7 +131,7 @@ if ( ! function_exists( 'ic_mail_alternate' ) ) {
 				$ic_mail_content = preg_replace( '/' . $button . '(.*?)<\/a>/i', '', $ic_mail_content );
 			}
 			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- PHPMailer uses external property names.
-			$mailer->AltBody = wp_strip_all_tags(
+			$mailer->AltBody = wp_specialchars_decode( wp_strip_all_tags(
 				str_replace(
 					array( '<br>', '</p>', '<ul>' ),
 					array(
@@ -141,7 +141,7 @@ if ( ! function_exists( 'ic_mail_alternate' ) ) {
 					),
 					$ic_mail_content
 				)
-			);
+			), ENT_QUOTES );
 			// phpcs:enable
 			$ic_mail_content = '';
 			unset( $ic_mail_content );
@@ -533,7 +533,7 @@ if ( ! function_exists( 'ic_mail' ) ) {
 			add_filter( 'wp_mail_content_type', 'ic_mail_set_html' );
 			$message = ic_htmlize_email( $message, $title, $sender_name, $previous_messages );
 		} else {
-			$message = wp_strip_all_tags(
+			$message = wp_specialchars_decode( wp_strip_all_tags(
 				str_replace(
 					array( '<br>', '</p>', '<ul>' ),
 					array(
@@ -543,7 +543,7 @@ if ( ! function_exists( 'ic_mail' ) ) {
 					),
 					$message
 				)
-			);
+			), ENT_QUOTES );
 			if ( ! empty( $previous_messages ) ) {
 				$message .= $previous_messages;
 			}

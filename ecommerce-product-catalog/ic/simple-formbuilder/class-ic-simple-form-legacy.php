@@ -510,6 +510,26 @@ class IC_Simple_Form_Legacy {
 	}
 
 	/**
+	 * Escapes a filtered visitor value for the current mail context.
+	 *
+	 * @param mixed  $value      Filtered field value.
+	 * @param string $field_type FormBuilder field type.
+	 *
+	 * @return string
+	 */
+	private function message_value( $value, $field_type = '' ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$value = esc_html( wp_specialchars_decode( (string) $value, ENT_QUOTES ) );
+		if ( $this->email_template && in_array( $field_type, array( 'paragraph', 'textarea' ), true ) ) {
+			$value = preg_replace( '/\r\n|\r|\n/', '<br>', $value );
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Tells whether a posted field is present and non-empty, mirroring ! empty() semantics.
 	 *
 	 * @param string $key Posted field name.
@@ -582,7 +602,7 @@ class IC_Simple_Form_Legacy {
 	}
 
 	function paragraph( $field, $field_id, $field_form_value, $field_attributes ) {
-		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><textarea class="' . $field->field_options->size . ' ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' name="' . $field->cid . '">' . $field_form_value . '</textarea></div>';
+		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><textarea class="' . $field->field_options->size . ' ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' name="' . $field->cid . '">' . esc_html( is_scalar( $field_form_value ) ? (string) $field_form_value : '' ) . '</textarea></div>';
 
 		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
 	}
@@ -613,6 +633,7 @@ class IC_Simple_Form_Legacy {
 			$add_comma  = false;
 			foreach ( $this->posted_value( $field_id ) as $field_value ) {
 				$field_value = apply_filters( 'ic_formbuilder_message_field_value', $field_value, $field_id, $field->field_type );
+				$field_value = $this->message_value( $field_value, $field->field_type );
 				if ( $add_comma ) {
 					$checkboxes .= ', ';
 				}
@@ -745,6 +766,7 @@ class IC_Simple_Form_Legacy {
 				$field_value_date = $this->posted_value( $field_id . '_month' ) . '/' . $this->posted_value( $field_id . '_day' ) . '/' . $this->posted_value( $field_id . '_year' );
 			}
 			$field_value = apply_filters( 'ic_formbuilder_message_field_value', $field_value_date, $field_id, $field->field_type );
+			$field_value = $this->message_value( $field_value, $field->field_type );
 
 			return str_replace( '::', ':', $field->label . ': ' . $field_value . $this->line );
 		}
@@ -778,6 +800,7 @@ class IC_Simple_Form_Legacy {
 				$field_value_time = $this->posted_value( $field_id . '_hour' ) . ':' . $this->posted_value( $field_id . '_minute' ) . ':' . $this->posted_value( $field_id . '_second' ) . ' ' . strtoupper( $this->posted_value( $field_id . '_day_time' ) );
 			}
 			$field_value = apply_filters( 'ic_formbuilder_message_field_value', $field_value_time, $field_id, $field->field_type );
+			$field_value = $this->message_value( $field_value, $field->field_type );
 			$time        = str_replace( '::', ':', $field->label . ': ' . $field_value . $this->line );
 
 			return $time;
@@ -806,6 +829,7 @@ class IC_Simple_Form_Legacy {
 		} else {
 			$field_value_address = $this->posted_value( $field_id . '_street' ) . ', ' . $this->posted_value( $field_id . '_zip' ) . ' ' . $this->posted_value( $field_id . '_city' ) . ', ' . $this->posted_value( $field_id . '_state' ) . ' ' . ic_get_country_name( $this->posted_value( $field_id . '_country' ) );
 			$field_value         = apply_filters( 'ic_formbuilder_message_field_value', $field_value_address, $field_id, $field->field_type );
+			$field_value         = $this->message_value( $field_value, $field->field_type );
 			$address             = str_replace( '::', ':', $field->label . ': ' . $field_value . $this->line );
 
 			return $address;
@@ -839,13 +863,13 @@ class IC_Simple_Form_Legacy {
 	}
 
 	function website( $field, $field_id, $field_form_value, $field_attributes ) {
-		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><span><input class="input website ' . $field->field_options->size . ' ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="url" name="' . $field->cid . '" placeholder="http://" value="' . $field_form_value . '" /></span></div>';
+		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><span><input class="input website ' . $field->field_options->size . ' ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="url" name="' . $field->cid . '" placeholder="http://" value="' . $this->attr_value( $field_form_value ) . '" /></span></div>';
 
 		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
 	}
 
 	function price( $field, $field_id, $field_form_value, $field_attributes ) {
-		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><span><input min="0" step="0.01" class="input price ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="number" name="' . $field->cid . '" placeholder="' . product_currency() . '" value="' . $field_form_value . '" /></span></div>';
+		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><span><input min="0" step="0.01" class="input price ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="number" name="' . $field->cid . '" placeholder="' . product_currency() . '" value="' . $this->attr_value( $field_form_value ) . '" /></span></div>';
 
 		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
 	}
@@ -855,7 +879,7 @@ class IC_Simple_Form_Legacy {
 		$max              = isset( $field->field_options->max ) ? $field->field_options->max : '';
 		$units            = isset( $field->field_options->units ) ? $field->field_options->units : '';
 		$step             = ( isset( $field->field_options->integer_only ) && $field->field_options->integer_only == 1 ) ? 'step="1"' : 'step="0.01"';
-		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><input min="' . $min . '" max="' . $max . '" ' . $step . ' class="input number  ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="number" name="' . $field->cid . '" value="' . $field_form_value . '" /><span class="units">' . $units . '</span></div>';
+		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field"><input min="' . $min . '" max="' . $max . '" ' . $step . ' class="input number  ' . $this->error_class . '" ' . $this->required . ' ' . $field_attributes . ' type="number" name="' . $field->cid . '" value="' . $this->attr_value( $field_form_value ) . '" /><span class="units">' . $units . '</span></div>';
 
 		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
 	}
@@ -874,6 +898,7 @@ class IC_Simple_Form_Legacy {
 			if ( $field->field_type == 'price' ) {
 				$field_value = price_format( $field_value );
 			}
+			$field_value = $this->message_value( $field_value, $field->field_type );
 			$return = apply_filters( 'formbuilder_message_row', str_replace( '::', ':', $field->label . ': ' . $field_value . $this->line ), $field, $field_id, $this->line );
 
 			return $return;

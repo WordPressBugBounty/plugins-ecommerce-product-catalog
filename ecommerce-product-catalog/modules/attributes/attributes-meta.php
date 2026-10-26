@@ -57,8 +57,9 @@ function al_product_attributes( $post, $args = null ) {
 	<th class="title"><b>Name</b></th>
 	<th></th>
 	<th class="title"><b>Value</b></th>
-	<th class="title"><b>Unit</b></th>
-	<th class="dragger"></th>
+	<th class="title"><b>Unit</b></th>';
+	do_action( 'product_attributes_edit_table_th', $args );
+	echo '<th class="dragger"></th>
 	</tr>
 	</thead>
 	<tbody><tr style="height: 6px;" class="ic-not-sortable"></tr>';
@@ -141,6 +142,7 @@ function al_product_attributes( $post, $args = null ) {
 											data-base_name="<?php echo esc_attr( $names['unit'] ); ?>"
 											name="<?php echo esc_attr( $unit_name ); ?>"
 											value="<?php echo esc_html( $attributes_unit_option_field ); ?>"<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Prepared markup, not text: HTML assembled earlier in this scope, so escaping it here would print the tags. ?><?php echo $unit_disabled_attr; ?>/></td>
+			<?php do_action( 'product_attributes_edit_table_td', $i, $post->ID, $names, $attributes_label_option_field ); ?>
 			<td class="dragger"></td>
 		</tr>
 	<?php } ?>
