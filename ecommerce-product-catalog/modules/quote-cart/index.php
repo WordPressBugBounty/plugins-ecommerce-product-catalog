@@ -35,6 +35,7 @@ class ic_simple_quote_cart {
 		if ( function_exists( 'start_quote_cart' ) ) {
 			return;
 		}
+		add_filter( 'is_ic_add_to_cart_shown', array( $this, 'return_true' ) );
 		add_filter( 'ic_simple_cart_settings_menu_name', array( $this, 'menu_name' ) );
 		add_filter( 'ic_simple_cart_default_customer_email_text', array( $this, 'email_text' ) );
 		add_filter( 'ic_simple_cart_default_admin_email_text', array( $this, 'email_text' ) );
