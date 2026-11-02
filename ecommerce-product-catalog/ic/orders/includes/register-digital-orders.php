@@ -87,8 +87,7 @@ class ic_orders {
 		add_action( 'do_meta_boxes', array( $this, 'unregister_external_boxes' ) );
 		add_action( 'admin_init', array( $this, 'wpseo_compatible' ) );
 
-		add_filter( 'posts_where', array( $this, 'admin_search_where' ) );
-		add_filter( 'posts_join', array( $this, 'admin_search_join' ) );
+		add_filter( 'posts_search', array( $this, 'admin_search' ), 10, 2 );
 
 		add_filter( 'formbuilder_raw_fields_fields', array( $this, 'delete_phone' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'disable_autosave' ) );
@@ -1078,45 +1077,52 @@ class ic_orders {
 	}
 
 	/**
-	 * Search digital orders by custom fields also
+	 * Search digital orders by custom fields also.
 	 *
-	 * @param string $join
+	 * Extends the main admin orders list search so each post_title LIKE term also
+	 * matches any postmeta value through a correlated EXISTS subquery. Using EXISTS
+	 * instead of a JOIN keeps one row per order and avoids alias clashes with
+	 * meta_query joins. The only user-derived text reused is the LIKE literal that
+	 * WP_Query::parse_search() already prepared and escaped.
+	 *
+	 * @param string   $search Search SQL from WP_Query::parse_search().
+	 * @param WP_Query $query  Query.
 	 *
 	 * @return string
-	 * @global string $pagenow
-	 * @global type $wpdb
 	 */
-	function admin_search_join( $join ) {
+	public function admin_search( $search, $query ) {
 		global $pagenow, $wpdb;
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list-table search routing; no state is changed.
-		if ( is_admin() && $pagenow == 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] == 'al_digital_orders' && isset( $_GET['s'] ) && $_GET['s'] != '' ) {
-			$join .= 'LEFT JOIN ' . $wpdb->postmeta . ' ON ' . $wpdb->posts . '.ID = ' . $wpdb->postmeta . '.post_id ';
+		if ( ! is_admin() || 'edit.php' !== $pagenow || ! ( $query instanceof WP_Query ) || ! $query->is_main_query() || 'al_digital_orders' !== $query->get( 'post_type' ) || '' === trim( (string) $search ) ) {
+			return $search;
+		}
+		$pattern  = '/\(\s*' . preg_quote( $wpdb->posts, '/' ) . '\.post_title\s+LIKE\s+(\'(?:[^\'\\\\]|\\\\.)*\')\s*\)/';
+		$replaced = preg_replace( $pattern, '(' . $wpdb->posts . '.post_title LIKE $1) OR EXISTS (SELECT 1 FROM ' . $wpdb->postmeta . ' AS ic_order_search_meta WHERE ic_order_search_meta.post_id = ' . $wpdb->posts . '.ID AND ic_order_search_meta.meta_value LIKE $1)', $search );
+		if ( null === $replaced ) {
+			return $search;
 		}
 
+		return $replaced;
+	}
+
+	/**
+	 * Deprecated: no longer hooked; search is handled by admin_search() via posts_search. Kept for back-compat.
+	 *
+	 * @param string $join JOIN clause.
+	 *
+	 * @return string
+	 */
+	public function admin_search_join( $join ) {
 		return $join;
 	}
 
 	/**
-	 * Search digital orders by custom fields also
+	 * Deprecated: no longer hooked; search is handled by admin_search() via posts_search. Kept for back-compat.
 	 *
-	 * @param type $where
+	 * @param string $where WHERE clause.
 	 *
-	 * @return type
-	 * @global string $pagenow
-	 * @global type $wpdb
+	 * @return string
 	 */
-	function admin_search_where( $where ) {
-		global $pagenow, $wpdb;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list-table search routing; no state is changed.
-		if ( is_admin() && $pagenow == 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] == 'al_digital_orders' && isset( $_GET['s'] ) && $_GET['s'] != '' ) {
-			$where = preg_replace(
-				'/\(\s*' . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
-				'(' . $wpdb->posts . '.post_title LIKE $1) OR (' . $wpdb->postmeta . '.meta_value LIKE $1)',
-				$where
-			);
-		}
-
+	public function admin_search_where( $where ) {
 		return $where;
 	}
 }

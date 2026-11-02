@@ -960,6 +960,12 @@ article#product_listing, #product_listing {
 	clear: both;
 }
 
+/* Elementor: let decorative background overlays pass clicks through to catalog listings */
+.e-con:has(.product-list, .product-subcategories)::before,
+.elementor-widget-wrap:has(.product-list, .product-subcategories) > .elementor-background-overlay {
+	pointer-events: none;
+}
+
 /* Product Page */
 .product-entry .entry-meta {
 	clear: left;

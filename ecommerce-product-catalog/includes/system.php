@@ -150,7 +150,7 @@ function ic_system_status() {
 						<td><?php esc_html_e( 'Reassign product data', 'ecommerce-product-catalog' ); ?>:</td>
 					<?php
 					$info = '';
-					if ( ! empty( $_GET['stop_reassign_product_data'] ) && check_admin_referer( 'ic_stop_reassign_product_data' ) ) {
+					if ( ! empty( $_GET['stop_reassign_product_data'] ) && check_admin_referer( 'ic_stop_reassign_product_data', 'ic_stop_reassign_product_data_nonce' ) ) {
 						$info = ic_stop_update_product_data();
 					}
 					if ( ! empty( $_GET['reassign_product_data'] ) && check_admin_referer( 'ic_reassign_product_data' ) ) {
@@ -181,7 +181,7 @@ function ic_system_status() {
 						$reassign_data     .= '<input type="hidden" name="post_type" value="al_product" />';
 						$reassign_data     .= '<input type="hidden" name="page" value="system.php" />';
 						$reassign_data     .= '<input type="hidden" name="stop_reassign_product_data" value="1" />';
-						$reassign_data     .= wp_nonce_field( 'ic_stop_reassign_product_data', '_wpnonce', true, false );
+						$reassign_data     .= wp_nonce_field( 'ic_stop_reassign_product_data', 'ic_stop_reassign_product_data_nonce', true, false );
 						$reassign_data     .= '<button type="submit" class="button">' . esc_html__( 'Stop', 'ecommerce-product-catalog' ) . '</button>';
 						$reassign_data     .= '</form>';
 					}
