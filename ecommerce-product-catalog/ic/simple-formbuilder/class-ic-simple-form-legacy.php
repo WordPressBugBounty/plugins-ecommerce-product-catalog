@@ -713,10 +713,11 @@ class IC_Simple_Form_Legacy {
 		if ( empty( $field->field_options ) || ! is_object( $field->field_options ) ) {
 			$field->field_options = new stdClass();
 		}
-		$field->field_options->options              = ic_dropdown_country_options( $field_form_value );
+		$field->field_options->options              = ic_dropdown_country_options( is_scalar( $field_form_value ) ? (string) $field_form_value : '' );
 		$field->field_options->include_blank_option = true;
+		$this->location_dropdown( $field, $field_form_value, $field_attributes );
 
-		return $this->dropdown( $field, $field_id, $field_form_value, $field_attributes );
+		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
 	}
 
 	/**
@@ -733,10 +734,152 @@ class IC_Simple_Form_Legacy {
 		if ( empty( $field->field_options ) || ! is_object( $field->field_options ) ) {
 			$field->field_options = new stdClass();
 		}
-		$field->field_options->options              = ic_dropdown_state_options( $field_form_value );
+		$field->field_options->options              = ic_dropdown_state_options( is_scalar( $field_form_value ) ? (string) $field_form_value : '' );
 		$field->field_options->include_blank_option = true;
+		$this->location_dropdown( $field, $field_form_value, $field_attributes );
 
-		return $this->dropdown( $field, $field_id, $field_form_value, $field_attributes );
+		if ( ! empty( $field->required ) && ! $this->state_has_options_for_country( $field ) ) {
+			// The paired country has no states, so the field cannot be filled (ic-form.js drops the required attribute too).
+			$required        = $field->required;
+			$field->required = false;
+			$row             = $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
+			$field->required = $required;
+
+			return $row;
+		}
+
+		return $this->any_field( $field, $field_id, $field_form_value, $field_attributes );
+	}
+
+	/**
+	 * Render the select markup of one country or state dropdown.
+	 *
+	 * Unlike dropdown(), options post their machine value (country code or COUNTRY_STATE code)
+	 * instead of the label, and the posted value (code or a legacy label) stays selected.
+	 *
+	 * @param object $field            Field definition with prepared options.
+	 * @param mixed  $field_form_value Current field value.
+	 * @param string $field_attributes Field HTML attributes.
+	 *
+	 * @return void
+	 */
+	private function location_dropdown( $field, $field_form_value, $field_attributes ) {
+		$this->form_html .= '<div class="label"><label for="' . $field->cid . '">' . $field->label . '</label></div><div class="field">';
+		if ( count( $field->field_options->options ) > 5 ) {
+			$this->error_class .= ' ic-chosen';
+		}
+		$this->form_html .= '<select data-placeholder="Choose a ' . str_replace(
+			array(
+				':',
+				'*',
+			),
+			'',
+			$field->label
+		) . '..." class="' . $this->error_class . ' ' . $this->required . '" ' . $field_attributes . ' name="' . $field->cid . '">';
+		$this->form_html .= '<option value=""></option>';
+		$current          = is_scalar( $field_form_value ) ? wp_specialchars_decode( (string) $field_form_value, ENT_QUOTES ) : '';
+		foreach ( $field->field_options->options as $option ) {
+			$machine_value = isset( $option->value ) ? (string) $option->value : (string) $option->label;
+			if ( '' === $machine_value ) {
+				continue;
+			}
+			$option_value = (string) apply_filters( 'ic_formbuilder_dorpdown_option_value', $machine_value, $field->cid );
+			$selected     = '';
+			if ( '' !== $current ) {
+				if ( in_array( $current, array( $option_value, $machine_value, wp_specialchars_decode( (string) $option->label, ENT_QUOTES ) ), true ) ) {
+					$selected = 'selected';
+				}
+			} elseif ( ! empty( $option->checked ) ) {
+				$selected = 'selected';
+			}
+			$selected         = apply_filters( 'ic_formbuilder_option_attributes', $selected, $option, $field );
+			$this->form_html .= '<option value="' . esc_attr( $option_value ) . '" ' . $selected . '>' . esc_html( apply_filters( 'ic_formbuilder_option_label', $option->label, $option ) ) . '</option>';
+		}
+		$this->form_html .= '</select>';
+		$this->form_html .= '</div>';
+	}
+
+	/**
+	 * Tell whether the country paired with a state field offers any states.
+	 *
+	 * Pairing mirrors ic-form.js: the country field whose posted name ends with "country" where the
+	 * state field name ends with "state", otherwise the nearest preceding country field.
+	 *
+	 * @param object $state_field State field definition.
+	 *
+	 * @return bool True when the state list is not empty or no paired country exists.
+	 */
+	private function state_has_options_for_country( $state_field ) {
+		if ( empty( $this->contact->fields ) ) {
+			return true;
+		}
+		$state_key     = $this->location_field_key( $state_field );
+		$country_key   = '';
+		$preceding_key = '';
+		$state_reached = false;
+		foreach ( $this->contact->fields as $field ) {
+			if ( $field === $state_field ) {
+				$state_reached = true;
+				continue;
+			}
+			if ( empty( $field->field_type ) || 'dropdown_country' !== $field->field_type ) {
+				continue;
+			}
+			$key = $this->location_field_key( $field );
+			if ( preg_replace( '/country$/', 'state', $key ) === $state_key ) {
+				$country_key = $key;
+				break;
+			}
+			if ( ! $state_reached ) {
+				$preceding_key = $key;
+			}
+		}
+		if ( '' === $country_key ) {
+			$country_key = $preceding_key;
+		}
+		if ( '' === $country_key ) {
+			return true;
+		}
+		$code = $this->location_country_code( $this->posted_value( $country_key ) );
+
+		return '' !== $code && ! empty( implecode_supported_states( $code ) );
+	}
+
+	/**
+	 * Get the posted name of one field, before or after process_form() rewrites its cid.
+	 *
+	 * @param object $field Field definition.
+	 *
+	 * @return string
+	 */
+	private function location_field_key( $field ) {
+		$cid = ! empty( $field->original_cid ) ? $field->original_cid : ( isset( $field->cid ) ? $field->cid : '' );
+
+		return (string) apply_filters( 'ic_formbuilder_cid', $this->pre_name . $cid, $field, $this->pre_name );
+	}
+
+	/**
+	 * Resolve a posted country value (code or legacy label) to a supported country code.
+	 *
+	 * @param mixed $value Posted country value.
+	 *
+	 * @return string Country code or an empty string.
+	 */
+	private function location_country_code( $value ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$value = wp_specialchars_decode( trim( (string) $value ), ENT_QUOTES );
+		if ( '' === $value ) {
+			return '';
+		}
+		$countries = implecode_supported_countries();
+		if ( isset( $countries[ $value ] ) ) {
+			return $value;
+		}
+		$code = array_search( $value, $countries, true );
+
+		return false === $code ? '' : (string) $code;
 	}
 
 	function date( $field, $field_id, $field_form_value, $field_attributes ) {
@@ -932,6 +1075,7 @@ class IC_Simple_Form_Legacy {
 	}
 
 	function submit_form() {
+		do_action( 'ic_formbuilder_submission_started', $this->contact, $this->pre_name );
 		global $submitted_form_name;
 		$submitted_form_name = $this->pre_name;
 

@@ -505,6 +505,12 @@ if (typeof update_all_cart_price_effects !== 'function') {
 			);
 			var effect_counted = jQuery( "input[name=ic_price_effect]" ).val();
 			jQuery( "input[name=ic_price_effect]" ).val( effect_total );
+			if ( ! checkout_container.find( "input[name='total_with_tax'], input[name='total_net']" ).length && ! effect_total) {
+				// No cart pricing (inquiry mode): never render a purchase total.
+				checkout_container.find( ".button-container .new-price" ).remove();
+				checkout_container.find( ".button-container .ic_cart_total" ).remove();
+				return;
+			}
 			var effect_total_vat   = 0;
 			var effect_total_gross = effect_total + effect_total_vat;
 			var final_price;

@@ -413,10 +413,11 @@ if ( ! function_exists( 'ic_mail' ) ) {
 	 * @param IC_Imap|string|null $imap              IMAP handler instance or callback name.
 	 * @param array|string|null   $reply_to          Reply-to email address.
 	 * @param string              $previous_messages Previous thread messages.
+	 * @param bool                $immediate         Bypass SMTP queue for time-sensitive mail.
 	 *
 	 * @return bool
 	 */
-	function ic_mail( $message, $sender_name, $sender_email, $receiver_email, $title, $template = true, $attachments = array(), $headers = array(), $smtp = '', $imap = null, $reply_to = null, $previous_messages = '' ) {
+	function ic_mail( $message, $sender_name, $sender_email, $receiver_email, $title, $template = true, $attachments = array(), $headers = array(), $smtp = '', $imap = null, $reply_to = null, $previous_messages = '', $immediate = false ) {
 		if ( ic_is_message_spam( $sender_name, $sender_email, $message ) ) {
 			return false;
 		}
@@ -428,7 +429,7 @@ if ( ! function_exists( 'ic_mail' ) ) {
 		}
 
 		if ( ! empty( $smtp ) ) {
-			if ( current_filter() !== 'ic_mail_background_send' && current_filter() !== 'ic_mail_scheduled_background_send' && current_filter() !== 'ic_mail_scheduled_single_background_send' ) {
+			if ( ! $immediate && current_filter() !== 'ic_mail_background_send' && current_filter() !== 'ic_mail_scheduled_background_send' && current_filter() !== 'ic_mail_scheduled_single_background_send' ) {
 				ic_mail_schedule(
 					$message,
 					$sender_name,

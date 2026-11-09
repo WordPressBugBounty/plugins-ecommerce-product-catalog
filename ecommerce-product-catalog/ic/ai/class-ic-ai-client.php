@@ -561,6 +561,31 @@ class IC_AI_Client {
 	}
 
 	/**
+	 * Save an automatically delivered key through Premium Support's verification path.
+	 *
+	 * @param string $key Verified AI key.
+	 * @return string Whether the extensions key was saved or kept.
+	 */
+	public function sync_extensions_license_key( $key ) {
+		$existing     = (string) get_option( 'custom_license_code', '' );
+		$shape        = '/^([1-9][0-9]*)-(?:[A-Z0-9]{4}-){6}([1-9][0-9]*)$/D';
+		$same_license = preg_match( $shape, $key, $incoming ) && preg_match( $shape, $existing, $current ) && $incoming[1] === $current[1] && $incoming[2] === $current[2];
+		if ( '' !== $existing && $existing !== $key && ! $same_license ) {
+			return 'kept';
+		}
+		update_option( 'custom_license_code', $key );
+		if ( function_exists( 'check_all_implecode_license' ) ) {
+			try {
+				check_all_implecode_license();
+			// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			} catch ( Throwable $error ) {
+				// AI activation already succeeded; Premium Support can retry verification normally.
+			}
+		}
+		return 'saved';
+	}
+
+	/**
 	 * Updates site settings.
 	 *
 	 * @param array $settings New settings.

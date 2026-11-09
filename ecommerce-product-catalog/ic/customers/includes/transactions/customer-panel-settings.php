@@ -43,6 +43,10 @@ class ic_customer_panel_settings {
 		}
 		$clean = array();
 		foreach ( $settings as $key => $value ) {
+			if ( in_array( $key, array( 'contact_details_intro', 'billing_details_intro' ), true ) ) {
+				$clean[ $key ] = is_scalar( $value ) ? wp_kses_post( (string) $value ) : '';
+				continue;
+			}
 			$clean[ $key ] = is_array( $value ) ? $this->ic_customer_panel_sanitize_settings( $value ) : sanitize_text_field( (string) $value );
 		}
 		if ( isset( $clean['page_id'] ) ) {

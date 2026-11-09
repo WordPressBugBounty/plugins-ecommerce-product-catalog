@@ -3189,6 +3189,8 @@ class IC_AI_Settings {
 				return $registered;
 			}
 		}
+		$outcome = $this->manager->client()->sync_extensions_license_key( $license_key );
+		$this->manager->client()->update_site_settings( array( 'extensions_key_outcome' => $outcome ) );
 		$message = $this->notified_license_applied_message( $integration );
 		$this->store_notice( $integration->post_type(), 'success', $message );
 
@@ -3230,6 +3232,12 @@ class IC_AI_Settings {
 	private function notified_license_applied_message( $integration ) {
 		$site_settings = $this->manager->client()->site_settings();
 		if ( $this->manager->client()->has_registered_client( $site_settings ) ) {
+			if ( ! empty( $site_settings['extensions_key_outcome'] ) ) {
+				return 'kept' === $site_settings['extensions_key_outcome']
+					? __( 'AI is active. Your site already uses another license key for premium extensions, so we kept it. The AI key is saved in the AI settings only.', 'ecommerce-product-catalog' )
+					: __( 'AI is active. Your license key was saved here and as your extensions license key in Catalog Settings > Premium Support, so premium extensions you buy later on this license work without entering it again.', 'ecommerce-product-catalog' );
+			}
+
 			if ( ! empty( $site_settings['active_plan']['name'] ) ) {
 				return sprintf(
 					/* translators: %s: active AI plan name. */

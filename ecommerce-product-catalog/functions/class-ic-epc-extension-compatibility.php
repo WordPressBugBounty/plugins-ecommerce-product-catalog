@@ -317,49 +317,50 @@ class IC_EPC_Extension_Compatibility {
 	 * @return array
 	 */
 	private static function resolve_extension_compatibility( array $plugin ) {
-		$source = 'none';
-		$rule   = '';
-		$note   = '';
-		$kind   = 'epc_rule';
+		$source              = 'none';
+		$rule                = '';
+		$note                = '';
+		$kind                = 'epc_rule';
+		$fallback_map        = self::legacy_extension_compatibility_map();
+		$block_paid_checkout = ! empty( $fallback_map[ $plugin['basename'] ]['block_paid_checkout'] );
 
 		if ( ! empty( $plugin['data']['EPCCompatibility'] ) ) {
 			$source = 'header';
 			$rule   = trim( $plugin['data']['EPCCompatibility'] );
-		} else {
-			$fallback_map = self::legacy_extension_compatibility_map();
-			if ( isset( $fallback_map[ $plugin['basename'] ] ) ) {
+		} elseif ( isset( $fallback_map[ $plugin['basename'] ] ) ) {
 				$fallback = $fallback_map[ $plugin['basename'] ];
 				$source   = 'fallback';
-				if ( is_array( $fallback ) ) {
-					if ( ! empty( $fallback['minimum_version'] ) ) {
-						$minimum_version = (string) $fallback['minimum_version'];
-						$rule            = $minimum_version . '+';
-						$note            = isset( $fallback['note'] ) ? (string) $fallback['note'] : '';
-						$kind            = 'minimum_version';
+			if ( is_array( $fallback ) ) {
+				if ( ! empty( $fallback['minimum_version'] ) ) {
+					$minimum_version = (string) $fallback['minimum_version'];
+					$rule            = $minimum_version . '+';
+					$note            = isset( $fallback['note'] ) ? (string) $fallback['note'] : '';
+					$kind            = 'minimum_version';
 
-						if ( empty( $plugin['data']['Version'] ) || version_compare( $plugin['data']['Version'], $minimum_version, '<' ) ) {
-							return array(
-								'status' => 'incompatible',
-								'source' => $source,
-								'rule'   => $rule,
-								'note'   => $note,
-								'kind'   => $kind,
-							);
-						}
-
+					if ( empty( $plugin['data']['Version'] ) || version_compare( $plugin['data']['Version'], $minimum_version, '<' ) ) {
 						return array(
-							'status' => 'compatible',
-							'source' => $source,
-							'rule'   => $rule,
-							'note'   => $note,
-							'kind'   => $kind,
+							'status'              => 'incompatible',
+							'source'              => $source,
+							'rule'                => $rule,
+							'note'                => $note,
+							'kind'                => $kind,
+							'block_paid_checkout' => $block_paid_checkout,
 						);
 					}
-					$rule = isset( $fallback['rule'] ) ? trim( (string) $fallback['rule'] ) : '';
-					$note = isset( $fallback['note'] ) ? (string) $fallback['note'] : '';
-				} else {
-					$rule = trim( (string) $fallback );
+
+					return array(
+						'status'              => 'compatible',
+						'source'              => $source,
+						'rule'                => $rule,
+						'note'                => $note,
+						'kind'                => $kind,
+						'block_paid_checkout' => $block_paid_checkout,
+					);
 				}
+				$rule = isset( $fallback['rule'] ) ? trim( (string) $fallback['rule'] ) : '';
+				$note = isset( $fallback['note'] ) ? (string) $fallback['note'] : '';
+			} else {
+				$rule = trim( (string) $fallback );
 			}
 		}
 
@@ -374,31 +375,34 @@ class IC_EPC_Extension_Compatibility {
 
 		if ( '' === $rule ) {
 			return array(
-				'status' => 'unknown',
-				'source' => $source,
-				'rule'   => '',
-				'note'   => $note,
-				'kind'   => $kind,
+				'status'              => 'unknown',
+				'source'              => $source,
+				'rule'                => '',
+				'note'                => $note,
+				'kind'                => $kind,
+				'block_paid_checkout' => $block_paid_checkout,
 			);
 		}
 
 		$matches = self::matches_compatibility_rule( $rule, IC_EPC_VERSION );
 		if ( null === $matches ) {
 			return array(
-				'status' => 'unknown',
-				'source' => $source,
-				'rule'   => $rule,
-				'note'   => $note,
-				'kind'   => $kind,
+				'status'              => 'unknown',
+				'source'              => $source,
+				'rule'                => $rule,
+				'note'                => $note,
+				'kind'                => $kind,
+				'block_paid_checkout' => $block_paid_checkout,
 			);
 		}
 
 		return array(
-			'status' => $matches ? 'compatible' : 'incompatible',
-			'source' => $source,
-			'rule'   => $rule,
-			'note'   => $note,
-			'kind'   => $kind,
+			'status'              => $matches ? 'compatible' : 'incompatible',
+			'source'              => $source,
+			'rule'                => $rule,
+			'note'                => $note,
+			'kind'                => $kind,
+			'block_paid_checkout' => $block_paid_checkout,
 		);
 	}
 
@@ -409,11 +413,16 @@ class IC_EPC_Extension_Compatibility {
 	 */
 	private static function legacy_extension_compatibility_map() {
 		$fallbacks = array(
+			'implecode-eu-orders/implecode-eu-orders.php' => array(
+				'minimum_version'     => '1.0.8',
+				'note'                => 'impleCode EU Orders 1.0.8 or newer is required for the current EPC version.',
+				'block_paid_checkout' => true,
+			),
 			'product-page-customizer/product-page-customizer.php' => array(
 				'minimum_version' => '1.19.2',
 				'note'            => 'Product Page Customizer 1.19.2 or newer is required for the current EPC version.',
 			),
-			'inventory-manager/inventory-manager.php' => array(
+			'inventory-manager/inventory-manager.php'     => array(
 				'minimum_version' => '1.6.8',
 				'note'            => 'Inventory Manager 1.6.8 or newer is required for the current EPC version.',
 			),
@@ -458,11 +467,12 @@ class IC_EPC_Extension_Compatibility {
 			}
 
 			$incompatible_plugins[ $plugin_basename ] = array(
-				'name'   => ! empty( $plugin['data']['Name'] ) ? $plugin['data']['Name'] : $plugin_basename,
-				'rule'   => $compatibility['rule'],
-				'source' => $compatibility['source'],
-				'note'   => $compatibility['note'],
-				'kind'   => isset( $compatibility['kind'] ) ? $compatibility['kind'] : 'epc_rule',
+				'name'                => ! empty( $plugin['data']['Name'] ) ? $plugin['data']['Name'] : $plugin_basename,
+				'rule'                => $compatibility['rule'],
+				'source'              => $compatibility['source'],
+				'note'                => $compatibility['note'],
+				'kind'                => isset( $compatibility['kind'] ) ? $compatibility['kind'] : 'epc_rule',
+				'block_paid_checkout' => ! empty( $compatibility['block_paid_checkout'] ),
 			);
 		}
 
@@ -688,12 +698,13 @@ class IC_EPC_Extension_Compatibility {
 
 		if ( empty( self::$blocked_extensions[ $basename ] ) ) {
 			self::$blocked_extensions[ $basename ] = array(
-				'name'   => $name,
-				'rule'   => $compatibility['rule'],
-				'source' => $compatibility['source'],
-				'note'   => $compatibility['note'],
-				'kind'   => isset( $compatibility['kind'] ) ? $compatibility['kind'] : 'epc_rule',
-				'hooks'  => array(),
+				'name'                => $name,
+				'rule'                => $compatibility['rule'],
+				'source'              => $compatibility['source'],
+				'note'                => $compatibility['note'],
+				'kind'                => isset( $compatibility['kind'] ) ? $compatibility['kind'] : 'epc_rule',
+				'block_paid_checkout' => ! empty( $compatibility['block_paid_checkout'] ),
+				'hooks'               => array(),
 			);
 		}
 
@@ -733,3 +744,20 @@ class IC_EPC_Extension_Compatibility {
 }
 
 IC_EPC_Extension_Compatibility::init();
+
+if ( ! function_exists( 'ic_paid_checkout_paused' ) ) {
+	/**
+	 * Returns whether a quarantined extension requires paid checkout to pause.
+	 *
+	 * @return bool
+	 */
+	function ic_paid_checkout_paused() {
+		foreach ( IC_EPC_Extension_Compatibility::get_blocked_extensions() as $extension ) {
+			if ( ! empty( $extension['block_paid_checkout'] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}

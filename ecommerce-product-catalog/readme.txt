@@ -5,7 +5,7 @@ Tags: ecommerce, shopping cart, catalog, quote, request a quote
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.6.8
+Stable tag: 3.6.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -388,6 +388,13 @@ This can be a store but it is not limited to it. It's main purpose is to present
 == Changelog ==
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
+
+= 3.6.9 - 05/11/2026 =
+
+* Fixed the inquiry checkout country and state fields: the state list now loads for the selected country and the selection is kept after a validation error.
+* The State field is now required only for countries that have states.
+* The cart no longer shows a purchase total when the checkout has no prices.
+* The customer panel tabs no longer shift the page while loading.
 
 = 3.6.8 - 02/11/2026 =
 

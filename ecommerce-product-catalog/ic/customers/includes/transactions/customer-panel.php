@@ -61,10 +61,14 @@ class ic_customer_panel {
 			if ( wp_style_is( 'ic-user-panel', 'registered' ) ) {
 				wp_enqueue_style( 'ic-user-panel' );
 			}
-			if ( wp_script_is( 'ic-user-panel', 'registered' ) ) {
-				wp_enqueue_script( 'ic-user-panel' );
+			if ( wp_style_is( 'al_digital_customers_styles', 'registered' ) ) {
+				wp_enqueue_style( 'al_digital_customers_styles' );
+			}
+			$panel_script = wp_script_is( 'front_edit_customer_panel', 'registered' ) ? 'front_edit_customer_panel' : 'ic-user-panel';
+			if ( wp_script_is( $panel_script, 'registered' ) ) {
+				wp_enqueue_script( $panel_script );
 				wp_localize_script(
-					'ic-user-panel',
+					$panel_script,
 					'ic_customer_panel',
 					array(
 						'customer_id' => $customer_id,
@@ -73,13 +77,16 @@ class ic_customer_panel {
 					)
 				);
 			}
-			$panel  = '<div id="customer_panel">';
+			$panel  = '<script>document.documentElement.classList.add("ic-customer-panel-js");</script><div id="customer_panel">';
 			$panel .= '<div id="customer_email">' . __( 'Login', 'ecommerce-product-catalog' ) . ': ' . ic_get_digital_customer_login( $customer_id ) . '</div>';
 			$panel .= apply_filters( 'ic_customer_panel_top', '' );
 			$panel .= '<div id="customer_logout"><a href="' . wp_logout_url( ic_current_page_url() ) . '" class="button ' . design_schemes( 'box', 0 ) . '">' . __( 'Logout', 'ecommerce-product-catalog' ) . '</a></div>';
 			$panel .= '<div class="customer_panel_actions">' . ic_customer_panel_actions() . '</div>';
-			$panel .= '<div id="customer_panel_tabs" class="ui-tabs">';
-			$panel .= '<ul class="ui-tabs-nav">' . apply_filters( 'customer_panel_tabs', '', $customer_id ) . '</ul>';
+			$panel .= '<div id="customer_panel_tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all ic-tabs-preinit">';
+
+			$tabs   = apply_filters( 'customer_panel_tabs', '', $customer_id );
+			$tabs   = str_replace( array( '<li>', '<a ' ), array( '<li class="ui-state-default ui-corner-top" role="tab">', '<a class="ui-tabs-anchor" ' ), $tabs );
+			$panel .= '<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">' . $tabs . '</ul>';
 			$panel .= apply_filters( 'customer_panel_content', '', $customer_id );
 			if ( ! current_user_can( 'administrator' ) && ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) ) {
 				$panel .= '<div id="customer_panel_tabs-password">';
@@ -87,6 +94,21 @@ class ic_customer_panel {
 				$panel .= '</div>';
 			}
 			$panel .= '</div>';
+			$panel  = preg_replace_callback(
+				'/<div id="(customer_panel_tabs-[^"]+)"([^>]*)>/',
+				static function ( $matches ) {
+					$attributes = $matches[2];
+					if ( false === strpos( $attributes, 'class=' ) ) {
+						$attributes .= ' class="ui-tabs-panel ui-widget-content ui-corner-bottom"';
+					} else {
+						$attributes = str_replace( 'class="', 'class="ui-tabs-panel ui-widget-content ui-corner-bottom ', $attributes );
+					}
+					return '<div id="' . $matches[1] . '"' . $attributes . '>';
+				},
+				$panel
+			);
+			// Anchor IDs come from the rendered navigation; raw hashes never enter a selector.
+			$panel .= '<script>(function(){var p=document.getElementById("customer_panel_tabs"),a=p.querySelectorAll(".ui-tabs-nav a"),n=0;for(var i=0;i<a.length;i++){if(a[i].hash===location.hash){n=i;break;}}if(a[n]){var t=document.getElementById(a[n].hash.slice(1));if(t&&t.parentNode===p){t.classList.add("ic-tab-initial");a[n].parentNode.classList.add("ui-tabs-active","ui-state-active");p.setAttribute("data-initial-tab",n);}}}());</script>';
 			$panel .= '</div>';
 			$panel .= do_shortcode( $content );
 
@@ -119,7 +141,7 @@ class ic_customer_panel {
 	function info_in_license_email( $message ) {
 
 			/* translators: Placeholders are substituted with runtime values. */
-			$message .= sprintf( __( 'You can manage your license when you login on %s. Use your email as username and license key as password. You can change the password after login.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ) );
+			$message .= sprintf( __( 'You can manage your license when you login on %s. Use your email and account password to log in.', 'ecommerce-product-catalog' ), get_bloginfo( 'name' ) );
 		$message     .= '<br><br>';
 
 			return $message;

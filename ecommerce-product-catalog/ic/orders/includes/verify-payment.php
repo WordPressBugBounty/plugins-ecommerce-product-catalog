@@ -47,6 +47,36 @@ if ( ! function_exists( 'ic_validate_payment_data' ) ) {
 
 
 /**
+ * Stores the first nonempty, already normalized gateway billing snapshot.
+ *
+ * @param int    $order_id        Paid order ID.
+ * @param array  $gateway_details Normalized gateway details, before enrichment.
+ * @param string $gateway         Gateway name.
+ * @return bool Whether a new snapshot was stored.
+ */
+function ic_record_payment_billing( $order_id, $gateway_details, $gateway ) {
+	if ( ! is_scalar( $order_id ) || ! is_numeric( $order_id ) || (int) $order_id <= 0 || 'al_digital_orders' !== get_post_type( $order_id ) || ! is_array( $gateway_details ) || ! is_scalar( $gateway ) || '' === trim( (string) $gateway ) ) {
+		return false;
+	}
+	$record   = array();
+	$nonempty = false;
+	foreach ( array( 'name', 'email', 'street', 'postcode', 'city', 'country', 'country_code' ) as $field ) {
+		if ( array_key_exists( $field, $gateway_details ) && is_scalar( $gateway_details[ $field ] ) ) {
+			$record[ $field ] = $gateway_details[ $field ];
+			if ( '' !== trim( (string) $gateway_details[ $field ] ) ) {
+				$nonempty = true;
+			}
+		}
+	}
+	if ( ! $nonempty ) {
+		return false;
+	}
+	$record['gateway']     = $gateway;
+	$record['received_at'] = time();
+	return (bool) add_post_meta( (int) $order_id, '_ic_payment_billing', wp_slash( $record ), true );
+}
+
+/**
  * Verifies if payment amount is the same or more than expected amount
  *
  * @param array|int $item_id
@@ -185,8 +215,12 @@ AND wposts.post_status = %s",
 }
 
 function ic_update_digital_order_status(
-	$payment_details, $order_products, $order_summary, $trans_id,
-	$just_status = false
+	$payment_details,
+	$order_products,
+	$order_summary,
+	$trans_id,
+	$just_status = false,
+	$invoice_context = array()
 ) {
 	if ( ! is_scalar( $trans_id ) ) {
 		$trans_id = '';
@@ -212,6 +246,9 @@ function ic_update_digital_order_status(
 	if ( empty( $order_id ) || is_wp_error( $order_id ) ) {
 		return $order_id;
 	}
+	// Only internal server callers supply context; request payment keys never do.
+	unset( $payment_details['_ic_invoice_checkout'] );
+	do_action( 'ic_order_save_context', $order_id, $just_created, $invoice_context );
 	$prev_payment_details = get_post_meta( $order_id, '_payment_details', true );
 	if ( isset( $prev_payment_details['shipping_email'] ) && is_email( $prev_payment_details['shipping_email'] ) ) {
 		$payment_details['shipping_email'] = $prev_payment_details['shipping_email'];
@@ -266,7 +303,18 @@ function ic_update_digital_order_status(
 				update_post_meta( $order_id, '_payment_details', $new_payment_details );
 			}
 		}
+		if ( ic_is_order_completion_status( $new_payment_details['status'] ) && ic_payment_tax_changed( $prev_payment_details, $new_payment_details ) ) {
+			do_action( 'ic_payment_tax_outcome_changed', (int) $order_id, 0, $prev_payment_details, $new_payment_details );
+		}
 	} else {
+		if ( ! empty( $payment_details['_ic_subscription_tax_context'] ) ) {
+			$context = $payment_details['_ic_subscription_tax_context'];
+			unset( $payment_details['_ic_subscription_tax_context'] );
+			if ( ic_is_order_completion_status( $payment_details['status'] ?? '' ) && ic_payment_tax_changed( $context['locked'], $context['candidate'] ) ) {
+				do_action( 'ic_payment_tax_outcome_changed', (int) $order_id, (int) $context['subscription_id'], $context['locked'], $context['candidate'] );
+			}
+		}
+		$payment_details = apply_filters( 'ic_order_payment_details_before_replace', $payment_details, $order_id );
 		if ( ! empty( $payment_details ) ) {
 			update_post_meta( $order_id, '_payment_details', $payment_details );
 		}
@@ -284,6 +332,7 @@ function ic_update_digital_order_status(
 	if ( empty( $triggered ) && ic_is_order_completion_status( $payment_details['status'] ) ) {
 
 		$payment_details = ic_get_order_payment_details( $order_id );
+		do_action( 'ic_order_before_completion', $order_id, $payment_details );
 
 		if ( empty( $order_products ) ) {
 			$order_products = get_post_meta( $order_id, '_order_products', true );
@@ -318,3 +367,4 @@ function ic_get_active_order_customer_id() {
 
 	return apply_filters( 'ic_order_customer_id', $customer_id );
 }
+

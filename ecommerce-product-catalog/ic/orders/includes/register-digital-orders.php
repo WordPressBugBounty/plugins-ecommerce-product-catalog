@@ -297,7 +297,7 @@ class ic_orders {
 					if ( $payment_details['vatid'] != '' ) {
 						?>
 						<tr>
-							<td><?php esc_html_e( 'EU VAT', 'ecommerce-product-catalog' ); ?>:</td>
+							<td><?php echo esc_html( apply_filters( 'ic_order_vat_label', __( 'VAT', 'ecommerce-product-catalog' ) ) ); ?>:</td>
 								<td><?php echo esc_html( $payment_details['vatid'] ); ?></td>
 						</tr>
 						<tr>

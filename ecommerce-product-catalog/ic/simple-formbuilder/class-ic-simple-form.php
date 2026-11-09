@@ -550,6 +550,7 @@ class IC_Simple_Form {
 	 * @return void
 	 */
 	private function submit_form() {
+		do_action( 'ic_formbuilder_submission_started', $this->contact, $this->pre_name );
 		$html_util = ic_html_util();
 
 		$this->error        = false;

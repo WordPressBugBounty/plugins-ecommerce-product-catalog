@@ -69,6 +69,7 @@ class IC_Identity_Erasure {
 				'customer_meta'   => '_customer_id',
 				'identity_meta'   => '_payment_details',
 				'identity_fields' => array(),
+				'additional_identity_meta' => array(),
 				'summary_meta'    => '',
 				'summary_fields'  => array(),
 				'statutory'       => false,
@@ -330,6 +331,18 @@ class IC_Identity_Erasure {
 				}
 			}
 			update_post_meta( $record_id, $source['identity_meta'], $data );
+		}
+		foreach ( $source['additional_identity_meta'] as $meta_key => $fields ) {
+			$additional = get_post_meta( $record_id, $meta_key, true );
+			if ( ! is_array( $additional ) || ! is_array( $fields ) ) {
+				continue;
+			}
+			foreach ( $fields as $field ) {
+				if ( array_key_exists( $field, $additional ) && is_scalar( $additional[ $field ] ) ) {
+					$additional[ $field ] = '';
+				}
+			}
+			update_post_meta( $record_id, $meta_key, wp_slash( $additional ) );
 		}
 		if ( $source['summary_meta'] ) {
 			$summary = get_post_meta( $record_id, $source['summary_meta'], true );

@@ -31,6 +31,9 @@ class ic_customers_checkout {
 	 * @return string
 	 */
 	function disable_email_field( $attributes, $field, $pre_name, $default_value ) {
+		if ( function_exists( 'ic_invoice_checkout_default' ) && null !== ic_invoice_checkout_default( $field->cid ) ) {
+			return $attributes;
+		}
 		if ( empty( $default_value ) || ! is_ic_digital_customer() ) {
 			return $attributes;
 		}
@@ -57,6 +60,10 @@ class ic_customers_checkout {
 	 * @return type
 	 */
 	function default_field_values( $value, $cid ) {
+		$billing = function_exists( 'ic_invoice_checkout_default' ) ? ic_invoice_checkout_default( $cid ) : null;
+		if ( null !== $billing ) {
+			return $billing;
+		}
 		if ( ! is_ic_digital_customer() ) {
 			return $value;
 		}

@@ -68,6 +68,7 @@ if ( ! function_exists( 'ic_orders_register_identity_source' ) ) {
 				'post_type'       => 'al_digital_orders',
 				'customer_meta'   => '_customer_id',
 				'identity_meta'   => '_payment_details',
+				'additional_identity_meta' => array( '_ic_payment_billing' => array( 'name', 'email', 'street', 'postcode', 'city', 'country', 'country_code' ) ),
 				'identity_fields' => array( 'customer_name', 'customer_email', 'shipping_email', 'email', 'name', 'billing_name', 'street', 'postcode', 'city', 'vatid', 'vat_name', 'vat_address', 'vat_ver_id', 'address', 'tax_code' ),
 				'summary_meta'    => '_order_summary',
 				'summary_fields'  => array( 'email' ),

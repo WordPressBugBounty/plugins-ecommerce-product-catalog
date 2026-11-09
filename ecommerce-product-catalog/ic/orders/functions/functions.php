@@ -229,25 +229,23 @@ function ic_get_manual_products( $manual_order_product, $custom_id = null ) {
 }
 
 function ic_should_digital_order_be_taxed( $order_id ) {
-	$return = false;
-	if ( function_exists( 'eu_tax_system_enabled' ) && eu_tax_system_enabled() ) {
-		$payment_details                 = ic_get_order_payment_details( $order_id );
-		$payment_details['country_code'] = ( isset( $payment_details['country_code'] ) && ! empty( $payment_details['country_code'] ) ) ? $payment_details['country_code'] : $payment_details['country'];
-		if ( empty( $payment_details['country_code'] ) && ! empty( $payment_details['customer_country'] ) ) {
-			$payment_details['country_code'] = $payment_details['customer_country'];
-		}
-		if ( is_eu_country( $payment_details['country_code'] ) ) {
-			if ( ! empty( $payment_details['vatid'] ) && ! empty( $payment_details['vat_country'] ) && ! empty( $payment_details['vat_ver_id'] ) ) {
-				if ( is_home_country( $payment_details['vat_country'] ) ) {
-					$return = true;
-				}
-			} else {
-				$return = true;
-			}
-		}
-	}
+	return ic_should_payment_details_be_taxed( ic_get_order_payment_details( $order_id ) );
+}
 
-	return $return;
+/** Pure taxation decision, shared by checkout and renewal consistency checks. */
+function ic_should_payment_details_be_taxed( $payment_details ) {
+	return (bool) apply_filters( 'ic_payment_details_taxed', false, $payment_details );
+}
+
+/**
+ * Ask tax providers whether two sets of details have different tax outcomes.
+ *
+ * @param array $old_details Original payment details.
+ * @param array $new_details Candidate payment details.
+ * @return bool
+ */
+function ic_payment_tax_changed( array $old_details, array $new_details ) {
+	return (bool) apply_filters( 'ic_payment_tax_changed', false, $old_details, $new_details );
 }
 
 /**
@@ -586,3 +584,4 @@ function ic_get_customer_orders( $customer_id ) {
 		return array();
 	}
 }
+

@@ -12,7 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ic_orders_save {
 
+	/**
+	 * Verified request contexts captured before parser default synthesis.
+	 *
+	 * @var array
+	 */
+	private $invoice_checkout_contexts = array();
+
 	function __construct() {
+		add_action( 'ic_formbuilder_submission_started', array( $this, 'capture_invoice_checkout' ), 10, 2 );
 		add_action( 'ic_formbuilder_before_mail', array( $this, 'save_formbuilder' ), 10, 5 );
 		add_action( 'digital_order_delivery_details', array( $this, 'shipping_summary' ) );
 		add_action( 'digital_order_data', array( $this, 'payment_label' ), 10, 2 );
@@ -34,7 +42,7 @@ class ic_orders_save {
 
 		add_filter( 'ic_formbuilder_admin_email', array( $this, 'url_shortcode' ), 6, 2 );
 
-		add_action( 'payment_status_change', array( $this, 'paid' ), 10, 4 );
+		add_action( 'payment_status_change', array( $this, 'paid' ), 10, 5 );
 
 		add_action( 'payment_quick_status_change', array( $this, 'quick_paid' ) );
 
@@ -43,15 +51,40 @@ class ic_orders_save {
 		add_filter( 'ic_update_order_summary', array( $this, 'update_shipping_summary' ), 10, 2 );
 	}
 
+	/**
+	 * Capture original checkout fields before parser defaults are added.
+	 *
+	 * @param object $contact Configured checkout fields.
+	 * @param string $pre_name Checkout field prefix.
+	 * @return void
+	 */
+	public function capture_invoice_checkout( $contact, $pre_name ) {
+		if ( in_array( $pre_name, array( 'cart_', 'quote_cart_', 'order_form_' ), true ) ) {
+			$this->invoice_checkout_contexts[ $pre_name ] = apply_filters( 'ic_order_checkout_context', array(), $contact, $pre_name );
+		}
+	}
+
 	function save_formbuilder( $message, $customer_email, $redirect, $contact, $pre_name ) {
 		if ( in_array( $pre_name, array( 'cart_', 'quote_cart_', 'order_form_' ), true ) ) {
 			global $ic_formbuilder_filled_fields;
 			$payment_details = apply_filters( 'ic_save_order_payment_details', $ic_formbuilder_filled_fields );
-			$this->save( $customer_email, $pre_name, $payment_details );
+			$context         = array_key_exists( $pre_name, $this->invoice_checkout_contexts ) ? $this->invoice_checkout_contexts[ $pre_name ] : apply_filters( 'ic_order_checkout_context', array(), $contact, $pre_name );
+			unset( $this->invoice_checkout_contexts[ $pre_name ] );
+			$this->save( $customer_email, $pre_name, $payment_details, array(), $context );
 		}
 	}
 
-	function save( $customer_email, $pre_name, $payment_details = array(), $order = array() ) {
+	/**
+	 * Save an order with optional trusted checkout provenance.
+	 *
+	 * @param string $customer_email Customer email.
+	 * @param string $pre_name Checkout field prefix.
+	 * @param array  $payment_details Payment details.
+	 * @param array  $order Order totals and products.
+	 * @param array  $invoice_context Trusted invoice checkout context.
+	 * @return int|WP_Error
+	 */
+	public function save( $customer_email, $pre_name, $payment_details = array(), $order = array(), $invoice_context = array() ) {
 		$payment_details['status']         = ic_get_default_order_status();
 		$payment_details['date']           = current_time( 'timestamp' );
 		$payment_details['shipping_email'] = empty( $payment_details['shipping_email'] ) ? $customer_email : $payment_details['shipping_email'];
@@ -98,7 +131,7 @@ class ic_orders_save {
 		);
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- The owning form or AJAX boundary verifies its action-specific nonce before this downstream request value is processed.
 		$trans_id      = isset( $_POST['trans_id'] ) && is_scalar( $_POST['trans_id'] ) ? sanitize_text_field( wp_unslash( $_POST['trans_id'] ) ) : '';
-		$order_id      = ic_update_digital_order_status( $payment_details, $order_products, $order_summary, $trans_id );
+		$order_id = ic_update_digital_order_status( $payment_details, $order_products, $order_summary, $trans_id, false, $invoice_context );
 		ic_save_global( 'ic_save_order_id', $order_id );
 		if ( function_exists( 'ic_count_shipping_cost_payment' ) ) {
 			$shipping_summary['price'] = ic_count_shipping_cost_payment( 0, $pre_name );
@@ -510,7 +543,7 @@ class ic_orders_save {
 		}
 	}
 
-	function paid( $payment_details = array(), $order_products = array(), $order_summary = array(), $trans_id = 0 ) {
+	function paid( $payment_details = array(), $order_products = array(), $order_summary = array(), $trans_id = 0, $gateway_context = null ) {
 		if ( ! is_array( $payment_details ) || ! is_array( $order_products ) || ! is_array( $order_summary ) || empty( $trans_id ) || ! array_key_exists( 'product_id', $order_products ) || ! isset( $order_summary['price'] ) || empty( $payment_details['currency'] ) ) {
 			return;
 		}
@@ -529,11 +562,27 @@ class ic_orders_save {
 		$verify_payment['order_summary']   = $order_summary;
 		do_action( 'ic_verify_payment_start', $verify_payment );
 		if ( ic_verify_payment_price( $order_products['product_id'], $order_summary['price'], $payment_details['currency'], $order_products, $trans_id ) ) {
+			$gateway_details = $payment_details;
+			$gateway         = '';
+			if ( null !== $gateway_context ) {
+				$gateway_details = isset( $gateway_context['billing'] ) ? $gateway_context['billing'] : array();
+				$gateway         = isset( $gateway_context['gateway'] ) ? $gateway_context['gateway'] : '';
+			} else {
+				foreach ( array( $payment_details['payment_name'] ?? '', $order_summary['gateway'] ?? '', $payment_details['payment_label'] ?? '' ) as $candidate ) {
+					if ( is_scalar( $candidate ) && '' !== trim( (string) $candidate ) ) {
+						$gateway = $candidate;
+						break;
+					}
+				}
+			}
 			$payment_details['status'] = 'confirmed';
 			if ( ic_digital_order_status( $trans_id ) != $payment_details['status'] ) {
 				do_action( 'ic_verify_payment_paid', $payment_details, $order_products, $order_summary, $trans_id );
-				ic_update_digital_order_status( $payment_details, $order_products, $order_summary, $trans_id, true );
+				$order_id = ic_update_digital_order_status( $payment_details, $order_products, $order_summary, $trans_id, true );
+			} else {
+				$order_id = ic_order_exists( $trans_id );
 			}
+			ic_record_payment_billing( $order_id, $gateway_details, $gateway );
 		}
 		do_action( 'ic_verify_payment_end', $verify_payment );
 	}

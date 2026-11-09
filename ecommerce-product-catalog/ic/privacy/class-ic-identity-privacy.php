@@ -239,7 +239,7 @@ class IC_Identity_Privacy {
 				)
 			);
 			foreach ( $ids as $id ) {
-				$data[] = array(
+				$item = array(
 					'group_id'    => 'ic-identity',
 					'group_label' => __( 'Orders and entitlements', 'ecommerce-product-catalog' ),
 					'item_id'     => $key . '-' . $id,
@@ -254,6 +254,22 @@ class IC_Identity_Privacy {
 						),
 					),
 				);
+				foreach ( $source['additional_identity_meta'] as $meta_key => $fields ) {
+					$additional = get_post_meta( $id, $meta_key, true );
+					if ( ! is_array( $additional ) || ! is_array( $fields ) ) {
+						continue;
+					}
+					$export_fields = '_ic_payment_billing' === $meta_key ? array_merge( $fields, array( 'gateway', 'received_at' ) ) : $fields;
+					foreach ( $export_fields as $field ) {
+						if ( array_key_exists( $field, $additional ) && is_scalar( $additional[ $field ] ) ) {
+							$item['data'][] = array(
+								'name'  => __( 'Payment billing', 'ecommerce-product-catalog' ) . ' ' . ucwords( str_replace( '_', ' ', $field ) ),
+								'value' => (string) $additional[ $field ],
+							);
+						}
+					}
+				}
+				$data[] = $item;
 			}
 		}
 		return array(

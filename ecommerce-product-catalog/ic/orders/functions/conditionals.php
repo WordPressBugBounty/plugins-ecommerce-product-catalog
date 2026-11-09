@@ -49,15 +49,5 @@ function ic_ic_order_manual( $order_id = null ) {
 }
 
 function is_ic_digital_order_taxed( $order_id ) {
-	if ( function_exists( 'eu_tax_system_enabled' ) && eu_tax_system_enabled() ) {
-		$payment_details					 = ic_get_order_payment_details( $order_id );
-		$payment_details[ 'vat_country' ]	 = isset( $payment_details[ 'vat_country' ] ) ? $payment_details[ 'vat_country' ] : '';
-		if ( $payment_details[ 'vat_country' ] == get_home_country() ) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
+	return (bool) apply_filters( 'ic_digital_order_taxed', false, $order_id );
 }

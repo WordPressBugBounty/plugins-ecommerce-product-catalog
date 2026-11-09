@@ -527,3 +527,72 @@ body .ic-existing-account-notification .ic-design.button {
         margin: 10px 0 0;
     }
 }
+
+/* Future invoice details in the existing My Data tab. */
+#customer_panel_tabs-customer-data h3 { margin: 0 0 4px; font-size: 19px; font-weight: 500; }
+#customer_panel_tabs-customer-data .ic-data-subtitle { margin: 0 0 16px; color: #666; font-size: 14px; line-height: 1.45; }
+#customer_panel_tabs-customer-data .ic-billing-details { border-top: 1px solid #e3e3e3; margin-top: 22px; padding-top: 18px; }
+#customer_panel_tabs-customer-data .ic-billing-details:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+#customer_panel_tabs-customer-data .ic-billing-grid { display: grid; grid-template-columns: 170px minmax(0, 380px) minmax(0, 1fr); gap: 12px 14px; align-items: center; font-size: 15px; }
+#customer_panel_tabs-customer-data label { color: #444; }
+#customer_panel_tabs-customer-data input:not([type=checkbox]):not([type=radio]),
+#customer_panel_tabs-customer-data select { font: inherit; font-size: 15px; padding: 8px 10px; border: 1px solid #ccc; border-radius: 3px; background: #fff; width: 100%; max-width: 100%; box-sizing: border-box; height: auto; margin: 0; }
+#customer_panel_tabs-customer-data .ic-contact-form .form_row { display: block; margin: 0 0 12px; }
+#customer_panel_tabs-customer-data .ic-contact-form .form_field { display: grid; grid-template-columns: 170px minmax(0, 380px); gap: 14px; align-items: center; width: 100%; padding: 0; }
+#customer_panel_tabs-customer-data .ic-contact-form .label,
+#customer_panel_tabs-customer-data .ic-contact-form .field { display: block; width: auto; margin: 0; padding: 0; }
+#customer_panel_tabs-customer-data .ic-current-password { display: grid; grid-template-columns: 170px minmax(0, 380px) minmax(0, 1fr); gap: 14px; align-items: center; margin: 0 0 12px; }
+#customer_panel_tabs-customer-data .ic-current-password[hidden] { display: none; }
+#customer_panel_tabs-customer-data .ic-contact-form > .ic-save-customer-data { margin-left: 184px; }
+#customer_panel_tabs-customer-data button { padding: 8px 16px; border-radius: 3px; font-size: 14px; background: #008a00; color: #fff; border: 0; cursor: pointer; }
+#customer_panel_tabs-customer-data button:disabled { opacity: .6; cursor: wait; }
+#customer_panel_tabs-customer-data .ic-billing-hint { font-size: 13px; color: #777; }
+#customer_panel_tabs-customer-data .ic-vies-badge { display: inline-block; font-size: 12px; background: #edf7ed; color: #1e4620; border: 1px solid #b7dcb9; border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+#customer_panel_tabs-customer-data .ic-vies-badge[hidden] { display: none; }
+#customer_panel_tabs-customer-data .ic-billing-mobile { display: none; }
+#customer_panel_tabs-customer-data .al-box { padding: 12px 16px; border-radius: 4px; border: 0; border-left: 4px solid #2a6f97; font-size: 14.5px; line-height: 1.55; margin: 14px 0 0; text-align: left; background: #eef5fb; color: #2b2b2b; }
+#customer_panel_tabs-customer-data .al-box.success { background: #edf7ed; border-left-color: #2e7d32; color: #1e4620; }
+#customer_panel_tabs-customer-data .al-box.warning { background: #fdf6e3; border-left-color: #dba617; }
+#customer_panel_tabs-customer-data .al-box.error { background: #fcf0f1; border-left-color: #b32d2e; }
+#customer_panel_tabs-customer-data .al-box a { color: #2a6f97; text-decoration: underline; }
+@media (max-width: 600px) {
+    #customer_panel_tabs-customer-data h3 { font-size: 18px; }
+    #customer_panel_tabs-customer-data .ic-data-subtitle { font-size: 13.5px; margin-bottom: 12px; }
+    #customer_panel_tabs-customer-data .ic-billing-grid,
+    #customer_panel_tabs-customer-data .ic-current-password,
+    #customer_panel_tabs-customer-data .ic-contact-form .form_field { display: block; }
+    #customer_panel_tabs-customer-data label { display: block; margin: 10px 0 4px; font-size: 14px; }
+    #customer_panel_tabs-customer-data .ic-billing-hint { display: block; }
+    #customer_panel_tabs-customer-data .ic-vies-badge { margin-top: 6px; }
+    #customer_panel_tabs-customer-data .ic-billing-desktop { display: none; }
+    #customer_panel_tabs-customer-data .ic-billing-mobile { display: inline; }
+    #customer_panel_tabs-customer-data .ic-contact-form > .ic-save-customer-data { margin-left: 0; }
+    #customer_panel_tabs-customer-data button { display: block; width: 100%; padding: 11px; margin-top: 16px; font-size: 15px; }
+    #customer_panel_tabs-customer-data .al-box { font-size: 14px; padding: 12px 14px; line-height: 1.5; }
+}
+@media (min-width: 601px) {
+    #customer_panel_tabs-customer-data .ic-contact-form > .ic-save-customer-data > .ic-api-response { margin-left: -184px; }
+}
+
+.ic-billing-form .chosen-container {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+}
+.ic-billing-form .chosen-container-single .chosen-single {
+    box-sizing: border-box;
+    height: 40px;
+    line-height: 38px;
+}
+.ic-billing-form .chosen-container .chosen-drop {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+/* Server navigation is styled before jQuery UI takes over; no-JS keeps every panel. */
+.ic-customer-panel-js #customer_panel_tabs.ic-tabs-preinit>div{display:none}
+.ic-customer-panel-js #customer_panel_tabs.ic-tabs-preinit>div.ic-tab-initial{display:block}
+#customer_panel_tabs>.ui-tabs-nav{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0;padding:5px 5px 0}
+#customer_panel_tabs>.ui-tabs-nav>li{float:none;list-style:none;margin:0;border-bottom-width:0;border-radius:3px 3px 0 0}
+#customer_panel_tabs>.ui-tabs-nav>li>a{display:block;padding:8px 14px;text-decoration:none;line-height:1.3}
+@media(max-width:640px){#customer_panel_tabs>.ui-tabs-nav{padding:6px;gap:4px}#customer_panel_tabs>.ui-tabs-nav>li>a{padding:7px 10px;font-size:14px}}
