@@ -5,7 +5,7 @@ Tags: ecommerce, shopping cart, catalog, quote, request a quote
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.6.9
+Stable tag: 3.6.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -388,6 +388,18 @@ This can be a store but it is not limited to it. It's main purpose is to present
 == Changelog ==
 
 Use [EPC Translate Project](https://translate.wordpress.org/projects/wp-plugins/ecommerce-product-catalog "eCommerce Product Catalog Translation Project") to add new or fix the existing translations in eCommerce Product Catalog. Use [Premium EPC Translation Project](https://translate.implecode.com/projects/ "eCommerce Product Catalog Translation Project") for all the extensions.
+
+= 3.6.10 - 18/11/2026 =
+
+* The customer panel loads much faster on sites using an SEO plugin such as Yoast, which no longer renders the panel a second time to build the page description.
+* The customer panel's contents are no longer copied into the page's social sharing description.
+* Faster order status lookups.
+* New Email Design settings under Catalog Design: keep the Classic emails or switch to the new Modern layout with a Clean, Elegant or Bold style. Existing stores stay on Classic.
+* Preview every email your store sends exactly as it is sent, and send a test email without reloading the page.
+* Edit email content directly from Email Design with a live preview; the email template editor preview also updates as you type.
+* The Extensions page can be filtered by feature.
+* Fixed a fatal error when another impleCode plugin loads the same login classes.
+* Compatibility with the latest Invoice System: order emails can wait until the final invoice is ready.
 
 = 3.6.9 - 05/11/2026 =
 

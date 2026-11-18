@@ -41,6 +41,13 @@ if ( ! function_exists( 'ic_htmlize_email' ) ) {
 	 * @global string $ic_mail_content
 	 */
 	function ic_htmlize_email( $message, $title, $sender_name ) {
+		if ( function_exists( 'ic_email_design_render' ) ) {
+			$modern = ic_email_design_render( $message, $title, $sender_name, '' );
+			if ( null !== $modern ) {
+				return $modern;
+			}
+		}
+
 		ob_start();
 		?>
 		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -469,6 +476,17 @@ if ( ! function_exists( 'ic_mail' ) ) {
 	 * @param boolean $template
 	 */
 	function ic_mail( $message, $sender_name, $sender_email, $receiver_email, $title, $template = true, $attachments = array() ) {
+		/**
+		 * Short-circuit delivery when a consumer durably takes responsibility for it.
+		 *
+		 * @param bool|null $result Null continues normal delivery; boolean is the result.
+		 * @param array     $args   All original positional delivery arguments.
+		 */
+		$pre = apply_filters( 'ic_pre_mail', null, array( $message, $sender_name, $sender_email, $receiver_email, $title, $template, $attachments ) );
+		if ( null !== $pre ) {
+			return (bool) $pre;
+		}
+
 		if ( ic_is_message_spam( $sender_name, $sender_email, $message ) ) {
 			return false;
 		}

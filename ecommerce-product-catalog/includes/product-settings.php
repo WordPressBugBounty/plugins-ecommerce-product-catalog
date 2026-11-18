@@ -129,6 +129,7 @@ function ic_epc_settings_screen_pages() {
 	$pages[] = ic_epc_shared_archive_design_settings_page();
 	$pages[] = ic_epc_shared_single_design_settings_page();
 	$pages[] = ic_epc_shared_design_schemes_settings_page();
+	$pages[] = IC_Email_Design_Settings::page();
 	$pages[] = ic_epc_single_names_settings_page();
 	$pages[] = ic_epc_archive_names_settings_page();
 

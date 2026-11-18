@@ -191,6 +191,15 @@ function ic_epc_render_extensions_page_content() {
 					<?php
 					start_implecode_install();
 					start_free_implecode_install();
+					$feature_view = IC_Premium_Features::request_view();
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped by IC_Premium_Features.
+					echo $feature_view['html'];
+					if ( $feature_view['filtered'] ) {
+						?>
+				</div>
+						<?php
+						return;
+					}
 					$extensions = get_site_transient( 'implecode_extensions_data' );
 					if ( false === $extensions ) {
 						$extensions_remote_url = apply_filters( 'ic_extensions_remote_url', 'provide_extensions' );

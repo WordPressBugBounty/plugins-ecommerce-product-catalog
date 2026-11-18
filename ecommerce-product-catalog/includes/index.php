@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+require_once AL_BASE_PATH . '/includes/class-ic-email-design.php';
 require_once AL_BASE_PATH . '/includes/tracking.php';
 require_once AL_BASE_PATH . '/includes/util/index.php';
 require_once AL_BASE_PATH . '/includes/class-ic-activation-wizard.php';
@@ -29,6 +30,7 @@ $ic_product_details = new IC_Product_Details();
 require_once AL_BASE_PATH . '/includes/product-columns.php';
 require_once AL_BASE_PATH . '/includes/product-category-columns.php';
 require_once AL_BASE_PATH . '/includes/system.php';
+require_once AL_BASE_PATH . '/includes/class-ic-premium-features.php';
 require_once AL_BASE_PATH . '/includes/extensions.php';
 require_once AL_BASE_PATH . '/includes/product-filter.php';
 require_once AL_BASE_PATH . '/includes/product-filters.php';

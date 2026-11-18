@@ -338,3 +338,7 @@ if ( ! function_exists( 'start_shopping_cart' ) ) {
 
 	start_shopping_cart();
 }
+
+
+
+require_once __DIR__ . '/includes/class-ic-cart-email-design.php';

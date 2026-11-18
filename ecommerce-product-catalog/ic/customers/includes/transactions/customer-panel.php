@@ -55,6 +55,9 @@ class ic_customer_panel {
 	}
 
 	function customer_panel( $atts, $content = null ) {
+		if ( doing_filter( 'get_the_excerpt' ) || doing_filter( 'wp_trim_excerpt' ) ) {
+			return '';
+		}
 		ic_save_global( 'force_location_selector_popup', 1 );
 		$customer_id = ic_get_logged_customer_id();
 		if ( is_ic_digital_customer( $customer_id ) ) {

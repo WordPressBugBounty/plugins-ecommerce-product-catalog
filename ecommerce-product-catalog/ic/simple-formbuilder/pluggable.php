@@ -51,6 +51,13 @@ if ( ! function_exists( 'ic_htmlize_email' ) ) {
 	 * @global string $ic_mail_content
 	 */
 	function ic_htmlize_email( $message, $title, $sender_name, $outside = '' ) {
+		if ( function_exists( 'ic_email_design_render' ) ) {
+			$modern = ic_email_design_render( $message, $title, $sender_name, $outside );
+			if ( null !== $modern ) {
+				return $modern;
+			}
+		}
+
 		$htmlized  = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -397,6 +404,25 @@ if ( ! function_exists( 'ic_email_button' ) ) {
 }
 
 if ( ! function_exists( 'ic_mail' ) ) {
+	/** Convert a message using this transport's plain-text delivery rules. */
+	function ic_mail_plain_message( $message, $previous_messages = '' ) {
+		$message = wp_specialchars_decode( wp_strip_all_tags(
+			str_replace(
+				array( '<br>', '</p>', '<ul>' ),
+				array(
+				"\r\n",
+				"\r\n",
+				"\r\n",
+				),
+				$message
+			)
+		), ENT_QUOTES );
+		if ( ! empty( $previous_messages ) ) {
+			$message .= $previous_messages;
+		}
+		return $message;
+	}
+
 	add_action( 'ic_mail_background_send', 'ic_mail', 10, 12 );
 	/**
 	 * Sends email using SMTP settings.
@@ -418,6 +444,17 @@ if ( ! function_exists( 'ic_mail' ) ) {
 	 * @return bool
 	 */
 	function ic_mail( $message, $sender_name, $sender_email, $receiver_email, $title, $template = true, $attachments = array(), $headers = array(), $smtp = '', $imap = null, $reply_to = null, $previous_messages = '', $immediate = false ) {
+		/**
+		 * Short-circuit delivery when a consumer durably takes responsibility for it.
+		 *
+		 * @param bool|null $result Null continues normal delivery; boolean is the result.
+		 * @param array     $args   All original positional delivery arguments.
+		 */
+		$pre = apply_filters( 'ic_pre_mail', null, array( $message, $sender_name, $sender_email, $receiver_email, $title, $template, $attachments, $headers, $smtp, $imap, $reply_to, $previous_messages, $immediate ) );
+		if ( null !== $pre ) {
+			return (bool) $pre;
+		}
+
 		if ( ic_is_message_spam( $sender_name, $sender_email, $message ) ) {
 			return false;
 		}
@@ -534,20 +571,7 @@ if ( ! function_exists( 'ic_mail' ) ) {
 			add_filter( 'wp_mail_content_type', 'ic_mail_set_html' );
 			$message = ic_htmlize_email( $message, $title, $sender_name, $previous_messages );
 		} else {
-			$message = wp_specialchars_decode( wp_strip_all_tags(
-				str_replace(
-					array( '<br>', '</p>', '<ul>' ),
-					array(
-						"\r\n",
-						"\r\n",
-						"\r\n",
-					),
-					$message
-				)
-			), ENT_QUOTES );
-			if ( ! empty( $previous_messages ) ) {
-				$message .= $previous_messages;
-			}
+			$message = ic_mail_plain_message( $message, $previous_messages );
 		}
 
 		$result = wp_mail( $receiver_email, $title, $message, $headers, $attachments );

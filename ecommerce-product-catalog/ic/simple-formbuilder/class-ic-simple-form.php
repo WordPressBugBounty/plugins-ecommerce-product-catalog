@@ -276,6 +276,32 @@ class IC_Simple_Form {
 	 * @param array       $style                 Inline style rules.
 	 * @param array       $smtp                  SMTP configuration.
 	 */
+	/** Compose one resolved field row for delivery or a generated preview. */
+	public static function compose_email_row( $field, $value, $field_id, $line ) {
+		$row = $field->label . ': ' . $value . $line;
+		return $row;
+	}
+
+	/** Generate a body through the shipping field-row formatter without form actions. */
+	public static function preview_body( $json, $line = '<br>', $values = array(), $pre_name = '' ) {
+		$form = json_decode( $json );
+		if ( empty( $form->fields ) || ! is_array( $form->fields ) ) { return ''; }
+		$message = '';
+		foreach ( $form->fields as $field ) {
+			if ( in_array( $field->field_type, array( 'file', 'section_break' ), true ) ) { continue; }
+			$value = $values[ $field->cid ] ?? ( 'email' === $field->field_type ? 'anna@example.invalid' : 'Sample ' . wp_strip_all_tags( $field->label ?? '' ) );
+			$options = array();
+			foreach ( (array) ( $field->field_options->options ?? array() ) as $option ) {
+				$options[ $option->value ?? $option->label ] = $option->label;
+			}
+			if ( $options && ! array_key_exists( $field->cid, $values ) ) { $value = reset( $options ); }
+			$value = is_array( $value ) ? implode( ', ', array_map( static function ( $entry ) use ( $options ) { return $options[ $entry ] ?? $entry; }, $value ) ) : ( $options[ $value ] ?? $value );
+			$value = function_exists( 'ic_formbuilder_is_multiline_field' ) && ic_formbuilder_is_multiline_field( $field ) ? nl2br( sanitize_textarea_field( $value ) ) : sanitize_text_field( $value );
+			$message .= self::compose_email_row( $field, $value, $pre_name . $field->cid, $line );
+		}
+		return $message;
+	}
+
 	public function __construct(
 		$form_fields,
 		$pre_name = 'ic_form_',
@@ -611,7 +637,7 @@ class IC_Simple_Form {
 				$field_value = nl2br( $field_value );
 			}
 
-			$message .= $field->label . ': ' . $field_value . $this->line;
+			$message .= self::compose_email_row( $field, $field_value, $field_id, $this->line );
 			if ( 'email' === $field->field_type && ! empty( $field_value ) && is_email( $field_value ) ) {
 				$this->customer_email = $field_value;
 				if ( empty( $this->message_sender_name ) ) {

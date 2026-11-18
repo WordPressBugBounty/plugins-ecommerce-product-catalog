@@ -23,6 +23,9 @@ add_action( 'general_submenu', 'shopping_cart_menu' );
 
 function shopping_cart_settings() {
 	register_setting( 'shopping_cart', 'shopping_cart_settings', array( 'sanitize_callback' => 'ic_sanitize_shopping_cart_settings' ) );
+	if ( class_exists( 'IC_Settings_Lock' ) ) {
+		IC_Settings_Lock::protect_option( 'shopping_cart_settings' );
+	}
 	register_setting( 'checkout_form', 'shopping_checkout_form', array( 'sanitize_callback' => 'ic_sanitize_shopping_checkout_form' ) );
 	register_setting( 'checkout_form', 'cart_form_editor_settings', array( 'sanitize_callback' => 'ic_sanitize_cart_form_editor_settings' ) );
 	do_action( 'shopping_cart_settings' );
@@ -257,10 +260,25 @@ function shopping_cart_settings_content() {
 					implecode_settings_text( __( 'Email to receive orders', 'ecommerce-product-catalog' ), 'shopping_cart_settings[receive_cart]', $shopping_cart_settings['receive_cart'] );
 					implecode_settings_text( __( 'Email to send confirmations', 'ecommerce-product-catalog' ), 'shopping_cart_settings[send_cart]', $shopping_cart_settings['send_cart'] );
 					implecode_settings_text( __( 'Your name in emails', 'ecommerce-product-catalog' ), 'shopping_cart_settings[cart_name]', $shopping_cart_settings['cart_name'] );
-					implecode_settings_text( __( 'Admin Email Subject', 'ecommerce-product-catalog' ), 'shopping_cart_settings[admin_email_subject]', $shopping_cart_settings['admin_email_subject'] );
-					implecode_settings_textarea( __( 'Admin Email template', 'ecommerce-product-catalog' ), 'shopping_cart_settings[admin_email]', $shopping_cart_settings['admin_email'] );
-					implecode_settings_text( __( 'User Email Subject', 'ecommerce-product-catalog' ), 'shopping_cart_settings[user_email_subject]', $shopping_cart_settings['user_email_subject'] );
-					implecode_settings_textarea( __( 'User Email template', 'ecommerce-product-catalog' ), 'shopping_cart_settings[user_email]', $shopping_cart_settings['user_email'] );
+					// Each email's subject and text are edited in Email Design; the legacy fields remain when it is not editable there.
+					$email_kind = class_exists( 'IC_Cart_Email_Design' ) ? IC_Cart_Email_Design::kind() : 'order';
+					$email_rows = 0;
+					foreach ( array( 'admin', 'user' ) as $email_role ) {
+						$email_row = function_exists( 'ic_email_design_settings_row' ) ? ic_email_design_settings_row( $email_kind . ( 'admin' === $email_role ? '_admin' : '' ) ) : '';
+						if ( '' !== $email_row ) {
+							echo $email_row; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped row markup.
+							++$email_rows;
+						} elseif ( 'admin' === $email_role ) {
+							implecode_settings_text( __( 'Admin Email Subject', 'ecommerce-product-catalog' ), 'shopping_cart_settings[admin_email_subject]', $shopping_cart_settings['admin_email_subject'] );
+							implecode_settings_textarea( __( 'Admin Email template', 'ecommerce-product-catalog' ), 'shopping_cart_settings[admin_email]', $shopping_cart_settings['admin_email'] );
+						} else {
+							implecode_settings_text( __( 'User Email Subject', 'ecommerce-product-catalog' ), 'shopping_cart_settings[user_email_subject]', $shopping_cart_settings['user_email_subject'] );
+							implecode_settings_textarea( __( 'User Email template', 'ecommerce-product-catalog' ), 'shopping_cart_settings[user_email]', $shopping_cart_settings['user_email'] );
+						}
+					}
+					if ( $email_rows && function_exists( 'ic_email_design_settings_note' ) ) {
+						echo ic_email_design_settings_note(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped row markup.
+					}
 					?>
 				</table>
 				<h3><?php esc_html_e( 'Form Settings', 'ecommerce-product-catalog' ); ?></h3>
@@ -289,7 +307,28 @@ function shopping_cart_settings_content() {
 					?>
 				</table>
 				<h3><?php esc_html_e( 'Cart Widget', 'ecommerce-product-catalog' ); ?></h3>
-				<table><?php implecode_settings_checkbox( __( 'Stick cart on top on scroll', 'ecommerce-product-catalog' ), 'shopping_cart_settings[stick_cart]', $shopping_cart_settings['stick_cart'] ); ?>
+				<table>
+				<?php
+				$stick_lock = class_exists( 'IC_Settings_Lock' ) ? IC_Settings_Lock::field_lock( 'shopping_cart_settings[stick_cart]' ) : null;
+				if ( $stick_lock && IC_Settings_Lock::is_locked( $stick_lock['feature'] ) ) {
+					$stick_cart = $shopping_cart_settings['stick_cart'];
+					$stick_row  = IC_Settings_Lock::row(
+						array(
+							'label'      => __( 'Stick cart on top on scroll', 'ecommerce-product-catalog' ),
+							'field'      => 'shopping_cart_settings[stick_cart]',
+							'feature'    => $stick_lock['feature'],
+							'extensions' => $stick_lock['extensions'],
+							'control'    => static function ( $attributes ) use ( $stick_cart ) {
+								return '<input type="checkbox" name="shopping_cart_settings[stick_cart]" value="1" ' . checked( 1, $stick_cart, false ) . $attributes . '/>';
+							},
+						)
+					);
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped at this point.
+					echo $stick_row;
+				} else {
+					implecode_settings_checkbox( __( 'Stick cart on top on scroll', 'ecommerce-product-catalog' ), 'shopping_cart_settings[stick_cart]', $shopping_cart_settings['stick_cart'] );
+				}
+				?>
 				</table>
 				<?php
 				do_action( 'shopping-cart-settings', $shopping_cart_settings );

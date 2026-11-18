@@ -431,26 +431,62 @@ function ic_order_completed_message( $order_id, $payment_details, $order_product
 	$site_name      = get_easy_order_sitename();
 	$attachments    = array();
 	$attachment     = apply_filters( 'digital_order_attachments', $attachments, $order_id );
-	$p              = ic_email_paragraph();
-	$ep             = ic_email_paragraph_end();
-	$message        = str_replace(
-		array(
-			'[customer_name]',
-			'[site_name]',
-			'[system_message_notes]',
-		),
-		array(
-			trim( $payment_details['name'] ),
-			$site_name,
-			apply_filters( 'digital_order_message_intro', '', $order_id ),
-		),
-		$shopping_cart_settings['complete_email']
-	);
-	$message        = shortcode_unautop( wpautop( $message ) );
-	$message        = str_replace( array( '<p>', '</p>' ), array( $p, $ep ), $message );
-	$email_title    = ! empty( $shopping_cart_settings['complete_email_subject'] ) ? $shopping_cart_settings['complete_email_subject'] : __( 'Order Completed', 'ecommerce-product-catalog' );
-	ic_mail( do_shortcode( $message ), $site_name, $admin_email, $customer_email, $email_title, true, $attachment );
+	$sample = ic_compose_order_completed_message( $shopping_cart_settings, $payment_details['name'], $site_name, apply_filters( 'digital_order_message_intro', '', $order_id ) );
+	ic_mail( $sample['body'], $site_name, $admin_email, $customer_email, $sample['subject'], true, $attachment );
 }
+
+/**
+ * Compose an order notification from values resolved by its owner.
+ *
+ * @param array  $settings Message settings.
+ * @param string $customer_name Customer display name.
+ * @param string $site_name Store name.
+ * @param string $notes Already resolved system notes.
+ * @return array
+ */
+function ic_compose_order_completed_message( $settings, $customer_name, $site_name, $notes = '' ) {
+	$message = str_replace(
+		array( '[customer_name]', '[site_name]', '[system_message_notes]' ),
+		array( trim( $customer_name ), $site_name, $notes ),
+		$settings['complete_email']
+	);
+	$message = shortcode_unautop( wpautop( $message ) );
+	$message = str_replace( array( '<p>', '</p>' ), array( ic_email_paragraph(), ic_email_paragraph_end() ), $message );
+	return array(
+		'body' => do_shortcode( $message ),
+		'subject' => ! empty( $settings['complete_email_subject'] ) ? $settings['complete_email_subject'] : __( 'Order Completed', 'ecommerce-product-catalog' ),
+	);
+}
+
+/** Register only an explicitly enabled, owner-described completion message. */
+function ic_order_completed_design_preview( $previews ) {
+	if ( ! function_exists( 'get_shopping_cart_settings' ) ) {
+		return $previews;
+	}
+	$settings = get_shopping_cart_settings();
+	$details = array( 'name' => 'Anna Sample', 'email' => 'anna@example.invalid', 'shipping_email' => 'anna@example.invalid' );
+	if ( empty( $settings['complete_email'] ) || ! apply_filters( 'ic_orders_enable_completion_message', false, 0, $details, array(), array() ) ) {
+		return $previews;
+	}
+	$metadata = apply_filters( 'ic_email_design_completion_definition', array() );
+	if ( empty( $metadata['plugin'] ) || empty( $metadata['group'] ) ) {
+		return $previews;
+	}
+	$previews['order_completed'] = array_merge( $metadata, array(
+		'label' => __( 'Order completed', 'ecommerce-product-catalog' ),
+		'recipient' => 'customer',
+		'order' => 60,
+		'read' => static function () use ( $settings ) {
+			return array( 'body' => $settings['complete_email'] );
+		},
+		'callback' => static function () use ( $settings, $details ) {
+			$notes = apply_filters( 'ic_email_design_completion_sample_notes', '', $details );
+			return ic_compose_order_completed_message( $settings, $details['name'], get_easy_order_sitename(), $notes );
+		},
+	) );
+	return $previews;
+}
+add_filter( 'ic_email_design_previews', 'ic_order_completed_design_preview' );
 
 function ic_format_vat_address( $address ) {
 	if ( ! empty( $address ) ) {

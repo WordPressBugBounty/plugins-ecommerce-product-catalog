@@ -209,6 +209,7 @@ AND wposts.post_status = %s",
 	if ( is_numeric( $trans_id ) ) {
 		$check_trans_id = get_post_meta( $trans_id, '_order_id', true );
 		if ( ! empty( $check_trans_id ) ) {
+			ic_save_global( 'trans_id_to_order_id_' . $trans_id, $trans_id );
 			return $trans_id;
 		}
 	}

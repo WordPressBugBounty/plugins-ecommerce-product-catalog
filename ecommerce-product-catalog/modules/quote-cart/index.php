@@ -193,7 +193,7 @@ class ic_simple_quote_cart {
 	 *
 	 * @return string
 	 */
-	function modify_admin_email( $message, $pre_name ) {
+	public function modify_admin_email( $message, $pre_name, $sample = null ) {
 		if ( $pre_name == 'cart_' ) {
 			$email_settings = get_shopping_cart_settings();
 
@@ -201,12 +201,19 @@ class ic_simple_quote_cart {
 			$ep          = ic_email_paragraph_end();
 			$new_message = wpautop( $email_settings['admin_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
-			$order_data  = $this->products_summary( 'admin' );
+			$order_data  = ( null !== $sample ? $sample['products'] : $this->products_summary( 'admin' ) );
 			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
 			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
-			return $new_message;
+			if ( null !== $sample ) {
+				$new_message = strtr( $new_message, $sample['tokens'] );
+			}
+			if ( class_exists( 'IC_Email_Design' ) && ( false !== strpos( $new_message, '[order_summary]' ) || false !== strpos( $new_message, '[order_button]' ) ) ) {
+				$context     = null !== $sample ? $sample['order'] : apply_filters( 'ic_email_design_message_context', array(), 'inquiry' );
+				$new_message = IC_Email_Design::replace_order_tokens( $new_message, $context );
+			}
+			return class_exists( 'IC_Email_Design' ) ? IC_Email_Design::message_heading( $new_message, 'inquiry_admin' ) : $new_message;
 		}
 
 		return $message;
@@ -220,7 +227,7 @@ class ic_simple_quote_cart {
 	 *
 	 * @return string
 	 */
-	function modify_user_email( $message, $pre_name ) {
+	public function modify_user_email( $message, $pre_name, $sample = null ) {
 		if ( $pre_name == 'cart_' ) {
 			$email_settings = get_shopping_cart_settings();
 
@@ -228,12 +235,19 @@ class ic_simple_quote_cart {
 			$ep          = ic_email_paragraph_end();
 			$new_message = wpautop( $email_settings['user_email'] );
 			$new_message = str_replace( '<p>', $p, $new_message );
-			$order_data  = $this->products_summary( 'user' );
+			$order_data  = ( null !== $sample ? $sample['products'] : $this->products_summary( 'user' ) );
 			// $order_data    .= $p . trim( $message, "<br>" ) . $ep;
 			$order_data .= $p . $message . $ep;
 			$new_message = str_replace( '[customer_details]', $order_data, $new_message );
 
-			return $new_message;
+			if ( null !== $sample ) {
+				$new_message = strtr( $new_message, $sample['tokens'] );
+			}
+			if ( class_exists( 'IC_Email_Design' ) && ( false !== strpos( $new_message, '[order_summary]' ) || false !== strpos( $new_message, '[order_button]' ) ) ) {
+				$context     = null !== $sample ? $sample['order'] : apply_filters( 'ic_email_design_message_context', array(), 'inquiry' );
+				$new_message = IC_Email_Design::replace_order_tokens( $new_message, $context );
+			}
+			return class_exists( 'IC_Email_Design' ) ? IC_Email_Design::message_heading( $new_message, 'inquiry' ) : $new_message;
 		}
 
 		return $message;
@@ -248,6 +262,8 @@ class ic_simple_quote_cart {
 	 * @return string
 	 */
 	function products_summary( $who = '' ) {
+		$modern         = class_exists( 'IC_Email_Design' ) && 'modern' === IC_Email_Design::options()['layout'];
+		$modern_amounts = array();
 		$cart_content   = ic_shopping_cart_content( true );
 		$products_array = shopping_cart_products_array( $cart_content );
 		$pre_message    = '';
@@ -272,6 +288,9 @@ class ic_simple_quote_cart {
 		$total_tax                        = 0;
 		foreach ( $products_array as $cart_id => $p_quantity ) {
 			$product_id   = cart_id_to_product_id( $cart_id );
+			if ( $modern ) {
+				$modern_amounts[] = price_format( floatval( get_shopping_cart_product_price( $product_id, $cart_id, $p_quantity ) ) * $p_quantity, 1 );
+			}
 			$pre_message .= ic_email_table_tr();
 			$pre_message .= apply_filters( 'ic_cart_checkout_email_name_td', ic_email_table_td_first() . apply_filters( 'cart_email_product_name', html_entity_decode( get_the_title( $product_id ), ENT_QUOTES, get_bloginfo( 'charset' ) ), $product_id, $cart_id ) . ic_email_table_td_end(), $product_id );
 			if ( function_exists( 'is_ic_sku_enabled' ) && is_ic_sku_enabled() ) {
@@ -284,6 +303,16 @@ class ic_simple_quote_cart {
 		$pre_message .= ic_email_table_end();
 		$p            = ic_email_paragraph();
 		$ep           = ic_email_paragraph_end();
+		$pre_message  = $modern ? IC_Email_Design::modern_product_summary(
+			$pre_message,
+			array(
+				'headers'  => array( __( 'Product name', 'ecommerce-product-catalog' ), __( 'Quantity', 'ecommerce-product-catalog' ) ),
+				'rows'     => count( $products_array ),
+				'quantity' => 1,
+				'amount'   => null,
+				'amounts'  => $modern_amounts,
+			)
+		) : $pre_message;
 		$pre_message  = apply_filters( 'cart_checkout_' . $who . '_product_data', $pre_message, $order_total, $total_tax, $p, $ep, $line );
 
 		return $pre_message;

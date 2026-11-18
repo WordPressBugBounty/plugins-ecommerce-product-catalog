@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once AL_BASE_PATH . '/includes/settings/settings-functions.php';
+require_once AL_BASE_PATH . '/includes/settings/class-ic-settings-lock.php';
 require_once AL_BASE_PATH . '/includes/settings/tooltips.php';
 
 require_once AL_BASE_PATH . '/includes/settings/general.php';
@@ -25,3 +26,5 @@ require_once AL_BASE_PATH . '/includes/settings/csv.php';
 require_once AL_BASE_PATH . '/includes/settings/image-sizes.php';
 require_once AL_BASE_PATH . '/includes/settings/extension-info.php';
 require_once AL_BASE_PATH . '/includes/settings/search.php';
+
+require_once AL_BASE_PATH . '/includes/settings/class-ic-email-design-settings.php';

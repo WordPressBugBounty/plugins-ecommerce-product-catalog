@@ -1,0 +1,86 @@
+.ic-email-design-columns{display:grid;grid-template-columns:minmax(320px,1fr) minmax(280px,1fr);gap:28px;align-items:start;max-width:1320px;margin-top:18px}.ic-email-design-card{background:#fff;border:1px solid #c3c4c7;padding:4px 20px 18px;box-sizing:border-box;min-width:0}.ic-email-design-card h2{font-size:15px;margin:16px 0 4px}.ic-email-design-card .description{font-size:12.5px;line-height:1.5;color:#646970;margin:5px 0 10px}.ic-email-design-row{display:grid;grid-template-columns:140px minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid #f0f0f1;align-items:start}.ic-email-design-label{font-weight:600;font-size:14px;padding-top:5px}.ic-email-radio{display:block;margin:4px 0;font-size:14px}.ic-email-dim .ic-email-design-row>div,.ic-email-dim .ic-email-design-label{opacity:.6}.ic-email-dim-note{background:#f6f7f7;border:1px solid #dcdcde;border-radius:3px;padding:8px 10px;color:#50575e;font-size:12.5px;margin:4px 0 0}.ic-email-design-card input[type=text]:not(.wp-color-picker),.ic-email-design-card input[type=url],.ic-email-design-card textarea{width:100%;box-sizing:border-box}.ic-email-design-card input[type=url]{margin-top:6px}.ic-email-logo-control{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 0}#ic-email-logo-preview{width:120px;min-height:36px;border:1px dashed #8c8f94;display:flex;align-items:center;justify-content:center;color:#646970;font-size:12px;background:#f6f7f7}#ic-email-logo-preview img{max-width:120px;max-height:36px;width:auto;height:auto}.ic-email-design-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}.ic-email-design-actions .button{white-space:normal;height:auto}.ic-email-preview-title{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin:0 0 10px}.ic-email-preview-title select{max-width:100%}.ic-email-design-preview{min-width:0}#ic-email-preview{width:100%;height:680px;border:1px solid #dcdcde;border-radius:6px;background:#f4f5f7;box-sizing:border-box}#ic-email-contrast-warning{color:#8a2424;font-weight:600}.ic-email-design-card .wp-picker-container{vertical-align:middle}.ic-email-design-card .wp-picker-input-wrap input{width:70px}.ic-email-design-card .wp-picker-container .button{margin-left:4px}@media(max-width:1050px){.ic-email-design-columns{grid-template-columns:1fr}.ic-email-design-preview{max-width:700px}}@media(max-width:600px){.ic-email-design-card{padding:4px 14px 18px}.ic-email-design-row{grid-template-columns:1fr;gap:4px}.ic-email-design-columns{gap:20px}.ic-email-preview-title{flex-wrap:wrap}.ic-email-preview-title select{max-width:100%}#ic-email-preview{height:740px}}
+.ic-email-dim-note{display:none}.ic-email-dim .ic-email-dim-note{display:block}
+
+.ic-email-design-actions .ic-email-design-test{max-width:100%;padding:6px 12px;line-height:1.4;min-height:32px;overflow-wrap:anywhere}
+.ic-email-design-test-recipient{display:inline-block;max-width:100%;overflow-wrap:anywhere}
+.ic-email-preview-viewport{width:100%;overflow:hidden;min-width:0}
+.ic-email-preview-viewport #ic-email-preview{display:block;width:100%;transform:none}
+
+
+body.ic-email-design-screen #implecode_settings>.table{display:block;width:100%}
+
+#implecode_settings .ic-email-design-content{min-width:0;max-width:none;box-sizing:border-box}.ic-email-custom-notice{background:#fcf9e8;border:1px solid #dba617;border-left-width:4px;padding:9px 11px;font-size:13px;line-height:1.5}.ic-email-custom-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}.ic-email-custom-row .button-link{margin-right:8px}.ic-email-before-after{display:grid;grid-template-columns:1fr 1fr;gap:20px}.ic-email-before-after pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:400px;max-height:50vh;overflow:auto}#ic-email-template-dialog{max-width:90vw;border:1px solid #8c8f94;padding:24px}#ic-email-template-dialog::backdrop{background:#0007}@media(max-width:600px){.ic-email-before-after{grid-template-columns:1fr}}
+
+/* Use the available design-page width instead of shrink-wrapped table cells. */
+body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings{display:grid;grid-template-columns:180px minmax(0,1fr);width:100%;table-layout:auto;box-sizing:border-box}
+body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.settings-submenu{display:block;width:auto;min-width:0}
+body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.settings-submenu h3{width:auto}
+body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.ic-email-design-content{display:block;width:auto;min-width:0;padding:0 0 0 20px}
+.ic-email-design-columns{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:22px;width:100%}
+.ic-email-design-row{grid-template-columns:105px minmax(0,1fr);gap:10px}
+@media(max-width:1100px){.ic-email-design-columns{grid-template-columns:1fr}}
+@media(max-width:782px){body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings{grid-template-columns:minmax(0,1fr)}body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.settings-submenu{display:flex;flex-wrap:wrap;gap:4px 12px;border-right:0;border-bottom:1px solid #ccc;padding-bottom:10px;margin-top:0}body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.settings-submenu h3{margin:0}body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings>.ic-email-design-content{padding:0}.ic-email-design-row{grid-template-columns:minmax(0,1fr)}}
+/* The settings router writes an inline table-row display when selecting a tab. */
+body.ic-email-design-screen #implecode_settings .settings-wrapper.design-product-settings{display:grid!important}
+
+/* Keep both picker panels outside the settings flow, including narrow screens. */
+.ic-email-design-card,.ic-email-design-content,.ic-email-design-columns{overflow:visible}
+.ic-email-design-card .wp-picker-container{position:relative}
+.ic-email-design-card .wp-picker-input-wrap{position:absolute;left:0;top:100%;z-index:1002;box-sizing:border-box;width:257px;padding:8px 8px 0;background:#fff;border:1px solid #c3c4c7;border-bottom:0}
+.ic-email-design-card .wp-picker-holder{position:absolute;left:0;top:calc(100% + 40px);z-index:1001}
+.ic-email-design-card .wp-picker-holder .iris-picker{margin-top:0}
+.ic-email-preview-viewport{position:relative}
+.ic-email-preview-frame{display:block;width:100%;border:1px solid #dcdcde;border-radius:6px;background:#f4f5f7;box-sizing:border-box}
+.ic-email-preview-frame.ic-email-preview-buffer{position:absolute;left:0;top:0;visibility:hidden;pointer-events:none}
+.ic-email-design-actions .spinner{float:none;margin:0;flex-shrink:0}
+#ic-email-test-result{flex-basis:100%;overflow-wrap:anywhere}
+.ic-email-header-option-fields{margin-left:22px}
+.ic-email-header-option-fields[hidden]{display:none}
+.ic-email-header-text{margin:4px 0 0;width:100%!important}
+
+/* Edit content: chooser row, popup over the settings column, inline no-JS form. */
+.ic-email-preview-choose{display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:100%}
+.ic-email-preview-choose select{min-width:0;max-width:100%}
+.ic-email-preview-choose .button[hidden]{display:none}
+.ic-email-content{background:#fff;border:1px solid #c3c4c7;padding:4px 20px 18px;margin:16px 0 0;box-sizing:border-box;min-width:0}
+.ic-email-content[hidden]{display:none}
+/* With JS (WP admin swaps body no-js -> js before first paint) the editor only opens as a popup; the inline no-JS form never paints. */
+.js .ic-email-content:not(.ic-email-content-popup){display:none}
+.ic-email-content-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ic-email-content-head h2{font-size:15px;margin:16px 0 8px;overflow-wrap:anywhere}
+.ic-email-content-close{background:none;border:0;padding:4px 8px;font-size:22px;line-height:1;color:#50575e;cursor:pointer}
+.ic-email-content-close:hover,.ic-email-content-close:focus{color:#1d2327}
+.ic-email-content-close[hidden],.ic-email-content-switch[hidden],.ic-email-content-field[hidden],.ic-email-content-tokens[hidden],.ic-email-content-default[hidden]{display:none}
+.ic-email-content-field{padding:10px 0 0}
+.ic-email-content-field label{display:block;font-weight:600;font-size:14px;margin:0 0 4px}
+.ic-email-content-field input[type=text],.ic-email-content-field textarea{width:100%;box-sizing:border-box}
+.ic-email-content-field textarea{min-height:220px;line-height:1.5}
+.ic-email-content-field .description,.ic-email-content>form>.description{font-size:12.5px;line-height:1.5;color:#646970;margin:5px 0 0}
+.ic-email-content-tokens p{margin:10px 0 6px;font-size:13px}
+.ic-email-content-token-list{display:flex;flex-wrap:wrap;gap:6px}
+.ic-email-content-token-list .ic-email-token{font-family:Consolas,Monaco,monospace;font-size:12px}
+.ic-email-content-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.ic-email-content-buttons{display:flex;gap:8px;margin-left:auto}
+.ic-email-content-status{margin:8px 0 0;color:#8a2424;font-weight:600}
+.ic-email-content-status:empty{display:none}
+.ic-email-content-switch{display:none}
+.ic-email-content-dirty{background:#fff8c5;border:1px solid #e6c75c;border-radius:3px;padding:6px 10px;font-size:12.5px;line-height:1.5;margin:8px 0 0}
+.ic-email-content-dirty[hidden]{display:none}
+#ic-email-content-result:empty{display:none}
+#ic-email-content-result{font-weight:600;color:#00692c}
+.ic-email-design-columns.ic-email-content-open>#ic-email-design-form{grid-column:1;grid-row:1}
+.ic-email-design-columns.ic-email-content-open>.ic-email-design-preview{grid-column:2;grid-row:1}
+.ic-email-content.ic-email-content-popup{grid-column:1;grid-row:1;z-index:20;margin:0;align-self:stretch;box-shadow:0 4px 18px rgba(0,0,0,.16)}
+@media(max-width:1100px){.ic-email-design-columns.ic-email-content-open>.ic-email-design-preview{grid-column:1;grid-row:2}}
+@media(max-width:782px){
+.ic-email-content.ic-email-content-popup{position:fixed;top:46px;left:0;right:0;bottom:0;z-index:100000;overflow:auto;padding:0 14px 18px;border:0;box-shadow:none}
+.ic-email-content-popup .ic-email-content-head{position:sticky;top:0;z-index:2;background:#fff;flex-wrap:wrap;padding-top:4px}
+.ic-email-content-popup .ic-email-content-switch{display:flex;align-items:center;gap:8px;position:sticky;top:52px;z-index:2;background:#fff;padding:8px 0;border-bottom:1px solid #f0f0f1;font-weight:600}
+.ic-email-content-popup .ic-email-content-switch[hidden]{display:none}
+.ic-email-content-popup .ic-email-content-switch input{margin:0}
+.ic-email-content-popup .ic-email-content-buttons{margin-left:0}
+body.ic-email-content-preview-on .ic-email-content.ic-email-content-popup{bottom:auto;overflow:visible}
+body.ic-email-content-preview-on .ic-email-content-popup form>:not(.ic-email-content-head):not(.ic-email-content-switch){display:none}
+body.ic-email-content-preview-on .ic-email-content-popup .ic-email-content-switch{position:static}
+body.ic-email-content-preview-on .ic-email-design-columns.ic-email-content-open>.ic-email-design-preview{position:fixed;left:0;right:0;bottom:0;top:var(--ic-email-content-head,140px);z-index:100000;overflow:auto;background:#fff;padding:10px 14px}
+}

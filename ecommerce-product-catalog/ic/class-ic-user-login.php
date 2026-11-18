@@ -85,10 +85,18 @@ class IC_User_Login {
 		$this->login_redirect = $login_redirect;
 		$this->collect_phone  = (bool) $collect_phone;
 		if ( file_exists( __DIR__ . '/user-functions.php' ) ) {
-			require_once __DIR__ . '/user-functions.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/user-functions.php' );
+			} else {
+				require_once __DIR__ . '/user-functions.php';
+			}
 		}
 		if ( ! class_exists( 'IC_Html_Util' ) && file_exists( __DIR__ . '/class-ic-html-util.php' ) ) {
-			require_once __DIR__ . '/class-ic-html-util.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-html-util.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-html-util.php';
+			}
 		}
 		$this->enable_features( $registration, $guest_login );
 
@@ -127,16 +135,32 @@ class IC_User_Login {
 			return;
 		}
 		if ( ! class_exists( 'IC_Confirmation_Transient' ) && file_exists( __DIR__ . '/class-ic-confirmation-transient.php' ) ) {
-			require_once __DIR__ . '/class-ic-confirmation-transient.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-confirmation-transient.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-confirmation-transient.php';
+			}
 		}
 		if ( ! class_exists( 'IC_Email_Templates' ) && file_exists( __DIR__ . '/class-ic-email-templates.php' ) ) {
-			require_once __DIR__ . '/class-ic-email-templates.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-email-templates.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-email-templates.php';
+			}
 		}
 		if ( ! class_exists( 'IC_Email_Template' ) && file_exists( __DIR__ . '/class-ic-email-template.php' ) ) {
-			require_once __DIR__ . '/class-ic-email-template.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-email-template.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-email-template.php';
+			}
 		}
 		if ( ! class_exists( 'IC_User_Registration' ) && file_exists( __DIR__ . '/class-ic-user-registration.php' ) ) {
-			require_once __DIR__ . '/class-ic-user-registration.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-user-registration.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-user-registration.php';
+			}
 		}
 		if ( class_exists( 'IC_User_Registration' ) ) {
 			$this->registration = new IC_User_Registration( $this->collect_phone );
@@ -155,7 +179,11 @@ class IC_User_Login {
 			return;
 		}
 		if ( ! class_exists( 'IC_Guest_Login' ) && file_exists( __DIR__ . '/class-ic-guest-login.php' ) ) {
-			require_once __DIR__ . '/class-ic-guest-login.php';
+			if ( function_exists( 'ic_framework_require_once' ) ) {
+				ic_framework_require_once( __DIR__ . '/class-ic-guest-login.php' );
+			} else {
+				require_once __DIR__ . '/class-ic-guest-login.php';
+			}
 		}
 		if ( class_exists( 'IC_Guest_Login' ) ) {
 			$this->guest_login = new IC_Guest_Login();

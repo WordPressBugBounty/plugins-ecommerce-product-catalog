@@ -605,6 +605,8 @@ class IC_Settings_Search {
 	public function get_url( $option_name ) {
 		$registered_settings      = $this->get_settings();
 		$args['find_option_name'] = $option_name;
+		if ( 0 === strpos( $option_name, 'ic_email_design' ) ) {
+			return add_query_arg( $args, IC_Email_Design_Settings::url() ); }
 		if ( ! empty( $registered_settings[ $option_name ]['tab'] ) ) {
 			$args['tab'] = $registered_settings[ $option_name ]['tab'];
 		}
